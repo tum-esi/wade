@@ -1,12 +1,5 @@
 # w-ade TODO
 
-PRIOS: 
-3) Adding new Folders/ Tds / Mashups + Saving 
-4) Routing  Router with specific ids
-- State: save TDs to store -> get when specific TD is clicked
-5) Upload from PC, URL
-6) Add to gitlab & write introduction
-
 TODO 
 - Hide results and show results button when no interaction is selected
 - Array and Object type support -> Buggy
