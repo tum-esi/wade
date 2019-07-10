@@ -1,0 +1,29 @@
+import Vue from 'vue';
+import Router from 'vue-router';
+
+Vue.use(Router);
+
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: () => import ('@/components/04_templates/tHomePage.vue')
+    },
+    {
+      path: '/td/:id',
+      name: 'thingDescription',
+      component: () => import('@/components/04_templates/tThingDescription.vue')
+    },
+    {
+      path: '/folder/:id',
+      name: 'folder',
+      component: () => import('@/components/04_templates/tFolder.vue')
+    },
+    {
+      path: '/mashup/:id',
+      name: 'mashup',
+      component: () => import('@/components/04_templates/tMashup.vue')
+    },
+  ],
+});
