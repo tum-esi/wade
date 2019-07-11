@@ -27,7 +27,7 @@ export default Vue.extend({
     },
     methods: {
       openModuleAddElement(element: any) {
-        this.$emit('open-module-element', element);
+        this.$eventHub.$emit('open-modal-element', element);
     }
   }
 });

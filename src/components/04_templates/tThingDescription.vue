@@ -92,10 +92,8 @@ export default Vue.extend({
 
 .td-main {
     display: flex;
-    min-height: 400px;
-    height: 80%;
-    max-height: 800px;
-}
+    min-height: 500px;
+    }
 
 
 .td-main-left {

@@ -215,6 +215,7 @@ textarea:focus, input:focus{
 
 #main-content {
   width: 80%;
+  height: 600px;
 }
 
 </style>

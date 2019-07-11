@@ -84,6 +84,8 @@ export default Vue.extend({
         },
         openAccordingEvent(args) {
             this.td = args;
+            this.checkTd();
+            this.setNewCurrentTd({ id: this.id, td: this.td});
         },
         checkIfStoredTdAvailable() {
             let storedTd = this.getCurrentTd(this.id);
