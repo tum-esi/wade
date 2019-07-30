@@ -3,10 +3,10 @@ import { PossibleInteractionTypesEnum } from '@/util/enums';
 
 // Parses a consumed Td to Vue 'Interaction' Component readable data
 export default class TdParser {
-    private consumedTd: WoT.ConsumedThing;
+    private consumedTd: WoT.ConsumedThing | null;
     private parsedTd: any;
 
-    constructor(consumedTd: WoT.ConsumedThing | any) {
+    constructor(consumedTd: WoT.ConsumedThing | null) {
         this.consumedTd = consumedTd;
         this.parsedTd = {
             propertyInteractions: [],

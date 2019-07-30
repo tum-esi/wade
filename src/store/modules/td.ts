@@ -1,11 +1,17 @@
 import * as Api from '@/backend/Api';
-import { ElementTypeEnum } from '@/util/enums';
+import { RESULT_MESSAGES } from '@/util/texts';
+import { InteractionStateEnum, TdStateEnum } from '@/util/enums';
+import MessageHandler from '@/backend/MessageHandler';
 
 export default {
     namespaced: true,
     state: {
-        currentJSONTD: {},
-        parsedTd: {},
+        tdState: TdStateEnum.NO_TD,
+        tdEditor: {},
+        tdParsed: {},
+
+        interactionState: InteractionStateEnum.NO_INTERACTIONS,
+
         selectedInteractions: [],
         resultProps: [],
         resultActions: [],
@@ -64,16 +70,27 @@ export default {
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
-        async resetAll( { commit }) {
+        async processChangedTd({ commit }, payload: { td: string }) {
+            commit('setTdEditor', payload.td);
+
+            const parsedTd = await Api.consumeAndParseTd(payload.td);
+            commit('setTdState', parsedTd.tdState);
+
+            if (parsedTd.tdState !== TdStateEnum.VALID_TD) {
+                // TODO: activate message handler
+                const messageHandler = new MessageHandler(parsedTd.tdState, parsedTd.errorMsg).returnAccordingMessage();
+                return;
+            }
+            commit('setTdParsed', parsedTd.tdParsed);
+        },
+        async resetAll({ commit }) {
             await Api.resetAll();
         },
         async resetInteractions({ commit }) {
-            commit('setParsedTd', []);
             commit('setSelectedInteractions', []);
         },
         async resetSelectedInteractions({ commit }) {
             commit('setSelectedInteractions', []);
-            // TODO: unsubscribe
         },
         async resetResults({ commit }) {
             commit('removeResults', []);
@@ -82,9 +99,10 @@ export default {
         async getParsedTd({ commit }, payload) {
             const parsedTd = await Api.getParsedTd(payload.jsonTd);
             if (parsedTd.error) {
+                commit('setTdState', TdStateEnum.INVALID_TD);
                 return parsedTd.error;
             } else {
-                commit('setParsedTd', parsedTd);
+                commit('setTdState', TdStateEnum.VALID_TD);
                 return parsedTd;
             }
         },
@@ -103,7 +121,7 @@ export default {
             return selectedInteractions;
         },
         // Invoke all selected interaction
-        async invokeInteractions({commit, state}) {
+        async invokeInteractions({ commit, state }) {
             const selectedInteractions = state.selectedInteractions;
             const results = await Api.invokeInteractions(selectedInteractions);
             commit('setResultProps', results.resultProps);
@@ -112,20 +130,20 @@ export default {
         }
     },
     mutations: {
+        setTdState(state: any, payload: string) {
+            if (payload) state.tdState = payload;
+        },
+        setTdEditor(state: any, payload: string) {
+            if (payload) state.tdEditor = payload;
+        },
+        setTdParsed(state: any, payload: string) {
+            if (payload) state.tdParsed = payload;
+        },
+
         removeResults(state: any, payload: any) {
             state.resultProps = payload;
             state.resultActions = payload;
             state.resultEvents = payload;
-        },
-        setCurrentJSONTD(state: any, payload: any) {
-            state.currentJSONTD = payload;
-        },
-        setParsedTd(state: any, payload: any) {
-            if (!payload) {
-                state.parsedTd = {};
-            } else {
-                state.parsedTd = payload;
-            }
         },
         setSelectedInteractions(state: any, payload: any) {
             state.selectedInteractions = payload;
@@ -138,17 +156,31 @@ export default {
         },
         setResultEvents(state: any, payload: any) {
             state.resultEvents = payload;
+        },
+        setValidTd(state: any, payload: boolean) {
+            state.isValidTd = payload;
         }
     },
     getters: {
+        isValidTd(state: any) {
+            console.log('state: ', state.tdState);
+            return state.tdState === TdStateEnum.VALID_TD;
+        },
+        getTdState(state: any) {
+            return state.tdState;
+        },
+        getTdEditor(state: any) {
+            return state.jsonTd;
+        },
+        getTdParsed(state: any) {
+            return state.tdParsed;
+        },
+
+        areInteractionsInvoked(state: any) {
+            return state.areInteractionsInvoked;
+        },
         getTdTabbar(state: any) {
             return state.tdTabbar;
-        },
-        getParsedTd(state: any) {
-            return state.parsedTd;
-        },
-        getCurrentJSONTD(state: any) {
-            return state.currentJSONTD;
         },
         getSelectionBtn(state: any) {
             return state.tdSelectionBtn;
@@ -170,6 +202,17 @@ export default {
         },
         getResultEvents(state: any) {
             return state.resultEvents;
+        },
+        getResultText(state: any) {
+            if (!state.isValidTd) {
+                return '';
+            }
+            if (!state.areInteractionsSelected) {
+                return RESULT_MESSAGES.NO_INTERACTIONS_SELECTED;
+            }
+            if (!state.areInteractionsInvoked) {
+                return RESULT_MESSAGES.NO_INTERACTIONS_INVOKED;
+            }
         }
     }
 };

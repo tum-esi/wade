@@ -1,15 +1,25 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
-import { PossibleInteractionTypesEnum } from '@/util/enums';
+import { PossibleInteractionTypesEnum, TdStateEnum } from '@/util/enums';
 
-export async function getParsedTd(jsonTD: JSON) {
-    const consumedTdResponse = await new TdConsumer(jsonTD).getConsumedThing();
-    if (consumedTdResponse.error) {
-        // TODO: handling of errors instead of parsedTd
-        return consumedTdResponse.error;
-    } else {
-        return new TdParser(consumedTdResponse.consumedThing).getParsedTd();
+
+// Return vue-parsed td, td state information and possible errors
+export async function consumeAndParseTd(td: string) {
+    const consumedTd = await new TdConsumer(td).getConsumedTd();
+
+    if (consumedTd.tdState !== TdStateEnum.VALID_CONSUMED_TD) {
+        return {
+            tdParsed: null,
+            errorMsg: consumedTd.errorMsg,
+            tdState: consumedTd.tdState
+        };
     }
+    const parsedTd = new TdParser(consumedTd.tdConsumed).getParsedTd();
+    return {
+        tdParsed: parsedTd,
+        errorMsg: null,
+        tdState: TdStateEnum.VALID_TD
+    };
 }
 
 export async function resetAll() {
@@ -31,7 +41,7 @@ export async function invokeInteractions(selectedInteractions) {
             case PossibleInteractionTypesEnum.PROP_READ:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultProp =
-                    await selectedInteractions[interaction].interactionSelectBtn.interaction();
+                        await selectedInteractions[interaction].interactionSelectBtn.interaction();
                     resultProp = resultProp.error ? resultProp.error : resultProp;
                     resultProps.push({
                         resultType: PossibleInteractionTypesEnum.PROP_READ,
@@ -43,8 +53,8 @@ export async function invokeInteractions(selectedInteractions) {
             case PossibleInteractionTypesEnum.PROP_WRITE:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultProp =
-                    await selectedInteractions[interaction]
-                    .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
+                        await selectedInteractions[interaction]
+                            .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
                     resultProp = resultProp.error ? resultProp.error : resultProp;
                     resultProps.push({
                         resultType: PossibleInteractionTypesEnum.PROP_READ,
@@ -63,15 +73,15 @@ export async function invokeInteractions(selectedInteractions) {
                         resultValue: resultEvent
                     });
                     // TODO: push unsubscribe?
-                 }
+                }
                 break;
             case PossibleInteractionTypesEnum.EVENT_UNSUB:
                 break;
             case PossibleInteractionTypesEnum.ACTION:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultAction =
-                    await selectedInteractions[interaction]
-                    .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
+                        await selectedInteractions[interaction]
+                            .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
                     resultAction = resultAction.error ? resultAction.error : resultAction;
                     resultActions.push({
                         resultType: PossibleInteractionTypesEnum.ACTION,
@@ -85,7 +95,7 @@ export async function invokeInteractions(selectedInteractions) {
         }
     }
 
-    return  {
+    return {
         resultProps,
         resultActions,
         resultEvents

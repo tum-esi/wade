@@ -1,13 +1,13 @@
 <template>
     <div class="selection-container">
         <div class="selection-title"><label>Selection</label></div>
-        <div class="selection-area">
+        <div class="selection-area" v-if="isValidTd">
             <div class="properties border-bottom-bold selection-area-el">
                 <div class="selection-label-container border-bottom"><label>Properties</label></div>
                 <div class="interaction-container-all">
                     <mInteraction 
                         v-for="(element, index) in 
-                        getParsedTd.propertyInteractions"
+                        getTdParsed.propertyInteractions"
                         :interactionType="element.interactionType"
                         :key="index"
                         :element="element"
@@ -23,7 +23,7 @@
                 <div class="selection-label-container border-bottom"><label>Actions</label></div>
                 <div class="interaction-container-all">
                     <mInteraction 
-                        v-for="(element, index) in getParsedTd.actionInteractions"
+                        v-for="(element, index) in getTdParsed.actionInteractions"
                         :interactionType="element.interactionType"
                         :key="index"
                         :element="element"
@@ -40,7 +40,7 @@
                 <div class="interaction-container-all">
                     <mInteraction 
                         class="interaction"
-                        v-for="(element, index) in getParsedTd.eventInteractions"
+                        v-for="(element, index) in getTdParsed.eventInteractions"
                         :interactionType="'select'"
                         :key="index"
                         :interactionName="element.interactionName"
@@ -50,15 +50,15 @@
                     />
                 </div>
             </div>
-        </div>
-        <div class="selection-btn">
-            <aBasicButton
-                class="selection-btn-invoke"
-                :btnClass="getSelectionBtn.btnClass"
-                :btnLabel="getSelectionBtn.btnLabel"
-                :btnOnClick="getSelectionBtn.btnOnClick"
-                v-on:invoke-interactions="invokeInteractions"
-            />
+            <div class="selection-btn">
+                <aBasicButton
+                    class="selection-btn-invoke"
+                    :btnClass="getSelectionBtn.btnClass"
+                    :btnLabel="getSelectionBtn.btnLabel"
+                    :btnOnClick="getSelectionBtn.btnOnClick"
+                    v-on:invoke-interactions="invokeInteractions"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -66,6 +66,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
+import { InteractionStateEnum, TdStateEnum } from '@/util/enums';
 import aBasicButton from '@/components/01_atoms/aButtonBasic.vue';
 import mInteraction from '@/components/02_molecules/mInteraction.vue';
 
@@ -79,7 +80,7 @@ export default Vue.extend({
         this.resetInteractions();
     },
     computed: {
-       ...mapGetters('TdStore', ['getSelectionBtn', 'getParsedTd', 'getSelectedInteractions']),
+       ...mapGetters('TdStore', ['getSelectionBtn', 'getTdParsed', 'getTdState', 'isValidTd'])
     },
     methods: {
         ...mapActions('TdStore', [
@@ -132,7 +133,7 @@ export default Vue.extend({
     width: 100%;
     height: 33.33%;
     padding: 5px 7px 5px 7px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .selection-label-container{
@@ -152,6 +153,6 @@ export default Vue.extend({
 
 .interaction-container-all {
     width: 100%;
-    overflow: scroll;
+    overflow: auto;
 }
 </style>

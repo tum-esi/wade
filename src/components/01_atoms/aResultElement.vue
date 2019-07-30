@@ -54,11 +54,11 @@ export default Vue.extend({
     align-items: center;
     border-left: 1px solid #393B3A;
     padding-left: 7px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .result-values label {
-    overflow: scroll;
+    overflow: auto;
     max-height: 100%;
 }
 </style>

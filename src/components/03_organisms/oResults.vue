@@ -1,7 +1,7 @@
 <template>
     <div class="results-container">
         <div class="results-title"><label>Results</label></div>
-        <div v-if="interactionsInvoked" class="results-area">
+        <div v-if="showResultsArea" class="results-area">
 
             <div class="properties border-bottom-bold selection-area-el">
                 <div class="selection-label-container border-bottom"><label>Result Properties</label></div>
@@ -43,13 +43,8 @@
             </div>
 
         </div>
-        <div v-if="!interactionsInvoked" class="results-btn">
-            <aBasicButton
-                class="results-btn-show"
-                :btnClass="getResultsBtn.btnClass"
-                :btnLabel="getResultsBtn.btnLabel"
-                :btnOnClick="getResultsBtn.btnOnClick"
-            />
+        <div v-else class="result-messages">
+           <p>{{ getResultText }}</p>
         </div>
     </div>
 </template>
@@ -57,25 +52,23 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
-import aBasicButton from '@/components/01_atoms/aButtonBasic.vue';
+import { TdStateEnum } from '@/util/enums';
 import aResultElement from '@/components/01_atoms/aResultElement.vue';
 
 export default Vue.extend({
     name: 'oResults',
     components: {
-        aBasicButton,
         aResultElement
     },
     beforeDestroy() {
         this.resetResults();
     },
-    data() {
-        return {
-            interactionsInvoked: true
-        };
-    },
     computed: {
-        ...mapGetters('TdStore', ['getResultsBtn', 'getResultProps', 'getResultActions', 'getResultEvents']),
+        ...mapGetters('TdStore', ['getResultsBtn', 'getResultProps',
+         'getResultActions', 'getResultEvents', 'getResultText', 'getTdState']),
+         showResultsArea() {
+           return this.getTdState === TdStateEnum.VALID_TD;
+         }
     },
     methods: {
         ...mapActions('TdStore', ['resetResults'])
@@ -113,7 +106,7 @@ export default Vue.extend({
     width: 100%;
     height: 33.33%;
     padding: 5px 7px 5px 7px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .selection-label-container {
@@ -122,23 +115,15 @@ export default Vue.extend({
 
 .interaction-container-all {
     width: 100%;
-    overflow: scroll;
+    overflow: auto;
 }
 
-.results-btn {
+.result-messages {
     height: 12%;
-    padding-top: 7px;
 }
 
-.results-btn-show {
-    width: 100%;
-    height: 100%;
-    padding: 5px;
+.result-messages p {
+    font-size: 14px;
 }
 
-.results-btn-show {
-    width: 100%;
-    height: 100%;
-    padding: 5px;
-}
 </style>

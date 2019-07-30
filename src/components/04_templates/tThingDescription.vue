@@ -59,7 +59,6 @@ export default Vue.extend({
         }
     },
     methods: {
-        // ...mapMutations('SidebarStore', ['setNewCurrentTd']),
         tdChanged( message: string | any) {
             this.statusMessage = message;
         },

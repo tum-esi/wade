@@ -28,64 +28,30 @@ export default Vue.extend({
         };
     },
     created() {
-        this.checkIfStoredTdAvailable();
         this.$eventHub.$on('fetched-td', this.openAccordingEvent);
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
     },
     computed: {
-        ...mapGetters('TdStore', ['getEditorPlaceholder', 'getCurrentJSONTD']),
+        ...mapGetters('TdStore', ['getEditorPlaceholder']),
         ...mapGetters('SidebarStore', ['getCurrentTd']),
         currentTd: {
             get(): string {
                 return this.td;
             },
-            set(value: string) {
-                this.setParsedTd( { } );
-                this.resetInteractions();
-                this.resetResults();
+            async set(value: string) {
                 this.td = value;
-                this.checkTd();
-                this.setNewCurrentTd({ id: this.id, td: this.td});
+                if (this.td.length > 0) this.processChangedTd( { td: this.td });
             }
         }
     },
     methods: {
-        ...mapActions('TdStore', ['getParsedTd', 'resetInteractions', 'resetResults']),
-        ...mapMutations('TdStore', ['setCurrentJSONTD', 'setParsedTd']),
-        ...mapMutations('SidebarStore', ['setNewCurrentTd']),
-        async checkTd() {
-            let parsedTd;
-            let statusMessage;
-
-            if (this.td.length <= 0) {
-                statusMessage = '...';
-            } else {
-                try {
-                    const jsonTd = JSON.parse(this.td);
-                    if (Object.keys(jsonTd).length === 0) {
-                        statusMessage = ErrorMessagesEnum.EMPTY_TD;
-                        parsedTd = '';
-                    } else {
-                        this.setCurrentJSONTD(JSON.stringify(jsonTd));
-                        statusMessage =  StatusMessagesEnum.TD_READY;
-                        // Parses td
-                        parsedTd = await this.getParsedTd( { jsonTd } );
-                        if (parsedTd.error) {
-                            statusMessage = parsedTd.error;
-                        }
-                    }
-                } catch (err) {
-                    statusMessage = `${ErrorMessagesEnum.INVALID_JSON_TD} (${err.name}: ${err.message})`;
-                }
-            }
-            this.$emit('td-changed', statusMessage);
-        },
+        ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
         openAccordingEvent(args) {
+            console.log('args: ', args);
             this.td = args;
-            this.checkTd();
-            this.setNewCurrentTd({ id: this.id, td: this.td});
+            this.processChangedTd( { td: this.td });
         },
         checkIfStoredTdAvailable() {
             let storedTd = this.getCurrentTd(this.id);
@@ -121,7 +87,7 @@ export default Vue.extend({
     width: 100%;
     height: 92%;
     max-height: 800px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .editor-area textarea{
