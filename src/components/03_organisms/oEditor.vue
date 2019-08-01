@@ -76,8 +76,9 @@ export default Vue.extend({
 
 .editor-title {
     padding: 7px 0px 7px 2px;
-    max-height: 8%;
-    min-height: 50px;
+    height: 10%;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     align-items: center;
 }
@@ -88,14 +89,14 @@ export default Vue.extend({
 
 .editor-area {
     width: 100%;
-    height: 92%;
+    height: 90%;
     max-height: 800px;
     overflow: auto;
 }
 
 .editor-area textarea{
     width: 100%;
-    height: 96%;
+    height: 100%;
     resize: none;
     padding: 7px;
     font-family: 'Courier New', Courier, monospace;

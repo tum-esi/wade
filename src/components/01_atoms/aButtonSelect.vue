@@ -6,11 +6,7 @@
   >
     <button v-if="btnLabel" class="select-btn-label" :class="btnGeneralStyle" >{{ btnLabel }}</button>
     <button v-else-if="!btnLabel" class="select-btn-label" :class="btnGeneralStyle">{{ getBtnLabel }}</button>
-    
-    <!-- <div class="select-btn-container">
-      
-      <input class="select-btn" id="select-btn" type="radio" :value="btnSelected" :checked="btnSelected" />
-    </div> -->
+
     <div class="select-btn-container">
       <img class="select-btn" @click.prevent="changeSelection" :src="currentSrc"/>
     </div>
@@ -22,6 +18,14 @@
 import Vue from 'vue';
 export default Vue.extend({
   name: 'aButtonSelect',
+  created() {
+    this.$eventHub.$on('selections-reseted', () => {
+      this.btnSelected = false;
+      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected; });
+  },
+  beforeDestroy() {
+    this.$eventHub.$off('selections-reseted');
+  },
   data() {
     return {
       btnSelected: false,

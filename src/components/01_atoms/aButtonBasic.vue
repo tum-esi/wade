@@ -85,10 +85,10 @@ button:disabled {
 }
 
 .btn-url-bar {
-    height: 100%;
-    width: 20%;
-    margin: 0;
-    font-size: 14px;
+  height: 70%;
+  width: 20%;
+  margin: 0;
+  font-size: 14px;
 }
 </style>
 

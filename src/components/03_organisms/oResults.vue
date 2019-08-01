@@ -52,7 +52,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
-import { TdStateEnum } from '@/util/enums';
+import { TdStateEnum, InteractionStateEnum } from '@/util/enums';
 import aResultElement from '@/components/01_atoms/aResultElement.vue';
 
 export default Vue.extend({
@@ -65,11 +65,10 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('TdStore', ['getResultsBtn', 'getResultProps',
-         'getResultActions', 'getResultEvents', 'getResultText', 'getTdState']),
+         'getResultActions', 'getResultEvents', 'getResultText', 'getInteractionState']),
          showResultsArea() {
-             const state = this.getTdState;
-            return state === TdStateEnum.VALID_TD || state === TdStateEnum.VALID_CONSUMED_TD;
-         }
+            return this.getInteractionState === InteractionStateEnum.INVOKED;
+        }
     },
     methods: {
         ...mapActions('TdStore', ['resetResults'])

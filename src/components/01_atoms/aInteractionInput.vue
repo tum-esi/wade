@@ -45,6 +45,11 @@
 import Vue from 'vue';
 export default Vue.extend({
   name: 'aInteractionInput',
+  created() {
+    this.$eventHub.$on('selections-reseted', () => {
+      this.btnSelected = false;
+      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected; });
+  },
   data() {
     return {
       btnSelected: false,
@@ -190,6 +195,8 @@ export default Vue.extend({
         this.btnValue = el;
     },
     changeSelection() {
+        // Cannot be selected when there's no input value
+        if (!this.btnValue) return;
         this.btnSelected = !this.btnSelected;
         this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
         this.onClick();

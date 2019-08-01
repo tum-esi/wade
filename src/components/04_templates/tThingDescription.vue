@@ -9,9 +9,10 @@
                     class="url-bar" 
                     :button="fetchButton"
                     :buttonAction="fetchFunction"
-                    v-on:btn-clicked="tdChanged"
+                    v-on:btn-clicked="hideUrlBar"
+                    v-on:cancel-btn-clicked="hideUrlBar"
                     />
-                <oEditor :id="id" v-on:td-changed="tdChanged"/>
+                <oEditor :class="showUrlBar ? 'editor-showUrlBar' : 'editor-full'" :id="id" v-on:td-changed="hideUrlBar"/>
             </div>
             <div class="td-main-middle border-right"> 
                 <oSelection />
@@ -100,7 +101,7 @@ export default Vue.extend({
         }
     },
     methods: {
-        tdChanged() {
+        hideUrlBar() {
             if (this.showUrlBar) this.showUrlBar = false;
         },
         tabClicked(args: any) {
@@ -127,6 +128,7 @@ export default Vue.extend({
 .td-main-left {
     width: 33%;
     padding: 0px 7px 7px 7px;
+    height: 100%;
 }
 
 .td-main-middle {
@@ -140,7 +142,15 @@ export default Vue.extend({
 }
 
 .url-bar{
-    height: 30px;
     width: 100%;
+    height: 10%;
+}
+
+.editor-full {
+    height: 100%;
+}
+
+.editor-showUrlBar {
+    height: 90%;
 }
 </style>

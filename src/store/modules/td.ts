@@ -146,6 +146,8 @@ export default {
         },
         // Invoke all selected interaction
         async invokeInteractions({ commit, state }) {
+            commit('setInteractionState', InteractionStateEnum.INVOKED);
+            commit('setStatusMessage');
             const selectedInteractions = state.selections;
             const results = await Api.invokeInteractions(selectedInteractions);
             commit('setResultProps', results.resultProps);
@@ -202,6 +204,9 @@ export default {
         }
     },
     getters: {
+        getSelections(state: any) {
+            return state.selections;
+        },
         getInteractionState(state: any) {
             return state.interactionState;
         },

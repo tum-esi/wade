@@ -57,7 +57,7 @@
                     :btnLabel="getSelectionResetBtn.btnLabel"
                     :btnOnClick="getSelectionResetBtn.btnOnClick"
                     :btnActive="isBtnActive"
-                    v-on:reset-selections="resetSelections"
+                    v-on:reset-selections="resetAllSelections"
                 />
                 <aBasicButton
                     class="selection-btn-invoke"
@@ -117,7 +117,11 @@ export default Vue.extend({
             const newInteractionList = await this.addToSelectedInteractions({ newInteraction: element});
         },
         async removeSelectedInteraction(element: any) {
-            const newInteractionList = await this.removeFromSelectedInteractions({ interactionToRemove: element});
+            const newInteractionList = await this.removeFromSelectedInteraction({ interactionToRemove: element});
+        },
+        resetAllSelections(){
+            this.resetSelections();
+            this.$eventHub.$emit('selections-reseted');
         }
     },
     watch: {

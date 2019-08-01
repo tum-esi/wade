@@ -23,7 +23,7 @@ export enum InteractionStateEnum {
   NO_INTERACTIONS = 'No interactions can be shown.',
   NOT_SELECTED = 'Select an interaction to invoke it.',
   NOT_INVOKED = 'Interactions are selected. Click invoke button to invoke them.',
-  INVOKED = 'Interactions have been invoked.',
+  INVOKED = 'Interactions have been invoked.'
 }
 
 export enum TdStateEnum {
