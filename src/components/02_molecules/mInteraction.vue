@@ -2,15 +2,6 @@
     <div class="interaction-container">
         <div class="interaction-name"><label>{{ interactionName }}</label></div>
         <div class="interaction-options">
-            <!-- <aDropdownButton 
-                v-if="interactionType === 'dropdown' | interactionSelectBtn.btnInputType.enum"
-                class="interaction-dropdown-btn"
-                :btnLabel="interactionSelectBtn.btnLabel"
-                :btnKey="interactionSelectBtn.btnKey"
-                :btnSrc="interactionSelectBtn.btnSrc"
-                :btnStyle="interactionSelectBtn.btnStyle"
-                :btnDropdownOptions="interactionDropdownBtn.btnDropdownOptions"
-            /> -->
             <aButtonSelect 
                 v-if="interactionType === 'select' || interactionType === 'property-read' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType"
                 class="interaction-select-btn"

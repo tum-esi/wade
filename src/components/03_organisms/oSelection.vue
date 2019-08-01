@@ -51,11 +51,20 @@
                 </div>
             </div>
             <div class="selection-btn">
+                <aBasicButton 
+                    class="selection-btn-reset"
+                    :btnClass="getSelectionResetBtn.btnClass"
+                    :btnLabel="getSelectionResetBtn.btnLabel"
+                    :btnOnClick="getSelectionResetBtn.btnOnClick"
+                    :btnActive="isBtnActive"
+                    v-on:reset-selections="resetSelections"
+                />
                 <aBasicButton
                     class="selection-btn-invoke"
                     :btnClass="getSelectionBtn.btnClass"
                     :btnLabel="getSelectionBtn.btnLabel"
                     :btnOnClick="getSelectionBtn.btnOnClick"
+                    :btnActive="isBtnActive"
                     v-on:invoke-interactions="invokeInteractions"
                 />
             </div>
@@ -80,14 +89,25 @@ export default Vue.extend({
         this.resetInteractions();
     },
     computed: {
-       ...mapGetters('TdStore', ['getSelectionBtn', 'getTdParsed', 'getTdState', 'isValidTd'])
+       ...mapGetters('TdStore', [
+           'getSelectionBtn',
+           'getSelectionResetBtn',
+           'getInteractionState',
+           'getTdParsed',
+           'getTdState',
+           'isValidTd']),
+        isBtnActive() {
+            return this.getInteractionState ===         InteractionStateEnum.NOT_INVOKED 
+            || this.getInteractionState === InteractionStateEnum.INVOKED;
+        }
     },
     methods: {
         ...mapActions('TdStore', [
                 'removeFromSelectedInteractions',
                 'addToSelectedInteractions',
                 'invokeInteractions',
-                'resetInteractions']),
+                'resetInteractions',
+                'resetSelections']),
 
         async addSelectedInteraction(element: any) {
             const newInteractionList = await this.addToSelectedInteractions({ newInteraction: element});
@@ -101,7 +121,7 @@ export default Vue.extend({
         }
     },
     watch: {
-        '$route.params.id': function (id) {
+        '$route.params.id'(id) {
             this.resetInteractions();
         }
     }
@@ -144,10 +164,13 @@ export default Vue.extend({
 .selection-btn {
     height: 12%;
     padding-top: 7px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
 }
 
-.selection-btn-invoke {
-    width: 100%;
+.selection-btn-invoke, .selection-btn-reset {
+    width: 49%;
     padding: 5px;
 }
 

@@ -60,6 +60,11 @@ export default {
             btnLabel: 'Invoke Interactions',
             btnOnClick: 'invoke-interactions'
         },
+        tdResetSelectionsBtn: {
+            btnClass: 'btn-reset',
+            btnLabel: 'Reset selections',
+            btnOnClick: 'reset-selections'
+        },
         tdResultsBtn: {
             btnClass: 'btn-results',
             btnLabel: 'Status: No interaction selected.',
@@ -83,17 +88,25 @@ export default {
             commit('setTdEditor', payload.td);
 
             const parsedTd = await Api.consumeAndParseTd(payload.td);
-
+            let interactionState: InteractionStateEnum | null = null;
             // Store new parsed td
             if (
                 parsedTd.tdState === TdStateEnum.VALID_TD
                 || parsedTd.tdState === TdStateEnum.VALID_CONSUMED_TD
-            ) commit('setTdParsed', parsedTd.tdParsed);
+            ) {
+                commit('setTdParsed', parsedTd.tdParsed);
+                const hasInteractions = state.tdParsed.propertyInteractions.length > 0
+                    || state.tdParsed.actionInteractions.length > 0
+                    || state.tdParsed.eventInteractions.length > 0;
+                interactionState = hasInteractions
+                    ? InteractionStateEnum.NOT_SELECTED
+                    : InteractionStateEnum.NO_INTERACTIONS;
+            }
 
             // Set td status and error message
             commit('setTdState', parsedTd.tdState);
             commit('setErrorMsg', parsedTd.errorMsg);
-            commit('setInteractionState', null);
+            commit('setInteractionState', interactionState);
             commit('setStatusMessage');
         },
 
@@ -102,12 +115,14 @@ export default {
             commit('setInteractions', []);
             commit('setSelections', []);
             commit('setResults', []);
+            commit('setStatusMessage');
         },
         async resetInteractions({ commit }) {
             commit('setInteractions', []);
         },
         async resetSelections({ commit }) {
             commit('setSelections', []);
+            commit('setStatusMessage');
         },
         async resetResults({ commit }) {
             commit('setResults', []);
@@ -118,6 +133,7 @@ export default {
             const selectedInteractions = state.selections;
             selectedInteractions.push(payload.newInteraction);
             commit('setSelections', selectedInteractions);
+            commit('setStatusMessage');
             return selectedInteractions;
         },
         // Remove specific interaction from interactions to be invoked
@@ -125,6 +141,7 @@ export default {
             const selectedInteractions = state.selections;
             selectedInteractions.splice(selectedInteractions.indexOf(payload.interactionToRemove), 1);
             commit('setSelections', selectedInteractions);
+            commit('setStatusMessage');
             return selectedInteractions;
         },
         // Invoke all selected interaction
@@ -167,6 +184,9 @@ export default {
         },
         setSelections(state: any, payload: any) {
             state.selections = payload;
+            state.interactionState = Object.entries(payload).length > 0
+                ? InteractionStateEnum.NOT_INVOKED
+                : InteractionStateEnum.NOT_SELECTED;
         },
         setResultProps(state: any, payload: any) {
             state.resultProps = payload;
@@ -182,6 +202,9 @@ export default {
         }
     },
     getters: {
+        getInteractionState(state: any) {
+            return state.interactionState;
+        },
         isValidTd(state: any) {
             return state.tdState === TdStateEnum.VALID_TD || state.tdState === TdStateEnum.VALID_CONSUMED_TD;
         },
@@ -205,6 +228,9 @@ export default {
         },
         getSelectionBtn(state: any) {
             return state.tdSelectionBtn;
+        },
+        getSelectionResetBtn(state: any) {
+            return state.tdResetSelectionsBtn;
         },
         getResultsBtn(state: any) {
             return state.tdResultsBtn;
