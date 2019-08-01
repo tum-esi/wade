@@ -10,11 +10,9 @@ import { mapGetters } from 'vuex';
 export default Vue.extend({
     name: 'aStatusbar',
     computed: {
-        ...mapGetters('TdStore', {tdState: 'getTdState', errorMsg: 'getErrorMsg'}),
+        ...mapGetters('TdStore', {statusMessage: 'getStatusMessage'}),
         getStatus(): string {
-            console.log('tdState:', this.tdState);
-            console.log('errorMsg:', this.errorMsg);
-            return this.tdState && this.errMsg ? `> ${this.tdState} (${errorMsg})` : (this.tdState ? `> ${this.tdState}` : '> ...'); 
+            return this.statusMessage;
         }
     }
 });
@@ -24,7 +22,6 @@ export default Vue.extend({
 .statusbar-container {
     font-family: 'Courier New', Courier, monospace;
     height: 10%;
-    /* background: rgb(83, 87, 85); */
     background: #393B3A;
     display: flex;
     align-items: center;

@@ -1,31 +1,30 @@
-import { ErrorMessagesEnum, TdStateEnum, StatusMessagesEnum } from '@/util/enums';
+import { TdStateEnum, InteractionStateEnum } from '@/util/enums';
 
 export default class MessageHandler {
 
     private tdState: TdStateEnum | null;
     private errorMessage: string | null;
+    private interactionState: InteractionStateEnum | null;
 
-    constructor(tdState: TdStateEnum | null, errorMessage: string | null) {
+    constructor(
+        tdState: TdStateEnum | null,
+        errorMessage: string | null,
+        interactionState: InteractionStateEnum | null
+    ) {
         this.tdState = tdState;
         this.errorMessage = errorMessage;
+        this.interactionState = interactionState;
     }
 
-    public returnAccordingMessage(): StatusMessagesEnum | string {
-        switch (this.tdState) {
-            case TdStateEnum.NO_TD:
-                return StatusMessagesEnum.NO_TD;
-            case TdStateEnum.VALID_TD_JSON:
-                return StatusMessagesEnum.VALID_TD_JSON;
-            case TdStateEnum.INVALID_TD_JSON:
-                return StatusMessagesEnum.INVALID_TD_JSON;
-            case TdStateEnum.INVALID_TD_EMPTY:
-                return StatusMessagesEnum.INVALID_TD_EMPTY;
-            case TdStateEnum.INVALID_TD:
-                return StatusMessagesEnum.INVALID_TD;
-            case TdStateEnum.VALID_TD:
-                return StatusMessagesEnum.VALID_TD;
-            default:
-            return '';
-        }
+    public getStatusMessage(): string {
+        const date = new Date();
+        const currentTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        let message = `${currentTime}> `;
+
+        if (this.tdState) message += `${this.tdState} `;
+        if (this.errorMessage) message += `Error: ${this.errorMessage}. `;
+        if (this.interactionState) message += `${this.interactionState} `;
+
+        return message;
     }
 }

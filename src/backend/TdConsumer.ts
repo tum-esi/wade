@@ -22,7 +22,11 @@ export default class TdConsumer {
         await this.parseTdJson(this.td);
         if (this.tdState === TdStateEnum.VALID_TD_JSON) await this.consumeThing();
 
-        return { tdJson: this.tdJson, tdConsumed: this.tdConsumed, tdState: this.tdState, errorMsg: this.errorMsg };
+        return {
+            tdJson: this.tdJson,
+            tdConsumed: this.tdConsumed,
+            tdState: this.tdState, errorMsg: this.errorMsg
+        };
     }
 
     // Tries to parse given td-string to a json object
@@ -37,6 +41,8 @@ export default class TdConsumer {
         try {
             this.tdJson = JSON.parse(td);
             this.tdState = TdStateEnum.VALID_TD_JSON;
+            // May not be empty json
+            if (Object.getOwnPropertyNames(this.tdJson).length === 0) this.tdState = TdStateEnum.INVALID_TD_EMPTY;
         } catch (err) {
             this.tdState = TdStateEnum.INVALID_TD_JSON;
             this.errorMsg = err;

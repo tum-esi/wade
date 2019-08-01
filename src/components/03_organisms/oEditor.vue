@@ -12,7 +12,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
-import { ErrorMessagesEnum, StatusMessagesEnum, TdStateEnum } from '@/util/enums';
+import { TdStateEnum } from '@/util/enums';
 
 export default Vue.extend({
     name: 'oEditor',
@@ -49,12 +49,12 @@ export default Vue.extend({
         ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
         checkIfStoredTdAvailable(args? ) {
             // TODO: this does currently not work
-            let storedTd = this.getCurrentTd(this.id);
+            const storedTd = this.getCurrentTd(this.id);
             this.td = storedTd ? storedTd : this.td;
         },
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = args.td ? args.td : '';
-            this.processChangedTd( { td: this.td });
+            this.processChangedTd(args);
             this.$emit('td-changed');
             this.resetInteractions();
             this.resetResults();

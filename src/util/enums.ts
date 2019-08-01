@@ -10,23 +10,6 @@ export enum ElementTitleEnum {
   MASHUP = 'Mashup'
 }
 
-export enum ErrorMessagesEnum {
-  INVALID_JSON_TD = 'ERROR: TD is not a valid JSON.',
-  EMPTY_TD = 'ERROR: TD may not be empty.',
-  NO_INTERACTIONS_TD = 'NO INTERACTIONS: TD does not contain any interactions.',
-  CONSUMER_ERROR = 'ERROR: Could not consume thing: '
-}
-
-export enum StatusMessagesEnum {
-  NO_TD = '',
-  VALID_TD_JSON = 'Valid json td.',
-  INVALID_TD_JSON = 'Td is not in correct JSON f',
-  TD_READY = 'VALID: TD is JSON, invoke interactions.',
-  INVALID_TD_EMPTY = 'empty-td',
-  INVALID_TD = 'invalid-td',
-  VALID_TD = 'valid-td'
-}
-
 export enum PossibleInteractionTypesEnum {
   PROP_READ = 'property-read',
   PROP_WRITE = 'property-write',
@@ -35,37 +18,23 @@ export enum PossibleInteractionTypesEnum {
   EVENT_UNSUB = 'event-unsubscribe'
 }
 
-// Maybe later own class?
 export enum InteractionStateEnum {
-  // No or not valid td
-  NO_INTERACTIONS = 'no-interactions',
-  // Interactions should be shown, nothing selected
-  NOT_SELECTED = 'nothing-selected',
-  // Inteactions are selected but not invoked, also when selection changed
-  NOT_INVOKED = 'nothing-invoked',
-  // Selected interactions are invoked and results should be shown
-  INVOKED = 'invoked',
+  // No / invalid td
+  NO_INTERACTIONS = 'No interactions can be shown.',
+  NOT_SELECTED = 'Select an interaction to invoke it.',
+  NOT_INVOKED = 'Interactions are selected. Click invoke button to invoke them.',
+  INVOKED = 'Interactions have been invoked.',
 }
 
 export enum TdStateEnum {
-  // Either no saved td, or empty td editor
-  NO_TD = 'no-td',
-  // Valid json td, not yet parsed
-  VALID_TD_JSON = 'valid-td-json',
-  // Invalid JSON
-  INVALID_TD_JSON = 'invalid-json',
-  // Successfully consumed TD
-  VALID_CONSUMED_TD = 'consumed-td',
-  // Fetched td. Is string.
-  VALID_TD_FETCHED = 'fetched-td',
-  // Could not fetch td
-  INVALID_TD_FETCHED = 'invalid-fetched-td',
-  // Empty Td
-  INVALID_TD_EMPTY = 'empty-td',
-  // Invalid td when consuming
-  INVALID_CONSUMED_TD = 'invalid-consumed-td',
-  // Td is invalid
-  INVALID_TD = 'invalid-td',
-  // Td is valid
-  VALID_TD = 'valid-td'
+  NO_TD = 'NO TD: No TD is uploaded.',
+  VALID_TD_JSON = 'VALID JSON: TD is valid JSON.',
+  INVALID_TD_JSON = 'INVALID JSON: TD is invalid JSON.',
+  VALID_CONSUMED_TD = 'CONSUMED: TD has been successfully consumed.',
+  VALID_TD_FETCHED = 'FETCH SUCCESS: TD has successfully been fetched.',
+  INVALID_TD_FETCHED = 'FETCH ERROR: TD could not be fetched.',
+  INVALID_TD_EMPTY = 'INVALID TD: TD may not be empty object.',
+  INVALID_CONSUMED_TD = 'CONSUME ERROR: TD could not be consumed.',
+  INVALID_TD = 'INVALID TD: TD is invalid.',
+  VALID_TD = 'VALID TD: TD is valid.'
 }

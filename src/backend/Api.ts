@@ -1,7 +1,16 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
-import { PossibleInteractionTypesEnum, TdStateEnum } from '@/util/enums';
+import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum } from '@/util/enums';
+import MessageHandler from './MessageHandler';
 
+export function updateStatusMessage(
+    tdState: TdStateEnum | null,
+    errorMsg: string | null,
+    interactionState: InteractionStateEnum | null
+): string {
+    const messageHandler = new MessageHandler(tdState, errorMsg, interactionState);
+    return messageHandler.getStatusMessage();
+}
 
 // Return vue-parsed td, td state information and possible errors
 export async function consumeAndParseTd(td: string) {
@@ -18,7 +27,7 @@ export async function consumeAndParseTd(td: string) {
     return {
         tdParsed: parsedTd,
         errorMsg: null,
-        tdState: TdStateEnum.VALID_TD
+        tdState: consumedTd.tdState
     };
 }
 
@@ -54,7 +63,7 @@ export async function invokeInteractions(selectedInteractions) {
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultProp =
                         await selectedInteractions[interaction]
-                            .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
+                        .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
                     resultProp = resultProp.error ? resultProp.error : resultProp;
                     resultProps.push({
                         resultType: PossibleInteractionTypesEnum.PROP_READ,
@@ -81,7 +90,7 @@ export async function invokeInteractions(selectedInteractions) {
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultAction =
                         await selectedInteractions[interaction]
-                            .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
+                        .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
                     resultAction = resultAction.error ? resultAction.error : resultAction;
                     resultActions.push({
                         resultType: PossibleInteractionTypesEnum.ACTION,

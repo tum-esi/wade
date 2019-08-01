@@ -8,11 +8,12 @@ export default {
     state: {
         tdState: TdStateEnum.NO_TD,
         errorMsg: '',
+        statusMessage: Api.updateStatusMessage(TdStateEnum.NO_TD, null, null),
 
         tdEditor: {},
         tdParsed: {},
 
-        interactionState: InteractionStateEnum.NO_INTERACTIONS,
+        interactionState: null,
 
         interactions: [],
         selections: [],
@@ -68,10 +69,12 @@ export default {
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
-        async processChangedTd({ commit }, payload: any) {
+        async processChangedTd({ commit, state }, payload: any) {
             if (!payload.td || payload.td.length <= 0) {
                 commit('setTdState', payload.tdState ? payload.tdState : TdStateEnum.NO_TD);
                 commit('setErrorMsg', payload.errorMsg ? payload.errorMsg : null);
+                commit('setInteractionState', null);
+                commit('setStatusMessage');
                 return;
             }
 
@@ -83,11 +86,16 @@ export default {
             const parsedTd = await Api.consumeAndParseTd(payload.td);
 
             // Store new parsed td
-            if (parsedTd.tdState === TdStateEnum.VALID_TD) commit('setTdParsed', parsedTd.tdParsed);
+            if (
+                parsedTd.tdState === TdStateEnum.VALID_TD
+                || parsedTd.tdState === TdStateEnum.VALID_CONSUMED_TD
+            ) commit('setTdParsed', parsedTd.tdParsed);
 
             // Set td status and error message
             commit('setTdState', parsedTd.tdState);
             commit('setErrorMsg', parsedTd.errorMsg);
+            commit('setInteractionState', null);
+            commit('setStatusMessage');
         },
 
         async resetAll({ commit }) {
@@ -146,8 +154,15 @@ export default {
             state.errorMsg = payload;
         },
         setTdState(state: any, payload: TdStateEnum | null) {
-            if (payload) state.tdState = payload;
+            state.tdState = payload;
         },
+        setInteractionState(state: any, payload: InteractionStateEnum | null) {
+            state.interactionState = payload;
+        },
+        setStatusMessage(state: any) {
+            state.statusMessage = Api.updateStatusMessage(state.tdState, state.errorMsg, state.interactionState);
+        },
+
         setTdEditor(state: any, payload: string) {
             if (payload) state.tdEditor = payload;
         },
@@ -181,13 +196,13 @@ export default {
     },
     getters: {
         isValidTd(state: any) {
-            return state.tdState === TdStateEnum.VALID_TD;
+            return state.tdState === TdStateEnum.VALID_TD || state.tdState === TdStateEnum.VALID_CONSUMED_TD;
+        },
+        getStatusMessage(state: any) {
+            return state.statusMessage;
         },
         getTdState(state: any) {
             return state.tdState;
-        },
-        getErrorMsg(state: any) {
-            return state.errorMsg;
         },
         getTdEditor(state: any) {
             return state.jsonTd;
