@@ -90,14 +90,14 @@ export default Vue.extend({
                         errorMsg
                     };
                 });
-                this.$eventHub.$emit('fetched-td', fetchedTd);
+                (this as any).$eventHub.$emit('fetched-td', fetchedTd);
             }
         };
     },
     computed: {
         ...mapGetters('TdStore', ['getTdTabbar']),
         id() {
-            return this.$route.params.id;
+            return (this as any).$route.params.id;
         }
     },
     methods: {

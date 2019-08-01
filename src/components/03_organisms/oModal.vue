@@ -74,7 +74,7 @@ export default Vue.extend({
       cancel() {
         this.$emit('cancel');
         // Delete input from form elements
-        this.$refs.formElement.forEach((element: any) => {
+        (this as any).$refs.formElement.forEach((element: any) => {
           element.input = '';
         });
       },

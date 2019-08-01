@@ -49,15 +49,15 @@ export default Vue.extend({
         ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
         checkIfStoredTdAvailable(args? ) {
             // TODO: this does currently not work
-            const storedTd = this.getCurrentTd(this.id);
+            const storedTd = (this as any).getCurrentTd(this.id);
             this.td = storedTd ? storedTd : this.td;
         },
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = args.td ? args.td : '';
-            this.processChangedTd(args);
-            this.$emit('td-changed');
-            this.resetInteractions();
-            this.resetResults();
+            (this as any).processChangedTd(args);
+            (this as any).$emit('td-changed');
+            (this as any).resetInteractions();
+            (this as any).resetResults();
         }
     },
      watch: {

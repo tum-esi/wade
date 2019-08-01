@@ -12,7 +12,7 @@ export default Vue.extend({
     computed: {
         ...mapGetters('TdStore', {statusMessage: 'getStatusMessage'}),
         getStatus(): string {
-            return this.statusMessage;
+            return (this as any).statusMessage;
         }
     }
 });

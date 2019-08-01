@@ -132,7 +132,7 @@ export default Vue.extend({
         return this.btnSelected ? this.srcSelected : this.srcUnselected;
     },
     getSelectedOption(): string {
-        if (this.btnValue === false) { return this.btnValue; }
+        if ((this as any).btnValue === false) { return this.btnValue; }
         return this.btnValue ? this.btnValue : 'Select';
     },
     getButtonSelectedStyle(): string {
@@ -144,13 +144,13 @@ export default Vue.extend({
       if (this.btnOnClickEvent) { this.$emit(this.btnOnClickEvent, this.btnOnClickValue); }
       if (this.btnValue && this.element) {
           if (this.interactionInputType('number')) {
-              this.btnValue = parseInt(this.btnValue);
+              (this as any).btnValue = parseInt(this.btnValue);
           }
           if (this.interactionInputType('object')) {
               this.btnValue = JSON.parse(this.btnValue);
           }
           if (this.interactionInputType('array')) {
-              this.btnValue = this.btnValue.split(' ');
+              (this as any).btnValue = this.btnValue.split(' ');
           }
       }
       this.btnSelected
@@ -181,7 +181,7 @@ export default Vue.extend({
                 }
                 break;
             case 'boolean':
-                if(this.btnInputType.propType === 'boolean')  {
+                if (this.btnInputType.propType === 'boolean') {
                     isCorrectType = true;
                 }
                 break;
@@ -192,7 +192,7 @@ export default Vue.extend({
     },
     setBtnValue(el: string | boolean) {
         this.dropdownVisible = !this.dropdownVisible;
-        this.btnValue = el;
+        (this as any).btnValue = el;
     },
     changeSelection() {
         // Cannot be selected when there's no input value

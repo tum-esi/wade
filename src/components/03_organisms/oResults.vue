@@ -67,7 +67,7 @@ export default Vue.extend({
         ...mapGetters('TdStore', ['getResultsBtn', 'getResultProps',
          'getResultActions', 'getResultEvents', 'getResultText', 'getInteractionState']),
          showResultsArea() {
-            return this.getInteractionState === InteractionStateEnum.INVOKED;
+            return (this as any).getInteractionState === InteractionStateEnum.INVOKED;
         }
     },
     methods: {

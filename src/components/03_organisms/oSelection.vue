@@ -86,7 +86,7 @@ export default Vue.extend({
         mInteraction
     },
     beforeDestroy() {
-        this.resetInteractions();
+        (this as any).resetInteractions();
     },
     computed: {
        ...mapGetters('TdStore', [
@@ -97,8 +97,8 @@ export default Vue.extend({
            'getTdState',
            'isValidTd']),
         isBtnActive() {
-            return this.getInteractionState ===         InteractionStateEnum.NOT_INVOKED 
-            || this.getInteractionState === InteractionStateEnum.INVOKED;
+            return (this as any).getInteractionState ===         InteractionStateEnum.NOT_INVOKED
+            || (this as any).getInteractionState === InteractionStateEnum.INVOKED;
         }
     },
     methods: {
@@ -110,23 +110,24 @@ export default Vue.extend({
                 'resetSelections']),
 
         async addSelectedInteraction(element: any) {
-            const newInteractionList = await this.addToSelectedInteractions({ newInteraction: element});
+            const newInteractionList = await (this as any).addToSelectedInteractions({ newInteraction: element});
         },
         async addSelectedInteractionWithInput(input: any, element: any) {
             element.interactionSelectBtn.input = input;
-            const newInteractionList = await this.addToSelectedInteractions({ newInteraction: element});
+            const newInteractionList = await (this as any).addToSelectedInteractions({ newInteraction: element});
         },
         async removeSelectedInteraction(element: any) {
-            const newInteractionList = await this.removeFromSelectedInteraction({ interactionToRemove: element});
+            const newInteractionList =
+                await (this as any).removeFromSelectedInteraction({ interactionToRemove: element});
         },
-        resetAllSelections(){
-            this.resetSelections();
+        resetAllSelections() {
+            (this as any).resetSelections();
             this.$eventHub.$emit('selections-reseted');
         }
     },
     watch: {
         '$route.params.id'(id) {
-            this.resetInteractions();
+            (this as any).resetInteractions();
         }
     }
 });

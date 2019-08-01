@@ -60,7 +60,7 @@ export default Vue.extend({
   computed: {
     ...mapGetters('SidebarStore', ['isActiveElement']),
     isActive(): any {
-      return this.isActiveElement(this.id, this.type);
+      return (this as any).isActiveElement(this.id, this.type);
     },
     getIconSrcPath(): any {
       return require(`@/assets/${this.iconSrcPath}.png`);
@@ -69,7 +69,7 @@ export default Vue.extend({
   methods: {
     ...mapMutations('SidebarStore', ['setActiveElement']),
     sidebarElementClicked() {
-      this.setActiveElement(this.id);
+      (this as any).setActiveElement(this.id);
       this.$emit('element-clicked', this.id, this.type);
     }
   }
