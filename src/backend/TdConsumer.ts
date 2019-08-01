@@ -20,12 +20,8 @@ export default class TdConsumer {
 
     public async getConsumedTd() {
         await this.parseTdJson(this.td);
-        console.log('tdState:', this.tdState);
-        console.log( 'is?', this.tdState === TdStateEnum.VALID_TD_JSON);
         if (this.tdState === TdStateEnum.VALID_TD_JSON) await this.consumeThing();
 
-        console.log('tdConsumed:', this.tdConsumed);
-        console.log('errMss:', this.errorMsg);
         return { tdJson: this.tdJson, tdConsumed: this.tdConsumed, tdState: this.tdState, errorMsg: this.errorMsg };
     }
 

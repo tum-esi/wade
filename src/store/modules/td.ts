@@ -12,10 +12,12 @@ export default {
 
         interactionState: InteractionStateEnum.NO_INTERACTIONS,
 
-        selectedInteractions: [],
+        interactions: [],
+        selections: [],
         resultProps: [],
         resultActions: [],
         resultEvents: [],
+
         tdTabbar: [
             {
                 tabId: 'editor',
@@ -25,12 +27,6 @@ export default {
                     btnKey: 'td-editor-upload',
                     btnSrc: 'upload',
                     btnDropdownOptions: [
-                        // {
-                        //     title: 'Load from pc',
-                        //     key: 'td-machine',
-                        //     icon: 'computer',
-                        //     style: 'border-bottom'
-                        // },
                         {
                             title: 'Load from url',
                             key: 'td-url',
@@ -71,6 +67,12 @@ export default {
     },
     actions: {
         async processChangedTd({ commit }, payload: { td: string }) {
+            if (payload.td.length <= 0) return;
+            // Reset interactions, selections and results
+            commit('setInteractions', []);
+            commit('setSelections', []);
+            commit('setResults', []);
+            // Store new td as string
             commit('setTdEditor', payload.td);
 
             const parsedTd = await Api.consumeAndParseTd(payload.td);
@@ -81,20 +83,26 @@ export default {
                 const messageHandler = new MessageHandler(parsedTd.tdState, parsedTd.errorMsg).returnAccordingMessage();
                 return;
             }
+            // Store new parsed td
             commit('setTdParsed', parsedTd.tdParsed);
         },
+
         async resetAll({ commit }) {
-            await Api.resetAll();
+            // await Api.resetAll();
+            commit('setInteractions', []);
+            commit('setSelections', []);
+            commit('setResults', []);
         },
         async resetInteractions({ commit }) {
-            commit('setSelectedInteractions', []);
+            commit('setInteractions', []);
         },
-        async resetSelectedInteractions({ commit }) {
-            commit('setSelectedInteractions', []);
+        async resetSelections({ commit }) {
+            commit('setSelections', []);
         },
         async resetResults({ commit }) {
-            commit('removeResults', []);
+            commit('setResults', []);
         },
+
         // Return parsed & consumed TD
         async getParsedTd({ commit }, payload) {
             const parsedTd = await Api.getParsedTd(payload.jsonTd);
@@ -108,21 +116,21 @@ export default {
         },
         // Add new interaction to interactions to be invoked
         async addToSelectedInteractions({ commit, state }, payload) {
-            const selectedInteractions = state.selectedInteractions;
+            const selectedInteractions = state.selections;
             selectedInteractions.push(payload.newInteraction);
-            commit('setSelectedInteractions', selectedInteractions);
+            commit('setSelections', selectedInteractions);
             return selectedInteractions;
         },
         // Remove specific interaction from interactions to be invoked
         async removeFromSelectedInteractions({ commit, state }, payload) {
-            const selectedInteractions = state.selectedInteractions;
+            const selectedInteractions = state.selections;
             selectedInteractions.splice(selectedInteractions.indexOf(payload.interactionToRemove), 1);
-            commit('setSelectedInteractions', selectedInteractions);
+            commit('setSelections', selectedInteractions);
             return selectedInteractions;
         },
         // Invoke all selected interaction
         async invokeInteractions({ commit, state }) {
-            const selectedInteractions = state.selectedInteractions;
+            const selectedInteractions = state.selections;
             const results = await Api.invokeInteractions(selectedInteractions);
             commit('setResultProps', results.resultProps);
             commit('setResultActions', results.resultActions);
@@ -134,19 +142,23 @@ export default {
             if (payload) state.tdState = payload;
         },
         setTdEditor(state: any, payload: string) {
+            console.log('td: ', payload);
             if (payload) state.tdEditor = payload;
         },
         setTdParsed(state: any, payload: string) {
             if (payload) state.tdParsed = payload;
         },
 
-        removeResults(state: any, payload: any) {
+        setResults(state: any, payload: any) {
             state.resultProps = payload;
             state.resultActions = payload;
             state.resultEvents = payload;
         },
-        setSelectedInteractions(state: any, payload: any) {
-            state.selectedInteractions = payload;
+        setInteractions(state: any, payload: any) {
+            state.interactions = payload;
+        },
+        setSelections(state: any, payload: any) {
+            state.selections = payload;
         },
         setResultProps(state: any, payload: any) {
             state.resultProps = payload;
@@ -163,7 +175,6 @@ export default {
     },
     getters: {
         isValidTd(state: any) {
-            console.log('state: ', state.tdState);
             return state.tdState === TdStateEnum.VALID_TD;
         },
         getTdState(state: any) {
@@ -175,7 +186,6 @@ export default {
         getTdParsed(state: any) {
             return state.tdParsed;
         },
-
         areInteractionsInvoked(state: any) {
             return state.areInteractionsInvoked;
         },

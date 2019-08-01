@@ -56,6 +56,10 @@ export enum TdStateEnum {
   INVALID_TD_JSON = 'invalid-json',
   // Successfully consumed TD
   VALID_CONSUMED_TD = 'consumed-td',
+  // Fetched td. Is string.
+  VALID_TD_FETCHED = 'fetched-td',
+  // Could not fetch td
+  INVALID_TD_FETCHED = 'invalid-fetched-td',
   // Empty Td
   INVALID_TD_EMPTY = 'empty-td',
   // Invalid td when consuming

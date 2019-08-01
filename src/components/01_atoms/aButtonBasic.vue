@@ -1,6 +1,6 @@
 <!-- Basic button with label -->
 <template>
-  <button class="btn btn-basic" :class="btnClass" v-on:click.prevent="onClick">{{ btnLabel }}</button>
+  <button class="btn btn-basic" :class="btnClass" v-on:click.prevent="onClick" :disabled="!btnActive">{{ btnLabel }}</button>
 </template>
 
 <script lang="ts">
@@ -28,6 +28,14 @@ export default Vue.extend({
         btnOnClick: {
           type: String,
           required: true
+        },
+        /**
+         * Inidicates wether button is enabled or disabled.
+         */
+        btnActive: {
+          type: Boolean,
+          required: false,
+          default: true
         }
     },
     methods: {
@@ -41,9 +49,12 @@ export default Vue.extend({
 });
 </script>
 
-
-
 <style scoped>
+button:disabled {
+    background-color: rgb(124, 129, 127);
+    color: #ffff;
+}
+
 .btn-basic {
   border: none;
   font-size: 16px;
@@ -71,6 +82,13 @@ export default Vue.extend({
 .btn-results {
   background: none;
   border: 1px solid #393B3A;
+}
+
+.btn-url-bar {
+    height: 100%;
+    width: 20%;
+    margin: 0;
+    font-size: 14px;
 }
 </style>
 

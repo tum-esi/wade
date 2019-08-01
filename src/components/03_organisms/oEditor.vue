@@ -42,23 +42,32 @@ export default Vue.extend({
             },
             async set(value: string) {
                 this.td = value;
-                if (this.td.length > 0) this.processChangedTd( { td: this.td });
+                this.tdChanged();
             }
         }
     },
     methods: {
         ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
         openAccordingEvent(args) {
-            console.log('args: ', args);
-            this.td = args;
-            this.processChangedTd( { td: this.td });
+            // TODO: Handle error
+            console.log(args);
+            this.td = args.td;
+            this.tdChanged();
         },
         checkIfStoredTdAvailable() {
+            // TODO: this does currently not work
             let storedTd = this.getCurrentTd(this.id);
             this.td = storedTd ? storedTd : this.td;
+        },
+        tdChanged() {
+            this.processChangedTd( { td: this.td });
+            this.$emit('td-changed');
+            this.resetInteractions();
+            this.resetResults();
         }
     },
      watch: {
+         // TODO: check how to find specific td from store and reload component
         '$route.params.id': function (id) {
         this.checkIfStoredTdAvailable();
         }
