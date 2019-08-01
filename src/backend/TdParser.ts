@@ -24,6 +24,7 @@ export default class TdParser {
     }
 
     private parseProperties() {
+        if (!this.consumedTd) return;
         for (const property in this.consumedTd.properties) {
             if (!this.consumedTd.properties.hasOwnProperty(property)) { continue; }
 
@@ -36,6 +37,7 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
                             const response = await this.consumedTd.properties[property].read()
                                 .then( async (res) => {
                                     return await res;
@@ -59,14 +61,12 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async (val: any, options?: any) => {
-                            console.log('Interaction: val, options:', val, options);
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
                             const response = await this.consumedTd.properties[property].write(val, options)
                             .then( async (res) => {
-                                console.log('Result in Prop write: ', res);
                                 return await 'Success';
                             })
                             .catch( async (err) => {
-                                console.log('Error in Prop read: ', err);
                                 return await { error: err};
                             });
                             return await response;
@@ -78,6 +78,7 @@ export default class TdParser {
     }
 
     private parseActions() {
+        if (!this.consumedTd) return;
         for (const action in this.consumedTd.actions) {
             if (!this.consumedTd.actions.hasOwnProperty(action)) { continue; }
 
@@ -90,13 +91,14 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async (input?: any) => {
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
                             const response = await this.consumedTd.actions[action].invoke(input)
                                 .then( async (res) => {
                                     if (res) { return await res; } else { return 'Success'; }
                                 })
                                 .catch(async (err) => {
                                     return await { error: err };
-                        });
+                                });
                             return await response;
                     }
                 },
@@ -105,6 +107,7 @@ export default class TdParser {
     }
 
     private parseEvents() {
+        if (!this.consumedTd) return;
         for (const event in this.consumedTd.events) {
             if (!this.consumedTd.events.hasOwnProperty(event)) { continue; }
             const eventInteraction = {
@@ -115,20 +118,18 @@ export default class TdParser {
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
                     subscribe: async () => {
+                        if (!this.consumedTd) return { error: 'No consumed Thing available.'};
                         const response = await this.consumedTd.events[event].subscribe(
                             async (res) =>  {
-                                console.log('Event-subscribtion: ', res);
                                 return await res;
                              },
                             async (err) => {
-                                console.log('Event-subscribtion Error: ', err);
                                 return await err;
                             });
-                        console.log('RESPONSE: ', response);
                         return await response;
                     },
                     unsubscribe: () => {
-                        this.consumedTd.events[event].unsubscribe();
+                        if (this.consumedTd) this.consumedTd.events[event].unsubscribe();
                     }
                 }
             };

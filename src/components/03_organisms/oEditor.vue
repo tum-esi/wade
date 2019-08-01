@@ -62,7 +62,7 @@ export default Vue.extend({
     },
      watch: {
          // TODO: check how to find specific td from store and reload component
-        '$route.params.id': function (id) {
+        '$route.params.id'(id) {
         this.checkIfStoredTdAvailable();
         }
     },

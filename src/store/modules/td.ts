@@ -1,7 +1,6 @@
 import * as Api from '@/backend/Api';
 import { RESULT_MESSAGES } from '@/util/texts';
 import { InteractionStateEnum, TdStateEnum } from '@/util/enums';
-import MessageHandler from '@/backend/MessageHandler';
 
 export default {
     namespaced: true,
@@ -114,18 +113,6 @@ export default {
             commit('setResults', []);
         },
 
-        // TODO: can be deleted??
-        // Return parsed & consumed TD
-        async getParsedTd({ commit }, payload) {
-            const parsedTd = await Api.getParsedTd(payload.jsonTd);
-            if (parsedTd.error) {
-                commit('setTdState', TdStateEnum.INVALID_TD);
-                return parsedTd.error;
-            } else {
-                commit('setTdState', TdStateEnum.VALID_TD);
-                return parsedTd;
-            }
-        },
         // Add new interaction to interactions to be invoked
         async addToSelectedInteractions({ commit, state }, payload) {
             const selectedInteractions = state.selections;

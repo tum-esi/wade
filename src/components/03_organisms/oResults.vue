@@ -67,14 +67,15 @@ export default Vue.extend({
         ...mapGetters('TdStore', ['getResultsBtn', 'getResultProps',
          'getResultActions', 'getResultEvents', 'getResultText', 'getTdState']),
          showResultsArea() {
-           return this.getTdState === TdStateEnum.VALID_TD;
+             const state = this.getTdState;
+            return state === TdStateEnum.VALID_TD || state === TdStateEnum.VALID_CONSUMED_TD;
          }
     },
     methods: {
         ...mapActions('TdStore', ['resetResults'])
     },
     watch: {
-    '$route.params.id': function (id) {
+    '$route.params.id'(id) {
         this.resetResults();
     }
     },
