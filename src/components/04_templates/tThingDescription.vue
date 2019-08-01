@@ -1,6 +1,7 @@
 <template>
     <div class="td-page-container">
         <mTabbar :tabbarElements="getTdTabbar"/>
+        <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage"/>
         <div class="td-main border-bottom">
             <div class="td-main-left border-right"> 
                 <mUrlBar 
@@ -19,7 +20,6 @@
                 <oResults />
             </div>
         </div>
-        <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage"/>
     </div>
 </template>
 
@@ -62,6 +62,7 @@ export default Vue.extend({
                 btnOnClick: 'btn-clicked'
             },
             async fetchFunction(url: string) {
+                // TODO: Error Handling connection time out
                 let td: null | string = null;
                 let errorMsg: null | string  = null;
                 let tdState: null | TdStateEnum = null;

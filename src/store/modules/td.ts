@@ -7,6 +7,8 @@ export default {
     namespaced: true,
     state: {
         tdState: TdStateEnum.NO_TD,
+        errorMsg: '',
+
         tdEditor: {},
         tdParsed: {},
 
@@ -66,25 +68,26 @@ export default {
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
-        async processChangedTd({ commit }, payload: { td: string }) {
-            if (payload.td.length <= 0) return;
-            // Reset interactions, selections and results
+        async processChangedTd({ commit }, payload: any) {
+            if (!payload.td || payload.td.length <= 0) {
+                commit('setTdState', payload.tdState ? payload.tdState : TdStateEnum.NO_TD);
+                commit('setErrorMsg', payload.errorMsg ? payload.errorMsg : null);
+                return;
+            }
+
             commit('setInteractions', []);
             commit('setSelections', []);
             commit('setResults', []);
-            // Store new td as string
             commit('setTdEditor', payload.td);
 
             const parsedTd = await Api.consumeAndParseTd(payload.td);
-            commit('setTdState', parsedTd.tdState);
 
-            if (parsedTd.tdState !== TdStateEnum.VALID_TD) {
-                // TODO: activate message handler
-                const messageHandler = new MessageHandler(parsedTd.tdState, parsedTd.errorMsg).returnAccordingMessage();
-                return;
-            }
             // Store new parsed td
-            commit('setTdParsed', parsedTd.tdParsed);
+            if (parsedTd.tdState === TdStateEnum.VALID_TD) commit('setTdParsed', parsedTd.tdParsed);
+
+            // Set td status and error message
+            commit('setTdState', parsedTd.tdState);
+            commit('setErrorMsg', parsedTd.errorMsg);
         },
 
         async resetAll({ commit }) {
@@ -103,6 +106,7 @@ export default {
             commit('setResults', []);
         },
 
+        // TODO: can be deleted??
         // Return parsed & consumed TD
         async getParsedTd({ commit }, payload) {
             const parsedTd = await Api.getParsedTd(payload.jsonTd);
@@ -138,11 +142,13 @@ export default {
         }
     },
     mutations: {
-        setTdState(state: any, payload: string) {
+        setErrorMsg(state: any, payload: string) {
+            state.errorMsg = payload;
+        },
+        setTdState(state: any, payload: TdStateEnum | null) {
             if (payload) state.tdState = payload;
         },
         setTdEditor(state: any, payload: string) {
-            console.log('td: ', payload);
             if (payload) state.tdEditor = payload;
         },
         setTdParsed(state: any, payload: string) {
@@ -179,6 +185,9 @@ export default {
         },
         getTdState(state: any) {
             return state.tdState;
+        },
+        getErrorMsg(state: any) {
+            return state.errorMsg;
         },
         getTdEditor(state: any) {
             return state.jsonTd;

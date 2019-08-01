@@ -12,7 +12,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
-import { ErrorMessagesEnum, StatusMessagesEnum } from '@/util/enums';
+import { ErrorMessagesEnum, StatusMessagesEnum, TdStateEnum } from '@/util/enums';
 
 export default Vue.extend({
     name: 'oEditor',
@@ -28,7 +28,7 @@ export default Vue.extend({
         };
     },
     created() {
-        this.$eventHub.$on('fetched-td', this.openAccordingEvent);
+        this.$eventHub.$on('fetched-td', this.tdChanged);
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
@@ -41,25 +41,19 @@ export default Vue.extend({
                 return this.td;
             },
             async set(value: string) {
-                this.td = value;
-                this.tdChanged();
+                this.tdChanged({ td: value});
             }
         }
     },
     methods: {
         ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
-        openAccordingEvent(args) {
-            // TODO: Handle error
-            console.log(args);
-            this.td = args.td;
-            this.tdChanged();
-        },
-        checkIfStoredTdAvailable() {
+        checkIfStoredTdAvailable(args? ) {
             // TODO: this does currently not work
             let storedTd = this.getCurrentTd(this.id);
             this.td = storedTd ? storedTd : this.td;
         },
-        tdChanged() {
+        tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
+            this.td = args.td ? args.td : '';
             this.processChangedTd( { td: this.td });
             this.$emit('td-changed');
             this.resetInteractions();

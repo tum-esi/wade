@@ -6,22 +6,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 export default Vue.extend({
     name: 'aStatusbar',
-    props: {
-        /**
-         * Message to be shown in status bar.
-         */
-        statusMessage: {
-            type: String,
-            required: false,
-            default: '...'
-        }
-    },
     computed: {
+        ...mapGetters('TdStore', {tdState: 'getTdState', errorMsg: 'getErrorMsg'}),
         getStatus(): string {
-            return this.statusMessage.length <= 0 ?
-                `Status: ...` : `Status: ${this.statusMessage}`;
+            console.log('tdState:', this.tdState);
+            console.log('errorMsg:', this.errorMsg);
+            return this.tdState && this.errMsg ? `> ${this.tdState} (${errorMsg})` : (this.tdState ? `> ${this.tdState}` : '> ...'); 
         }
     }
 });
