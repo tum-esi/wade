@@ -140,6 +140,19 @@ export default {
                 }
                 return null;
             };
+        },
+        doesIdAlreadyExist(state: any) {
+            return (id: string) => {
+                let doesExist = false;
+                for (const sidebarElement in state.sidebarElements) {
+                    if (!state.sidebarElements.hasOwnProperty(state.sidebarElements[sidebarElement])) {
+                        if (state.sidebarElements[sidebarElement].id === id) {
+                            doesExist = true;
+                        }
+                    }
+                }
+                return doesExist;
+            };
         }
     }
 };

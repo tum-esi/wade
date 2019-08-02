@@ -1,10 +1,19 @@
 # w-ade TODO
 http://plugfest.thingweb.io:8083/TestThing
 
+1) Interactions: Reihenfolge & Drag n Drop von Interactions
+2) Editor: JSON View Editor for TD 
+4) Sidebar: Put folders together / Folder / Element structure
+5) Store: Storage of multiple TDs / Mashups/ Folders with unique ID
+6) Bindings: Add Coap, MQTT and other
+7) Subscribing: Show updated subscription status
+8) WoT-Logo is a button right now -> NO!
+9) Router: Redirect if td does not exist
+
 IMPORTANT TODO
 - Add other bindings
 - Editor JSON view
-- Adapt store to save every element with a unique td (also persistant saving element) && display stored td / refactor store for persistant storage -> Persistent storage of elements and ids (electron)
+- Persistant saving element && display stored td / refactor store for persistant storage -> Persistent storage of elements and ids (electron)
 
 -  event subscription updates
 
@@ -14,11 +23,11 @@ TODO
 - Redo smart TD-Editor -> try again with other json plugin? -> readd old tdEditor? 
 - Unsubscribe to events
 - Loading indication when invoking actions
-- Element (folder, td, mashup) name must be unique -> used as ID
 - Implement filter functionality
 - Upload from machine
 
 SMALL & LOW PRIO TODOS 
+- Statusbar History functionality
 - Filter sidebar
 - Refactor sidebar selection with store
 - Handle unsubscribe
@@ -46,6 +55,11 @@ npm run serve
 ### Run in electron in dev mode: 
 ```
 npm run electron:serve
+```
+
+### Build electron app: 
+```
+npm run electron:build
 ```
 
 ### Architecture:

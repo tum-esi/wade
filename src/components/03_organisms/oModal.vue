@@ -92,7 +92,10 @@ export default Vue.extend({
           if (element.hasError) {
             // Cancel if one of the formFields has an error
             hasError = true;
+          } else if (element.hasDuplicateError) {
+            hasError = true;
           } else if (element.input) {
+            console.log('element obj:', element);
             // Push form data to newElement and delete form input
             const newDataElement = {
               key: element.key,

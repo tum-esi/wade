@@ -3,12 +3,13 @@
     <div class="form-field-basic-container">
       <label>{{form.title}}</label>
       <input
-        :class="{ 'error-input' : hasError }"
+        :class="{ 'error-input' : hasError || hasDuplicateError}"
         :placeholder="form.placeholder"
-        v-on:click="hasError=false"
+        v-on:click="hasError=false, hasDuplicateError=false"
         v-model="input"
       >
       <label v-if="hasError" class="error">{{ errorMessage }}</label>
+      <label v-if="hasDuplicateError" class="error">{{ errorDuplicateMessage }}</label>
     </div>
   </div>
 </template>
@@ -23,10 +24,11 @@ export default Vue.extend({
         required: true
         }
     },
-      data() {
+  data() {
     return {
       input: '',
       hasError: false,
+      hasDuplicateError: false,
       key: this.form.key
     };
   },
@@ -38,6 +40,13 @@ export default Vue.extend({
         this.form.rules.errorMessage
       ) {
         return this.form.rules.errorMessage;
+      } else {
+        return '';
+      }
+    },
+    errorDuplicateMessage(): string {
+      if (this.form.rules && this.form.rules.errorMessageDuplicate) {
+        return this.form.rules.errorMessageDuplicate;
       } else {
         return '';
       }
@@ -54,8 +63,16 @@ export default Vue.extend({
     checkError() {
       if (this.form.isRequired && this.input === '') {
         this.hasError = true;
+        return; // Return when there's already an error here
       } else {
         this.hasError = false;
+      }
+      // Check if form is unique if it has to be unique
+      if (this.form.mustBeUnique) {
+        // check store if unique id
+        this.hasDuplicateError =
+          (this.input !== '')
+          && this.$store.getters['SidebarStore/doesIdAlreadyExist'](this.input);
       }
     }
   }
@@ -91,7 +108,7 @@ export default Vue.extend({
 }
 
 .form-field-basic-container .error {
-  padding-top: 10px;
+  padding: 10px 0px 0px 2px;
   font-weight: normal;
   color: #ab7c79;
   display: initial;

@@ -50,6 +50,7 @@ declare global {
       input: string;
       // Is true when the input is empty or violates the rules of the formfield which has the type BasicFormField
       hasError: boolean;
+      hasDuplicateError: boolean;
     }
     interface BasicFormFieldInterface {
       key: string;
@@ -57,11 +58,13 @@ declare global {
       placeholder: string;
       value: string;
       isRequired: boolean;
+      mustBeUnique?: boolean;
       rules?: {
         minChars: number,
         maxChars: number,
         exludedChars?: string[],
-        errorMessage?: string
+        errorMessage?: string,
+        errorMessageDuplicate?: string
       };
     }
 

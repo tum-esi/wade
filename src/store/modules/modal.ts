@@ -12,10 +12,12 @@ export default {
                     placeholder: 'My Folder',
                     value: '',
                     isRequired: true,
+                    mustBeUnique: true,
                     rules: {
                         minChars: 5,
                         maxChars: 30,
-                        errorMessage: 'The folder\'s name should have at least 5 and maximal 30 characters.'
+                        errorMessage: 'The folder\'s name should have at least 5 and maximal 30 characters.',
+                        errorMessageDuplicate: 'Another element with the same name exists. Please change the name.'
                     }
                 },
                 {
@@ -38,10 +40,12 @@ export default {
                     placeholder: 'My Mashup',
                     value: '',
                     isRequired: true,
+                    mustBeUnique: true,
                     rules: {
                         minChars: 5,
                         maxChars: 30,
-                        errorMessage: 'The mashup\'s name should have at least 5 and maximal 30 characters.'
+                        errorMessage: 'The mashup\'s name should have at least 5 and maximal 30 characters.',
+                        errorMessageDuplicate: 'Another element with the same name exists. Please change the name.'
                     }
                 },
                 {
@@ -64,10 +68,12 @@ export default {
                     placeholder: 'My Thing Desription',
                     value: '',
                     isRequired: true,
+                    mustBeUnique: true,
                     rules: {
                         minChars: 5,
                         maxChars: 30,
-                        errorMessage: 'The Thing Description\'s name should have at least 5 and maximal 30 characters.'
+                        errorMessage: 'The Thing Description\'s name should have at least 5 and maximal 30 characters.',
+                        errorMessageDuplicate: 'Another element with the same name exists. Please change the name.'
                     }
                 }
             ]
