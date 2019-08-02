@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import aTab from '@/components/01_atoms/aTab.vue';
 import aSearchbar from '@/components/01_atoms/aSearchbar.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
@@ -63,6 +63,7 @@ export default Vue.extend({
       },
       sidebarElementClicked(elementId: string, elementType: string) {
         this.$emit('sidebar-element-clicked', elementId, elementType);
+        // (this as any).setActiveElement(this.id);
       },
       openModuleAddElement(element: any) {
         this.$emit('open-module-element', element);

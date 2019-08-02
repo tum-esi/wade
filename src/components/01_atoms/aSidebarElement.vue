@@ -67,9 +67,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapMutations('SidebarStore', ['setActiveElement']),
     sidebarElementClicked() {
-      (this as any).setActiveElement(this.id);
       this.$emit('element-clicked', this.id, this.type);
     }
   }

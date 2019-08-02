@@ -22,6 +22,9 @@ export default Vue.extend({
     components: {
         aDropdownButton
     },
+    created() {
+      this.$store.commit('SidebarStore/setActiveElement', null);
+    },
     computed: {
         ...mapGetters('SidebarStore', ['getAddNewButton']),
     },

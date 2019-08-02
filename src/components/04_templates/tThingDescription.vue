@@ -49,6 +49,7 @@ export default Vue.extend({
     },
     created() {
         this.$eventHub.$on('dropdown-clicked', this.tabClicked);
+        this.$store.commit('SidebarStore/setActiveElement', this.$route.params.id);
     },
     beforeDestroy() {
         this.$eventHub.$off('dropdown-clicked');
@@ -109,7 +110,13 @@ export default Vue.extend({
                 this.showUrlBar = true;
             }
         }
-    }
+    },
+    watch: {
+        // Check if router id changed and change active sidebar element
+        '$route.params.id'(id) {
+            this.$store.commit('SidebarStore/setActiveElement', id);
+        }
+    },
 });
 </script>
 
