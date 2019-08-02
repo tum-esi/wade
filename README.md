@@ -2,10 +2,11 @@
 http://plugfest.thingweb.io:8083/TestThing
 
 IMPORTANT TODO
-- Make bundle
 - Add other bindings
 - Editor JSON view
-- Adapt store to save every element with a unique td (also persistant saving element) && display stored td / refactor store for persistant storage
+- Adapt store to save every element with a unique td (also persistant saving element) && display stored td / refactor store for persistant storage -> Persistent storage of elements and ids (electron)
+
+-  event subscription updates
 
 TODO 
 - Array and Object type support -> Buggy
@@ -14,16 +15,14 @@ TODO
 - Unsubscribe to events
 - Loading indication when invoking actions
 - Element (folder, td, mashup) name must be unique -> used as ID
-- Persistent storage of elements and ids (electron)
 - Implement filter functionality
 - Upload from machine
 
 SMALL & LOW PRIO TODOS 
+- Filter sidebar
 - Refactor sidebar selection with store
 - Handle unsubscribe
 - Input Button -> only click on outer div 
-- Disable Invoke Action button 
-- Status Button in Results kein Button einfach statische Info 
 - Drag and Drop for ordering of interactions
 - Fix styling of home element / - Settings / Logo -> Header
 - Dropdown -> reselect -> dann invoke möglich

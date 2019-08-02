@@ -152,18 +152,18 @@ export default Vue.extend({
     height: 80%;
     border: 1px solid #393B3A;
     border-radius: 3px;
+    background: #B4BAB9;
 }
 
 .selection-area-el {
     width: 100%;
     height: 33.33%;
-    padding: 5px 7px 5px 7px;
-    overflow: auto;
+    padding: 5px 7px 0px 7px;
 }
 
 .selection-label-container{
     width: 100%;
-    max-height: 20%;
+    height: 20%;
 }
 
 .selection-btn {
@@ -182,5 +182,6 @@ export default Vue.extend({
 .interaction-container-all {
     width: 100%;
     overflow: auto;
+    height: 80%;
 }
 </style>

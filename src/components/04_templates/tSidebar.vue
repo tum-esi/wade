@@ -77,7 +77,7 @@ export default Vue.extend({
 }
 
 .sidebar-header {
-  height: 60px;
+  height: 50px;
   background: #b5dfdd;
 }
 

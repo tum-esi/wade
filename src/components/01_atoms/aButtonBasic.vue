@@ -51,8 +51,8 @@ export default Vue.extend({
 
 <style scoped>
 button:disabled {
-    background-color: rgb(124, 129, 127);
-    color: #ffff;
+  background-color: #939C9E;
+  color: #B4BAB9;
 }
 
 .btn-basic {

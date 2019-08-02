@@ -118,6 +118,8 @@ export default Vue.extend({
   height: 100%;
   align-items: center;
   padding: 3px;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
 }
 
 .btn-selection-container button {
