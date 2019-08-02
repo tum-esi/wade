@@ -118,7 +118,7 @@ export default Vue.extend({
         },
         async removeSelectedInteraction(element: any) {
             const newInteractionList =
-                await (this as any).removeFromSelectedInteraction({ interactionToRemove: element});
+                await (this as any).removeFromSelectedInteractions({ interactionToRemove: element});
         },
         resetAllSelections() {
             (this as any).resetSelections();
