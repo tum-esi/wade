@@ -22,16 +22,7 @@
         />
       </div>
     <div class="sidebar-elements-container"> 
-      <aSidebarElement 
-        v-for="(element, index) in getSidebarElements"
-        :key="index"
-        :title="element.title"
-        :id="element.id"
-        :type="element.type"
-        :hasChildren="element.hasChildren"
-        :children="element.children"
-        :hasTimingPerformance="element.hasTimingPerformance"
-        :iconSrcPath="element.iconSrcPath"
+      <mSidebarElementGroup 
         v-on:element-clicked="sidebarElementClicked"
       />
     </div>
@@ -44,7 +35,7 @@ import { mapGetters, mapMutations } from 'vuex';
 import aTab from '@/components/01_atoms/aTab.vue';
 import aSearchbar from '@/components/01_atoms/aSearchbar.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
-import aSidebarElement from '@/components/01_atoms/aSidebarElement.vue';
+import mSidebarElementGroup from '@/components/02_molecules/mSidebarElementGroup.vue';
 
 export default Vue.extend({
   name: 'tSidebar',
@@ -52,7 +43,7 @@ export default Vue.extend({
       aTab,
       aSearchbar,
       aDropdownButton,
-      aSidebarElement
+      mSidebarElementGroup
   },
   computed: {
     ...mapGetters('SidebarStore', ['getHeaderTab', 'getAddNewButton', 'getSidebarElements']),
@@ -63,7 +54,6 @@ export default Vue.extend({
       },
       sidebarElementClicked(elementId: string, elementType: string) {
         this.$emit('sidebar-element-clicked', elementId, elementType);
-        // (this as any).setActiveElement(this.id);
       },
       openModuleAddElement(element: any) {
         this.$emit('open-module-element', element);

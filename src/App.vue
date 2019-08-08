@@ -77,7 +77,6 @@ export default Vue.extend({
       };
       const newSidebarEl = await this.addNewElement(newEl);
       this.addSidebarElement(newSidebarEl);
-      // HERE: add to sidebar
       switch (newElement.type) {
         case ElementTypeEnum.TD:
           this.$router.push({
@@ -100,6 +99,7 @@ export default Vue.extend({
         default:
           break;
       }
+      this.$eventHub.$emit('sidebar-element-added');
     },
     homeClicked() {
       this.$router.push({

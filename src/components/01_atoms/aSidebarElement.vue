@@ -38,8 +38,9 @@ export default Vue.extend({
       default: false
     },
     children: {
-      type: Object as () => WADE.SidebarElement[],
-      required: false
+      type: Array as () => WADE.SidebarElement[],
+      required: false,
+      default: null
     },
     hasTimingPerformance: {
       type: Boolean,
@@ -49,6 +50,10 @@ export default Vue.extend({
       type: String,
       required: false,
       default: ''
+    },
+    onClick: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -68,6 +73,7 @@ export default Vue.extend({
   },
   methods: {
     sidebarElementClicked() {
+      this.onClick();
       this.$emit('element-clicked', this.id, this.type);
     }
   }
@@ -94,7 +100,7 @@ export default Vue.extend({
 }
 
 .sidebar-element-container:hover {
-  background: #b4bab9;
+  background: #939C9E;
 }
 
 .sidebar-element-icon-type {

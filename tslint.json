@@ -17,6 +17,7 @@
     "no-consecutive-blank-lines": false,
     "trailing-comma": false,
     "curly": false,
-    "align": [true, "parameters"]
+    "align": [true, "parameters"],
+    "arrow-parens": false
   }
 }

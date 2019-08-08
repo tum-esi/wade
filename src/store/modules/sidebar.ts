@@ -52,7 +52,7 @@ export default {
                     title: payload.title,
                     id: payload.id,
                     hasChildren: false,
-                    hasTimingPerformance: false,
+                    hasTimingPerformance: true,
                     iconSrcPath: ElementTypeEnum.TD,
                     td: {}
                 };
@@ -63,12 +63,23 @@ export default {
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
-                    hasChildren: false,
+                    hasChildren: true,
                     hasTimingPerformance: false,
                     iconSrcPath: ElementTypeEnum.FOLDER,
-                    folders: [],
-                    mashups: [],
-                    tds: []
+                    folder: {},
+                    children: [
+                        // only for testing, dummy data
+                        {
+                            type: payload.type,
+                            title: `${payload.id}${Math.random()}`,
+                            id: `${payload.id}${Math.random()}`,
+                            hasChildren: true,
+                            hasTimingPerformance: false,
+                            iconSrcPath: ElementTypeEnum.FOLDER,
+                            folder: {},
+                            children: []
+                        }
+                    ]
                 };
                 commit('addNewFolder', newElement);
                 return newElement;
@@ -80,8 +91,8 @@ export default {
                     hasChildren: false,
                     hasTimingPerformance: false,
                     iconSrcPath: ElementTypeEnum.MASHUP,
-                    mashups: [],
-                    tds: []
+                    mashup: {},
+                    children: []
                 };
                 commit('addNewMashup', newElement);
                 return newElement;

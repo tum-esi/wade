@@ -110,12 +110,20 @@ declare global {
       id: string;
       // Type of the element
       type: ElementTypeEnum;
+      // Icon path
+      iconSrcPath: string | any;
       // Has this element any children
       hasChildren?: boolean;
       // Array of Elements. A TD can't have any children.
-      children?: SidebarElement[];
+      children?: { folders?: SidebarElement[], mashups?: SidebarElement[], tds?: SidebarElement[]};
       // Has this Element a Timing performance
       hasTimingPerformance?: boolean;
+      // If element is td
+      td?: object;
+      // If element is folder
+      folder?: object;
+      // If element is mashup
+      mashup?: object;
     }
 
     interface TabbarElementInterface {
