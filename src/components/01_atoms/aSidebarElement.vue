@@ -1,6 +1,6 @@
 <template>
-  <div class="sidebar-element-container" v-on:click="sidebarElementClicked" :class="styleCss">
-    <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }">
+  <div class="sidebar-element-container" v-on:click="sidebarElementClicked">
+    <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }" :style="styleCss">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath">
       <label class="sidbar-element-label">{{ title }}</label>
       <img
@@ -9,7 +9,7 @@
         :src="srcPathTimingPerf"
       >
       <img 
-        v-if="children.length > 0" 
+        :style="children.length > 0 ? '' : 'visibility: hidden;'"
         class="sidebar-element-icon-dropdown" 
         @mouseover="childrenHover = true" 
         @mouseleave="childrenHover = false"
@@ -134,15 +134,9 @@ export default Vue.extend({
 }
 
 .sidebar-element-icon-type {
-  width: 20%;
   padding: 10px;
-  max-height: 40px;
-  max-width: 40px;
-}
-
-.sidebar-element-delete-icon {
-  width: 15%;
-  padding: 10px;
+  height: 40px;
+  width: 40px;
 }
 
 .sidebar-element-delete-icon:hover {
@@ -155,9 +149,10 @@ export default Vue.extend({
   overflow: hidden;
 }
 
-.sidebar-element-icon-dropdown, .sidebar-element-icon-performance{
-  width: 15%;
+.sidebar-element-icon-dropdown, .sidebar-element-icon-performance, .sidebar-element-delete-icon{
   padding: 10px;
+  max-height: 35px;
+  max-width: 35px;
 }
 
 .child {

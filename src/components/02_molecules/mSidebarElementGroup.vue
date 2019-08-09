@@ -73,7 +73,10 @@ export default Vue.extend({
                 hasTimingPerformance: current.hasTimingPerformance,
                 iconSrcPath: current.iconSrcPath,
                 showChildren: false,
-                styleCss: parentId !== 'parent' ? 'child' : null,
+                styleCss: current.numOfParents > 0
+                    ? `padding-left:${15 * current.numOfParents}px;
+                    background: rgba(0, 0, 0, ${current.numOfParents * 5 * 0.01});`
+                    : '',
                 onClick: () => {
                     current.showChildren = !current.showChildren;
                     if (current.showChildren && current.hasChildren && current.children.length > 0) {

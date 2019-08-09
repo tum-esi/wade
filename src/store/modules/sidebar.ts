@@ -69,6 +69,7 @@ export default {
                     hasTimingPerformance: false,
                     iconSrcPath: ElementTypeEnum.FOLDER,
                     folder: {},
+                    numOfParents: 0,
                     children: [
                         // only for testing, dummy data
                         {
@@ -80,6 +81,7 @@ export default {
                             hasTimingPerformance: false,
                             iconSrcPath: ElementTypeEnum.FOLDER,
                             folder: {},
+                            numOfParents: 1,
                             children: []
                         },
                         {
@@ -91,6 +93,7 @@ export default {
                             hasTimingPerformance: false,
                             iconSrcPath: ElementTypeEnum.FOLDER,
                             folder: {},
+                            numOfParents: 1,
                             children: [
                                 {
                                     parentId: `${payload.id + 2}`,
@@ -101,6 +104,7 @@ export default {
                                     hasTimingPerformance: false,
                                     iconSrcPath: ElementTypeEnum.FOLDER,
                                     folder: {},
+                                    numOfParents: 2,
                                     children: []
                                 },
                             ]
