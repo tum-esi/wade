@@ -199,6 +199,10 @@ textarea:focus, input:focus{
   background: #8aaba9;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;

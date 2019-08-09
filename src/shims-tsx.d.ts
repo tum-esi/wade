@@ -116,8 +116,6 @@ declare global {
       hasChildren?: boolean;
       // Array of Elements. A TD can't have any children.
       children?: SidebarElement[];
-      // Has this Element a Timing performance
-      hasTimingPerformance?: boolean;
       // If element is td
       td?: object;
       // If element is folder

@@ -1,15 +1,13 @@
 <template>
-  <div class="sidebar-element-container" v-on:click="sidebarElementClicked">
+  <div class="sidebar-element-container" 
+      v-on:click="sidebarElementClicked"
+      @mouseover="showOptions = true" 
+      @mouseleave="showOptions = false">
     <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }" :style="styleCss">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath">
       <label class="sidbar-element-label">{{ title }}</label>
-      <img
-        v-if="hasTimingPerformance"
-        class="sidebar-element-icon-performance"
-        :src="srcPathTimingPerf"
-      >
       <img 
-        :style="children.length > 0 ? '' : 'visibility: hidden;'"
+        :style="children && children.length > 0 ? '' : 'visibility: hidden;'"
         class="sidebar-element-icon-dropdown" 
         @mouseover="childrenHover = true" 
         @mouseleave="childrenHover = false"
@@ -20,6 +18,14 @@
         @mouseover="deleteHover = true" 
         @mouseleave="deleteHover = false"
         :src="deleteHover ? srcPathDeleteWhite : srcPathDelete" v-on:click.stop="deleteBtnClicked"
+      >
+      <img
+        :class="{'invisible' : !canHaveChildren || !showOptions}"
+        class="sidebar-element-icon-options"
+        @mouseover="optionsHover = true"
+        @mouseleave="optionsHover = false"
+        :src="optionsHover ? srcPathOptionsWhite : srcPathOptions"
+        v-on:click.stop="optionBtnClicked"
       >
     </div>
   </div>
@@ -54,10 +60,6 @@ export default Vue.extend({
       required: false,
       default: null
     },
-    hasTimingPerformance: {
-      type: Boolean,
-      default: false
-    },
     iconSrcPath: {
       type: String,
       required: false,
@@ -74,10 +76,13 @@ export default Vue.extend({
   },
   data() {
     return{
+      showOptions: false,
       childrenAreShown: false,
       deleteHover: false,
       childrenHover: false,
-      srcPathTimingPerf: require('@/assets/performance.png'),
+      optionsHover: false,
+      srcPathOptions: require('@/assets/options.png'),
+      srcPathOptionsWhite: require('@/assets/options_white.png'),
       srcPathDropdown: require('@/assets/arrow_down.png'),
       srcPathDropdownClosed: require('@/assets/arrow_right.png'),
       srcPathDropdownWhite: require('@/assets/arrow_down_white.png'),
@@ -93,6 +98,9 @@ export default Vue.extend({
     },
     getIconSrcPath(): any {
       return require(`@/assets/${this.iconSrcPath}.png`);
+    },
+    canHaveChildren(): boolean {
+      return this.type === ElementTypeEnum.FOLDER || this.type === ElementTypeEnum.MASHUP;
     }
   },
   methods: {
@@ -105,6 +113,9 @@ export default Vue.extend({
     showChildrenClicked() {
       this.childrenAreShown = !this.childrenAreShown;
       this.onClick();
+    },
+    optionBtnClicked() {
+      // TODO: show Dropdown to add children
     }
   }
 });
@@ -149,13 +160,17 @@ export default Vue.extend({
   overflow: hidden;
 }
 
-.sidebar-element-icon-dropdown, .sidebar-element-icon-performance, .sidebar-element-delete-icon{
-  padding: 10px;
-  max-height: 35px;
-  max-width: 35px;
+.sidebar-element-icon-dropdown, .sidebar-element-delete-icon{
+    padding: 7px 5px 7px 0px;
+    max-height: 30px;
+    max-width: 30px;
+    object-fit: contain;
+
 }
 
-.child {
-  background: #1234;
+.sidebar-element-icon-options {
+  padding: 7px 0px 7px 0px;
+  width: 15px;
+  object-fit: contain;
 }
 </style>

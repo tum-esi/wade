@@ -8,7 +8,6 @@
         :type="element.type"
         :hasChildren="element.hasChildren"
         :children="element.children"
-        :hasTimingPerformance="element.hasTimingPerformance"
         :iconSrcPath="element.iconSrcPath"
         :onClick="element.onClick"
         :styleCss="element.styleCss"
@@ -70,7 +69,6 @@ export default Vue.extend({
                 type: current.type,
                 hasChildren: current.hasChildren,
                 children: current.children,
-                hasTimingPerformance: current.hasTimingPerformance,
                 iconSrcPath: current.iconSrcPath,
                 showChildren: false,
                 styleCss: current.numOfParents > 0
@@ -117,7 +115,7 @@ export default Vue.extend({
                 // Delete sidebar element
                 this.sidebarElements.splice(this.sidebarElements.indexOf(sidebarElement), 1);
                 // Recursively check if this sidebarElement had children & delete them too
-                if (sidebarElement.children.length > 0) {
+                if (sidebarElement.children && sidebarElement.children.length > 0) {
                     for (const childElement of sidebarElement.children) {
                         this.removeComponent(childElement.id);
                     }

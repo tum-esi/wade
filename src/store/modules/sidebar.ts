@@ -53,7 +53,6 @@ export default {
                     title: payload.title,
                     id: payload.id,
                     hasChildren: false,
-                    hasTimingPerformance: true,
                     iconSrcPath: ElementTypeEnum.TD,
                     td: {}
                 };
@@ -66,7 +65,6 @@ export default {
                     title: payload.title,
                     id: payload.id,
                     hasChildren: true,
-                    hasTimingPerformance: false,
                     iconSrcPath: ElementTypeEnum.FOLDER,
                     folder: {},
                     numOfParents: 0,
@@ -78,7 +76,6 @@ export default {
                             title: `${payload.id + 1}`,
                             id: `${payload.id + 1}`,
                             hasChildren: true,
-                            hasTimingPerformance: false,
                             iconSrcPath: ElementTypeEnum.FOLDER,
                             folder: {},
                             numOfParents: 1,
@@ -90,7 +87,6 @@ export default {
                             title: `${payload.id + 2}`,
                             id: `${payload.id + 2}`,
                             hasChildren: true,
-                            hasTimingPerformance: false,
                             iconSrcPath: ElementTypeEnum.FOLDER,
                             folder: {},
                             numOfParents: 1,
@@ -101,7 +97,6 @@ export default {
                                     title: `${payload.id + 3}`,
                                     id: `${payload.id + 3}`,
                                     hasChildren: true,
-                                    hasTimingPerformance: false,
                                     iconSrcPath: ElementTypeEnum.FOLDER,
                                     folder: {},
                                     numOfParents: 2,
@@ -119,7 +114,6 @@ export default {
                     title: payload.title,
                     id: payload.id,
                     hasChildren: false,
-                    hasTimingPerformance: false,
                     iconSrcPath: ElementTypeEnum.MASHUP,
                     mashup: {},
                     children: []
