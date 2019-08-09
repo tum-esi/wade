@@ -11,14 +11,16 @@
         :hasTimingPerformance="element.hasTimingPerformance"
         :iconSrcPath="element.iconSrcPath"
         :onClick="element.onClick"
+        :styleCss="element.styleCss"
         v-on:element-clicked="sidebarElementClicked"
+        v-on:delete-element="deleteElement"
     />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import aSidebarElement from '@/components/01_atoms/aSidebarElement.vue';
 
 export default Vue.extend({
@@ -31,9 +33,13 @@ export default Vue.extend({
         this.$eventHub.$on('sidebar-element-added', () => {
             this.addComponent(this.getSidebarElements, 'parent');
         });
+        this.$eventHub.$on('sidebar-element-removed', (id: string) => {
+            this.removeComponent(id);
+        });
     },
     beforeDestroy() {
         this.$eventHub.$off('sidebar-element-added');
+        this.$eventHub.$off('sidebar-element-removed');
     },
     mounted() {
         const parentElement = { id: 'parent' };
@@ -48,6 +54,7 @@ export default Vue.extend({
       };
   },
   methods: {
+    ...mapMutations('SidebarStore', ['deleteSidebarElement']),
     addComponent(elements, parentId) {
         for (let i = 0, l = elements.length; i < l; i++) {
             const current = elements[i];
@@ -57,6 +64,7 @@ export default Vue.extend({
 
             // Data for new sidebar element
             const newSidebarElement = {
+                parentId,
                 title: current.title,
                 id: current.id,
                 type: current.type,
@@ -65,12 +73,13 @@ export default Vue.extend({
                 hasTimingPerformance: current.hasTimingPerformance,
                 iconSrcPath: current.iconSrcPath,
                 showChildren: false,
+                styleCss: parentId !== 'parent' ? 'child' : null,
                 onClick: () => {
                     current.showChildren = !current.showChildren;
                     if (current.showChildren && current.hasChildren && current.children.length > 0) {
                         this.addComponent(current.children, current.id);
                     } else if (!current.showChildren && current.hasChildren && current.children.length > 0) {
-                        this.removeComponent(current.children);
+                        this.hideComponent(current.children);
                     }
                 }
             };
@@ -84,7 +93,7 @@ export default Vue.extend({
             }
         }
     },
-    removeComponent(elements) {
+    hideComponent(elements) {
         for (let i = 0, l = elements.length; i < l; i++) {
             const current = elements[i];
 
@@ -93,12 +102,32 @@ export default Vue.extend({
 
             // Recursively also remove children
             if (current.hasChildren && current.children.length > 0) {
-                this.removeComponent(current.children);
+                this.hideComponent(current.children);
+            }
+        }
+    },
+
+    removeComponent(id) {
+        // this.sidebarElements is a one dimensional vs store sidebarElements is nested
+        for (const sidebarElement of this.sidebarElements) {
+            if (sidebarElement.id === id) {
+                // Delete sidebar element
+                this.sidebarElements.splice(this.sidebarElements.indexOf(sidebarElement), 1);
+                // Recursively check if this sidebarElement had children & delete them too
+                if (sidebarElement.children.length > 0) {
+                    for (const childElement of sidebarElement.children) {
+                        this.removeComponent(childElement.id);
+                    }
+                }
             }
         }
     },
     sidebarElementClicked(id: string, type: string) {
-      this.$emit('element-clicked', id, type);
+        this.$emit('element-clicked', id, type);
+    },
+    deleteElement(id: string, type: string) {
+        this.deleteSidebarElement({id, type});
+        this.$eventHub.$emit('sidebar-element-removed', id);
     }
   }
 });

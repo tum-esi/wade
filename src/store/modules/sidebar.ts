@@ -48,6 +48,7 @@ export default {
         switch (payload.type) {
             case ElementTypeEnum.TD:
                 newElement = {
+                    parentId: 'parent',
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
@@ -60,6 +61,7 @@ export default {
                 return newElement;
             case ElementTypeEnum.FOLDER:
                 newElement = {
+                    parentId: 'parent',
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
@@ -70,14 +72,38 @@ export default {
                     children: [
                         // only for testing, dummy data
                         {
+                            parentId: payload.id,
                             type: payload.type,
-                            title: `${payload.id}${Math.random()}`,
-                            id: `${payload.id}${Math.random()}`,
+                            title: `${payload.id + 1}`,
+                            id: `${payload.id + 1}`,
                             hasChildren: true,
                             hasTimingPerformance: false,
                             iconSrcPath: ElementTypeEnum.FOLDER,
                             folder: {},
                             children: []
+                        },
+                        {
+                            parentId: payload.id,
+                            type: payload.type,
+                            title: `${payload.id + 2}`,
+                            id: `${payload.id + 2}`,
+                            hasChildren: true,
+                            hasTimingPerformance: false,
+                            iconSrcPath: ElementTypeEnum.FOLDER,
+                            folder: {},
+                            children: [
+                                {
+                                    parentId: `${payload.id + 2}`,
+                                    type: payload.type,
+                                    title: `${payload.id + 3}`,
+                                    id: `${payload.id + 3}`,
+                                    hasChildren: true,
+                                    hasTimingPerformance: false,
+                                    iconSrcPath: ElementTypeEnum.FOLDER,
+                                    folder: {},
+                                    children: []
+                                },
+                            ]
                         }
                     ]
                 };
@@ -102,6 +128,23 @@ export default {
     },
     },
     mutations: {
+        deleteSidebarElement(state: any, payload: any) {
+            // Search elements and children recursive and delet existing element
+            function getElement(elements: WADE.SidebarElement[], id: string) {
+                for (const element of elements) {
+                    if (element.id === id) {
+                        // Delete element
+                        elements.splice(elements.indexOf(element), 1);
+                        break;
+                    }
+                    if (element.hasChildren && element.children && element.children.length > 0) {
+                        getElement(element.children, id);
+                    }
+                }
+                state.sidebarElements = elements;
+            }
+            getElement(state.sidebarElements, payload.id);
+        },
       setActiveElement(state: any, payload: any) {
           state.activeElementId = payload;
       },

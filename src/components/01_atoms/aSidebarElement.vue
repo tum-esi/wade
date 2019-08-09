@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-element-container" v-on:click="sidebarElementClicked">
+  <div class="sidebar-element-container" v-on:click="sidebarElementClicked" :class="styleCss">
     <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath">
       <label class="sidbar-element-label">{{ title }}</label>
@@ -8,7 +8,19 @@
         class="sidebar-element-icon-performance"
         :src="srcPathTimingPerf"
       >
-      <img v-if="hasChildren" class="sidebar-element-icon-dropdown" :src="srcPathDropdown">
+      <img 
+        v-if="children.length > 0" 
+        class="sidebar-element-icon-dropdown" 
+        @mouseover="childrenHover = true" 
+        @mouseleave="childrenHover = false"
+        :src="childrenAreShown ? childrenHover ? srcPathDropdownWhite : srcPathDropdown : childrenHover ? srcPathDropdownClosedWhite : srcPathDropdownClosed"
+        v-on:click.stop="showChildrenClicked"
+      >
+      <img class="sidebar-element-delete-icon" 
+        @mouseover="deleteHover = true" 
+        @mouseleave="deleteHover = false"
+        :src="deleteHover ? srcPathDeleteWhite : srcPathDelete" v-on:click.stop="deleteBtnClicked"
+      >
     </div>
   </div>
 </template>
@@ -54,13 +66,25 @@ export default Vue.extend({
     onClick: {
       type: Function,
       required: true
+    },
+    styleCss: {
+      type: String,
+      required: false
     }
   },
   data() {
-      return{
-          srcPathTimingPerf: require('@/assets/performance.png'),
-          srcPathDropdown: require('@/assets/arrow_down.png')
-      };
+    return{
+      childrenAreShown: false,
+      deleteHover: false,
+      childrenHover: false,
+      srcPathTimingPerf: require('@/assets/performance.png'),
+      srcPathDropdown: require('@/assets/arrow_down.png'),
+      srcPathDropdownClosed: require('@/assets/arrow_right.png'),
+      srcPathDropdownWhite: require('@/assets/arrow_down_white.png'),
+      srcPathDropdownClosedWhite: require('@/assets/arrow_right_white.png'),
+      srcPathDelete: require('@/assets/delete.png'),
+      srcPathDeleteWhite: require('@/assets/delete_white.png')
+    };
   },
   computed: {
     ...mapGetters('SidebarStore', ['isActiveElement']),
@@ -73,8 +97,14 @@ export default Vue.extend({
   },
   methods: {
     sidebarElementClicked() {
-      this.onClick();
       this.$emit('element-clicked', this.id, this.type);
+    },
+    deleteBtnClicked() {
+      this.$emit('delete-element', this.id, this.type);
+    },
+    showChildrenClicked() {
+      this.childrenAreShown = !this.childrenAreShown;
+      this.onClick();
     }
   }
 });
@@ -106,14 +136,31 @@ export default Vue.extend({
 .sidebar-element-icon-type {
   width: 20%;
   padding: 10px;
+  max-height: 40px;
+  max-width: 40px;
+}
+
+.sidebar-element-delete-icon {
+  width: 15%;
+  padding: 10px;
+}
+
+.sidebar-element-delete-icon:hover {
+  -webkit-filter: brightness(3);
+  filter: brightness(3);
 }
 
 .sidbar-element-label {
   width: 65%;
+  overflow: hidden;
 }
 
 .sidebar-element-icon-dropdown, .sidebar-element-icon-performance{
   width: 15%;
   padding: 10px;
+}
+
+.child {
+  background: #1234;
 }
 </style>

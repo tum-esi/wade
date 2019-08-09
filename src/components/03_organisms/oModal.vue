@@ -95,7 +95,6 @@ export default Vue.extend({
           } else if (element.hasDuplicateError) {
             hasError = true;
           } else if (element.input) {
-            console.log('element obj:', element);
             // Push form data to newElement and delete form input
             const newDataElement = {
               key: element.key,

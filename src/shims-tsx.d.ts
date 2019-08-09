@@ -115,7 +115,7 @@ declare global {
       // Has this element any children
       hasChildren?: boolean;
       // Array of Elements. A TD can't have any children.
-      children?: { folders?: SidebarElement[], mashups?: SidebarElement[], tds?: SidebarElement[]};
+      children?: SidebarElement[];
       // Has this Element a Timing performance
       hasTimingPerformance?: boolean;
       // If element is td
@@ -124,6 +124,8 @@ declare global {
       folder?: object;
       // If element is mashup
       mashup?: object;
+      // Optional string for element style
+      styleCss?: string;
     }
 
     interface TabbarElementInterface {
