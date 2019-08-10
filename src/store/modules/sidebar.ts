@@ -34,8 +34,32 @@ export default {
                   key: ElementTypeEnum.MASHUP,
                   icon: 'mashup'
                 }
-              ]
-        },
+              ] as WADE.DropdownOptionInterface[]
+        } as WADE.ADropdowButtonInterface,
+        sidebarElementDropdown: {
+            btnKey: 'show-dropdown-options-sidebar-element',
+            btnStyle: 'dropdown-container-sidebar-element',
+            btnIconStyle: 'sidebar-element-icon-options',
+            btnDropdownOptions: [
+                {
+                  title: `Add new ${ElementTitleEnum.FOLDER}`,
+                  key: ElementTypeEnum.FOLDER,
+                  icon: 'folder',
+                  style: 'border-bottom'
+                },
+                {
+                  title: 'Add new TD',
+                  key: ElementTypeEnum.TD,
+                  icon: 'td',
+                  style: 'border-bottom'
+                },
+                {
+                  title: `Add new ${ElementTitleEnum.MASHUP}`,
+                  key: ElementTypeEnum.MASHUP,
+                  icon: 'mashup'
+                }
+              ] as WADE.DropdownOptionInterface[]
+        } as WADE.ADropdowButtonInterface,
         sidebarElements: [],
         folders: [],
         mashups: [],
@@ -172,6 +196,9 @@ export default {
         },
         getAddNewButton(state: any) {
             return state.sidebarAddNewButton;
+        },
+        sidebarElementDropdown(state: any) {
+            return state.sidebarElementDropdown;
         },
         getSidebarElements(state: any) {
             return state.sidebarElements;

@@ -19,14 +19,21 @@
         @mouseleave="deleteHover = false"
         :src="deleteHover ? srcPathDeleteWhite : srcPathDelete" v-on:click.stop="deleteBtnClicked"
       >
-      <img
-        :class="{'invisible' : !canHaveChildren || !showOptions}"
-        class="sidebar-element-icon-options"
+      <div
         @mouseover="optionsHover = true"
         @mouseleave="optionsHover = false"
-        :src="optionsHover ? srcPathOptionsWhite : srcPathOptions"
-        v-on:click.stop="optionBtnClicked"
       >
+        <aDropdownButton
+          :class="{'invisible' : (!canHaveChildren || !showOptions) &&!isDropdownShown}" 
+          class="dropdown-options"
+          :btnSrc="optionsHover ? srcPathOptionsWhite : srcPathOptions"
+          :btnKey="sidebarElementDropdown.btnKey"
+          :btnDropdownOptions="sidebarElementDropdown.btnDropdownOptions"
+          :btnStyle="sidebarElementDropdown.btnStyle"
+          :btnIconStyle="sidebarElementDropdown.btnIconStyle"
+          v-on:show-dropdown-options-sidebar-element="setShowDropdown"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -35,9 +42,13 @@
 import Vue from 'vue';
 import { ElementTypeEnum } from '@/util/enums';
 import { mapMutations, mapGetters } from 'vuex';
+import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 
 export default Vue.extend({
     name: 'aSidebarElement',
+    components: {
+      aDropdownButton
+    },
     props: {
     title: {
       type: String,
@@ -76,23 +87,24 @@ export default Vue.extend({
   },
   data() {
     return{
+      isDropdownShown: false,
       showOptions: false,
       childrenAreShown: false,
       deleteHover: false,
       childrenHover: false,
       optionsHover: false,
-      srcPathOptions: require('@/assets/options.png'),
-      srcPathOptionsWhite: require('@/assets/options_white.png'),
+      srcPathOptions: 'options',
+      srcPathOptionsWhite: 'options_white',
       srcPathDropdown: require('@/assets/arrow_down.png'),
       srcPathDropdownClosed: require('@/assets/arrow_right.png'),
       srcPathDropdownWhite: require('@/assets/arrow_down_white.png'),
       srcPathDropdownClosedWhite: require('@/assets/arrow_right_white.png'),
       srcPathDelete: require('@/assets/delete.png'),
-      srcPathDeleteWhite: require('@/assets/delete_white.png')
+      srcPathDeleteWhite: require('@/assets/delete_white.png'),
     };
   },
   computed: {
-    ...mapGetters('SidebarStore', ['isActiveElement']),
+    ...mapGetters('SidebarStore', ['isActiveElement', 'sidebarElementDropdown']),
     isActive(): any {
       return (this as any).isActiveElement(this.id, this.type);
     },
@@ -116,6 +128,9 @@ export default Vue.extend({
     },
     optionBtnClicked() {
       // TODO: show Dropdown to add children
+    },
+    setShowDropdown(isDropdownShown: boolean) {
+      this.isDropdownShown = isDropdownShown;
     }
   }
 });
@@ -168,9 +183,7 @@ export default Vue.extend({
 
 }
 
-.sidebar-element-icon-options {
-  padding: 7px 0px 7px 0px;
-  width: 15px;
-  object-fit: contain;
+.dropdown-options {
+  border: none; 
 }
 </style>

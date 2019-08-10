@@ -1,10 +1,10 @@
 <template>
     <div class="dropdown-btn-container" v-on:click.prevent="showDropdown =! showDropdown">
-        <div class="button-label-container">
+        <div v-if="btnLabel" class="button-label-container">
             <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
         </div>
 
-        <img class="button-icon" v-if="btnSrc" v-bind:src="iconSrc">
+        <img class="button-icon" v-if="btnSrc" v-bind:src="iconSrc" :class="btnIconStyle">
 
         <div class="dropdown-container" v-if="showDropdown" :class="btnStyle">
             <div
@@ -55,17 +55,23 @@ export default Vue.extend({
          * A list of all options for the dropdown.
          */
         btnDropdownOptions: {
-        // type: Array as () => Array<WADE.DropdownOption>,
+        type: Array as () => WADE.DropdownOptionInterface[],
         required: true
         },
         /**
-         * Source path for the button's icon.
-         * TODO: add this everywhere
+         * Unique styling for the dropdown container.
          */
         btnStyle: {
             type: String,
             required: false
         },
+        /**
+         * Unique styling for the icon.
+         */
+        btnIconStyle: {
+            type: String,
+            required: false
+        }
     },
     data() {
         return {
@@ -97,6 +103,11 @@ export default Vue.extend({
             btnInput: dropdownElement.inputValue
         });
         }
+    },
+    watch: {
+        showDropdown() {
+            this.$emit(`${this.btnKey}`, this.showDropdown);
+        }
     }
 });
 </script>
@@ -126,6 +137,7 @@ export default Vue.extend({
     background: #b5dfdd;
 }
 
+/* Default styling for dropdown container */
 .dropdown-container {
     border: 1px solid #000;
     border-radius: 3px;
@@ -151,6 +163,13 @@ export default Vue.extend({
     margin-top: 80%;
 }
 
+/* Dropdown styling for sidebar element dropdowns */
+.dropdown-container-sidebar-element {
+    left: -1180%;
+    width: 1300%;
+    margin-top: 200%;
+}
+
 .dropdown-element {
     padding: 0px 7px 0px 7px;
     display: flex;
@@ -171,5 +190,13 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* btn style for sidebar dropdown options */
+.sidebar-element-icon-options {
+  padding: 7px 0px 7px 0px;
+  width: 15px;
+  object-fit: contain;
+  background: transparent;
 }
 </style>
