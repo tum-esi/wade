@@ -45,7 +45,8 @@ export default Vue.extend({
         hasError: false,
         newElement: {
           type: '',
-          data: [{}]
+          data: [{}],
+          parentId: ''
         },
         defaultSrc: '',
         footerButtons: [
@@ -83,6 +84,7 @@ export default Vue.extend({
         let hasError = false;
         this.newElement.type = this.modalElement.type;
         this.newElement.data = [];
+        this.newElement.parentId = this.modalElement.parentId || '';
 
         // Check if formfields are correct
         this.$eventHub.$emit('check-has-error');

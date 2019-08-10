@@ -31,7 +31,8 @@
           :btnDropdownOptions="sidebarElementDropdown.btnDropdownOptions"
           :btnStyle="sidebarElementDropdown.btnStyle"
           :btnIconStyle="sidebarElementDropdown.btnIconStyle"
-          v-on:show-dropdown-options-sidebar-element="setShowDropdown"
+          v-on:add-new-from-sidebar-element="setShowDropdown"
+          v-on:dropdown-clicked="optionDropdownClicked"
         />
       </div>
     </div>
@@ -126,11 +127,13 @@ export default Vue.extend({
       this.childrenAreShown = !this.childrenAreShown;
       this.onClick();
     },
-    optionBtnClicked() {
-      // TODO: show Dropdown to add children
-    },
     setShowDropdown(isDropdownShown: boolean) {
       this.isDropdownShown = isDropdownShown;
+    },
+    optionDropdownClicked(element: any) {
+      this.isDropdownShown = false;
+      element.parentId = this.id;
+      this.$emit('dropdown-clicked', element);
     }
   }
 });

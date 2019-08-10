@@ -37,7 +37,7 @@ export default {
               ] as WADE.DropdownOptionInterface[]
         } as WADE.ADropdowButtonInterface,
         sidebarElementDropdown: {
-            btnKey: 'show-dropdown-options-sidebar-element',
+            btnKey: 'add-new-from-sidebar-element',
             btnStyle: 'dropdown-container-sidebar-element',
             btnIconStyle: 'sidebar-element-icon-options',
             btnDropdownOptions: [
@@ -72,7 +72,7 @@ export default {
         switch (payload.type) {
             case ElementTypeEnum.TD:
                 newElement = {
-                    parentId: 'parent',
+                    parentId: payload.parentId ? payload.parentId : 'parent',
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
@@ -84,7 +84,7 @@ export default {
                 return newElement;
             case ElementTypeEnum.FOLDER:
                 newElement = {
-                    parentId: 'parent',
+                    parentId: payload.parentId ? payload.parentId : 'parent',
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
@@ -92,48 +92,13 @@ export default {
                     iconSrcPath: ElementTypeEnum.FOLDER,
                     folder: {},
                     numOfParents: 0,
-                    children: [
-                        // only for testing, dummy data
-                        {
-                            parentId: payload.id,
-                            type: payload.type,
-                            title: `${payload.id + 1}`,
-                            id: `${payload.id + 1}`,
-                            hasChildren: true,
-                            iconSrcPath: ElementTypeEnum.FOLDER,
-                            folder: {},
-                            numOfParents: 1,
-                            children: []
-                        },
-                        {
-                            parentId: payload.id,
-                            type: payload.type,
-                            title: `${payload.id + 2}`,
-                            id: `${payload.id + 2}`,
-                            hasChildren: true,
-                            iconSrcPath: ElementTypeEnum.FOLDER,
-                            folder: {},
-                            numOfParents: 1,
-                            children: [
-                                {
-                                    parentId: `${payload.id + 2}`,
-                                    type: payload.type,
-                                    title: `${payload.id + 3}`,
-                                    id: `${payload.id + 3}`,
-                                    hasChildren: true,
-                                    iconSrcPath: ElementTypeEnum.FOLDER,
-                                    folder: {},
-                                    numOfParents: 2,
-                                    children: []
-                                },
-                            ]
-                        }
-                    ]
+                    children: []
                 };
                 commit('addNewFolder', newElement);
                 return newElement;
             case ElementTypeEnum.MASHUP:
                 newElement = {
+                    parentId: payload.parentId ? payload.parentId : 'parent',
                     type: payload.type,
                     title: payload.title,
                     id: payload.id,
@@ -180,7 +145,24 @@ export default {
           state.folders.push(payload);
       },
       addSidebarElement(state: any, payload: any) {
-          state.sidebarElements.push(payload);
+        if (payload.parentId === 'parent') {
+            state.sidebarElements.push(payload);
+            return;
+        }
+
+        function findParentElement(elements: WADE.SidebarElement[], parentId: string) {
+            for (const element of elements) {
+                if (element.id === parentId && element.children) {
+                    element.children.push(payload);
+                    break;
+                }
+                if (element.children && element.children.length > 0) {
+                    findParentElement(element.children, parentId);
+                }
+            }
+            state.sidebarElements = elements;
+        }
+        findParentElement(state.sidebarElements, payload.parentId);
       },
       setNewCurrentTd(state: any, payload: any) {
           for (const sidebarElement in state.sidebarElements) {

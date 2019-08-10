@@ -24,6 +24,7 @@
     <div class="sidebar-elements-container"> 
       <mSidebarElementGroup 
         v-on:element-clicked="sidebarElementClicked"
+        v-on:dropdown-clicked="openModuleAddElement"
       />
     </div>
   </div>

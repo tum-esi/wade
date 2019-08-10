@@ -13,6 +13,7 @@
         :styleCss="element.styleCss"
         v-on:element-clicked="sidebarElementClicked"
         v-on:delete-element="deleteElement"
+        v-on:dropdown-clicked="optionDropdownClicked"
     />
   </div>
 </template>
@@ -129,6 +130,9 @@ export default Vue.extend({
     deleteElement(id: string, type: string) {
         this.deleteSidebarElement({id, type});
         this.$eventHub.$emit('sidebar-element-removed', id);
+    },
+    optionDropdownClicked(element: any) {
+        this.$emit('dropdown-clicked', element);
     }
   }
 });

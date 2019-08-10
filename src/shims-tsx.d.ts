@@ -31,6 +31,7 @@ declare global {
       src: string;
       title: string;
       forms: ModalAddElementFormItem[];
+      parentId?: string | null;
     }
 
     interface ModalAddElementFormItem {

@@ -92,16 +92,18 @@ export default Vue.extend({
             return require(`@/assets/${btnSrc}.png`);
         },
         dropDownClicked(dropdownElement: WADE.DropdownOptionInterface) {
-        this.$emit('dropdown-clicked', {
-            btnKey: this.btnKey,
-            btnValue: dropdownElement.key,
-            btnInput: dropdownElement.inputValue
-        });
-        this.$eventHub.$emit('dropdown-clicked', {
-            btnKey: this.btnKey,
-            btnValue: dropdownElement.key,
-            btnInput: dropdownElement.inputValue
-        });
+            this.$emit('dropdown-clicked', {
+                btnKey: this.btnKey,
+                btnValue: dropdownElement.key,
+                btnInput: dropdownElement.inputValue,
+                parentId: null
+            });
+            this.$eventHub.$emit('dropdown-clicked', {
+                btnKey: this.btnKey,
+                btnValue: dropdownElement.key,
+                btnInput: dropdownElement.inputValue,
+                parentId: null
+            });
         }
     },
     watch: {
