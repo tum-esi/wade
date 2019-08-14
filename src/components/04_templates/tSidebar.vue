@@ -1,28 +1,26 @@
 <template>
   <div class="sidebar">
-      <aTab 
-        class="sidebar-header"
-        :tabId="getHeaderTab.tabId"
-        :tabTitle="getHeaderTab.tabTitle"
-        :tabStyle="getHeaderTab.tabStyle"
-        :tabButtonStyle="getHeaderTab.tabButtonStyle"
-        :tabIconButton="getHeaderTab.tabIconButton"
-        v-on:tab-clicked="homeClicked"
-        />
-      <div class="sidebar-search">
-        <aSearchbar 
-          class="searchbar"
-        />
-        <aDropdownButton 
-          class="dropdown-btn"
-          :btnKey="getAddNewButton.btnKey"
-          :btnSrc="getAddNewButton.btnSrc"
-          :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
-          v-on:dropdown-clicked="openModuleAddElement"
-        />
-      </div>
-    <div class="sidebar-elements-container"> 
-      <mSidebarElementGroup 
+    <aTab
+      class="sidebar-header"
+      :tabId="getHeaderTab.tabId"
+      :tabTitle="getHeaderTab.tabTitle"
+      :tabStyle="getHeaderTab.tabStyle"
+      :tabButtonStyle="getHeaderTab.tabButtonStyle"
+      :tabIconButton="getHeaderTab.tabIconButton"
+      v-on:tab-clicked="homeClicked"
+    />
+    <div class="sidebar-search">
+      <aSearchbar class="searchbar" />
+      <aDropdownButton
+        class="dropdown-btn"
+        :btnKey="getAddNewButton.btnKey"
+        :btnSrc="getAddNewButton.btnSrc"
+        :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
+        v-on:dropdown-clicked="openModuleAddElement"
+      />
+    </div>
+    <div class="sidebar-elements-container">
+      <mSidebarElementGroup
         v-on:element-clicked="sidebarElementClicked"
         v-on:dropdown-clicked="openModuleAddElement"
       />
@@ -30,7 +28,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 import Vue from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
 import aTab from '@/components/01_atoms/aTab.vue';
@@ -41,31 +39,35 @@ import mSidebarElementGroup from '@/components/02_molecules/mSidebarElementGroup
 export default Vue.extend({
   name: 'tSidebar',
   components: {
-      aTab,
-      aSearchbar,
-      aDropdownButton,
-      mSidebarElementGroup
+    aTab,
+    aSearchbar,
+    aDropdownButton,
+    mSidebarElementGroup
   },
   computed: {
-    ...mapGetters('SidebarStore', ['getHeaderTab', 'getAddNewButton', 'getSidebarElements']),
+    ...mapGetters('SidebarStore', [
+      'getHeaderTab',
+      'getAddNewButton',
+      'getSidebarElements'
+    ])
   },
   methods: {
-      homeClicked() {
-        this.$emit('home-clicked');
-      },
-      sidebarElementClicked(elementId: string, elementType: string) {
-        this.$emit('sidebar-element-clicked', elementId, elementType);
-      },
-      openModuleAddElement(element: any) {
-        this.$emit('open-module-element', element);
-      }
+    homeClicked() {
+      this.$emit('home-clicked');
+    },
+    sidebarElementClicked(elementId: string, elementType: string) {
+      this.$emit('sidebar-element-clicked', elementId, elementType);
+    },
+    openModuleAddElement(element: any) {
+      this.$emit('open-module-element', element);
+    }
   }
 });
 </script>
 
 <style scoped>
 .sidebar {
-  border-right: 1px solid #393B3A;
+  border-right: 1px solid #393b3a;
 }
 
 .sidebar-header {
@@ -79,7 +81,7 @@ export default Vue.extend({
   justify-content: space-between;
   padding: 7px;
   height: 50px;
-  border-bottom: 1px solid #393B3A;
+  border-bottom: 1px solid #393b3a;
 }
 
 /* Searchbar Input field with icon */
@@ -91,6 +93,5 @@ export default Vue.extend({
 .dropdown-btn {
   width: 20%;
 }
-
 </style>
 
