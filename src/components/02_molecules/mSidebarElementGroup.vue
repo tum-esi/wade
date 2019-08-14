@@ -11,6 +11,7 @@
         :iconSrcPath="element.iconSrcPath"
         :onClick="element.onClick"
         :styleCss="element.styleCss"
+        :showChildren="element.showChildren"
         v-on:element-clicked="sidebarElementClicked"
         v-on:delete-element="deleteElement"
         v-on:dropdown-clicked="optionDropdownClicked"
@@ -30,8 +31,8 @@ export default Vue.extend({
     },
     created() {
         // Check if new element was added to store and renew list
-        this.$eventHub.$on('sidebar-element-added', () => {
-            this.addComponent(this.getSidebarElements, 'parent');
+        this.$eventHub.$on('sidebar-element-added', (parentId: string) => {
+            this.addComponent(this.getSidebarElements, parentId, true);
         });
         this.$eventHub.$on('sidebar-element-removed', (id: string) => {
             this.removeComponent(id);
@@ -42,8 +43,7 @@ export default Vue.extend({
         this.$eventHub.$off('sidebar-element-removed');
     },
     mounted() {
-        const parentElement = { id: 'parent' };
-        this.addComponent(this.getSidebarElements, parent);
+        this.addComponent(this.getSidebarElements, 'parent', false);
     },
   computed: {
     ...mapGetters('SidebarStore', ['getSidebarElements'])
@@ -55,12 +55,33 @@ export default Vue.extend({
   },
   methods: {
     ...mapMutations('SidebarStore', ['deleteSidebarElement']),
-    addComponent(elements, parentId) {
-        for (let i = 0, l = elements.length; i < l; i++) {
+    addComponent(elements: WADE.SidebarElement[], parentId: string, isNewElement: boolean) {
+        for (let i = 0, lI = elements.length; i < lI; i++) {
             const current = elements[i];
+            const uiElementAlreadyExists = this.sidebarElements.find((el) => { if (el.id === current.id) return el; });
 
-            // Don't add component when already shown
-            if (this.sidebarElements.some(sidebarElement => sidebarElement.id === current.id )) continue;
+            // If a new element was added as a child it needs to be shown
+            if (isNewElement && uiElementAlreadyExists) {
+                for (let y = 0, lY = this.sidebarElements.length; y < lY; y++) {
+                    if (parentId !== 'parent' && parentId === this.sidebarElements[y].id) {
+                        // Parent sidebar element should show children
+                        this.sidebarElements[y].showChildren = true; // parentElement
+                        const currentSidebarElement = this.sidebarElements.find(
+                                (el) => { if (el.id === current.id) return el; });
+                        current.showChildren = true;
+                        if (
+                            current.showChildren
+                            && current.hasChildren
+                            && current.children
+                            && current.children.length > 0) {
+                            this.addComponent(current.children, current.id, true);
+                        }
+                    }
+                }
+            }
+
+            // Don't add component to UI when already shown
+            if (uiElementAlreadyExists) continue;
 
             // Data for new sidebar element
             const newSidebarElement = {
@@ -77,10 +98,15 @@ export default Vue.extend({
                     background: rgba(0, 0, 0, ${current.numOfParents * 5 * 0.01});`
                     : '',
                 onClick: () => {
+                    const sidebarEl = this.sidebarElements.find((el) => { if (el.id === current.id) return el; });
+                    sidebarEl.showChildren = !sidebarEl.showChildren;
+
                     current.showChildren = !current.showChildren;
-                    if (current.showChildren && current.hasChildren && current.children.length > 0) {
-                        this.addComponent(current.children, current.id);
-                    } else if (!current.showChildren && current.hasChildren && current.children.length > 0) {
+                    if (current.showChildren && current.hasChildren &&
+                    current.children && current.children.length > 0) {
+                        this.addComponent(current.children, current.id, false);
+                    } else if (!current.showChildren && current.hasChildren &&
+                    current.children && current.children.length > 0) {
                         this.hideComponent(current.children);
                     }
                 }
@@ -98,6 +124,7 @@ export default Vue.extend({
     hideComponent(elements) {
         for (let i = 0, l = elements.length; i < l; i++) {
             const current = elements[i];
+            current.showChildren = false;
 
             const elIndex = this.sidebarElements.findIndex(el => el.id === current.id);
             if (elIndex !== -1) this.sidebarElements.splice(elIndex, 1);

@@ -125,6 +125,10 @@ declare global {
       mashup?: object;
       // Optional string for element style
       styleCss?: string;
+      // Shows how deeply an element is nested for displaying purposes
+      numOfParents: number;
+      // Should the children be visible in UI
+      showChildren: boolean;
     }
 
     interface TabbarElementInterface {

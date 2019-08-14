@@ -78,6 +78,7 @@ export default {
                         id: payload.id,
                         hasChildren: false,
                         iconSrcPath: ElementTypeEnum.TD,
+                        numOfParents: 0,
                         td: {}
                     };
                     commit('addNewTd', newElement);
@@ -102,9 +103,10 @@ export default {
                         type: payload.type,
                         title: payload.title,
                         id: payload.id,
-                        hasChildren: false,
+                        hasChildren: true,
                         iconSrcPath: ElementTypeEnum.MASHUP,
                         mashup: {},
+                        numOfParents: 0,
                         children: []
                     };
                     commit('addNewMashup', newElement);
@@ -153,6 +155,7 @@ export default {
             function findParentElement(elements: WADE.SidebarElement[], parentId: string) {
                 for (const element of elements) {
                     if (element.id === parentId && element.children) {
+                        payload.numOfParents = element.numOfParents + 1;
                         element.children.push(payload);
                         break;
                     }
@@ -205,13 +208,18 @@ export default {
         doesIdAlreadyExist(state: any) {
             return (id: string) => {
                 let doesExist = false;
-                for (const sidebarElement in state.sidebarElements) {
-                    if (!state.sidebarElements.hasOwnProperty(state.sidebarElements[sidebarElement])) {
-                        if (state.sidebarElements[sidebarElement].id === id) {
+                function checkId(idToProve: string, elements: any) {
+                    for (const element of elements) {
+                        if (element.id === idToProve) {
                             doesExist = true;
+                            break;
+                        }
+                        if (element.children && element.children.length > 0) {
+                            checkId(idToProve, element.children);
                         }
                     }
                 }
+                checkId(id, state.sidebarElements);
                 return doesExist;
             };
         }

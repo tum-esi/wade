@@ -11,7 +11,7 @@
         class="sidebar-element-icon-dropdown" 
         @mouseover="childrenHover = true" 
         @mouseleave="childrenHover = false"
-        :src="childrenAreShown ? childrenHover ? srcPathDropdownWhite : srcPathDropdown : childrenHover ? srcPathDropdownClosedWhite : srcPathDropdownClosed"
+        :src="showChildren ? childrenHover ? srcPathDropdownWhite : srcPathDropdown : childrenHover ? srcPathDropdownClosedWhite : srcPathDropdownClosed"
         v-on:click.stop="showChildrenClicked"
       >
       <img class="sidebar-element-delete-icon" 
@@ -84,13 +84,16 @@ export default Vue.extend({
     styleCss: {
       type: String,
       required: false
+    },
+    showChildren: {
+      type: Boolean,
+      required: false
     }
   },
   data() {
     return{
       isDropdownShown: false,
       showOptions: false,
-      childrenAreShown: false,
       deleteHover: false,
       childrenHover: false,
       optionsHover: false,
@@ -124,7 +127,6 @@ export default Vue.extend({
       this.$emit('delete-element', this.id, this.type);
     },
     showChildrenClicked() {
-      this.childrenAreShown = !this.childrenAreShown;
       this.onClick();
     },
     setShowDropdown(isDropdownShown: boolean) {

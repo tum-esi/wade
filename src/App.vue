@@ -48,7 +48,6 @@ export default Vue.extend({
     ...mapActions('SidebarStore', ['addNewElement']),
     ...mapMutations('SidebarStore', ['addSidebarElement']),
     openModal(element: any) {
-      console.log('element: ', element);
       switch (element.btnValue) {
         case ElementTypeEnum.FOLDER:
           this.modalElement = this.getElementFolder;
@@ -73,13 +72,13 @@ export default Vue.extend({
     },
     async createNewElement(newElement: any) {
       this.isModalVisible = false;
-
+      if (!newElement.data) return;
       const newEl = {
         type: newElement.type,
         title: newElement.data[0].value,
         description: newElement.data.length > 1 ? newElement.data[1].value : null,
         id: newElement.data[0].value,
-        parentId: newElement.parentId
+        parentId: newElement.parentId ? newElement.parentId : 'parent'
       };
       const newSidebarEl = await this.addNewElement(newEl);
       this.addSidebarElement(newSidebarEl);
@@ -105,7 +104,7 @@ export default Vue.extend({
         default:
           break;
       }
-      this.$eventHub.$emit('sidebar-element-added');
+      this.$eventHub.$emit('sidebar-element-added', newElement.parentId ? newElement.parentId : 'parent');
     },
     homeClicked() {
       this.$router.push({
