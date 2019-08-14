@@ -144,7 +144,7 @@ export default Vue.extend({
       if (this.btnOnClickEvent) { this.$emit(this.btnOnClickEvent, this.btnOnClickValue); }
       if (this.btnValue && this.element) {
           if (this.interactionInputType('number')) {
-              (this as any).btnValue = parseInt(this.btnValue);
+              (this as any).btnValue = parseInt(this.btnValue, 10);
           }
           if (this.interactionInputType('object')) {
               this.btnValue = JSON.parse(this.btnValue);
