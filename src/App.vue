@@ -107,31 +107,33 @@ export default Vue.extend({
       this.$eventHub.$emit('sidebar-element-added', newElement.parentId ? newElement.parentId : 'parent');
     },
     homeClicked() {
+      if (this.$router.currentRoute.name === 'home') return;
       this.$router.push({
         name: 'home'
       });
     },
     sidebarElementClicked(elementId: string, elementType: string) {
+      let routeName = '';
       switch (elementType) {
         case ElementTypeEnum.TD:
-          this.$router.push({
-            name: 'thingDescription',
-            params: { id: elementId }
-          });
+          routeName = 'thingDescription';
           break;
         case ElementTypeEnum.MASHUP:
-          this.$router.push({
-            name: 'mashup',
-            params: { id: elementId }
-          });
+          routeName = 'mashup';
           break;
         case ElementTypeEnum.FOLDER:
-          this.$router.push({
-            name: 'folder',
-            params: { id: elementId }
-          });
+          routeName = 'folder';
           break;
       }
+
+      if (this.$router.currentRoute.name === routeName
+        && this.$router.currentRoute.params
+        && this.$router.currentRoute.params.id === elementId) return;
+
+      this.$router.push({
+        name: routeName,
+        params: { id: elementId }
+      });
     }
   }
 });
