@@ -123,7 +123,6 @@ export default Vue.extend({
 }
 
 .button-icon {
-    max-height: 100%;
     max-width: 100%;
     object-fit: contain;
     padding: 5px 7px 5px 7px;

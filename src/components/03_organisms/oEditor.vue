@@ -4,7 +4,7 @@
             <label>Thing Description</label>
         </div>
         <div class="editor-area">
-            <textarea :placeholder="getEditorPlaceholder" spellcheck="false" v-model="currentTd"></textarea>
+            <textarea :placeholder="getEditorPlaceholder" spellcheck="false" wrap="off" v-model="currentTd"></textarea>
         </div>
     </div>
 </template>
@@ -56,7 +56,14 @@ export default Vue.extend({
             this.td = storedTd ? storedTd : this.td;
         },
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
-            this.td = args.td ? args.td : '';
+            this.td = '';
+            if (args.td) {
+                try {
+                    this.td = JSON.stringify(JSON.parse(args.td), null, 2);
+                } catch {
+                    this.td = args.td;
+                }
+            }
             (this as any).processChangedTd(args);
             (this as any).$emit('td-changed');
             (this as any).resetInteractions();
