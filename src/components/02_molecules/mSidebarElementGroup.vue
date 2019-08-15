@@ -188,6 +188,7 @@ export default Vue.extend({
     deleteElement(id: string, type: string) {
       this.deleteSidebarElement({ id, type });
       this.$eventHub.$emit('sidebar-element-removed', id);
+      this.$router.push({name: 'home'});
     },
     optionDropdownClicked(element: any) {
       this.$emit('dropdown-clicked', element);

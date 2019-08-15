@@ -134,6 +134,8 @@ export default Vue.extend({
 
 /* Will only be applied for tabbar-tabs */
 .tab-container-in-tabbar {
+  width: 15%;
+  justify-content: center;
   padding: 10px 20px 10px 20px;
   border-right: 1px solid #393B3A;
   display: flex;

@@ -197,6 +197,7 @@ export default Vue.extend({
 .sidebar-element-icon-options {
   padding: 7px 0px 7px 0px;
   width: 15px;
+  height: 100%;
   object-fit: contain;
   background: transparent;
 }
