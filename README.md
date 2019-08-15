@@ -1,46 +1,47 @@
-# w-ade TODO
+# WADE
 http://plugfest.thingweb.io:8083/TestThing
 
-1) Interactions: Reihenfolge & Drag n Drop von Interactions
-2) Editor: JSON View Editor for TD 
-4) Sidebar: Put folders together / Folder / Element structure
-5) Store: Storage of multiple TDs / Mashups/ Folders with unique ID
-6) Bindings: Add Coap, MQTT and other
-7) Subscribing: Show updated subscription status
-8) WoT-Logo is a button right now -> NO!
-9) Router: Redirect if td does not exist
+## TODOs and BUGS 
+### LEGENDE:
+(+) = IMPROVEMENT
+(o) = NEW FEATURE
+(x) = BUG
+(-) = OTHER
 
-IMPORTANT TODO
-- Add other bindings
-- Editor JSON view
-- Persistant saving element && display stored td / refactor store for persistant storage -> Persistent storage of elements and ids (electron)
+### NEXT: 
+- (o) Folders: Create user interface for folders
+- (o) Mashups: Create user interface for mashups
+- (o) Editor: Add td from local machine
 
--  event subscription updates
+### IMPORTANT TODO
+- (-) Bindings: Test COAP/COAPS bindings
+- (-) Bindings: Test Websocket bindings
+- (o) Bindings: Add MQTT binding
+- (+) Interaction Selection: Support all possible input types for write and actions in UI 
+- (o) Store: Persistant element saving
+- (o) Store: Display stored td
+- (o) Subscribing: Show updated subscription status
+- (o) Subscribing: Unsubscribe to events
 
-TODO 
-- Array and Object type support -> Buggy
-- Support all possible input types for write and actions in UI 
-- Redo smart TD-Editor -> try again with other json plugin? -> readd old tdEditor? 
-- Unsubscribe to events
-- Loading indication when invoking actions
-- Implement filter functionality
-- Upload from machine
+### TODO 
+- (+) Editor: Real JSON editor (line and error indidaction)
+- (x) Interaction Selection: Reset button does not always reset UI 
+- (+) Interaction Results: Array and Object type support 
+- (o) Interactions: Reihenfolge & Drag n Drop von Interactions
+- (o) Sidebar: Drag and Drop of elements to change order 
+- (o) Sidebar: Drag and Drop to add a td/ mashup to a folder/ mashup
 
-SMALL & LOW PRIO TODOS 
-- Statusbar History functionality
-- Filter sidebar
-- Refactor sidebar selection with store
-- Handle unsubscribe
-- Input Button -> only click on outer div 
-- Drag and Drop for ordering of interactions
-- Fix styling of home element / - Settings / Logo -> Header
-- Dropdown -> reselect -> dann invoke möglich
-- 'isActive' on sidebar is not invoked when new element is added
-- Fetch error handling when connection timed out
-- Error in Results: Handle better (right now just the full response is shown)
-- Add zeros to current time in statusbar to prevent different length of statusbar-time
-- Reset inputs of selected interactions when they are 
-- When interactions of a td have been selected and the same td is fetched from an url, the selected interactions are not reseted in GUI.
+### LOW PRIO TODO
+- (x) Mashup: Should only have td as childern (not folders or other mashups) 
+- (+) Sidebar: Delete element -> confirm deletion
+- (o) Sidebar: Implement filter functionality
+- (+) Results: Improve error handling (right now just the full response is shown)
+- (+) Uri Bar: Fetch error handling when connection timed out
+- (o) Throbber: Indicate loading in fetch url, results, ...
+- (o) Statusbar: History functionality
+- (+) Interaction Selection: Input Button -> only click on outer div 
+- (+) Statusbar: Add zeros to current time in statusbar to prevent different length of statusbar-time
+- (x) Design: WoT-Logo is a button right now -> NO!
 
 ## Project setup
 ```
