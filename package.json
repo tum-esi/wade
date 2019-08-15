@@ -15,6 +15,7 @@
   "dependencies": {
     "@node-wot/binding-coap": "^0.6.2-SNAPSHOT.1",
     "@node-wot/binding-http": "^0.6.2-SNAPSHOT.1",
+    "@node-wot/binding-websockets": "^0.6.2",
     "@node-wot/core": "^0.6.2-SNAPSHOT.1",
     "core-js": "^2.6.5",
     "vue": "^2.6.10",

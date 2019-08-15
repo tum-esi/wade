@@ -1,5 +1,9 @@
 import { Servient } from '@node-wot/core';
-import { HttpClientFactory, HttpConfig } from '@node-wot/binding-http';
+import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
+import { CoapClientFactory, CoapsClientFactory } from '@node-wot/binding-coap';
+// import { MqttClientFactory } from '@node-wot/binding-mqtt';
+import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
+
 import { TdStateEnum } from '@/util/enums';
 
 export default class TdConsumer {
@@ -54,7 +58,15 @@ export default class TdConsumer {
         const servient = new Servient();
 
         // TODO: add HttpConfig
-        await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
+        // await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
+
+        await servient.addClientFactory(new HttpClientFactory());
+        await servient.addClientFactory(new HttpsClientFactory());
+        await servient.addClientFactory(new WebSocketClientFactory());
+        await servient.addClientFactory(new WebSocketSecureClientFactory());
+        await servient.addClientFactory(new CoapClientFactory());
+        await servient.addClientFactory(new CoapsClientFactory());
+        // await servient.addClientFactory(new MqttClientFactory());
 
         await servient.start().then((thingFactory) => {
             this.tdConsumed = thingFactory.consume(JSON.stringify(this.tdJson));
@@ -66,5 +78,4 @@ export default class TdConsumer {
             this.errorMsg = err;
         });
     }
-
 }

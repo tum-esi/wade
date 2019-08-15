@@ -30,6 +30,9 @@ export default Vue.extend({
     created() {
         this.$eventHub.$on('fetched-td', this.tdChanged);
     },
+    mounted() {
+        // TODO: checkIfStoredTdAvailable
+    },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
     },
@@ -46,7 +49,7 @@ export default Vue.extend({
         }
     },
     methods: {
-        ...mapActions('TdStore', ['resetInteractions', 'resetResults', 'processChangedTd']),
+        ...mapActions('TdStore', ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
         checkIfStoredTdAvailable(args? ) {
             // TODO: this does currently not work
             const storedTd = (this as any).getCurrentTd(this.id);
