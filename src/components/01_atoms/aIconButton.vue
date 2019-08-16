@@ -1,7 +1,7 @@
 <!-- Basic icon button with an optional label and a click action -->
 <template>
   <div class="btn-container btn" @click.prevent="onClickAction">
-    <img class="btn-img" :src="getImg">
+    <img class="btn-img" :class="iconBtnStyle" :src="getImg">
     <span v-if="iconBtnLabel"><label>{{ iconBtnLabel }}</label></span>
   </div>
 </template>
@@ -39,6 +39,13 @@ export default Vue.extend({
     iconBtnOnClick: {
         type: String,
         required: true
+    },
+    /**
+     * Custom optional styling for button icon
+     */
+    iconBtnStyle: {
+      type: String,
+      required: false
     }
   },
 computed: {
@@ -57,7 +64,6 @@ methods: {
 </script>
 
 <style scoped>
-
 .btn-container {
   border: none;
   display: flex;
@@ -67,6 +73,13 @@ methods: {
 .btn-img {
   max-width: 100%;
   max-height: 100%;
+}
+
+/* custom styling for mashup add btn image */
+.btn-img-mashup-add {
+  width: 100%;
+  object-fit: contain;
+  padding: 5px 7px 5px 7px;
 }
 </style>
 
