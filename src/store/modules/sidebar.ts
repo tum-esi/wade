@@ -67,7 +67,7 @@ export default {
         activeElementId: null
     },
     actions: {
-        async addNewElement({ commit }, payload) {
+        async addNewElement({ commit }, payload: WADE.NewStoreElementInterface) {
             let newElement;
             switch (payload.type) {
                 case ElementTypeEnum.TD:
@@ -88,6 +88,7 @@ export default {
                         parentId: payload.parentId ? payload.parentId : 'parent',
                         type: payload.type,
                         title: payload.title,
+                        description: payload.description || '',
                         id: payload.id,
                         hasChildren: true,
                         iconSrcPath: ElementTypeEnum.FOLDER,
@@ -102,6 +103,7 @@ export default {
                         parentId: payload.parentId ? payload.parentId : 'parent',
                         type: payload.type,
                         title: payload.title,
+                        description: payload.description || '',
                         id: payload.id,
                         hasChildren: true,
                         iconSrcPath: ElementTypeEnum.MASHUP,
@@ -118,7 +120,7 @@ export default {
     },
     mutations: {
         deleteSidebarElement(state: any, payload: any) {
-            // Search elements and children recursive and delet existing element
+            // Search elements and children recursive and delete existing element
             function getElement(elements: WADE.SidebarElement[], id: string) {
                 for (const element of elements) {
                     if (element.id === id) {
@@ -193,16 +195,30 @@ export default {
                 return state.activeElementId === id;
             };
         },
-        getCurrentTd(state: any) {
-            return (id: string) => {
-                for (const sidebarElement in state.sidebarElements) {
-                    if (!state.sidebarElements.hasOwnProperty(state.sidebarElements[sidebarElement])) {
-                        if (state.sidebarElements[sidebarElement].id === id) {
-                            return state.sidebarElements[sidebarElement].td;
+        /**
+         * Returns either a specific sidebar element when param has 'id'
+         * or an array of sidebar elements, when param has 'type'
+         * @param state store state
+         */
+        getSidebarElement(state: any) {
+            return (elToFind) => {
+                let sidebarElement: null | any | any[] = elToFind.id ? null : [];
+                function findElement(elToProve: {id?: string, type?: string}, elements: any) {
+                    for (const element of elements) {
+                        if (elToProve.id && element.id === elToFind.id) {
+                            sidebarElement = element;
+                            break;
+                        }
+                        if (elToProve.type && element.type === elToProve.type) {
+                            sidebarElement.push(element);
+                        }
+                        if (element.children && element.children.length > 0) {
+                            findElement(elToProve, element.children);
                         }
                     }
                 }
-                return null;
+                findElement(elToFind, state.sidebarElements);
+                return sidebarElement;
             };
         },
         doesIdAlreadyExist(state: any) {

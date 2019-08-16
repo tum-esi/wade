@@ -120,6 +120,7 @@ export default Vue.extend({
     border: 1px solid #b5dfdd;
     border-radius: 3px;
     position: relative;
+    height: 100%;
 }
 
 .button-icon {
@@ -169,6 +170,13 @@ export default Vue.extend({
     left: -1180%;
     width: 1300%;
     margin-top: 200%;
+}
+
+.dropdown-container-mashup-tds {
+    left: 0;
+    width: 100%;
+    margin-top: 100%;
+        margin-top: 5%;
 }
 
 .dropdown-element {

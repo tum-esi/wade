@@ -24,6 +24,7 @@ http://plugfest.thingweb.io:8083/TestThing
 - (o) Subscribing: Unsubscribe to events
 
 ### TODO 
+- (o) Tabbar in Element: Handle tabbing (set active tab etc) -> Router!
 - (+) Editor: Real JSON editor (line and error indidaction)
 - (x) Interaction Selection: Reset button does not always reset UI 
 - (+) Interaction Results: Array and Object type support 

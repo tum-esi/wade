@@ -41,6 +41,17 @@ declare global {
       value: string;
       required: boolean;
     }
+  /**
+   * Element that was added via modal and is now stored to sidebar store.
+   */
+    interface NewStoreElementInterface {
+      type: ElementTypeEnum;
+      title: string;
+      description?: string;
+      id: string;
+      parentId: string;
+    }
+
     /**
      * The outcome fields of a basic formfield
      */

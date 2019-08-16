@@ -38,7 +38,7 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
-        ...mapGetters('SidebarStore', ['getCurrentTd']),
+        ...mapGetters('SidebarStore', ['getSidebarElement']),
         currentTd: {
             get(): string {
                 return this.td;
@@ -52,7 +52,7 @@ export default Vue.extend({
         ...mapActions('TdStore', ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
         checkIfStoredTdAvailable(args? ) {
             // TODO: this does currently not work
-            const storedTd = (this as any).getCurrentTd(this.id);
+            const storedTd = (this as any).getSidebarElement(this.id);
             this.td = storedTd ? storedTd : this.td;
         },
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
