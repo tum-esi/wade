@@ -9,30 +9,36 @@ http://plugfest.thingweb.io:8083/TestThing
 (-) = OTHER
 
 ### NEXT: 
+- (-) Build: Build for other systems (linux & windows & mac)
+             -> Test on other mac (do you need electron installed?)
+             -> Test on windows (do you need electron installed)
 - (o) Folders: Create user interface for folders
 - (o) Mashups: Create user interface for mashups
+- (o) Subscribing: Show updated subscription status
+- (o) Subscribing: Unsubscribe to events
+- (-) Testing: Test wade with WoT cart
+- (+) Interaction Selection: Support all possible input types for write and actions in UI (also images and so on)
 - (o) Editor: Add td from local machine
+
 
 ### IMPORTANT TODO
 - (-) Bindings: Test COAP/COAPS bindings
-- (-) Bindings: Test Websocket bindings
 - (o) Bindings: Add MQTT binding
-- (+) Interaction Selection: Support all possible input types for write and actions in UI 
 - (o) Store: Persistant element saving
 - (o) Store: Display stored td
-- (o) Subscribing: Show updated subscription status
-- (o) Subscribing: Unsubscribe to events
 
 ### TODO 
+- (o) User credentials
 - (o) Tabbar in Element: Handle tabbing (set active tab etc) -> Router!
 - (+) Editor: Real JSON editor (line and error indidaction)
 - (x) Interaction Selection: Reset button does not always reset UI 
-- (+) Interaction Results: Array and Object type support 
+- (x) Interaction Results: Array and Object type support 
 - (o) Interactions: Reihenfolge & Drag n Drop von Interactions
 - (o) Sidebar: Drag and Drop of elements to change order 
 - (o) Sidebar: Drag and Drop to add a td/ mashup to a folder/ mashup
 
 ### LOW PRIO TODO
+- (+) Selection: When no input is given but is required make icon gray to indicate its not clickable
 - (x) Mashup: Should only have td as childern (not folders or other mashups) 
 - (+) Sidebar: Delete element -> confirm deletion
 - (o) Sidebar: Implement filter functionality
@@ -43,6 +49,9 @@ http://plugfest.thingweb.io:8083/TestThing
 - (+) Interaction Selection: Input Button -> only click on outer div 
 - (+) Statusbar: Add zeros to current time in statusbar to prevent different length of statusbar-time
 - (x) Design: WoT-Logo is a button right now -> NO!
+- (o) Td Names: Basic validation for naming of Td (default node regex)
+- (-) Bindings: Test Websocket bindings
+- (o) Click Enter to add Modal 
 
 ## Project setup
 ```

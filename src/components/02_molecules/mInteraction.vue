@@ -94,6 +94,10 @@ export default Vue.extend({
     width: 40%;
 }
 
+.interaction-options :hover {
+  background: #92afae;
+}
+
 .interaction-dropdown-btn {
     height: 100%;
 }

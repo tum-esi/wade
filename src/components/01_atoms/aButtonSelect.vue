@@ -110,6 +110,10 @@ export default Vue.extend({
   background: #305E5C !important;
 }
 
+.btn-selection-container-selected :hover {
+  background: #305E5C !important;
+}
+
 .btn-selection-container {
   background: #b5dfdd;
   height: 100%;
@@ -133,11 +137,6 @@ export default Vue.extend({
 .btn-selection-container button:active button:focus{
   outline: none; 
   border: none;
-}
-
-.btn-selection-container:hover {
-  color: #fff;
-  background: #92afae;
 }
 
 .select-btn-container {

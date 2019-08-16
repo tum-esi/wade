@@ -209,4 +209,10 @@ export default Vue.extend({
   object-fit: contain;
   background: transparent;
 }
+
+/* btn style for mashup options */
+.mashup-icon-style {
+    width: 6%;
+    padding: 7px 3px 7px 7px;
+}
 </style>

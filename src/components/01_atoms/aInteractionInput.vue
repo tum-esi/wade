@@ -35,7 +35,7 @@
     </div>
 
     <div class="select-btn-container">
-        <img class="select-btn" @click.prevent="changeSelection" :src="currentSrc"/>
+        <img class="select-btn" @click.prevent="changeSelection" :src="btnValue ? currentSrc : srcSelectionNotPossibele"/>
     </div>
 
   </div>
@@ -58,7 +58,8 @@ export default Vue.extend({
       placeholder: '',
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
-      srcSelected: require('@/assets/checked_circle.png')
+      srcSelected: require('@/assets/checked_circle.png'),
+      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
     };
   },
   props: {
@@ -209,6 +210,10 @@ export default Vue.extend({
 
 <style scoped>
 .btn-selection-container-selected {
+  background: #305E5C !important;
+}
+
+.btn-selection-container-selected :hover {
   background: #305E5C !important;
 }
 
