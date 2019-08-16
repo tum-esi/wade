@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-container">
+  <div @keyup.enter="create" @keyup.esc="cancel" class="modal-container">
     <div class="add-el-container">
       <aHeaderElement
         :title="modalElement.title"
