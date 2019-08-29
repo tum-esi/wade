@@ -12,11 +12,19 @@
             :src="showCurrentTd ? interactionsHover ? srcPathDropdownWhite : srcPathDropdown : interactionsHover ? srcPathDropdownClosedWhite : srcPathDropdownClosed"
             @click.stop="showCurrentTd = !showCurrentTd"
         />
+        <img
+          class="mashup-td-delete-icon"
+          @mouseover="deleteHover = true"
+          @mouseleave="deleteHover = false"
+          :src="deleteHover ? srcPathDeleteWhite : srcPathDelete"
+          v-on:click.stop="deleteBtnClicked"
+        /> 
   </div>
 </template>
 
 <script lang='ts'>
 import Vue from 'vue';
+import { ElementTypeEnum } from '../../util/enums';
 
 export default Vue.extend({
   name: 'mMashupTdElement',
@@ -29,11 +37,14 @@ export default Vue.extend({
   data() {
     return {
         interactionsHover: false,
+        deleteHover: false,
         showCurrentTd: false,
         srcPathDropdown: require('@/assets/arrow_down.png'),
         srcPathDropdownClosed: require('@/assets/arrow_right.png'),
         srcPathDropdownWhite: require('@/assets/arrow_down_white.png'),
         srcPathDropdownClosedWhite: require('@/assets/arrow_right_white.png'),
+        srcPathDelete: require('@/assets/delete.png'),
+        srcPathDeleteWhite: require('@/assets/delete_white.png')
     };
   },
   computed: {
@@ -42,7 +53,11 @@ export default Vue.extend({
       return true;
     }
   },
-  methods: {}
+  methods: {
+    deleteBtnClicked() {
+      this.$emit('delete-element', this.td.id, ElementTypeEnum.TD);
+    },
+  }
 });
 </script>
 
@@ -62,7 +77,7 @@ export default Vue.extend({
 }
 
 .mashup-td-label {
-  width: 65%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -70,5 +85,12 @@ export default Vue.extend({
     padding: 10px;
     height: 40px;
     width: 40px;
+}
+
+.mashup-td-delete-icon {
+  padding: 7px 5px 7px 0px;
+  max-height: 40px;
+  max-width: 40px;
+  object-fit: contain;
 }
 </style>

@@ -210,6 +210,10 @@ textarea:focus, input:focus{
   visibility: hidden;
 }
 
+.error {
+    background: #A36A5B;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;

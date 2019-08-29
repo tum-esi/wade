@@ -51,11 +51,13 @@ export async function invokeInteractions(selectedInteractions) {
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
                     let resultProp =
                         await selectedInteractions[interaction].interactionSelectBtn.interaction();
-                    resultProp = resultProp.error ? resultProp.error : resultProp;
+                    const resultHasError = resultProp.error ? true : false;
+                    resultProp = resultHasError ? resultProp.error : resultProp;
                     resultProps.push({
                         resultType: PossibleInteractionTypesEnum.PROP_READ,
                         resultTitle: selectedInteractions[interaction].interactionName,
-                        resultValue: resultProp
+                        resultValue: resultProp,
+                        resultError: resultHasError
                     });
                 }
                 break;

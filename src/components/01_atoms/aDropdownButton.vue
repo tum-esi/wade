@@ -176,7 +176,7 @@ export default Vue.extend({
     left: 0;
     width: 100%;
     margin-top: 100%;
-        margin-top: 5%;
+    margin-top: 5%;
 }
 
 .dropdown-element {

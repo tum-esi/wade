@@ -14,12 +14,13 @@
                     v-for="(element, index) in this.mashupTds"
                     :key="index"
                     :td="element"
+                    v-on:delete-element="deleteTdFromMashup"
                 />
             </div>
         </div>
 
         <label v-if="tds.length > 0">Please add one or more Thing Description</label>
-        <div v-else-if="tds.length <= 0">
+        <div v-else-if="tds.length == 0">
             <label>There are no stored Thing Descriptions. Please create at least one.</label>
                 <aIconButton
                     class="add-new-td"
@@ -46,6 +47,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapMutations } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import mMashupTdElement from '@/components/02_molecules/mMashupTdElement.vue';
@@ -87,6 +89,7 @@ export default Vue.extend({
         }
     },
     methods: {
+        ...mapMutations('SidebarStore', ['deleteSidebarElement']),
         addTdToMashup(args) {
             for (const td of this.tds) {
                 if (td.id === args.btnValue && this.mashupTds.indexOf(td) === -1) {
@@ -96,6 +99,10 @@ export default Vue.extend({
         },
         openModal() {
             this.$eventHub.$emit('open-modal-element', { btnValue: ElementTypeEnum.TD, parentId: this.mashup.id });
+        },
+        deleteTdFromMashup(id: string, type: string) {
+            (this as any).deleteSidebarElement(id, type);
+            this.$eventHub.$emit('sidebar-element-removed', id);
         }
     }
 });

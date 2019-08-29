@@ -41,10 +41,10 @@ export default {
                 tabIsActive: false
             },
             {
-                tabId: 'requests',
-                tabTitle: 'Requests',
+                tabId: 'config',
+                tabTitle: 'Configuration File',
                 tabStyle: 'tab-container-in-tabbar',
-                tabLink: '/requests',
+                tabLink: '/config',
                 tabIsActive: false
             },
             {
@@ -70,7 +70,41 @@ export default {
             btnLabel: 'Status: No interaction selected.',
             btnOnClick: '-'
         },
-        tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
+        tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.',
+        defaultTdConfig: {
+            servient: {
+                _staticAddress: 'plugfest.thingweb.io',
+                scriptDir: '.',
+                scriptAction: true
+            },
+            http: {
+                port: 8080,
+                allowSelfSigned: true
+            },
+            coap: {
+                port: 5683
+            },
+            mqtt: {
+                broker: 'mqtt://test.mosquitto.org',
+                _username: 'username',
+                _password: 'password',
+                _clientId: 'uniqueId',
+                port: 1883
+            },
+            log: {
+                level: 'info'
+            },
+            credentials: {
+                'urn:dev:wot:org:eclipse:leshan': {
+                    identity: 'node-wot',
+                    psk: 'hello'
+                },
+                'urn:dev:wot:org:eclipse:cf-secure': {
+                    identity: 'password',
+                    psk: 'sesame'
+                }
+            }
+        }
     },
     actions: {
         async processChangedTd({ commit, state }, payload: any) {
@@ -204,6 +238,16 @@ export default {
         }
     },
     getters: {
+        getConfig(state: any) {
+            // TODO: search for save config with id (given as param) else return default config
+            let config;
+            try {
+                config = JSON.stringify(state.defaultTdConfig);
+                return config;
+            } catch {
+                return state.defaultTdConfig;
+            }
+        },
         getSelections(state: any) {
             return state.selections;
         },

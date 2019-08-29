@@ -1,6 +1,6 @@
 import { Servient } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
-import { CoapClientFactory, CoapsClientFactory } from '@node-wot/binding-coap';
+import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
 // import { MqttClientFactory } from '@node-wot/binding-mqtt';
 import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 
@@ -57,14 +57,26 @@ export default class TdConsumer {
     private async consumeThing() {
         const servient = new Servient();
 
+        // const DEFAULT_COAP_PORT = 5683;
+        const DEFAULT_COAP_PORT = 5055;
+        const DEFAULT_HTTP_PORT = 8080;
+        const DEFAULT_MQTT_PORT = 1883;
+
+
+
         // TODO: add HttpConfig
         // await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
 
-        await servient.addClientFactory(new HttpClientFactory());
+        // const coapServer = new CoapServer(DEFAULT_COAP_PORT);
+        // await servient.addServer(coapServer);
+
+        // TODO .addCredentials
+        await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
         await servient.addClientFactory(new HttpsClientFactory());
         await servient.addClientFactory(new WebSocketClientFactory());
         await servient.addClientFactory(new WebSocketSecureClientFactory());
         await servient.addClientFactory(new CoapClientFactory());
+        // await servient.addClientFactory(new CoapClientFactory(coapServer));
         await servient.addClientFactory(new CoapsClientFactory());
         // await servient.addClientFactory(new MqttClientFactory());
 

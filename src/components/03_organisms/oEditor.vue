@@ -6,16 +6,37 @@
         <div class="editor-area">
             <textarea :placeholder="getEditorPlaceholder" spellcheck="false" wrap="off" v-model="currentTd"></textarea>
         </div>
+        <div class="config-btns">
+            <aButtonBasic
+                v-on:open-config-tab="btnConfigClicked"
+                :btnClass="hasMqtt ? configMqttButton.btnClass : configButton.btnClass"
+                :btnLabel="configButton.btnLabel"
+                :btnOnClick="configButton.btnOnClick"
+                :btnActive="td.length > 0"
+            />
+            <aButtonBasic
+                v-if="hasMqtt"
+                v-on:open-config-tab="btnConfigClicked"
+                :btnClass="configMqttButton.btnClass"
+                :btnLabel="configMqttButton.btnLabel"
+                :btnOnClick="configMqttButton.btnOnClick"
+                :btnActive="td.length > 0"
+            />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { TdStateEnum } from '@/util/enums';
 
 export default Vue.extend({
     name: 'oEditor',
+    components: {
+        aButtonBasic,
+    },
     props: {
         id: {
             required: true,
@@ -24,7 +45,18 @@ export default Vue.extend({
     data() {
         return {
             td: '',
-            key: this.$route.path
+            key: this.$route.path,
+            hasMqtt: true,
+            configButton: {
+                btnLabel: 'Change Configuration',
+                btnClass: 'btn-config-big',
+                btnOnClick: 'open-config-tab'
+            },
+            configMqttButton: {
+                btnLabel: 'Change Mqtt Configuration',
+                btnClass: 'btn-config-small',
+                btnOnClick: 'open-config-tab'
+            },
         };
     },
     created() {
@@ -68,6 +100,9 @@ export default Vue.extend({
             (this as any).$emit('td-changed');
             (this as any).resetInteractions();
             (this as any).resetResults();
+        },
+        btnConfigClicked() {
+            this.$emit('open-config');
         }
     },
     watch: {
@@ -85,9 +120,8 @@ export default Vue.extend({
 
 .editor-title {
     padding: 7px 0px 7px 2px;
-    height: 10%;
-    display: -webkit-box;
-    display: -ms-flexbox;
+    max-height: 8%;
+    min-height: 50px;
     display: flex;
     align-items: center;
 }
@@ -98,9 +132,9 @@ export default Vue.extend({
 
 .editor-area {
     width: 100%;
-    height: 90%;
+    height: 80%;
     max-height: 800px;
-    overflow: auto;
+    /* overflow: auto; */
 }
 
 .editor-area textarea{
@@ -118,5 +152,12 @@ export default Vue.extend({
     height: 100%;
     display: flex;
     align-items: center;
+}
+
+.config-btns {
+    height: 10%;
+    padding-top: 7px;
+    display: flex;
+    justify-content: space-between;
 }
 </style>

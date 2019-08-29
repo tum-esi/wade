@@ -9,6 +9,23 @@ http://plugfest.thingweb.io:8083/TestThing
 (-) = OTHER
 
 ### NEXT: 
+When input selection is unselected reset input (dropdown)
+
+TODO neue Version morgen: 
+- Subscription!!!
+    - Fix reset Interaction Selection
+    - Invoke interaction -> timeout
+    - if it has no port -> default port
+    - Enum input
+    - Test with coap 
+    - Make option to select protocol (if more than one protocol is available)
+    - Make a default config file for each td -> in an extra tab
+    - Make a default config file for mqtt
+    - Finish interface for mashups -> 
+        - Ausklappen und auswählen der TDs 
+        - Ausführen der TDs nacheinander 
+
+
 - (-) Build: Build for other systems (linux & windows & mac)
              -> Test on other mac (do you need electron installed?)
              -> Test on windows (do you need electron installed)
@@ -19,6 +36,7 @@ http://plugfest.thingweb.io:8083/TestThing
 - (-) Testing: Test wade with WoT cart
 - (+) Interaction Selection: Support all possible input types for write and actions in UI (also images and so on)
 - (o) Editor: Add td from local machine
+- (+) Refactor: Deleting / Adding / Merging sidebar elements: strict interface to add / remove in data and in GUI 
 
 
 ### IMPORTANT TODO
@@ -38,7 +56,9 @@ http://plugfest.thingweb.io:8083/TestThing
 - (o) Sidebar: Drag and Drop to add a td/ mashup to a folder/ mashup
 
 ### LOW PRIO TODO
-- (+) Selection: When no input is given but is required make icon gray to indicate its not clickable
+- (+) Limit
+- (+) Results UI: Make id smaller (write -> w, read -> r ...) and response bigger -> display as obj
+- (o) Output/Input Results: Validating interaction response data schema: Error Message (A WoT Thing Description MUST accurately describe the data returned and accepted by each interaction)
 - (x) Mashup: Should only have td as childern (not folders or other mashups) 
 - (+) Sidebar: Delete element -> confirm deletion
 - (o) Sidebar: Implement filter functionality
@@ -51,7 +71,13 @@ http://plugfest.thingweb.io:8083/TestThing
 - (x) Design: WoT-Logo is a button right now -> NO!
 - (o) Td Names: Basic validation for naming of Td (default node regex)
 - (-) Bindings: Test Websocket bindings
-- (o) Click Enter to add Modal 
+- (+) Dropdown: Hide all open dropdowns if anything else was clicked
+- (o) Duplicate Tds: There should be duplicate tds for mashup. (To share Tds among several mashup)
+- (+) Electron Interface: 
+        Hide developer console on start. 
+        Do not allow resizing of window (to a very small window).
+        Remove gap to window (Make "full screen")
+- (+) Scrollbar: Restyle
 
 ## Project setup
 ```

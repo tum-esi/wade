@@ -23,7 +23,7 @@ export default Vue.extend({
           required: true
         },
         /**
-         * Triggered event when button is clicked.
+         * Triggered event when button is clicked. Eg.: 'btn-open-tab-clicked'
          */
         btnOnClick: {
           type: String,
@@ -89,6 +89,21 @@ button:disabled {
   width: 20%;
   margin: 0;
   font-size: 14px;
+}
+
+.btn-config-big {
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+}
+
+.btn-config-small {
+  width: 49%;
+  margin: 0;
+  justify-content: space-between;
+  padding: 5px;
+  font-size: 13px;
+  overflow: hidden;
 }
 </style>
 

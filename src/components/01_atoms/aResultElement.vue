@@ -1,7 +1,7 @@
 <template>
     <div class="result-container">
         <div class="result-title"><label>{{ resultTitle }}</label></div>
-        <div class="result-values">
+        <div class="result-values" :class="{ 'error' : resultError }">
             <label> 
                 {{ resultValue }}
             </label>
@@ -25,6 +25,11 @@ export default Vue.extend({
         },
         resultValue: {
             required: false
+        },
+        resultError: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     }
 });

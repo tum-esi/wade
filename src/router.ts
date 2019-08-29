@@ -25,5 +25,10 @@ export default new Router({
       name: 'mashup',
       component: () => import('@/components/04_templates/tMashup.vue')
     },
+    {
+      path: '/:type/:id/:tab',
+      name: 'config',
+      component: () => import('@/components/03_organisms/oConfig.vue')
+    }
   ],
 });

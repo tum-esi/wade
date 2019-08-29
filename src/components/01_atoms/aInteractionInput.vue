@@ -14,10 +14,10 @@
             <div class="input-dropdown-content" 
                 :class="{'input-dropdown-content-visible' : dropdownVisible}">
                 <label @click.prevent="setBtnValue(true)">
-                   Set True
+                   True
                 </label>
                 <label @click.prevent="setBtnValue(false)">
-                   Set False
+                   False
                 </label>
             </div>
     </div>
@@ -160,6 +160,9 @@ export default Vue.extend({
     },
     interactionInputType(type: string) {
         let isCorrectType = false;
+        console.log('type: ', type);
+        console.log('btnKey: ', this.btnKey);
+        console.log('input type: ', this.btnInputType);
         switch (type) {
             case 'text':
                 if (this.btnInputType.propType === 'string' && !this.btnInputType.propEnum
@@ -252,15 +255,23 @@ export default Vue.extend({
 }
 
 .input-dropdown-content {
+  padding: 3px;
   display: none;
   position: absolute;
   background-color: #f1f1f1;
-  min-width: 160px;
+  left: -100%;
+  width: 200%;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
+  border-radius: 3px;
+}
+
+.input-dropdown-content:hover {
+  background-color: #f1f1f1 !important; 
 }
 
 .input-dropdown-btn {
+    height: 100%;
     width: 100%;
     font-size: 14px;
     outline: none;
@@ -268,6 +279,7 @@ export default Vue.extend({
     background: none;
     text-align: left;
     padding-left: 1px;
+    overflow: hidden;
 }
 .input-dropdown-content-visible {
     display: block;

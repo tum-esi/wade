@@ -12,6 +12,7 @@
                         :resultType="element.resultType"
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
+                        :resultError="element.resultError"
                     />
                 </div>
             </div>
@@ -25,6 +26,7 @@
                         :resultType="element.resultType"
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
+                        :resultError="element.resultError"
                     />
                 </div>
             </div>
@@ -38,6 +40,7 @@
                         :resultType="element.resultType"
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
+                        :resultError="element.resultError"
                     />
                 </div>
             </div>

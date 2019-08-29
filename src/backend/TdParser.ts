@@ -37,9 +37,9 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.' };
                             const response = await this.consumedTd.properties[property].read()
-                                .then( async (res) => {
+                                .then(async (res) => {
                                     return await res;
                                 })
                                 .catch(async (err) => {
@@ -61,14 +61,14 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async (val: any, options?: any) => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.' };
                             const response = await this.consumedTd.properties[property].write(val, options)
-                            .then( async (res) => {
-                                return await 'Success';
-                            })
-                            .catch( async (err) => {
-                                return await { error: err};
-                            });
+                                .then(async (res) => {
+                                    return await 'Success';
+                                })
+                                .catch(async (err) => {
+                                    return await { error: err };
+                                });
                             return await response;
                         }
                     },
@@ -83,23 +83,23 @@ export default class TdParser {
             if (!this.consumedTd.actions.hasOwnProperty(action)) { continue; }
 
             this.parsedTd.actionInteractions.push({
-                    interactionName: action,
-                    interactionType: PossibleInteractionTypesEnum.ACTION,
-                    interactionSelectBtn: {
-                        btnInputType: this.getCorrectInputTypeActions(this.consumedTd.actions[action]),
-                        btnKey: `action-${action}`,
-                        btnGeneralStyle: 'btn-event-interaction',
-                        btnSelectedStyle: 'btn-event-interaction-selected',
-                        interaction: async (input?: any) => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
-                            const response = await this.consumedTd.actions[action].invoke(input)
-                                .then( async (res) => {
-                                    if (res) { return await res; } else { return 'Success'; }
-                                })
-                                .catch(async (err) => {
-                                    return await { error: err };
-                                });
-                            return await response;
+                interactionName: action,
+                interactionType: PossibleInteractionTypesEnum.ACTION,
+                interactionSelectBtn: {
+                    btnInputType: this.getCorrectInputTypeActions(this.consumedTd.actions[action]),
+                    btnKey: `action-${action}`,
+                    btnGeneralStyle: 'btn-event-interaction',
+                    btnSelectedStyle: 'btn-event-interaction-selected',
+                    interaction: async (input?: any) => {
+                        if (!this.consumedTd) return { error: 'No consumed Thing available.' };
+                        const response = await this.consumedTd.actions[action].invoke(input)
+                            .then(async (res) => {
+                                if (res) { return await res; } else { return 'Success'; }
+                            })
+                            .catch(async (err) => {
+                                return await { error: err };
+                            });
+                        return await response;
                     }
                 },
             });
@@ -118,11 +118,11 @@ export default class TdParser {
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
                     subscribe: async () => {
-                        if (!this.consumedTd) return { error: 'No consumed Thing available.'};
+                        if (!this.consumedTd) return { error: 'No consumed Thing available.' };
                         const response = await this.consumedTd.events[event].subscribe(
-                            async (res) =>  {
+                            async (res) => {
                                 return await res;
-                             },
+                            },
                             async (err) => {
                                 return await err;
                             });
@@ -142,29 +142,37 @@ export default class TdParser {
         const propEnum = property.enum ? property.enum :
             (property.input ? (property.input.enum ? property.input.enum : null) : null);
         const propType = property.type ? property.type :
-            (property.input.type ? property.input.type : 'string');
+            (property.input && property.input.type ? property.input.type : null);
         const propMin = (property.minimum || property.minimum === 0) ? property.minimum : null;
         const propMax = property.maximum ? property.maximum : null;
+        const propMinLength = property.minLength ? property.minLength : null;
+        const propMaxLength = property.maxLength ? property.maxLength : null;
 
         return {
             propType,
             propEnum,
             propMin,
-            propMax
+            propMax,
+            propMinLength,
+            propMaxLength
         };
     }
 
     // Get possible action input types from property for interactions
     private getCorrectInputTypeActions(action: any) {
         const propType = action.input ?
-                        (action.input.type ? action.input.type : null) : null;
+            (action.input.type ? action.input.type : null) : null;
+        const propEnum = action.enum ?
+            action.enum
+            : (action.input && action.input.enum ? action.input.enum : null);
         const propRequired = action.input ?
-                        (action.input.required ? action.input.required : null) : null;
+            (action.input.required ? action.input.required : null) : null;
         const propProperties = action.input ?
-                        (action.input.properties ? action.input.properties : null) : null;
+            (action.input.properties ? action.input.properties : null) : null;
 
         return {
             propType,
+            propEnum,
             propRequired,
             propProperties
         };

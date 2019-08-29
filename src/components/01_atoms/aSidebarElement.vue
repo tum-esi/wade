@@ -23,6 +23,7 @@
         :src="deleteHover ? srcPathDeleteWhite : srcPathDelete"
         v-on:click.stop="deleteBtnClicked"
       />
+        <!-- v-on:click.stop="isModalVisible = true" -->
       <div @mouseover="optionsHover = true" @mouseleave="optionsHover = false">
         <aDropdownButton
           :class="{'invisible' : (!canHaveChildren || !showOptions) &&!isDropdownShown}"
@@ -37,6 +38,12 @@
         />
       </div>
     </div>
+    <oModal 
+      v-if="isModalVisible"
+      v-show="isModalVisible"
+      v-on:cancel="isModalVisible = false;"
+      :modalElement="modalElement"
+    />
   </div>
 </template>
 
@@ -45,11 +52,13 @@ import Vue from 'vue';
 import { ElementTypeEnum } from '@/util/enums';
 import { mapMutations, mapGetters } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
+import oModal from '@/components/03_organisms/oModal.vue';
 
 export default Vue.extend({
   name: 'aSidebarElement',
   components: {
-    aDropdownButton
+    aDropdownButton,
+    oModal
   },
   props: {
     title: {
@@ -93,6 +102,8 @@ export default Vue.extend({
   },
   data() {
     return {
+      modalElement: {} as WADE.ModalAddElementInterface,
+      isModalVisible: false,
       isDropdownShown: false,
       showOptions: false,
       deleteHover: false,

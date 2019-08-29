@@ -1,28 +1,35 @@
 <template>
   <div class="td-page-container">
-    <mTabbar :tabbarElements="getTdTabbar" />
-    <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
-    <div class="td-main">
-      <div class="td-main-left border-right">
-        <mUrlBar
-          v-if="showUrlBar"
-          class="url-bar"
-          :button="fetchButton"
-          :buttonAction="fetchFunction"
-          v-on:btn-clicked="hideUrlBar"
-          v-on:cancel-btn-clicked="hideUrlBar"
-        />
-        <oEditor
-          :class="showUrlBar ? 'editor-showUrlBar' : 'editor-full'"
-          :id="id"
-          v-on:td-changed="hideUrlBar"
-        />
-      </div>
-      <div class="td-main-middle border-right">
-        <oSelection />
-      </div>
-      <div class="td-main-right">
-        <oResults />
+    <mTabbar :tabbarElements="getTdTabbar" v-on:tab-clicked="tabClicked" />
+    <div v-if="currentTabId === 'config'" class="td-config">
+      <oConfig />
+    </div>
+    <div v-if="currentTabId === 'editor'" class="td-editor">
+      <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
+      <div class="td-main">
+        <div class="td-main-left border-right">
+          <mUrlBar
+            v-if="showUrlBar"
+            class="url-bar"
+            :button="fetchButton"
+            :buttonAction="fetchFunction"
+            v-on:btn-clicked="hideUrlBar"
+            v-on:cancel-btn-clicked="hideUrlBar"
+          />
+          <div :class="showUrlBar ? 'editor-showUrlBar' : 'editor-full'">
+            <oEditor
+              :id="id"
+              v-on:td-changed="hideUrlBar"
+              v-on:open-config="tabClicked('config')"
+            />
+          </div>
+        </div>
+        <div class="td-main-middle border-right">
+          <oSelection />
+        </div>
+        <div class="td-main-right">
+          <oResults />
+        </div>
       </div>
     </div>
   </div>
@@ -34,6 +41,7 @@ import { mapGetters, mapActions } from 'vuex';
 import aStatusbar from '@/components/01_atoms/aStatusbar.vue';
 import mTabbar from '@/components/02_molecules/mTabbar.vue';
 import mUrlBar from '@/components/02_molecules/mUrlBar.vue';
+import oConfig from '@/components/03_organisms/oConfig.vue';
 import oEditor from '@/components/03_organisms/oEditor.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
@@ -45,6 +53,7 @@ export default Vue.extend({
   name: 'tThingDescription',
   components: {
     aStatusbar,
+    oConfig,
     oEditor,
     oSelection,
     oResults,
@@ -60,6 +69,8 @@ export default Vue.extend({
   },
   data() {
     return {
+      tdId: '',
+      currentTabId: 'editor',
       statusMessage: '',
       showUrlBar: false,
       fetchButton: {
@@ -113,12 +124,18 @@ export default Vue.extend({
       if (args.btnValue === 'td-url') {
         this.showUrlBar = true;
       }
+      if (typeof args === 'string') this.currentTabId = args;
+      // this.$router.push({
+      //   name: 'config',
+      //   params: { type: 'td', id: this.id, tab: 'config' }
+      // });
     }
   },
   watch: {
     // Check if router id changed and change active sidebar element
     '$route.params.id'(id) {
       this.$store.commit('SidebarStore/setActiveElement', id);
+      this.tdId = id;
     }
   }
 });
@@ -130,9 +147,13 @@ export default Vue.extend({
   flex-direction: column;
 }
 
+.td-editor {
+  height: 90%;
+}
+
 .td-main {
   display: flex;
-  min-height: 500px;
+  height: 90%;
 }
 
 .td-main-left {

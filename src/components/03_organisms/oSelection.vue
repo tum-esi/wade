@@ -2,6 +2,7 @@
     <div class="selection-container">
         <div class="selection-title"><label>Selection</label></div>
         <div class="selection-area" v-if="isValidTd">
+            <!-- Properties -->
             <div class="properties border-bottom-bold selection-area-el">
                 <div class="selection-label-container border-bottom"><label>Properties</label></div>
                 <div class="interaction-container-all">
@@ -19,6 +20,7 @@
                     />
                 </div>
             </div>
+            <!-- Actions -->
             <div class="actions border-bottom-bold selection-area-el">
                 <div class="selection-label-container border-bottom"><label>Actions</label></div>
                 <div class="interaction-container-all">
@@ -35,6 +37,7 @@
                     />
                 </div>
             </div>
+            <!-- Events -->
             <div class="events selection-area-el">
                 <div class="selection-label-container border-bottom"><label>Events</label></div>
                 <div class="interaction-container-all">
@@ -177,6 +180,7 @@ export default Vue.extend({
 .selection-btn-invoke, .selection-btn-reset {
     width: 49%;
     padding: 5px;
+    margin: 0;
 }
 
 .interaction-container-all {
