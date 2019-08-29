@@ -14,9 +14,9 @@
                         :element="element"
                         :interactionName="element.interactionName"
                         :interactionSelectBtn="element.interactionSelectBtn"
-                        v-on:select-with-input="addSelectedInteractionWithInput"
-                        v-on:select="addSelectedInteraction(element)"
-                        v-on:deselect="removeSelectedInteraction(element)"
+                        v-on:select-with-input="select"
+                        v-on:select="select(element)"
+                        v-on:deselect="reset(element)"
                     />
                 </div>
             </div>
@@ -31,9 +31,9 @@
                         :element="element"
                         :interactionName="element.interactionName"
                         :interactionSelectBtn="element.interactionSelectBtn"
-                        v-on:select-with-input="addSelectedInteractionWithInput"
-                        v-on:select="addSelectedInteraction(element)"
-                        v-on:deselect="removeSelectedInteraction(element)"
+                        v-on:select-with-input="select"
+                        v-on:select="select(element)"
+                        v-on:deselect="reset(element)"
                     />
                 </div>
             </div>
@@ -48,8 +48,8 @@
                         :key="index"
                         :interactionName="element.interactionName"
                         :interactionSelectBtn="element.interactionSelectBtn"
-                        v-on:select="addSelectedInteraction(element)"
-                        v-on:deselect="removeSelectedInteraction(element)"
+                        v-on:select="select(element)"
+                        v-on:deselect="reset(element)"
                     />
                 </div>
             </div>
@@ -60,7 +60,7 @@
                     :btnLabel="getSelectionResetBtn.btnLabel"
                     :btnOnClick="getSelectionResetBtn.btnOnClick"
                     :btnActive="isBtnActive"
-                    v-on:reset-selections="resetAllSelections"
+                    v-on:reset-selections="resetAll"
                 />
                 <aBasicButton
                     class="selection-btn-invoke"
@@ -111,26 +111,28 @@ export default Vue.extend({
                 'invokeInteractions',
                 'resetInteractions',
                 'resetSelections']),
-
-        async addSelectedInteraction(element: any) {
+        // Add clicked interaction to selected interactions.
+        // element: { interactionName, interactionSelectBtn, interactionType }
+        async select(element, input?) {
+            if (input || typeof input === 'boolean') {
+                element.interactionSelectBtn.input = input;
+            }
             const newInteractionList = await (this as any).addToSelectedInteractions({ newInteraction: element});
         },
-        async addSelectedInteractionWithInput(input: any, element: any) {
-            element.interactionSelectBtn.input = input;
-            const newInteractionList = await (this as any).addToSelectedInteractions({ newInteraction: element});
+        // Remove clicked interaction of selected interactions.
+        // element: { interactionName, interactionSelectBtn, interactionType }
+        async reset(element) {
+            await (this as any).removeFromSelectedInteractions({ interactionToRemove: element});
         },
-        async removeSelectedInteraction(element: any) {
-            const newInteractionList =
-                await (this as any).removeFromSelectedInteractions({ interactionToRemove: element});
-        },
-        resetAllSelections() {
+        // Remove all interactions from selected interacitons.
+        async resetAll() {
             (this as any).resetSelections();
-            this.$eventHub.$emit('selections-reseted');
+            // TODO: this.$eventHub.$emit('selections-reseted');
         }
     },
     watch: {
         '$route.params.id'(id) {
-            (this as any).resetInteractions();
+            (this as any).resetAll();
         }
     }
 });

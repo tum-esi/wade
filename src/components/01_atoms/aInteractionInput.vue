@@ -35,7 +35,7 @@
     </div>
 
     <div class="select-btn-container">
-        <img class="select-btn" @click.prevent="changeSelection" :src="btnValue ? currentSrc : srcSelectionNotPossibele"/>
+        <img class="select-btn" @click.prevent="changeSelection" :src="hasBtnValue ? currentSrc : srcSelectionNotPossibele"/>
     </div>
 
   </div>
@@ -138,12 +138,22 @@ export default Vue.extend({
     },
     getButtonSelectedStyle(): string {
         return this.btnSelected ? 'btn-selection-container-selected' : '';
+    },
+    hasBtnValue(): boolean {
+      if ((typeof this.btnValue  === 'string' && this.btnValue.length <= 0)
+          || this.btnValue === null
+          || this.btnValue === undefined
+      ) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
   methods: {
     onClick() {
       if (this.btnOnClickEvent) { this.$emit(this.btnOnClickEvent, this.btnOnClickValue); }
-      if (this.btnValue && this.element) {
+      if (this.hasBtnValue && this.element) {
           if (this.interactionInputType('number')) {
               (this as any).btnValue = parseInt(this.btnValue, 10);
           }
@@ -155,14 +165,11 @@ export default Vue.extend({
           }
       }
       this.btnSelected
-        ? (this.btnValue ? this.$emit('selected-with-input', this.btnValue, this.element)
+        ? (this.hasBtnValue ? this.$emit('selected-with-input', this.element, this.btnValue)
         : this.$emit('select', this.btnValue)) : this.$emit('deselect');
     },
     interactionInputType(type: string) {
         let isCorrectType = false;
-        console.log('type: ', type);
-        console.log('btnKey: ', this.btnKey);
-        console.log('input type: ', this.btnInputType);
         switch (type) {
             case 'text':
                 if (this.btnInputType.propType === 'string' && !this.btnInputType.propEnum
@@ -200,7 +207,8 @@ export default Vue.extend({
     },
     changeSelection() {
         // Cannot be selected when there's no input value
-        if (!this.btnValue) return;
+        if (!this.hasBtnValue) return;
+
         this.btnSelected = !this.btnSelected;
         this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
         this.onClick();
