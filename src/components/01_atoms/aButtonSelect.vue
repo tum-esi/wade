@@ -21,7 +21,8 @@ export default Vue.extend({
   created() {
     this.$eventHub.$on('selections-reseted', () => {
       this.btnSelected = false;
-      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected; });
+      this.currentSrc = this.srcUnselected;
+    });
   },
   beforeDestroy() {
     this.$eventHub.$off('selections-reseted');
@@ -94,7 +95,7 @@ export default Vue.extend({
       if (this.btnOnClickEvent) { this.$emit(this.btnOnClickEvent, this.btnOnClickValue); }
       this.btnSelected ? this.$emit('select') : this.$emit('deselect');
     },
-     changeSelection() {
+    changeSelection() {
         this.btnSelected = !this.btnSelected;
         this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
         this.onClick();

@@ -114,19 +114,13 @@ export default Vue.extend({
         // Add clicked interaction to selected interactions.
         // element: { interactionName, interactionSelectBtn, interactionType }
         async select(element, input?, changeInput?: boolean) {
-            console.log('=== INPUT:', input);
-            if (input || typeof input === 'boolean') {
-                element.interactionSelectBtn.input = input;
-            }
-            if (
-                (element.interactionSelectBtn.input || typeof element.interactionSelectBtn.input === 'boolean')
-                && changeInput
-            ) {
-                // just change input (if not in selected interactions add it)
-                await (this as any).addToSelectedInteractions({ changeInteraction: element});
-            } else {
-                await (this as any).addToSelectedInteractions({ newInteraction: element});
-            }
+            if (input !== null || input !== undefined)element.interactionSelectBtn.input = input;
+
+            // Either just change input or add new interaction
+            await (this as any).addToSelectedInteractions(
+                changeInput
+                ? { changeInteraction: element}
+                : { newInteraction: element});
         },
         // Remove clicked interaction of selected interactions.
         // element: { interactionName, interactionSelectBtn, interactionType }
@@ -136,7 +130,7 @@ export default Vue.extend({
         // Remove all interactions from selected interacitons.
         async resetAll() {
             (this as any).resetSelections();
-            // TODO: this.$eventHub.$emit('selections-reseted');
+            this.$eventHub.$emit('selections-reseted');
         }
     },
     watch: {

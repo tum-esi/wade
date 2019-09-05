@@ -5,37 +5,37 @@
     class="btn-input-container"
   >
 
-    <input v-if="interactionInputType('text')" class="input-text" type="text" :placeholder="getPlaceholder" v-model="inputValue"/>
+    <input v-if="checkInputType('text')" class="input-text" type="text" :placeholder="getPlaceholder" v-model="inputValue" @change="changeInput(inputValue, false)"/>
 
-    <input v-else-if="interactionInputType('number')" class="input-text" type="number" :min="this.btnInputType.propMin" :max="this.btnInputType.propMax" placeholder="Number" v-model="inputValue"/>
+    <input v-else-if="checkInputType('number')" class="input-text" type="number" :min="this.btnInputType.propMin" :max="this.btnInputType.propMax" placeholder="Number" v-model="inputValue" @change="changeInput(inputValue, false)"/>
 
-    <div v-else-if="interactionInputType('boolean')" class="input-dropdown">
+    <div v-else-if="btnInputType.propType === 'boolean'" class="input-dropdown">
         <button class="input-dropdown-btn" @click.prevent="dropdownVisible = !dropdownVisible" >{{ getSelectedOption }}</button>
             <div class="input-dropdown-content" 
                 :class="{'input-dropdown-content-visible' : dropdownVisible}">
-                <label @click.prevent="changeBtnInputValue(true)">
+                <label @click.prevent="changeInput(true, true)">
                    True
                 </label>
-                <label @click.prevent="changeBtnInputValue(false)">
+                <label @click.prevent="changeInput(false, true)">
                    False
                 </label>
             </div>
     </div>
 
-    <div v-else-if="interactionInputType('enum')" class="input-dropdown">
+    <div v-else-if="btnInputType.propEnum" class="input-dropdown">
         <button class="input-dropdown-btn" @click.prevent="dropdownVisible = !dropdownVisible" >{{ getSelectedOption }}</button>
             <div class="input-dropdown-content" 
                 :class="{'input-dropdown-content-visible' : dropdownVisible}">
                 <label 
                 v-for="(el, index) in this.btnInputType.propEnum"
-                :key="index" @click.prevent="changeBtnInputValue(el)">
+                :key="index" @click.prevent="changeInput(el, true)">
                     {{ el }}
                 </label>
             </div>
     </div>
 
     <div class="select-btn-container">
-        <img class="select-btn" @click.prevent="changeSelection" :src="!isInputEmpty ? currentSrc : srcSelectionNotPossibele"/>
+        <img class="select-btn" @click.prevent="btnSelected ? deselect() : select()" :src="!isInputEmpty ? currentSrc : srcSelectionNotPossibele"/>
     </div>
 
   </div>
@@ -46,9 +46,10 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'aInteractionInput',
   created() {
-    this.$eventHub.$on('selections-reseted', () => {
-      this.btnSelected = false;
-      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected; });
+    this.$eventHub.$on('selections-reseted', () => { this.deselect(); });
+  },
+  beforeDestroy() {
+    this.$eventHub.$off('selections-reseted');
   },
   data() {
     return {
@@ -151,118 +152,71 @@ export default Vue.extend({
     }
   },
   methods: {
-    interactionInputType(type: string) {
-        let isCorrectType = false;
-        switch (type) {
-            case 'text':
-                if (this.btnInputType.propType === 'string' && !this.btnInputType.propEnum
-                || this.btnInputType.propType === 'array' && !this.btnInputType.propEnum
-                || this.btnInputType.propType === 'object' && !this.btnInputType.propEnum
-                ) {
-                    isCorrectType = true;
-                    this.placeholder = this.btnInputType.propType;
-                }
-                break;
-            case 'object':
-              if (this.btnInputType.propType === 'object') isCorrectType = true;
-              break;
-            case 'array':
-              if (this.btnInputType.propType === 'array') isCorrectType = true;
-              break;
-            case 'enum':
-                if (this.btnInputType.propEnum) isCorrectType = true;
-                break;
-            case 'number':
-                if (['integer', 'float', 'double', 'number'].indexOf(this.btnInputType.propType) !== -1
-                && !this.btnInputType.propEnum) {
-                    isCorrectType = true;
-                }
-                break;
-            case 'boolean':
-                if (this.btnInputType.propType === 'boolean') {
-                    isCorrectType = true;
-                }
-                break;
-            default:
-                break;
+    checkInputType(inputType: string): boolean {
+      if (inputType === 'text'
+        && (this.btnInputType.propType === 'string' && !this.btnInputType.propEnum)
+        || (this.btnInputType.propType === 'array' && !this.btnInputType.propEnum)
+        || (this.btnInputType.propType === 'object' && !this.btnInputType.propEnum)
+      ) {
+        this.placeholder = this.btnInputType.propType;
+        return true;
+      }
+
+      if (inputType === 'number'
+        && ['integer', 'float', 'double', 'number'].indexOf(this.btnInputType.propType) !== -1
+        && !this.btnInputType.propEnum) {
+          return true;
         }
-        return isCorrectType;
+
+      return false;
     },
-    // Change input of an interaction
-    //  TODO: Make difference between dropdown -> bool/enum and input field
-    // TODO: When input field: parse!!
-    changeBtnInputValue(input?: string | boolean) {
-      // If (input) -> Was called by dropdown -> hide dropdown and change this.inputValue
-      if (input) {
+    changeInput(input: string | boolean | number | any, isDropdown: boolean) {
+      if (input === undefined) return;
+      // Hide dropdown and change input when enum/boolean
+      if (isDropdown) {
         this.dropdownVisible = !this.dropdownVisible;
         (this as any).inputValue = input;
-      } else {
-        this.inputValue = this.getParsedInputValue();
       }
-
-      console.log('=== INPUT VALUE before Emit=', this.inputValue);
-      // Only emit changed input when interaction is already selected
-      if (this.btnSelected) this.$emit('select-with-input', this.element, this.inputValue, true);
+      // When btn is selected emit selection change
+      if (this.btnSelected)   {
+        this.$emit('select-with-input', this.element, isDropdown ? this.inputValue : this.getParsedInputValue(), true);
+      }
     },
-    // Select or deselect an interaction input
-    changeSelection() {
+    select() {
       // Cannot be selected when there's no input value
       if (this.isInputEmpty || !this.element) return;
-
-      // Change selection in UI
-      this.btnSelected = !this.btnSelected;
-      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
-
-      if (this.btnSelected && !this.isInputEmpty) {
-        this.$emit('select-with-input', this.element, this.getParsedInputValue(), false);
-      } else {
-        this.$emit('deselect');
-      }
+      // Change UI selection
+      this.btnSelected = true;
+      this.currentSrc = this.srcSelected;
+      // Emit new selection
+      this.$emit('select-with-input', this.element, this.getParsedInputValue(), false);
     },
+    deselect() {
+      this.inputValue = '';
+      this.btnSelected = false;
+      this.currentSrc = this.srcUnselected;
+      this.$emit('deselect');
+    },
+    // Parse string input to correct data type (do not show in UI)
     getParsedInputValue() {
-      console.log('this.inputValue: ', this.inputValue);
       let parsedInputValue: any = this.inputValue;
-      // Parse string input when needed
-      if (this.interactionInputType('number')) {
+      if (['integer', 'float', 'double', 'number'].indexOf(this.btnInputType.propType) !== -1) {
           parsedInputValue = parseInt(this.inputValue, 10);
       }
-      if (this.interactionInputType('object')) {
+      if (this.btnInputType.propType === 'object') {
         try {
           parsedInputValue = JSON.parse(this.inputValue);
         } catch {
+          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
       }
-      if (this.interactionInputType('array')) {
-        // #1 Does it have brackets? No -> just split
-        // #2 Does it have brackets? Yes -> 
-        // -> remove brackets
-        // -> has '' -> replace with ""
-        // -> has " " -> passt
-        // -> is boolean -> passt
-        // -> is  number -> passt
-        // -> is object -> check if valid obj -> wenn ja -> passt; wenn nein 
-        // -> create real obj 
-
-        // Test cases
-        // const test1 = 'blabla';
-        // const test2 = '"blabla"';
-        // const test6 = '[a, b, c]'; // elements need to be converted to strings
-        // const test8 = 'a, b, c'; // elements need to be converted to strings
-        // const test7 = '["a", "b", "c"]';
-        // const test9 = '"a", "b", "c"';
-        // const test3 = '{ a : b }'; // Not valid obj
-        // const test4 = '{ "a" : b }'; // Not valid obj
-        // const test5 = '{ a : "b" }'; // Not valid obj
-        // const test10 = '{ "a" : "b" }';
-        // const test11 = '[{ "a" : "b" }]';
-        // Remove []
-        // Make elements for each ' '
-        // Remove ""
+      if (this.btnInputType.propType === 'array') {
         const jsonArr = parsedInputValue.replace(/([^\[\],\s]+)/g, '"$&"');
         try {
           parsedInputValue = JSON.parse(jsonArr);
         } catch {
+          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
         if (!parsedInputValue || typeof parsedInputValue === 'string') parsedInputValue = this.inputValue.split(' ');
@@ -270,12 +224,6 @@ export default Vue.extend({
       return parsedInputValue;
     }
   }
-  // watch: {
-  //   inputValue() {
-  //     if (this.interactionInputType('object')) return; // Does not work for objects
-  //     this.changeBtnInputValue();
-  //   }
-// }
 });
 </script>
 

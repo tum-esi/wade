@@ -65,7 +65,6 @@ export default Vue.extend({
     },
     methods: {
         selectWithInput(element: any, inputValue: any, changeInput: boolean) {
-            console.log('element: ', element, 'inputValue:', inputValue, 'changeInput: ', changeInput);
             this.$emit('select-with-input', element, inputValue, changeInput);
         }
     }
