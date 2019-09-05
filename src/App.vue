@@ -211,7 +211,8 @@ textarea:focus, input:focus{
 }
 
 .error {
-    background: #A36A5B;
+    background: #A36A5B !important;
+    color: #393B3A !important;
 }
 
 /* Styling for start page */

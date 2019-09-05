@@ -43,7 +43,6 @@ export default Vue.extend({
         ...mapGetters('TdStore', ['getConfig']),
         getCurrentConfig(): any {
             let config = (this as any).getConfig;
-            console.log('config:', config);
             try {
                 config = JSON.stringify(JSON.parse(config), null, 2);
             } catch {

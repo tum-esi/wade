@@ -7,7 +7,7 @@ export function updateStatusMessage(
     tdState: TdStateEnum | null,
     errorMsg: string | null,
     interactionState: InteractionStateEnum | null
-): string {
+): { message: string, error: boolean } {
     const messageHandler = new MessageHandler(tdState, errorMsg, interactionState);
     return messageHandler.getStatusMessage();
 }

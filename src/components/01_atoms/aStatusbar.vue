@@ -1,5 +1,5 @@
 <template>
-    <div class="statusbar-container">
+    <div class="statusbar-container border-bottom" :class="{'error' : getStatusMessage.error}">
         <label>{{ getStatus }}</label>
     </div>
 </template>
@@ -10,9 +10,9 @@ import { mapGetters } from 'vuex';
 export default Vue.extend({
     name: 'aStatusbar',
     computed: {
-        ...mapGetters('TdStore', {statusMessage: 'getStatusMessage'}),
+        ...mapGetters('TdStore', ['getStatusMessage']),
         getStatus(): string {
-            return (this as any).statusMessage;
+            return (this as any).getStatusMessage.message;
         }
     }
 });
