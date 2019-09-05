@@ -78,6 +78,7 @@ TODO neue Version morgen:
         Do not allow resizing of window (to a very small window).
         Remove gap to window (Make "full screen")
 - (+) Scrollbar: Restyle
+- (o) Selection: Show error if input is not in correct format
 
 ## Project setup
 ```

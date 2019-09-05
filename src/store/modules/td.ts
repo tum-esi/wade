@@ -162,10 +162,38 @@ export default {
             commit('setResults', []);
         },
 
-        // Add new interaction to interactions to be invoked
+        // Add new interaction or change interaction input (without changing the order of selected interactions).
         async addToSelectedInteractions({ commit, state }, payload) {
-            const selectedInteractions = state.selections;
-            selectedInteractions.push(payload.newInteraction);
+            if (!payload.changeInteraction && !payload.newInteraction) return;
+
+            const selectedInteractions = await state.selections;
+
+            const interaction = await payload.changeInteraction
+                ? payload.changeInteraction
+                : payload.newInteraction ? payload.newInteraction : null;
+            const index = await selectedInteractions.indexOf(interaction);
+            const isNew = await payload.newInteraction ? true : false;
+
+            if (isNew) {
+                // Remove interaction if it already exists
+                if (index !== -1) await selectedInteractions.splice(index, 1);
+                // Add to selected interactions
+                selectedInteractions.push(interaction);
+            } else {
+                // Replace selected interaction when input changed
+                selectedInteractions[index] = await interaction;
+            }
+
+            // if (payload.changeInteraction) {
+            //     // find selectedInteraction and replace it with payload.changeInteraction
+            //         const indexToReplace = await selectedInteractions.indexOf(payload.changeInteraction);
+            //         selectedInteractions[indexToReplace] = await payload.changeInteraction;
+            // } else {
+            //         // Remove interaction if it already exists
+            //         // const indexToReplace = await selectedInteractions.indexOf(payload.newInteraction);
+            //         // if (indexToReplace !== -1)  await selectedInteractions.splice(indexToReplace, 1);
+            //         selectedInteractions.push(payload.newInteraction);
+            // }
             commit('setSelections', selectedInteractions);
             commit('setStatusMessage');
             return selectedInteractions;

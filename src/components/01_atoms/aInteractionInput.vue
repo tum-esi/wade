@@ -5,18 +5,18 @@
     class="btn-input-container"
   >
 
-    <input v-if="interactionInputType('text')" class="input-text" type="text" :placeholder="getPlaceholder" v-model="btnValue"/>
+    <input v-if="interactionInputType('text')" class="input-text" type="text" :placeholder="getPlaceholder" v-model="inputValue"/>
 
-    <input v-else-if="interactionInputType('number')" class="input-text" type="number" :min="this.btnInputType.propMin" :max="this.btnInputType.propMax" placeholder="Number" v-model="btnValue"/>
+    <input v-else-if="interactionInputType('number')" class="input-text" type="number" :min="this.btnInputType.propMin" :max="this.btnInputType.propMax" placeholder="Number" v-model="inputValue"/>
 
     <div v-else-if="interactionInputType('boolean')" class="input-dropdown">
         <button class="input-dropdown-btn" @click.prevent="dropdownVisible = !dropdownVisible" >{{ getSelectedOption }}</button>
             <div class="input-dropdown-content" 
                 :class="{'input-dropdown-content-visible' : dropdownVisible}">
-                <label @click.prevent="setBtnValue(true)">
+                <label @click.prevent="changeBtnInputValue(true)">
                    True
                 </label>
-                <label @click.prevent="setBtnValue(false)">
+                <label @click.prevent="changeBtnInputValue(false)">
                    False
                 </label>
             </div>
@@ -28,14 +28,14 @@
                 :class="{'input-dropdown-content-visible' : dropdownVisible}">
                 <label 
                 v-for="(el, index) in this.btnInputType.propEnum"
-                :key="index" @click.prevent="setBtnValue(el)">
+                :key="index" @click.prevent="changeBtnInputValue(el)">
                     {{ el }}
                 </label>
             </div>
     </div>
 
     <div class="select-btn-container">
-        <img class="select-btn" @click.prevent="changeSelection" :src="hasBtnValue ? currentSrc : srcSelectionNotPossibele"/>
+        <img class="select-btn" @click.prevent="changeSelection" :src="!isInputEmpty ? currentSrc : srcSelectionNotPossibele"/>
     </div>
 
   </div>
@@ -53,7 +53,7 @@ export default Vue.extend({
   data() {
     return {
       btnSelected: false,
-      btnValue: '',
+      inputValue: '',
       dropdownVisible: false,
       placeholder: '',
       currentSrc: require('@/assets/circle.png'),
@@ -133,41 +133,24 @@ export default Vue.extend({
         return this.btnSelected ? this.srcSelected : this.srcUnselected;
     },
     getSelectedOption(): string {
-        if ((this as any).btnValue === false) { return this.btnValue; }
-        return this.btnValue ? this.btnValue : 'Select';
+        if ((this as any).inputValue === false) { return this.inputValue; }
+        return this.inputValue ? this.inputValue : 'Select';
     },
     getButtonSelectedStyle(): string {
         return this.btnSelected ? 'btn-selection-container-selected' : '';
     },
-    hasBtnValue(): boolean {
-      if ((typeof this.btnValue  === 'string' && this.btnValue.length <= 0)
-          || this.btnValue === null
-          || this.btnValue === undefined
+    isInputEmpty(): boolean {
+      if ((typeof this.inputValue  === 'string' && this.inputValue.length <= 0)
+          || this.inputValue === null
+          || this.inputValue === undefined
       ) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     }
   },
   methods: {
-    onClick() {
-      if (this.btnOnClickEvent) { this.$emit(this.btnOnClickEvent, this.btnOnClickValue); }
-      if (this.hasBtnValue && this.element) {
-          if (this.interactionInputType('number')) {
-              (this as any).btnValue = parseInt(this.btnValue, 10);
-          }
-          if (this.interactionInputType('object')) {
-              this.btnValue = JSON.parse(this.btnValue);
-          }
-          if (this.interactionInputType('array')) {
-              (this as any).btnValue = this.btnValue.split(' ');
-          }
-      }
-      this.btnSelected
-        ? (this.hasBtnValue ? this.$emit('selected-with-input', this.element, this.btnValue)
-        : this.$emit('select', this.btnValue)) : this.$emit('deselect');
-    },
     interactionInputType(type: string) {
         let isCorrectType = false;
         switch (type) {
@@ -180,10 +163,14 @@ export default Vue.extend({
                     this.placeholder = this.btnInputType.propType;
                 }
                 break;
+            case 'object':
+              if (this.btnInputType.propType === 'object') isCorrectType = true;
+              break;
+            case 'array':
+              if (this.btnInputType.propType === 'array') isCorrectType = true;
+              break;
             case 'enum':
-                if (this.btnInputType.propEnum) {
-                    isCorrectType = true;
-                }
+                if (this.btnInputType.propEnum) isCorrectType = true;
                 break;
             case 'number':
                 if (['integer', 'float', 'double', 'number'].indexOf(this.btnInputType.propType) !== -1
@@ -201,19 +188,94 @@ export default Vue.extend({
         }
         return isCorrectType;
     },
-    setBtnValue(el: string | boolean) {
+    // Change input of an interaction
+    //  TODO: Make difference between dropdown -> bool/enum and input field
+    // TODO: When input field: parse!!
+    changeBtnInputValue(input?: string | boolean) {
+      // If (input) -> Was called by dropdown -> hide dropdown and change this.inputValue
+      if (input) {
         this.dropdownVisible = !this.dropdownVisible;
-        (this as any).btnValue = el;
-    },
-    changeSelection() {
-        // Cannot be selected when there's no input value
-        if (!this.hasBtnValue) return;
+        (this as any).inputValue = input;
+      } else {
+        this.inputValue = this.getParsedInputValue();
+      }
 
-        this.btnSelected = !this.btnSelected;
-        this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
-        this.onClick();
+      console.log('=== INPUT VALUE before Emit=', this.inputValue);
+      // Only emit changed input when interaction is already selected
+      if (this.btnSelected) this.$emit('select-with-input', this.element, this.inputValue, true);
+    },
+    // Select or deselect an interaction input
+    changeSelection() {
+      // Cannot be selected when there's no input value
+      if (this.isInputEmpty || !this.element) return;
+
+      // Change selection in UI
+      this.btnSelected = !this.btnSelected;
+      this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
+
+      if (this.btnSelected && !this.isInputEmpty) {
+        this.$emit('select-with-input', this.element, this.getParsedInputValue(), false);
+      } else {
+        this.$emit('deselect');
+      }
+    },
+    getParsedInputValue() {
+      console.log('this.inputValue: ', this.inputValue);
+      let parsedInputValue: any = this.inputValue;
+      // Parse string input when needed
+      if (this.interactionInputType('number')) {
+          parsedInputValue = parseInt(this.inputValue, 10);
+      }
+      if (this.interactionInputType('object')) {
+        try {
+          parsedInputValue = JSON.parse(this.inputValue);
+        } catch {
+          parsedInputValue = null;
+        }
+      }
+      if (this.interactionInputType('array')) {
+        // #1 Does it have brackets? No -> just split
+        // #2 Does it have brackets? Yes -> 
+        // -> remove brackets
+        // -> has '' -> replace with ""
+        // -> has " " -> passt
+        // -> is boolean -> passt
+        // -> is  number -> passt
+        // -> is object -> check if valid obj -> wenn ja -> passt; wenn nein 
+        // -> create real obj 
+
+        // Test cases
+        // const test1 = 'blabla';
+        // const test2 = '"blabla"';
+        // const test6 = '[a, b, c]'; // elements need to be converted to strings
+        // const test8 = 'a, b, c'; // elements need to be converted to strings
+        // const test7 = '["a", "b", "c"]';
+        // const test9 = '"a", "b", "c"';
+        // const test3 = '{ a : b }'; // Not valid obj
+        // const test4 = '{ "a" : b }'; // Not valid obj
+        // const test5 = '{ a : "b" }'; // Not valid obj
+        // const test10 = '{ "a" : "b" }';
+        // const test11 = '[{ "a" : "b" }]';
+        // Remove []
+        // Make elements for each ' '
+        // Remove ""
+        const jsonArr = parsedInputValue.replace(/([^\[\],\s]+)/g, '"$&"');
+        try {
+          parsedInputValue = JSON.parse(jsonArr);
+        } catch {
+          parsedInputValue = null;
+        }
+        if (!parsedInputValue || typeof parsedInputValue === 'string') parsedInputValue = this.inputValue.split(' ');
+      }
+      return parsedInputValue;
     }
   }
+  // watch: {
+  //   inputValue() {
+  //     if (this.interactionInputType('object')) return; // Does not work for objects
+  //     this.changeBtnInputValue();
+  //   }
+// }
 });
 </script>
 

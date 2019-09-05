@@ -21,7 +21,7 @@
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
                 :element="element"
-                v-on:selected-with-input="selectWithInput"
+                v-on:select-with-input="selectWithInput"
                 v-on:deselect="$emit('deselect')"
             />
 
@@ -64,8 +64,9 @@ export default Vue.extend({
         }
     },
     methods: {
-        selectWithInput(value: any, element: any) {
-            this.$emit('select-with-input', value, element);
+        selectWithInput(element: any, inputValue: any, changeInput: boolean) {
+            console.log('element: ', element, 'inputValue:', inputValue, 'changeInput: ', changeInput);
+            this.$emit('select-with-input', element, inputValue, changeInput);
         }
     }
 });
