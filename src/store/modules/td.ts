@@ -1,5 +1,5 @@
 import * as Api from '@/backend/Api';
-import { RESULT_MESSAGES } from '@/util/texts';
+import { RESULT_MESSAGES } from '@/util/enums';
 import { InteractionStateEnum, TdStateEnum } from '@/util/enums';
 
 export default {

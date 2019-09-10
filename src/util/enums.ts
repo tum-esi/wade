@@ -26,8 +26,14 @@ export enum InteractionStateEnum {
   INVOKED = 'Interactions have been invoked.'
 }
 
+// Results messages
+export enum RESULT_MESSAGES {
+  NO_INTERACTIONS_SELECTED = 'No interactions have been selected',
+  NO_INTERACTIONS_INVOKED = 'Interactions have not been invoked yet'
+}
+
 export enum TdStateEnum {
-  NO_TD = 'NO TD: No TD is uploaded.',
+  NO_TD = 'NO TD: Paste or upload a Thing Description.',
   VALID_TD_JSON = 'VALID JSON: TD is valid JSON.',
   INVALID_TD_JSON = 'INVALID JSON: TD is invalid JSON.',
   VALID_CONSUMED_TD = 'CONSUMED: TD has been successfully consumed.',

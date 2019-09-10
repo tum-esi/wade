@@ -1,9 +1,9 @@
 <template>
     <div class="config-container">
         <!-- <label>Default Configuration</label> -->
-        <div class="default-config-container border-right">
+        <div class="default-config-container">
             <label>Configuration</label>
-            <div class="config-view-options">
+            <!-- <div class="config-view-options">
                 <div>
                     <input
                     type="radio"
@@ -13,12 +13,8 @@
                     >
                     <label class="config-checkbox-label" :for="configDisplayOptions.beauty">{{ configDisplayOptions.beauty }}</label>
                 </div>
-            </div>
-            <textarea spellcheck="false" wrap="off" v-model="getCurrentConfig"></textarea>
-        </div>
-        <div class="mqtt-config-container">
-            <label>MQTT Configuration</label>
-            <textarea spellcheck="false" wrap="off"></textarea>
+            </div> -->
+            <textarea class="config-textarea" spellcheck="false" wrap="off" v-model="getCurrentConfig"></textarea>
         </div>
     </div>
 </template>
@@ -36,10 +32,13 @@ export default Vue.extend({
             configDisplayOptions: {
                 raw: 'raw',
                 beauty: 'form-data'
-            }
+            },
+            currentValue: undefined
         };
     },
     computed: {
+        // What do I need ?
+        // #1 
         ...mapGetters('TdStore', ['getConfig']),
         getCurrentConfig(): any {
             let config = (this as any).getConfig;
@@ -70,11 +69,19 @@ export default Vue.extend({
 
 .default-config-container .mqtt-config-container {
     height: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 textarea {
     resize: false;
     height: 100%;
+}
+
+.config-textarea {
+    resize: none;
+    width: 500px;
+    height: 500px;
 }
 
 </style>

@@ -8,40 +8,29 @@ http://plugfest.thingweb.io:8083/TestThing
 (x) = BUG
 (-) = OTHER
 
-### NEXT: 
-When input selection is unselected reset input (dropdown)
 
-TODO neue Version morgen: 
+What happens if the prop title is super long? -> in UI? 
+
+
+### NEXT: 
 - Subscription!!!
-    - Fix reset Interaction Selection
     - Invoke interaction -> timeout
     - if it has no port -> default port
-    - Enum input
-    - Test with coap 
+    - Test with coap (with & without port)
     - Make option to select protocol (if more than one protocol is available)
-    - Make a default config file for each td -> in an extra tab
-    - Make a default config file for mqtt
+
     - Finish interface for mashups -> 
         - Ausklappen und auswählen der TDs 
         - Ausführen der TDs nacheinander 
 
-
-- (-) Build: Build for other systems (linux & windows & mac)
-             -> Test on other mac (do you need electron installed?)
-             -> Test on windows (do you need electron installed)
 - (o) Folders: Create user interface for folders
 - (o) Mashups: Create user interface for mashups
-- (o) Subscribing: Show updated subscription status
-- (o) Subscribing: Unsubscribe to events
-- (-) Testing: Test wade with WoT cart
 - (+) Interaction Selection: Support all possible input types for write and actions in UI (also images and so on)
 - (o) Editor: Add td from local machine
 - (+) Refactor: Deleting / Adding / Merging sidebar elements: strict interface to add / remove in data and in GUI 
 
 
 ### IMPORTANT TODO
-- (-) Bindings: Test COAP/COAPS bindings
-- (o) Bindings: Add MQTT binding
 - (o) Store: Persistant element saving
 - (o) Store: Display stored td
 
@@ -49,7 +38,6 @@ TODO neue Version morgen:
 - (o) User credentials
 - (o) Tabbar in Element: Handle tabbing (set active tab etc) -> Router!
 - (+) Editor: Real JSON editor (line and error indidaction)
-- (x) Interaction Selection: Reset button does not always reset UI 
 - (x) Interaction Results: Array and Object type support 
 - (o) Interactions: Reihenfolge & Drag n Drop von Interactions
 - (o) Sidebar: Drag and Drop of elements to change order 
@@ -79,6 +67,7 @@ TODO neue Version morgen:
         Remove gap to window (Make "full screen")
 - (+) Scrollbar: Restyle
 - (o) Selection: Show error if input is not in correct format
+- (+) Errors: Show connection errors in statusbar
 
 ## Project setup
 ```
