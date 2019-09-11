@@ -54,7 +54,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapMutations('SidebarStore', ['deleteSidebarElement']),
+    ...mapMutations('SidebarStore', ['deleteSidebarElement', 'deleteElementFromStore']),
     addComponent(
       elements: WADE.SidebarElement[],
       parentId: string,
@@ -187,8 +187,9 @@ export default Vue.extend({
     },
     deleteElement(id: string, type: string) {
       this.deleteSidebarElement({ id, type });
+      this.deleteElementFromStore({ id, type });
       this.$eventHub.$emit('sidebar-element-removed', id);
-      this.$router.push({name: 'home'});
+      if (this.$router.currentRoute.name !== 'home') this.$router.push({name: 'home'});
     },
     optionDropdownClicked(element: any) {
       this.$emit('dropdown-clicked', element);

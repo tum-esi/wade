@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 
 export default Vue.extend({
@@ -23,12 +23,13 @@ export default Vue.extend({
         aDropdownButton
     },
     created() {
-      this.$store.commit('SidebarStore/setActiveElement', null);
+      this.setActiveElement(null);
     },
     computed: {
         ...mapGetters('SidebarStore', ['getAddNewButton']),
     },
     methods: {
+        ...mapActions('SidebarStore', ['setActiveElement']),
       openModuleAddElement(element: any) {
         this.$eventHub.$emit('open-modal-element', element);
     }

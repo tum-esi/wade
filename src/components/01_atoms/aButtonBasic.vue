@@ -1,6 +1,6 @@
 <!-- Basic button with label -->
 <template>
-  <button class="btn btn-basic" :class="btnClass" v-on:click.prevent="onClick" :disabled="!btnActive">{{ btnLabel }}</button>
+  <button class="btn btn-basic" :class="btnClass" @click="onClick" :disabled="!btnActive">{{ btnLabel }}</button>
 </template>
 
 <script lang="ts">
@@ -61,7 +61,6 @@ button:disabled {
   margin-right: 10px;
 }
 
-.btn-basic:focus,
 .btn-basic:active {
   outline: none;
   background: #92afae;

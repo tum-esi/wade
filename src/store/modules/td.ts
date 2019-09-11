@@ -42,7 +42,7 @@ export default {
             },
             {
                 tabId: 'config',
-                tabTitle: 'Configuration File',
+                tabTitle: 'Config',
                 tabStyle: 'tab-container-in-tabbar',
                 tabLink: '/config',
                 tabIsActive: false

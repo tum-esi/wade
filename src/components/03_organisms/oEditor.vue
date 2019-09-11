@@ -9,17 +9,16 @@
         <div class="config-btns">
             <aButtonBasic
                 v-on:open-config-tab="btnConfigClicked"
-                :btnClass="hasMqtt ? configMqttButton.btnClass : configButton.btnClass"
+                :btnClass="saveTdBtn.btnClass"
                 :btnLabel="configButton.btnLabel"
                 :btnOnClick="configButton.btnOnClick"
                 :btnActive="td.length > 0"
             />
             <aButtonBasic
-                v-if="hasMqtt"
-                v-on:open-config-tab="btnConfigClicked"
-                :btnClass="configMqttButton.btnClass"
-                :btnLabel="configMqttButton.btnLabel"
-                :btnOnClick="configMqttButton.btnOnClick"
+                v-on:save-td="btnSaveTdClicked"
+                :btnClass="saveTdBtn.btnClass"
+                :btnLabel="saveTdBtn.btnLabel"
+                :btnOnClick="saveTdBtn.btnOnClick"
                 :btnActive="td.length > 0"
             />
         </div>
@@ -46,31 +45,28 @@ export default Vue.extend({
         return {
             td: '',
             key: this.$route.path,
-            hasMqtt: true,
             configButton: {
                 btnLabel: 'Change Configuration',
                 btnClass: 'btn-config-big',
                 btnOnClick: 'open-config-tab'
             },
-            configMqttButton: {
-                btnLabel: 'Change Mqtt Configuration',
+            saveTdBtn: {
+                btnLabel: 'Save',
                 btnClass: 'btn-config-small',
-                btnOnClick: 'open-config-tab'
+                btnOnClick: 'save-td'
             },
         };
     },
     created() {
         this.$eventHub.$on('fetched-td', this.tdChanged);
-    },
-    mounted() {
-        // TODO: checkIfStoredTdAvailable
+        this.td = (this as any).getSavedTd(this.$route.params.id);
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
-        ...mapGetters('SidebarStore', ['getSidebarElement']),
+        ...mapGetters('SidebarStore', ['getSidebarElement', 'getSavedTd']),
         currentTd: {
             get(): string {
                 return this.td;
@@ -82,11 +78,6 @@ export default Vue.extend({
     },
     methods: {
         ...mapActions('TdStore', ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
-        checkIfStoredTdAvailable(args? ) {
-            // TODO: this does currently not work
-            const storedTd = (this as any).getSidebarElement(this.id);
-            this.td = storedTd ? storedTd : this.td;
-        },
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = '';
             if (args.td) {
@@ -103,11 +94,14 @@ export default Vue.extend({
         },
         btnConfigClicked() {
             this.$emit('open-config');
+        },
+        btnSaveTdClicked() {
+            this.$store.commit('SidebarStore/saveTd', { content: this.td, id: this.$route.params.id });
         }
     },
     watch: {
         '$route.params.id'(id) {
-            this.checkIfStoredTdAvailable();
+            this.td = (this as any).getSavedTd(this.$route.params.id);
         }
     },
 });
@@ -134,7 +128,6 @@ export default Vue.extend({
     width: 100%;
     height: 80%;
     max-height: 800px;
-    /* overflow: auto; */
 }
 
 .editor-area textarea{
@@ -144,14 +137,6 @@ export default Vue.extend({
     padding: 7px;
     font-family: 'Courier New', Courier, monospace;
     color: #000;
-}
-
-/* TODO: does not work */
-.editor-area textarea::placeholder{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
 }
 
 .config-btns {

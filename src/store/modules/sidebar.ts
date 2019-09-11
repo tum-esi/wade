@@ -2,6 +2,7 @@ import { ElementTypeEnum, ElementTitleEnum } from '@/util/enums';
 export default {
     namespaced: true,
     state: {
+        // ===== STATIC STORE STATE ===== //
         sidebarHeaderTab: {
             tabId: 'homeButton',
             tabTitle: 'W-ADE',
@@ -60,6 +61,7 @@ export default {
                 }
             ] as WADE.DropdownOptionInterface[]
         } as WADE.ADropdowButtonInterface,
+        // ===== DYNAMIC STORE STATE ===== //
         sidebarElements: [],
         folders: [],
         mashups: [],
@@ -67,6 +69,9 @@ export default {
         activeElementId: null
     },
     actions: {
+        async setActiveElement({ commit }, payload) {
+            commit('setActiveElement', payload);
+        },
         async addNewElement({ commit }, payload: WADE.NewStoreElementInterface) {
             let newElement;
             switch (payload.type) {
@@ -79,9 +84,8 @@ export default {
                         hasChildren: false,
                         iconSrcPath: ElementTypeEnum.TD,
                         numOfParents: 0,
-                        td: {}
                     };
-                    commit('addNewTd', newElement);
+                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
                     return newElement;
                 case ElementTypeEnum.FOLDER:
                     newElement = {
@@ -92,11 +96,10 @@ export default {
                         id: payload.id,
                         hasChildren: true,
                         iconSrcPath: ElementTypeEnum.FOLDER,
-                        folder: {},
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addNewFolder', newElement);
+                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
                     return newElement;
                 case ElementTypeEnum.MASHUP:
                     newElement = {
@@ -111,7 +114,7 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addNewMashup', newElement);
+                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
                     return newElement;
                 default:
                     break;
@@ -119,34 +122,33 @@ export default {
         },
     },
     mutations: {
-        deleteSidebarElement(state: any, payload: any) {
-            // Search elements and children recursive and delete existing element
-            function getElement(elements: WADE.SidebarElement[], id: string) {
-                for (const element of elements) {
-                    if (element.id === id) {
-                        // Delete element
-                        elements.splice(elements.indexOf(element), 1);
-                        break;
-                    }
-                    if (element.hasChildren && element.children && element.children.length > 0) {
-                        getElement(element.children, id);
-                    }
+        // Find td element and save content to it
+        saveTd(state: any, payload: { content: any, id: string }) {
+            let tdElement: {id: string, type: string, content: any};
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.content = payload.content;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
                 }
-                state.sidebarElements = elements;
             }
-            getElement(state.sidebarElements, payload.id);
         },
-        setActiveElement(state: any, payload: any) {
-            state.activeElementId = payload;
+        // Adds a new td / mashup / folder to tds / mashups / folders
+        addElementToStore(state: any, payload: { id: string, type: string}) {
+            state[`${payload.type}s`].push(payload);
         },
-        addNewMashup(state: any, payload: any) {
-            state.mashups.push(payload);
-        },
-        addNewTd(state: any, payload: any) {
-            state.tds.push(payload);
-        },
-        addNewFolder(state: any, payload: any) {
-            state.folders.push(payload);
+        // Delete td/ mashup/ folder from tds/ mashups/ folders
+        deleteElementFromStore(state: any, payload: any) {
+            const elementList = state[`${payload.type}s`];
+            for (const element of elementList) {
+                if (element.id === payload.id) {
+                    elementList.splice(elementList.indexOf(element), 1);
+                    return;
+                }
+            }
         },
         addSidebarElement(state: any, payload: any) {
             if (payload.parentId === 'parent') {
@@ -169,15 +171,38 @@ export default {
             }
             findParentElement(state.sidebarElements, payload.parentId);
         },
-        setNewCurrentTd(state: any, payload: any) {
-            for (const sidebarElement in state.sidebarElements) {
-                if (state.sidebarElements[sidebarElement].id === payload.id) {
-                    state.sidebarElements[sidebarElement].td = payload.td;
+        // Search sidebar elements and children recursive and delete element
+        deleteSidebarElement(state: any, payload: any) {
+            function getElement(elements: WADE.SidebarElement[], id: string) {
+                for (const element of elements) {
+                    if (element.id === id) {
+                        // Delete element
+                        elements.splice(elements.indexOf(element), 1);
+                        break;
+                    }
+                    if (element.hasChildren && element.children && element.children.length > 0) {
+                        getElement(element.children, id);
+                    }
                 }
+                state.sidebarElements = elements;
             }
+            getElement(state.sidebarElements, payload.id);
+        },
+        // Sets active sidebar element (shown in UI)
+        setActiveElement(state: any, payload: any) {
+            state.activeElementId = payload;
         }
     },
     getters: {
+        getSavedTd(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.content || '';
+                    }
+                }
+            };
+        },
         getHeaderTab(state: any) {
             return state.sidebarHeaderTab;
         },
