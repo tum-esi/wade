@@ -61,7 +61,7 @@ export default {
                 }
             ] as WADE.DropdownOptionInterface[]
         } as WADE.ADropdowButtonInterface,
-        defaultConfig: {
+        configDefault: {
             http: {
                 allowSelfSigned: true
             },
@@ -69,12 +69,9 @@ export default {
             },
             mqtt: {
                 broker: 'mqtt://broker.org',
-                _username: 'username',
-                _password: 'password',
-                _clientId: 'uniqueId'
-            },
-            log: {
-                level: 'info'
+                username: 'username',
+                password: 'password',
+                clientId: 'uniqueId'
             },
             credentials: {
                 'test-thing': {
@@ -111,7 +108,7 @@ export default {
                         id: newElement.id,
                         type: newElement.type,
                         content: '',
-                        config: state.defaultConfig
+                        config: state.configDefault
                     });
                     return newElement;
                 case ElementTypeEnum.FOLDER:
@@ -235,14 +232,14 @@ export default {
     },
     getters: {
         getDefaultConfig(state: any) {
-            return JSON.stringify(state.defaultConfig);
+            return JSON.stringify(state.configDefault);
         },
         getConfig(state: any) {
             return (id: string) => {
                 for (const td of state.tds) {
                     if (td.id === id) {
                         if (!td.config || td.config.length <= 0) {
-                            return JSON.stringify(state.defaultConfig);
+                            return JSON.stringify(state.configDefault);
                         } else {
                             let config;
                             try {

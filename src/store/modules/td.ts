@@ -19,8 +19,7 @@ export default {
         resultProps: [],
         resultActions: [],
         resultEvents: [],
-
-        tdTabbar: [
+        tdTabs: [
             {
                 tabId: 'editor',
                 tabTitle: 'Editor',
@@ -246,7 +245,7 @@ export default {
             return state.areInteractionsInvoked;
         },
         getTdTabbar(state: any) {
-            return state.tdTabbar;
+            return state.tdTabs;
         },
         getSelectionBtn(state: any) {
             return state.tdSelectionBtn;

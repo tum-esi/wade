@@ -3,10 +3,24 @@
         <div class="change-config-area">
             <div class="config-title">
                 <label>Configuration</label>
+                <div class="format-option">
+                    <input type="radio" name="format" id="raw" value="raw" v-model="format"/>
+                    <label for="raw">Raw</label>
+                </div>
+                <div class="format-option">
+                    <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format"/>
+                    <label for="form-fields">Form-Fields</label>
+                </div>
             </div>
             <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
-            <div class="config-area">
+            <div v-if="format === 'raw'"class="config-area">
                 <textarea spellcheck="false" wrap="off" v-model="currentConfig"></textarea>
+            </div>
+            <div v-else class="config-area">
+                <div class="config-area-form-container">
+                    <p>Hint: Only usable with default config.</p>
+                    <!-- TODO: mFormConfigOptions -->
+                </div>
             </div>
             <div class="config-btns">
                 <aButtonBasic
@@ -90,6 +104,7 @@ export default Vue.extend({
             id: '',
             config: '',
             configStatus: TdConfigEnum.INFO as TdConfigEnum,
+            format: 'raw',
             resetConfigBtn: {
                 btnLabel: 'Reset Config to default',
                 btnClass: 'btn-config-small',
@@ -143,6 +158,9 @@ export default Vue.extend({
             if (this.getSavedConfig() !== this.config) {
                 this.configStatus = TdConfigEnum.UNSAVED;
                 this.saveConfigBtn.btnActive = true;
+            } else {
+                this.configStatus = TdConfigEnum.INFO;
+                this.saveConfigBtn.btnActive = false;
             }
         },
         btnSaveConfigClicked() {
@@ -167,6 +185,15 @@ function getBeautifiedJSONasString(value: string) {
 
 
 <style scoped>
+.format-option {
+    padding-left: 7px;
+}
+
+.format-option label {
+    font-size: 14px !important;
+    padding-left: 7px;
+}
+
 .config-container {
     height: 100%;
     width: 100%;
@@ -210,7 +237,8 @@ function getBeautifiedJSONasString(value: string) {
 }
 
 .config-title label {
-    font-size: 14px;
+    font-size: 16px;
+    padding-right: 7px;
 }
 
 .config-area {
@@ -229,6 +257,19 @@ function getBeautifiedJSONasString(value: string) {
     border: 1px solid #393B3A;
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
+}
+
+.config-area-form-container {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #393B3A;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding: 7px;
+}
+
+.config-area-form-container p {
+    font-size: 12px;
 }
 
 .config-btns {
