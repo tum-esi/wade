@@ -13,8 +13,8 @@ export function updateStatusMessage(
 }
 
 // Return vue-parsed td, td state information and possible errors
-export async function consumeAndParseTd(td: string) {
-    const consumedTd = await new TdConsumer(td).getConsumedTd();
+export async function consumeAndParseTd(td: string, config: object) {
+    const consumedTd = await new TdConsumer(td, config).getConsumedTd();
 
     if (consumedTd.tdState !== TdStateEnum.VALID_CONSUMED_TD) {
         return {

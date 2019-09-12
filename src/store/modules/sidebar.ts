@@ -61,6 +61,28 @@ export default {
                 }
             ] as WADE.DropdownOptionInterface[]
         } as WADE.ADropdowButtonInterface,
+        defaultConfig: {
+            http: {
+                allowSelfSigned: true
+            },
+            coap: {
+            },
+            mqtt: {
+                broker: 'mqtt://broker.org',
+                _username: 'username',
+                _password: 'password',
+                _clientId: 'uniqueId'
+            },
+            log: {
+                level: 'info'
+            },
+            credentials: {
+                'test-thing': {
+                    username: 'username',
+                    password: 'password'
+                }
+            }
+        },
         // ===== DYNAMIC STORE STATE ===== //
         sidebarElements: [],
         folders: [],
@@ -72,7 +94,7 @@ export default {
         async setActiveElement({ commit }, payload) {
             commit('setActiveElement', payload);
         },
-        async addNewElement({ commit }, payload: WADE.NewStoreElementInterface) {
+        async addNewElement({ state, commit }, payload: WADE.NewStoreElementInterface) {
             let newElement;
             switch (payload.type) {
                 case ElementTypeEnum.TD:
@@ -85,7 +107,12 @@ export default {
                         iconSrcPath: ElementTypeEnum.TD,
                         numOfParents: 0,
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
+                    commit('addElementToStore', {
+                        id: newElement.id,
+                        type: newElement.type,
+                        content: '',
+                        config: state.defaultConfig
+                    });
                     return newElement;
                 case ElementTypeEnum.FOLDER:
                     newElement = {
@@ -99,7 +126,7 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
+                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
                     return newElement;
                 case ElementTypeEnum.MASHUP:
                     newElement = {
@@ -114,7 +141,7 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type});
+                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
                     return newElement;
                 default:
                     break;
@@ -122,9 +149,22 @@ export default {
         },
     },
     mutations: {
+        saveTdConfig(state: any, payload: { config: any, id: string }) {
+            let tdElement: { id: string, type: string, config: any, content?: any };
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.config = payload.config;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
+        },
         // Find td element and save content to it
         saveTd(state: any, payload: { content: any, id: string }) {
-            let tdElement: {id: string, type: string, content: any};
+            let tdElement: { id: string, type: string, content: any, config: any };
             let index: number;
             for (const element of state.tds) {
                 if (element.id === payload.id) {
@@ -137,7 +177,7 @@ export default {
             }
         },
         // Adds a new td / mashup / folder to tds / mashups / folders
-        addElementToStore(state: any, payload: { id: string, type: string}) {
+        addElementToStore(state: any, payload: { id: string, type: string }) {
             state[`${payload.type}s`].push(payload);
         },
         // Delete td/ mashup/ folder from tds/ mashups/ folders
@@ -194,6 +234,29 @@ export default {
         }
     },
     getters: {
+        getDefaultConfig(state: any) {
+            return JSON.stringify(state.defaultConfig);
+        },
+        getConfig(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (!td.config || td.config.length <= 0) {
+                            return JSON.stringify(state.defaultConfig);
+                        } else {
+                            let config;
+                            try {
+                                config = JSON.stringify(td.config);
+                            } catch (error) {
+                                config = td.config.toString();
+                            }
+                            return config;
+                        }
+                    }
+                }
+                return '';
+            };
+        },
         getSavedTd(state: any) {
             return (id: string) => {
                 for (const td of state.tds) {
@@ -201,6 +264,7 @@ export default {
                         return td.content || '';
                     }
                 }
+                return '';
             };
         },
         getHeaderTab(state: any) {
@@ -228,7 +292,7 @@ export default {
         getSidebarElement(state: any) {
             return (elToFind) => {
                 let sidebarElement: null | any | any[] = elToFind.id ? null : [];
-                function findElement(elToProve: {id?: string, type?: string}, elements: any) {
+                function findElement(elToProve: { id?: string, type?: string }, elements: any) {
                     for (const element of elements) {
                         if (elToProve.id && element.id === elToFind.id) {
                             sidebarElement = element;

@@ -151,6 +151,10 @@ export default Vue.extend({
   height: 90%;
 }
 
+.td-config {
+  height: 90%;
+}
+
 .td-main {
   display: flex;
   height: 90%;

@@ -9,21 +9,23 @@
       :tabIconButton="getHeaderTab.tabIconButton"
       v-on:tab-clicked="homeClicked"
     />
-    <div class="sidebar-search">
-      <aSearchbar class="searchbar" />
-      <aDropdownButton
-        class="dropdown-btn"
-        :btnKey="getAddNewButton.btnKey"
-        :btnSrc="getAddNewButton.btnSrc"
-        :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
-        v-on:dropdown-clicked="openModuleAddElement"
-      />
-    </div>
-    <div class="sidebar-elements-container">
-      <mSidebarElementGroup
-        v-on:element-clicked="sidebarElementClicked"
-        v-on:dropdown-clicked="openModuleAddElement"
-      />
+    <div class="sidebar-content">
+      <div class="sidebar-search">
+        <aSearchbar class="searchbar" />
+        <aDropdownButton
+          class="dropdown-btn"
+          :btnKey="getAddNewButton.btnKey"
+          :btnSrc="getAddNewButton.btnSrc"
+          :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
+          v-on:dropdown-clicked="openModuleAddElement"
+        />
+      </div>
+      <div class="sidebar-elements-container">
+        <mSidebarElementGroup
+          v-on:element-clicked="sidebarElementClicked"
+          v-on:dropdown-clicked="openModuleAddElement"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -71,8 +73,12 @@ export default Vue.extend({
 }
 
 .sidebar-header {
-  height: 50px;
+  height: 10%;
   background: #b5dfdd;
+}
+
+.sidebar-content {
+  height: 90%;
 }
 
 /* Contains searchbar and add-dropdown-btn */
@@ -80,7 +86,7 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   padding: 7px;
-  height: 50px;
+  height: 10%;
   border-bottom: 1px solid #393b3a;
 }
 

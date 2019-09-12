@@ -70,41 +70,7 @@ export default {
             btnLabel: 'Status: No interaction selected.',
             btnOnClick: '-'
         },
-        tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.',
-        defaultTdConfig: {
-            servient: {
-                _staticAddress: 'plugfest.thingweb.io',
-                scriptDir: '.',
-                scriptAction: true
-            },
-            http: {
-                port: 8080,
-                allowSelfSigned: true
-            },
-            coap: {
-                port: 5683
-            },
-            mqtt: {
-                broker: 'mqtt://test.mosquitto.org',
-                _username: 'username',
-                _password: 'password',
-                _clientId: 'uniqueId',
-                port: 1883
-            },
-            log: {
-                level: 'info'
-            },
-            credentials: {
-                'urn:dev:wot:org:eclipse:leshan': {
-                    identity: 'node-wot',
-                    psk: 'hello'
-                },
-                'urn:dev:wot:org:eclipse:cf-secure': {
-                    identity: 'password',
-                    psk: 'sesame'
-                }
-            }
-        }
+        tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
         async processChangedTd({ commit, state }, payload: any) {
@@ -121,7 +87,7 @@ export default {
             commit('setResults', []);
             commit('setTdEditor', payload.td);
 
-            const parsedTd = await Api.consumeAndParseTd(payload.td);
+            const parsedTd = await Api.consumeAndParseTd(payload.td, payload.config);
             let interactionState: InteractionStateEnum | null = null;
             // Store new parsed td
             if (
@@ -183,17 +149,6 @@ export default {
                 // Replace selected interaction when input changed
                 selectedInteractions[index] = await interaction;
             }
-
-            // if (payload.changeInteraction) {
-            //     // find selectedInteraction and replace it with payload.changeInteraction
-            //         const indexToReplace = await selectedInteractions.indexOf(payload.changeInteraction);
-            //         selectedInteractions[indexToReplace] = await payload.changeInteraction;
-            // } else {
-            //         // Remove interaction if it already exists
-            //         // const indexToReplace = await selectedInteractions.indexOf(payload.newInteraction);
-            //         // if (indexToReplace !== -1)  await selectedInteractions.splice(indexToReplace, 1);
-            //         selectedInteractions.push(payload.newInteraction);
-            // }
             commit('setSelections', selectedInteractions);
             commit('setStatusMessage');
             return selectedInteractions;
@@ -266,16 +221,6 @@ export default {
         }
     },
     getters: {
-        getConfig(state: any) {
-            // TODO: search for save config with id (given as param) else return default config
-            let config;
-            try {
-                config = JSON.stringify(state.defaultTdConfig);
-                return config;
-            } catch {
-                return state.defaultTdConfig;
-            }
-        },
         getSelections(state: any) {
             return state.selections;
         },

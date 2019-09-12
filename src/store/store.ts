@@ -31,7 +31,8 @@ export default new Vuex.Store({
         'SidebarStore/addElementToStore',
         'SidebarStore/deleteSidebarElement',
         'SidebarStore/deleteElementFromStore',
-        'SidebarStore/saveTd'
+        'SidebarStore/saveTd',
+        'SidebarStore/saveTdConfig'
       ]
     })
   ],

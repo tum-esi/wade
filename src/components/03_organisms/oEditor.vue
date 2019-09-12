@@ -59,14 +59,14 @@ export default Vue.extend({
     },
     created() {
         this.$eventHub.$on('fetched-td', this.tdChanged);
-        this.td = (this as any).getSavedTd(this.$route.params.id);
+        this.tdChanged({ td: (this as any).getSavedTd(this.$route.params.id)});
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
-        ...mapGetters('SidebarStore', ['getSidebarElement', 'getSavedTd']),
+        ...mapGetters('SidebarStore', ['getSidebarElement', 'getSavedTd', 'getConfig']),
         currentTd: {
             get(): string {
                 return this.td;
@@ -87,7 +87,8 @@ export default Vue.extend({
                     this.td = args.td;
                 }
             }
-            (this as any).processChangedTd(args);
+            const config = JSON.parse((this as any).getConfig(this.$route.params.id));
+            (this as any).processChangedTd({ td: args.td, config });
             (this as any).$emit('td-changed');
             (this as any).resetInteractions();
             (this as any).resetResults();
@@ -101,7 +102,7 @@ export default Vue.extend({
     },
     watch: {
         '$route.params.id'(id) {
-            this.td = (this as any).getSavedTd(this.$route.params.id);
+            this.tdChanged({ td: (this as any).getSavedTd(this.$route.params.id)});
         }
     },
 });

@@ -9,59 +9,20 @@ import { TdStateEnum } from '@/util/enums';
 export default class TdConsumer {
 
     private td: string;
+    private config: any;
     private tdJson: JSON | null;
     private tdConsumed: WoT.ConsumedThing | null;
     private tdState: TdStateEnum | null;
     private errorMsg: string | null;
     private defaultConfig: any;
 
-    constructor(td: string) {
+    constructor(td: string, config: any) {
         this.td = td;
+        this.config = config;
         this.tdJson = null;
         this.tdConsumed = null;
         this.tdState = null;
         this.errorMsg = null;
-
-        this.defaultConfig = {
-            servient: {
-                scriptDir: '.',
-                scriptAction: true
-            },
-            http: {
-                port: 8080,
-                allowSelfSigned: true,
-                serverKey: 'privatekey.pem',
-                serverCert: 'certificate.pem',
-                security: {
-                    scheme: 'basic'
-                }
-            },
-            _coap: {
-                port: 5683
-            },
-            _mqtt : {
-                broker : 'mqtt://test.mosquitto.org',
-                port: 1883
-            },
-            log: {
-                level: 'info'
-            },
-            credentials: {
-                'urn:dev:wot:org:eclipse:thingweb:security-example': {
-                    username: 'node-wot',
-                    password: 'hello',
-                    token: '1/mZ1edKKACtPAb7zGlwSzvs72PvhAbGmB8K1ZrGxpcNM'
-                },
-                'urn:com:blue:pump:data': {
-                    username: 'w3c',
-                    password: 'WebOfThings19'
-                },
-                'urn:uuid:57a9ebb4-f7c9-5828-bf8d-7c34fcff0c31': {
-                    username: 'wotbasicproxy',
-                    password: ']kBDQI6}_1p9'
-                }
-            },
-        };
     }
 
     public async getConsumedTd() {
@@ -98,17 +59,7 @@ export default class TdConsumer {
     // Tries to consume given td json object
     private async consumeThing() {
         const servient = new Servient();
-        // servient.addCredentials(this.defaultConfig.credentials);
-        servient.addCredentials({
-            'urn:uuid:57a9ebb4-f7c9-5828-bf8d-7c34fcff0c31': {
-                username: 'wotbasicproxy',
-                password: ']kBDQI6}_1p9'
-            },
-            'urn:com:blue:pump:data': {
-                username: 'w3c',
-                password: 'WebOfThings19'
-            }
-        });
+        if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
 
         // const DEFAULT_COAP_PORT = 5683;
         const DEFAULT_COAP_PORT = 5055;

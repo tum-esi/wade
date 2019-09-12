@@ -164,7 +164,6 @@ export default Vue.extend({
 
 body {
   width: 100%;
-  padding: 10px;
 }
 
 textarea:focus, input:focus{
@@ -218,8 +217,6 @@ textarea:focus, input:focus{
 /* Styling for start page */
 #app {
   background: #B4BAB9;
-  border: 1px solid #393B3A;
-  border-radius: 3px;
   width: 100%;
   display: flex;
   min-height: 600px;

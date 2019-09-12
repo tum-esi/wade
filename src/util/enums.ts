@@ -44,3 +44,11 @@ export enum TdStateEnum {
   INVALID_TD = 'INVALID TD: TD is invalid.',
   VALID_TD = 'VALID TD: TD is valid.'
 }
+
+export enum TdConfigEnum {
+  INFO = 'This config will be used for your TD.',
+  UNSAVED = 'Please save your changes to apply them',
+  SAVE_SUCCESS = 'Config was safed successfully.',
+  RESET = 'Config was resetted to default config. Click save to apply this.',
+  ERROR = 'Error: Wrong data format. Change config to make it saveable.'
+}
