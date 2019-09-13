@@ -1,13 +1,16 @@
 import * as Api from '@/backend/Api';
 import { RESULT_MESSAGES } from '@/util/enums';
-import { InteractionStateEnum, TdStateEnum } from '@/util/enums';
+import { InteractionStateEnum, TdStateEnum, ProtocolEnum } from '@/util/enums';
 
 export default {
     namespaced: true,
     state: {
+        // ===== DYNAMIC STORE STATES ===== //
         tdState: TdStateEnum.NO_TD,
         errorMsg: '',
         statusMessage: Api.updateStatusMessage(TdStateEnum.NO_TD, null, null),
+
+        protocols: [] as ProtocolEnum[],
 
         tdEditor: {},
         tdParsed: {},
@@ -19,6 +22,7 @@ export default {
         resultProps: [],
         resultActions: [],
         resultEvents: [],
+        // ===== STATIC STORE STATES ===== //
         tdTabs: [
             {
                 tabId: 'editor',
@@ -73,6 +77,7 @@ export default {
     },
     actions: {
         async processChangedTd({ commit, state }, payload: any) {
+            // Do not consume td when its empty or not in correct format
             if (!payload.td || payload.td.length <= 0) {
                 commit('setTdState', payload.tdState ? payload.tdState : TdStateEnum.NO_TD);
                 commit('setErrorMsg', payload.errorMsg ? payload.errorMsg : null);
@@ -108,7 +113,11 @@ export default {
             commit('setInteractionState', interactionState);
             commit('setStatusMessage');
         },
-
+        // Scan Td for different forms
+        async setProtocols({ commit }, payload: any) {
+            const protocols = await Api.retrieveProtocols(payload.td);
+            commit('setProtocols', protocols);
+        },
         async resetAll({ commit }) {
             // await Api.resetAll();
             commit('setInteractions', []);
@@ -172,6 +181,9 @@ export default {
         }
     },
     mutations: {
+        setProtocols(state: any, payload: string) {
+            state.protocols = payload;
+        },
         setErrorMsg(state: any, payload: string) {
             state.errorMsg = payload;
         },
@@ -220,6 +232,12 @@ export default {
         }
     },
     getters: {
+        getProtocols(state: any) {
+            return (id: string) => {
+                // TODO: get correct protocol for correct td
+                return state.protocols;
+            };
+        },
         getSelections(state: any) {
             return state.selections;
         },

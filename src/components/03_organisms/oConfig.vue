@@ -1,5 +1,5 @@
 <template>
-    <div class="config-container">
+    <div class="config-container border-right">
         <div class="change-config-area">
             <div class="config-title">
                 <label>Configuration</label>
@@ -11,6 +11,9 @@
                     <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format"/>
                     <label for="form-fields">Form-Fields</label>
                 </div>
+                <aButtonBasic
+                    v-on:show-help="showHelp"
+                    :btnClass
             </div>
             <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
             <div v-if="format === 'raw'"class="config-area">
@@ -39,7 +42,8 @@
                 />
             </div>
         </div>
-        <div class="help-area">
+        <div class="config-right-side">
+        <!-- <div class="help-area">
             <div class="config-title">
                 <label>Config Format Help</label>
             </div>
@@ -78,7 +82,8 @@ Config interface:
 }
                 </textarea>
             </div>
-        </div>
+        </div> -->
+        </div> 
     </div>
 </template>
 
@@ -86,6 +91,7 @@ Config interface:
 import Vue from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
 import { TdConfigEnum } from '@/util/enums';
+import { getFormattedJsonString } from '@/util/helpers';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aConfigStatusBar from '@/components/01_atoms/aConfigStatusBar.vue';
 import { setTimeout } from 'timers';
@@ -97,11 +103,10 @@ export default Vue.extend({
         aConfigStatusBar
     },
     created() {
-        this.config = JSON.stringify(JSON.parse((this as any).getConfig(this.$route.params.id)), null, 2);
+        this.config = getFormattedJsonString((this as any).getConfig(this.id));
     },
     data() {
         return {
-            id: '',
             config: '',
             configStatus: TdConfigEnum.INFO as TdConfigEnum,
             format: 'raw',
@@ -120,6 +125,10 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('SidebarStore', ['getConfig', 'getDefaultConfig']),
+        ...mapGetters('TdStore', ['getProtocols']),
+        id() {
+            return this.$route.params.id;
+        },
         currentConfig: {
             get(): string {
                 return this.config;
@@ -127,7 +136,7 @@ export default Vue.extend({
             async set(value: string) {
                 this.config = value;
                 // Check if there are unsaved changes
-                this.saveConfigBtn.btnActive = !(this.getSavedConfig() === this.config);
+                this.saveConfigBtn.btnActive = !((this as any).getSavedConfig() === this.config);
                 // Check if config has JSON format
                 try {
                     JSON.parse(this.config);
@@ -138,24 +147,24 @@ export default Vue.extend({
                 }
             }
         },
+        getSelectedProtocol() {
+            // TODO:
+            // Here it needs to be checked wether there is only one protocol to choose from
+            // -> then it can't be deselected
+            // If there's more than chosse the preferred one (for all)
+            // If you want to select specific protocols per interaction do this in the editor tab
+            return (this as any).getProtocols(this.$route.params.id);
+        }
     },
     methods: {
         ...mapMutations('SidebarStore', ['saveTdConfig']),
         getSavedConfig(isDefault: boolean = false): string {
-            return JSON.stringify(
-                JSON.parse(
-                isDefault
-                    ? (this as any).getDefaultConfig
-                    : (this as any).getConfig(this.$route.params.id)
-                ),
-                null,
-                2
-            );
+            return isDefault ? getFormattedJsonString((this as any).getDefaultConfig) : (this as any).getConfig(this.id);
         },
         resetConfigBtnClicked() {
             this.config = this.getSavedConfig(true);
             // If default config differs from saved config, it needs to be saved
-            if (this.getSavedConfig() !== this.config) {
+            if ((this as any).getSavedConfig() !== this.config) {
                 this.configStatus = TdConfigEnum.UNSAVED;
                 this.saveConfigBtn.btnActive = true;
             } else {
@@ -164,7 +173,7 @@ export default Vue.extend({
             }
         },
         btnSaveConfigClicked() {
-            (this as any).saveTdConfig({ id: this.$route.params.id, config: JSON.parse(this.config) });
+            (this as any).saveTdConfig({ id: this.id, config: JSON.parse(this.config) });
             this.configStatus = TdConfigEnum.SAVE_SUCCESS;
             this.saveConfigBtn.btnActive = false;
             setTimeout(() => { this.configStatus = TdConfigEnum.INFO; }, 1500);
@@ -177,10 +186,6 @@ export default Vue.extend({
         }
     }
 });
-
-function getBeautifiedJSONasString(value: string) {
-    return JSON.stringify(JSON.parse(value), null, 2);
-}
 </script>
 
 
@@ -196,18 +201,19 @@ function getBeautifiedJSONasString(value: string) {
 
 .config-container {
     height: 100%;
-    width: 100%;
+    width: 50%;
     display: flex;
-    padding: 0px 7px 5px 7px;
+    padding: 0px 12px 10px 12px;
 }
 
-.change-config-area, .help-area {
+/* .change-config-area, .help-area {
     width: 50%;
     height: 100%;
-}
+} */
 
 .change-config-area {
-    padding-right: 7px;
+    width: 100%;
+    height: 100%;
 }
 
 .help-area-text {

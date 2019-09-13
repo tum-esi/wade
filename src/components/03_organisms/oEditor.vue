@@ -87,22 +87,22 @@ export default Vue.extend({
                     this.td = args.td;
                 }
             }
-            this.processChangedTd({ td: args.td, config: JSON.parse(this.getConfig(this.id)) });
+            (this as any).processChangedTd({ td: args.td, config: JSON.parse((this as any).getConfig(this.id)) });
 
             // Hide url bar if td changed
             this.$emit('hide-url-bar');
 
             // Reset result fields and interaction fields
-            this.resetInteractions();
-            this.resetResults();
+            (this as any).resetInteractions();
+            (this as any).resetResults();
 
             // Update possible protocol list
-            this.setProtocols({td: args.td});
+            (this as any).setProtocols({td: args.td});
         }
     },
     watch: {
         '$route.params.id'(id) {
-            this.tdChanged({ td: this.getSavedTd(this.id)});
+            this.tdChanged({ td: (this as any).getSavedTd(this.id)});
         }
     },
 });

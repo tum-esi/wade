@@ -90,8 +90,8 @@ export default class TdConsumer {
         await servient.addClientFactory(new HttpClientFactory({}));
         // await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
         await servient.addClientFactory(new HttpsClientFactory({}));
-        await servient.addClientFactory(new WebSocketClientFactory());
-        await servient.addClientFactory(new WebSocketSecureClientFactory());
+        // await servient.addClientFactory(new WebSocketClientFactory());
+        // await servient.addClientFactory(new WebSocketSecureClientFactory());
         await servient.addClientFactory(new CoapClientFactory());
         // await servient.addClientFactory(new CoapClientFactory(coapServer));
         await servient.addClientFactory(new CoapsClientFactory());

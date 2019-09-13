@@ -62,17 +62,17 @@ export default {
             ] as WADE.DropdownOptionInterface[]
         } as WADE.ADropdowButtonInterface,
         configDefault: {
-            http: {
-                allowSelfSigned: true
-            },
-            coap: {
-            },
-            mqtt: {
-                broker: 'mqtt://broker.org',
-                username: 'username',
-                password: 'password',
-                clientId: 'uniqueId'
-            },
+            // http: {
+            //     allowSelfSigned: true
+            // },
+            // coap: {
+            // },
+            // mqtt: {
+            //     broker: 'mqtt://broker.org',
+            //     username: 'username',
+            //     password: 'password',
+            //     clientId: 'uniqueId'
+            // },
             credentials: {
                 'test-thing': {
                     username: 'username',

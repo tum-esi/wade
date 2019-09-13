@@ -2,7 +2,8 @@
   <div class="td-page-container">
     <mTabbar :tabbarElements="getTdTabbar" v-on:tab-clicked="tabClicked" />
     <div v-if="currentTabId === 'config'" class="td-config">
-      <oConfig />
+      <oConfig class="td-config-child-el"/>
+      <oProtocolSelection class="td-config-child-el" />
     </div>
     <div v-if="currentTabId === 'editor'" class="td-editor">
       <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
@@ -18,8 +19,7 @@
           />
           <div :class="showUrlBar ? 'editor-showUrlBar' : 'editor-full'">
             <oEditor
-              :id="id"
-              v-on:td-changed="hideUrlBar"
+              v-on:hide-url-bar="hideUrlBar"
               v-on:open-config="tabClicked('config')"
             />
           </div>
@@ -45,6 +45,7 @@ import oConfig from '@/components/03_organisms/oConfig.vue';
 import oEditor from '@/components/03_organisms/oEditor.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
+import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
 import { Url } from 'url';
 import { TdStateEnum } from '../../util/enums';
 import { ftruncate } from 'fs';
@@ -54,6 +55,7 @@ export default Vue.extend({
   components: {
     aStatusbar,
     oConfig,
+    oProtocolSelection,
     oEditor,
     oSelection,
     oResults,
@@ -153,6 +155,13 @@ export default Vue.extend({
 
 .td-config {
   height: 90%;
+  width: 100%;
+  display: flex;
+}
+
+.td-config-child-el {
+  width: 50%;
+  height: 100%;
 }
 
 .td-main {

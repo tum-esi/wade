@@ -11,6 +11,35 @@ http://plugfest.thingweb.io:8083/TestThing
 
 What happens if the prop title is super long? -> in UI? 
 
+change default config: 
+
+  "http": {
+    "port": 8080,
+    "allowSelfSigned": true
+  },
+  "coap": {
+    "_port": 5683
+  },
+  "mqtt": {
+    "broker": "mqtt://test.mosquitto.org",
+    "_username": "username",
+    "_password": "password",
+    "_clientId": "uniqueId",
+    "port": 1883
+  },
+  "credentials": {
+    "urn:dev:wot:org:eclipse:leshan": {
+      "identity": "node-wot",
+      "psk": "hello"
+    },
+    "urn:dev:wot:org:eclipse:cf-secure": {
+      "identity": "password",
+      "psk": "sesame"
+    }
+  }
+}
+
+Add description for config
 
 ### NEXT: 
 - Subscription!!!

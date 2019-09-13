@@ -52,3 +52,11 @@ export enum TdConfigEnum {
   RESET = 'Config was resetted to default config. Click save to apply this.',
   ERROR = 'Error: Wrong data format. Change config to make it saveable.'
 }
+
+export enum ProtocolEnum {
+  HTTP = 'http',
+  HTTPS = 'https',
+  COAP = 'coap',
+  COAPS = 'coaps',
+  MQTT = 'mqtt'
+}

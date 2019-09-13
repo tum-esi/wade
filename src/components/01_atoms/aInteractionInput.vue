@@ -221,6 +221,7 @@ export default Vue.extend({
         }
         if (!parsedInputValue || typeof parsedInputValue === 'string') parsedInputValue = this.inputValue.split(' ');
       }
+      console.log('RETURN INPUT VALUE', parsedInputValue);
       return parsedInputValue;
     }
   }

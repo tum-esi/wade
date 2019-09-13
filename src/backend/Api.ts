@@ -1,7 +1,48 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
-import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum } from '@/util/enums';
+import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
 import MessageHandler from './MessageHandler';
+
+export function retrieveProtocols(td: string): ProtocolEnum[] | null {
+    const protocols = [] as ProtocolEnum[];
+    let tdJson;
+    try {
+        tdJson = JSON.parse(td);
+    } catch (error) {
+        return protocols;
+    }
+
+    // Check forms of properties and add protocols
+    function addProtocols(interactions) {
+        for (const el in interactions) {
+            if (!interactions.hasOwnProperty(el)) continue;
+            if (!interactions[el].forms) break;
+            for (const form of interactions[el].forms) {
+                if (form.href && form.href.indexOf('http') !== -1) {
+                    protocols.push(ProtocolEnum.HTTP);
+                }
+                if (form.href && form.href.indexOf('https') !== -1) {
+                    protocols.push(ProtocolEnum.HTTPS);
+                }
+                if (form.href && form.href.indexOf('mqtt') !== -1) {
+                    protocols.push(ProtocolEnum.MQTT);
+                }
+                if (form.href && form.href.indexOf('coap') !== -1) {
+                    protocols.push(ProtocolEnum.COAP);
+                }
+                if (form.href && form.href.indexOf('coaps') !== -1) {
+                    protocols.push(ProtocolEnum.COAPS);
+                }
+            }
+        }
+    }
+
+    if (tdJson.properties) addProtocols(tdJson.properties);
+    if (tdJson.actions) addProtocols(tdJson.actions);
+    if (tdJson.events) addProtocols(tdJson.events);
+
+    return Array.from(new Set(protocols));
+}
 
 export function updateStatusMessage(
     tdState: TdStateEnum | null,
