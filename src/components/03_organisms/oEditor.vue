@@ -8,14 +8,14 @@
         </div>
         <div class="config-btns">
             <aButtonBasic
-                v-on:open-config-tab="btnConfigClicked"
+                v-on:open-config-tab="$emit('open-config')"
                 :btnClass="saveTdBtn.btnClass"
                 :btnLabel="configButton.btnLabel"
                 :btnOnClick="configButton.btnOnClick"
                 :btnActive="td.length > 0"
             />
             <aButtonBasic
-                v-on:save-td="btnSaveTdClicked"
+                v-on:save-td="$store.commit('SidebarStore/saveTd', { content: td, id })"
                 :btnClass="saveTdBtn.btnClass"
                 :btnLabel="saveTdBtn.btnLabel"
                 :btnOnClick="saveTdBtn.btnOnClick"
@@ -30,21 +30,16 @@ import Vue from 'vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { TdStateEnum } from '@/util/enums';
+import { getFormattedJsonString } from '@/util/helpers';
 
 export default Vue.extend({
     name: 'oEditor',
     components: {
         aButtonBasic,
     },
-    props: {
-        id: {
-            required: true,
-        }
-    },
     data() {
         return {
             td: '',
-            key: this.$route.path,
             configButton: {
                 btnLabel: 'Change Configuration',
                 btnClass: 'btn-config-big',
@@ -59,14 +54,17 @@ export default Vue.extend({
     },
     created() {
         this.$eventHub.$on('fetched-td', this.tdChanged);
-        this.tdChanged({ td: (this as any).getSavedTd(this.$route.params.id)});
+        this.tdChanged({ td: (this as any).getSavedTd(this.id)});
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
-        ...mapGetters('SidebarStore', ['getSidebarElement', 'getSavedTd', 'getConfig']),
+        ...mapGetters('SidebarStore', ['getSavedTd', 'getConfig']),
+        id() {
+            return (this as any).$route.params.id;
+        },
         currentTd: {
             get(): string {
                 return this.td;
@@ -77,32 +75,34 @@ export default Vue.extend({
         }
     },
     methods: {
-        ...mapActions('TdStore', ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
+        ...mapActions('TdStore',
+            ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd', 'setProtocols']),
+        // Executed when td changd: via loading saved td/ fetching td/ user changed td
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = '';
             if (args.td) {
                 try {
-                    this.td = JSON.stringify(JSON.parse(args.td), null, 2);
+                    this.td = getFormattedJsonString(args.td);
                 } catch {
                     this.td = args.td;
                 }
             }
-            const config = JSON.parse((this as any).getConfig(this.$route.params.id));
-            (this as any).processChangedTd({ td: args.td, config });
-            (this as any).$emit('td-changed');
-            (this as any).resetInteractions();
-            (this as any).resetResults();
-        },
-        btnConfigClicked() {
-            this.$emit('open-config');
-        },
-        btnSaveTdClicked() {
-            this.$store.commit('SidebarStore/saveTd', { content: this.td, id: this.$route.params.id });
+            this.processChangedTd({ td: args.td, config: JSON.parse(this.getConfig(this.id)) });
+
+            // Hide url bar if td changed
+            this.$emit('hide-url-bar');
+
+            // Reset result fields and interaction fields
+            this.resetInteractions();
+            this.resetResults();
+
+            // Update possible protocol list
+            this.setProtocols({td: args.td});
         }
     },
     watch: {
         '$route.params.id'(id) {
-            this.tdChanged({ td: (this as any).getSavedTd(this.$route.params.id)});
+            this.tdChanged({ td: this.getSavedTd(this.id)});
         }
     },
 });
