@@ -65,7 +65,7 @@ export default Vue.extend({
         getResultValue() {
             try {
                 if (this.subscription) this.subscription.unsubscribe();
-                this.subscription = this.resultValue.subscribe(
+                this.subscription = (this as any).resultValue.subscribe(
                     res => this.resultValText = res,
                     error => this.resultValText = error,
                     () => this.resultValText = 'Completed'
