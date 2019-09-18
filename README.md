@@ -55,8 +55,6 @@ Add description for config
 
 
 ### IMPORTANT TODO
-- (o) Store: Persistant element saving
-- (o) Store: Display stored td
 
 ### TODO 
 - (o) User credentials
@@ -111,6 +109,7 @@ npm run electron:serve
 ### Build electron app: 
 ```
 npm run electron:build
+npm run electron:build --linux
 ```
 
 ### Architecture:

@@ -7,7 +7,7 @@ export default class TdParser {
     private parsedTd: any;
     private protocols: ProtocolEnum[];
 
-    constructor(consumedTd: WoT.ConsumedThing | null, protocols: ProtocolEnum[] = []) {
+    constructor(consumedTd: WoT.ConsumedThing | null, protocols: ProtocolEnum[] | any = []) {
         this.consumedTd = consumedTd;
         this.parsedTd = {
             propertyInteractions: [],

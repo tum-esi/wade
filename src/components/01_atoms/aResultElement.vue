@@ -75,13 +75,11 @@ export default Vue.extend({
             }
         },
         unsubscribe() {
-            console.log('Unsubscribed!');
-            console.log('this.subscription:', this.subscription);
             if (!this.subscription) return;
             try {
                 this.subscription.unsubscribe();
-            } catch(error) {
-                console.log(error);
+            } catch (error) {
+                // Show error here
             }
         }
     }

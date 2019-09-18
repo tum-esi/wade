@@ -24,7 +24,9 @@ function createWindow() {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
     // if (!process.env.IS_TEST) { win.webContents.openDevTools(); }
-    if (!process.env.IS_TEST) {  }
+    if (!process.env.IS_TEST) {
+      // do not show dev tools
+    }
   } else {
     createProtocol('app');
     // Load the index.html when not in development
