@@ -13,6 +13,8 @@ export enum ElementTitleEnum {
 export enum PossibleInteractionTypesEnum {
   PROP_READ = 'property-read',
   PROP_WRITE = 'property-write',
+  PROP_OBSERVE_READ = 'property-observe-read',
+  PROP_OBSERVE_WRITE = 'property-observe-write',
   ACTION = 'action-invoke',
   EVENT_SUB = 'event-subscribe',
   EVENT_UNSUB = 'event-unsubscribe'

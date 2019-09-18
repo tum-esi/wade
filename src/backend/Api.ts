@@ -54,8 +54,8 @@ export function updateStatusMessage(
 }
 
 // Return vue-parsed td, td state information and possible errors
-export async function consumeAndParseTd(td: string, config: object) {
-    const consumedTd = await new TdConsumer(td, config).getConsumedTd();
+export async function consumeAndParseTd(td: string, config: object, protocols: string[]) {
+    const consumedTd = await new TdConsumer(td, config, protocols).getConsumedTd();
 
     if (consumedTd.tdState !== TdStateEnum.VALID_CONSUMED_TD) {
         return {
@@ -64,7 +64,7 @@ export async function consumeAndParseTd(td: string, config: object) {
             tdState: consumedTd.tdState
         };
     }
-    const parsedTd = new TdParser(consumedTd.tdConsumed).getParsedTd();
+    const parsedTd = new TdParser(consumedTd.tdConsumed, protocols).getParsedTd();
     return {
         tdParsed: parsedTd,
         errorMsg: null,
@@ -124,10 +124,21 @@ export async function invokeInteractions(selectedInteractions) {
                         resultTitle: selectedInteractions[interaction].interactionName,
                         resultValue: resultEvent
                     });
-                    // TODO: push unsubscribe?
                 }
                 break;
             case PossibleInteractionTypesEnum.EVENT_UNSUB:
+                break;
+            case PossibleInteractionTypesEnum.PROP_OBSERVE_READ:
+            case PossibleInteractionTypesEnum.PROP_OBSERVE_WRITE:
+                if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
+                    let resultProp = await selectedInteractions[interaction].interactionSelectBtn.interaction();
+                    resultProp = resultProp.error ? resultProp.error : resultProp;
+                    resultProps.push({
+                        resultType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
+                        resultTitle: selectedInteractions[interaction].interactionName,
+                        resultValue: resultProp
+                    });
+                }
                 break;
             case PossibleInteractionTypesEnum.ACTION:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {

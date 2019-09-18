@@ -3,7 +3,7 @@
     <mTabbar :tabbarElements="getTdTabbar" v-on:tab-clicked="tabClicked" />
     <div v-if="currentTabId === 'config'" class="td-config">
       <oConfig class="td-config-child-el"/>
-      <oProtocolSelection class="td-config-child-el" />
+      <!-- <oProtocolSelection class="td-config-child-el" /> -->
     </div>
     <div v-if="currentTabId === 'editor'" class="td-editor">
       <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />

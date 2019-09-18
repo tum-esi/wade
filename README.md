@@ -42,10 +42,7 @@ change default config:
 Add description for config
 
 ### NEXT: 
-- Subscription!!!
     - Invoke interaction -> timeout
-    - if it has no port -> default port
-    - Test with coap (with & without port)
     - Make option to select protocol (if more than one protocol is available)
 
     - Finish interface for mashups -> 
@@ -53,8 +50,6 @@ Add description for config
         - Ausführen der TDs nacheinander 
 
 - (o) Folders: Create user interface for folders
-- (o) Mashups: Create user interface for mashups
-- (+) Interaction Selection: Support all possible input types for write and actions in UI (also images and so on)
 - (o) Editor: Add td from local machine
 - (+) Refactor: Deleting / Adding / Merging sidebar elements: strict interface to add / remove in data and in GUI 
 

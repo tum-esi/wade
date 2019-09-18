@@ -91,7 +91,7 @@ export default {
             commit('setResults', []);
             commit('setTdEditor', payload.td);
 
-            const parsedTd = await Api.consumeAndParseTd(payload.td, payload.config);
+            const parsedTd = await Api.consumeAndParseTd(payload.td, payload.config, payload.protocols);
             let interactionState: InteractionStateEnum | null = null;
             // Store new parsed td
             if (

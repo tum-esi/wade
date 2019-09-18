@@ -3,7 +3,7 @@
         <div class="interaction-name"><label>{{ interactionName }}</label></div>
         <div class="interaction-options">
             <aButtonSelect 
-                v-if="interactionType === 'select' || interactionType === 'property-read' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType"
+                v-if="(interactionType === 'select' || interactionType === 'property-read' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType) || interactionType === 'property-observe-read'"
                 class="interaction-select-btn"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
@@ -14,7 +14,7 @@
             />
 
             <aInteractionInput
-                v-else-if="interactionType === 'property-write' || interactionType === 'action-invoke' && interactionSelectBtn.btnInputType.propType"
+                v-else-if="interactionType === 'property-write' || interactionType === 'action-invoke' || interactionType === 'property-observe-write' && interactionSelectBtn.btnInputType.propType"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnInputType="interactionSelectBtn.btnInputType"
@@ -83,7 +83,7 @@ export default Vue.extend({
 }
 
 .interaction-name {
-    width: 60%;
+    width: 50%;
     height: 100%;
     display: flex;
     align-items: center;
@@ -91,7 +91,7 @@ export default Vue.extend({
 }
 
 .interaction-options {
-    width: 40%;
+    width: 50%;
 }
 
 .interaction-options :hover {

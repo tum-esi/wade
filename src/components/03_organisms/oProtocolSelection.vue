@@ -44,6 +44,12 @@ export default Vue.extend({
     computed: {
         ...mapGetters('TdStore', ['getProtocols'])
     }
+
+            // TODO:
+            // Here it needs to be checked wether there is only one protocol to choose from
+            // -> then it can't be deselected
+            // If there's more than chosse the preferred one (for all)
+            // If you want to select specific protocols per interaction do this in the editor tab
 });
 </script>
 

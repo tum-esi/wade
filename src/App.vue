@@ -219,7 +219,7 @@ textarea:focus, input:focus{
   background: #B4BAB9;
   width: 100%;
   display: flex;
-  min-height: 600px;
+  height: 600px;
 }
 
 #sidebar {

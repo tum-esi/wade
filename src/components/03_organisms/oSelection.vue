@@ -129,6 +129,7 @@ export default Vue.extend({
         },
         // Remove all interactions from selected interacitons.
         async resetAll() {
+            this.$eventHub.$emit('unsubscribe');
             (this as any).resetSelections();
             this.$eventHub.$emit('selections-reseted');
         }

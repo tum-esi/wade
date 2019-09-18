@@ -1,89 +1,94 @@
 <template>
     <div class="config-container border-right">
         <div class="change-config-area">
-            <div class="config-title">
-                <label>Configuration</label>
-                <div class="format-option">
-                    <input type="radio" name="format" id="raw" value="raw" v-model="format"/>
-                    <label for="raw">Raw</label>
-                </div>
-                <div class="format-option">
-                    <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format"/>
-                    <label for="form-fields">Form-Fields</label>
+            <div class="config-header">
+                <div class="config-title">
+                    <label>Configuration</label>
+                    <div class="format-option">
+                        <input type="radio" name="format" id="raw" value="raw" v-model="format"/>
+                        <label for="raw">Raw</label>
+                    </div>
+                    <div class="format-option">
+                        <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format"/>
+                        <label for="form-fields">Form-Fields</label>
+                    </div>
                 </div>
                 <aButtonBasic
-                    v-on:show-help="showHelp"
-                    :btnClass
-            </div>
-            <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
-            <div v-if="format === 'raw'"class="config-area">
-                <textarea spellcheck="false" wrap="off" v-model="currentConfig"></textarea>
-            </div>
-            <div v-else class="config-area">
-                <div class="config-area-form-container">
-                    <p>Hint: Only usable with default config.</p>
-                    <!-- TODO: mFormConfigOptions -->
-                </div>
-            </div>
-            <div class="config-btns">
-                <aButtonBasic
-                    v-on:reset-config="resetConfigBtnClicked"
-                    :btnClass="resetConfigBtn.btnClass"
-                    :btnLabel="resetConfigBtn.btnLabel"
-                    :btnOnClick="resetConfigBtn.btnOnClick"
-                    :btnActive="true"
-                />
-                <aButtonBasic
-                    v-on:save-config="btnSaveConfigClicked"
-                    :btnClass="saveConfigBtn.btnClass"
-                    :btnLabel="saveConfigBtn.btnLabel"
-                    :btnOnClick="saveConfigBtn.btnOnClick"
-                    :btnActive="saveConfigBtn.btnActive"
+                    v-on:show-help="showHelpClicked"
+                    :btnClass="showHelp ? showHelpBtn.btnClassHide : showHelpBtn.btnClassShow"
+                    :btnLabel="showHelp  ? showHelpBtn.btnLabelHide : showHelpBtn.btnLabelShow"
+                    :btnOnClick="showHelpBtn.btnOnClick"
+
                 />
             </div>
+            <div v-if="!showHelp" class="show-config">
+                <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
+                <div v-if="format === 'raw'"class="config-area">
+                    <textarea spellcheck="false" wrap="off" v-model="currentConfig"></textarea>
+                </div>
+                <div v-else class="config-area">
+                    <div class="config-area-form-container">
+                        <p>Hint: Only usable with default config.</p>
+                        <!-- TODO: mFormConfigOptions -->
+                    </div>
+                </div>
+                <div class="config-btns">
+                    <aButtonBasic
+                        v-on:reset-config="resetConfigBtnClicked"
+                        :btnClass="resetConfigBtn.btnClass"
+                        :btnLabel="resetConfigBtn.btnLabel"
+                        :btnOnClick="resetConfigBtn.btnOnClick"
+                        :btnActive="true"
+                    />
+                    <aButtonBasic
+                        v-on:save-config="btnSaveConfigClicked"
+                        :btnClass="saveConfigBtn.btnClass"
+                        :btnLabel="saveConfigBtn.btnLabel"
+                        :btnOnClick="saveConfigBtn.btnOnClick"
+                        :btnActive="saveConfigBtn.btnActive"
+                    />
+                </div>
+            </div>
+            <div v-if="showHelp" class="config-help-container">
+                <div class="help-area">
+                    <div class="help-area-text">
+                        <textarea disabled>
+        Config needs to be in valid JSON format. Else it cannot be saved. 
+        Config interface:
+        {
+            http: {
+                port: number,
+                proxy: string,
+                allowSelfSigned: boolean
+            },
+            coap: {
+                port: number
+            },
+            mqtt: {
+                broker: string,                     // Broker URL
+                username: string,
+                password: string,
+                clientId: string
+                port: number
+            },
+            credentials: {                          // There can be multiple credentials properties 
+                thing-id: {                           // for multiple things.
+                    username: string,
+                    password: string
+                }, 
+                other-thing-id: {
+                    identity: string,
+                    psk: string
+                },
+                other-thing-id: {
+                    token: string
+                }}
+        }
+                        </textarea>
+                    </div>
+                </div>
+            </div> 
         </div>
-        <div class="config-right-side">
-        <!-- <div class="help-area">
-            <div class="config-title">
-                <label>Config Format Help</label>
-            </div>
-            <div class="help-area-text">
-                <textarea disabled>
-Config needs to be in valid JSON format. Else it cannot be saved. 
-Config interface:
-{
-    http: {
-        port: number,
-        proxy: string,
-        allowSelfSigned: boolean
-    },
-    coap: {
-        port: number
-    },
-    mqtt: {
-        broker: string,                     // Broker URL
-        username: string,
-        password: string,
-        clientId: string
-        port: number
-    },
-    credentials: {                          // There can be multiple credentials properties 
-        thing-id: {                           // for multiple things.
-            username: string,
-            password: string
-        }, 
-        other-thing-id: {
-            identity: string,
-            psk: string
-        },
-        other-thing-id: {
-            token: string
-        }}
-}
-                </textarea>
-            </div>
-        </div> -->
-        </div> 
     </div>
 </template>
 
@@ -110,6 +115,7 @@ export default Vue.extend({
             config: '',
             configStatus: TdConfigEnum.INFO as TdConfigEnum,
             format: 'raw',
+            showHelp: false,
             resetConfigBtn: {
                 btnLabel: 'Reset Config to default',
                 btnClass: 'btn-config-small',
@@ -120,6 +126,13 @@ export default Vue.extend({
                 btnClass: 'btn-config-small',
                 btnOnClick: 'save-config',
                 btnActive: false
+            },
+            showHelpBtn: {
+                btnLabelShow: 'Show Config Format Help',
+                btnLabelHide: 'Hide Config Format Help',
+                btnClassShow: 'show-format',
+                btnClassHide: 'hide-format',
+                btnOnClick: 'show-help',
             }
         };
     },
@@ -147,19 +160,17 @@ export default Vue.extend({
                 }
             }
         },
-        getSelectedProtocol() {
-            // TODO:
-            // Here it needs to be checked wether there is only one protocol to choose from
-            // -> then it can't be deselected
-            // If there's more than chosse the preferred one (for all)
-            // If you want to select specific protocols per interaction do this in the editor tab
-            return (this as any).getProtocols(this.$route.params.id);
-        }
     },
     methods: {
         ...mapMutations('SidebarStore', ['saveTdConfig']),
         getSavedConfig(isDefault: boolean = false): string {
-            return isDefault ? getFormattedJsonString((this as any).getDefaultConfig) : (this as any).getConfig(this.id);
+            return getFormattedJsonString( isDefault
+                ? (this as any).getDefaultConfig
+                : (this as any).getConfig(this.id)
+            );
+        },
+        showHelpClicked() {
+            this.showHelp = !this.showHelp;
         },
         resetConfigBtnClicked() {
             this.config = this.getSavedConfig(true);
@@ -206,10 +217,10 @@ export default Vue.extend({
     padding: 0px 12px 10px 12px;
 }
 
-/* .change-config-area, .help-area {
-    width: 50%;
+.config-help-container, .show-config, .help-area {
+    width: 100%;
     height: 100%;
-} */
+}
 
 .change-config-area {
     width: 100%;
@@ -230,6 +241,11 @@ export default Vue.extend({
     resize: none;
 }
 
+.config-header {
+    display: flex;
+    justify-content: space-between;
+}
+
 .config-title {
     padding: 7px 0px 7px 2px;
     max-height: 8%;
@@ -242,7 +258,7 @@ export default Vue.extend({
     height: 7%;
 }
 
-.config-title label {
+.config-header label {
     font-size: 16px;
     padding-right: 7px;
 }

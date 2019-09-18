@@ -61,7 +61,7 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
-        ...mapGetters('SidebarStore', ['getSavedTd', 'getConfig']),
+        ...mapGetters('SidebarStore', ['getSavedTd', 'getConfig', 'getProtocols']),
         id() {
             return (this as any).$route.params.id;
         },
@@ -75,8 +75,9 @@ export default Vue.extend({
         }
     },
     methods: {
+        ...mapMutations('SidebarStore', ['saveTdProtocols']),
         ...mapActions('TdStore',
-            ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd', 'setProtocols']),
+            ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
         // Executed when td changd: via loading saved td/ fetching td/ user changed td
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = '';
@@ -87,7 +88,12 @@ export default Vue.extend({
                     this.td = args.td;
                 }
             }
-            (this as any).processChangedTd({ td: args.td, config: JSON.parse((this as any).getConfig(this.id)) });
+            (this as any).saveTdProtocols({id: this.id, td: args.td});
+            (this as any).processChangedTd({
+                td: args.td,
+                config: JSON.parse((this as any).getConfig(this.id)),
+                protocols: (this as any).getProtocols(this.id)
+            });
 
             // Hide url bar if td changed
             this.$emit('hide-url-bar');
@@ -97,7 +103,6 @@ export default Vue.extend({
             (this as any).resetResults();
 
             // Update possible protocol list
-            (this as any).setProtocols({td: args.td});
         }
     },
     watch: {

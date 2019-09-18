@@ -104,5 +104,28 @@ button:disabled {
   font-size: 13px;
   overflow: hidden;
 }
+
+/* Unique style for config show hide format btn */
+.hide-format, .show-format {
+  font-size: 14px;
+  margin: 7px 0 7px 7px;
+  padding: 7px;
+}
+
+.hide-format {
+  background: #ab7c79;
+}
+
+/* Unique style for unsubscribe btn */
+.unsubscribe-btn {
+  font-size: 14px;
+  border: 1px solid #b5dfdd;
+  padding: 7px;
+  margin: 0;
+}
+
+.unsubscribe-btn:hover {
+  border-color: #8aaba9;
+}
 </style>
 

@@ -32,7 +32,8 @@ export default new Vuex.Store({
         'SidebarStore/deleteSidebarElement',
         'SidebarStore/deleteElementFromStore',
         'SidebarStore/saveTd',
-        'SidebarStore/saveTdConfig'
+        'SidebarStore/saveTdConfig',
+        'SidebarStore/saveTdProtocols'
       ]
     })
   ],

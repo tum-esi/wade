@@ -1,18 +1,20 @@
 import * as WoT from 'wot-typescript-definitions';
-import { PossibleInteractionTypesEnum } from '@/util/enums';
+import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
 
 // Parses a consumed Td to Vue 'Interaction' Component readable data
 export default class TdParser {
     private consumedTd: WoT.ConsumedThing | null;
     private parsedTd: any;
+    private protocols: ProtocolEnum[];
 
-    constructor(consumedTd: WoT.ConsumedThing | null) {
+    constructor(consumedTd: WoT.ConsumedThing | null, protocols: ProtocolEnum[] = []) {
         this.consumedTd = consumedTd;
         this.parsedTd = {
             propertyInteractions: [],
             actionInteractions: [],
             eventInteractions: []
         };
+        this.protocols = protocols;
 
         this.parseProperties();
         this.parseActions();
@@ -28,6 +30,33 @@ export default class TdParser {
         for (const property in this.consumedTd.properties) {
             if (!this.consumedTd.properties.hasOwnProperty(property)) { continue; }
 
+            if (this.protocols.indexOf(ProtocolEnum.MQTT) !== -1) {
+                this.parsedTd.propertyInteractions.push({
+                    interactionName: `${property}: Observe`,
+                    interactionType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
+                    interactionSelectBtn: {
+                        btnInputType: this.getCorrectInputType(this.consumedTd.properties[property]),
+                        btnKey: `property-${property}-observe`,
+                        btnGeneralStyle: 'btn-event-interaction',
+                        btnSelectedStyle: 'btn-event-interaction-selected',
+                        interaction: async () => {
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
+                            const response = await this.consumedTd.properties[property]
+                            .subscribe(
+                                async (res) => {
+                                    return await res;
+                                },
+                                async (err) => {
+                                    return await err;
+                                });
+                            return await response;
+                        }
+                    }
+                });
+                continue;
+            }
+
+            // Readable properties
             if (!this.consumedTd.properties[property].writeOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Read`,
@@ -51,6 +80,7 @@ export default class TdParser {
                 });
             }
 
+            // Writeable properties (have input)
             if (!this.consumedTd.properties[property].readOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Write`,
@@ -117,19 +147,12 @@ export default class TdParser {
                     btnKey: `select-${event}`,
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
-                    subscribe: async () => {
+                    subscribe: () => {
                         if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                        const response = await this.consumedTd.events[event].subscribe(
-                            async (res) => {
-                                return await res;
-                            },
-                            async (err) => {
-                                return await err;
-                            });
-                        return await response;
+                        return this.consumedTd.events[event];
                     },
                     unsubscribe: () => {
-                        if (this.consumedTd) this.consumedTd.events[event].unsubscribe();
+                        if (this.consumedTd) return this.consumedTd.events[event];
                     }
                 }
             };

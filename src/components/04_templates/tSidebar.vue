@@ -11,7 +11,8 @@
     />
     <div class="sidebar-content">
       <div class="sidebar-search">
-        <aSearchbar class="searchbar" />
+        <!-- <aSearchbar class="searchbar" /> -->
+        <label> Add Sidebar Element </label>
         <aDropdownButton
           class="dropdown-btn"
           :btnKey="getAddNewButton.btnKey"
@@ -88,6 +89,11 @@ export default Vue.extend({
   padding: 7px;
   height: 10%;
   border-bottom: 1px solid #393b3a;
+  align-items: center;
+}
+
+.sidebar-search label {
+  padding-left: 15px;
 }
 
 /* Searchbar Input field with icon */
@@ -98,6 +104,12 @@ export default Vue.extend({
 /* Add-dropdown btn */
 .dropdown-btn {
   width: 20%;
+}
+
+/* Contains sidebar elements (tds, folders, mashups) */
+.sidebar-elements-container {
+  height: 90%;
+  overflow: scroll;
 }
 </style>
 

@@ -2,23 +2,28 @@ import { Servient } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
 import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
-import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
-
+// import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
+
+// const DEFAULT_COAP_PORT = 5683;
+// const DEFAULT_COAP_PORT = 5055;
+// const DEFAULT_HTTP_PORT = 8080;
+// const DEFAULT_MQTT_PORT = 1883;
 
 export default class TdConsumer {
 
     private td: string;
     private config: any;
+    private protocols: string[];
     private tdJson: JSON | null;
     private tdConsumed: WoT.ConsumedThing | null;
     private tdState: TdStateEnum | null;
     private errorMsg: string | null;
-    private defaultConfig: any;
 
-    constructor(td: string, config: any) {
+    constructor(td: string, config: any, protocols: string[]) {
         this.td = td;
         this.config = config;
+        this.protocols = protocols;
         this.tdJson = null;
         this.tdConsumed = null;
         this.tdState = null;
@@ -32,7 +37,8 @@ export default class TdConsumer {
         return {
             tdJson: this.tdJson,
             tdConsumed: this.tdConsumed,
-            tdState: this.tdState, errorMsg: this.errorMsg
+            tdState: this.tdState,
+            errorMsg: this.errorMsg
         };
     }
 
@@ -59,44 +65,57 @@ export default class TdConsumer {
     // Tries to consume given td json object
     private async consumeThing() {
         const servient = new Servient();
+        console.log('protocols:', this.protocols);
+
+        // Get config of td, possibly altered by user
         if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
 
-        // const DEFAULT_COAP_PORT = 5683;
-        const DEFAULT_COAP_PORT = 5055;
-        const DEFAULT_HTTP_PORT = 8080;
-        const DEFAULT_MQTT_PORT = 1883;
+        if (this.protocols.indexOf('mqtt') !== -1) {
+            // Default mqtt config
+            const MQTT_CONFIG = {
+                uri: 'mqtt://localhost:1883',
+                username: undefined,
+                password: undefined,
+                clientId: undefined
+            };
 
-        const MQTT_CONFIG = {
-            uri: 'mqtt://localhost:1883',
-            username: undefined,
-            password: undefined,
-            clientId: undefined,
-            port: DEFAULT_MQTT_PORT
-        };
+            // Add mqtt config entered by user
+            if (this.config && this.config.mqtt) {
+                MQTT_CONFIG.uri = this.config.mqtt.broker || '';
+                MQTT_CONFIG.username = this.config.mqtt.username || undefined;
+                MQTT_CONFIG.password = this.config.mqtt.password || undefined;
+                MQTT_CONFIG.clientId = this.config.mqtt.clientId || undefined;
+            }
 
-        // TODO: Only do this if it is mqtt -> stop if it takes longer
-        // Needed to publish data to a broker (needed for propertiers)
-        // const mqttBrokerServer =
-        //     new MqttBrokerServer(MQTT_CONFIG.uri, MQTT_CONFIG.username, MQTT_CONFIG.password, MQTT_CONFIG.clientId);
-        // servient.addServer(mqttBrokerServer);
+            // Add broker credentials
+            const mqttBrokerServer =
+                new MqttBrokerServer(MQTT_CONFIG.uri, MQTT_CONFIG.username, MQTT_CONFIG.password, MQTT_CONFIG.clientId);
+            servient.addServer(mqttBrokerServer);
 
+            await servient.addClientFactory(new MqttClientFactory());
+        }
 
-        // await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
+        if (this.protocols.indexOf('coap') !== -1) {
+            // const coapServer = new CoapServer(DEFAULT_COAP_PORT);
+            // await servient.addServer(coapServer);
+            await servient.addClientFactory(new CoapClientFactory());
+            // await servient.addClientFactory(new CoapClientFactory(coapServer));
+        }
 
-        // const coapServer = new CoapServer(DEFAULT_COAP_PORT);
-        // await servient.addServer(coapServer);
+        if (this.protocols.indexOf('coaps') !== -1) {
+            await servient.addClientFactory(new CoapsClientFactory());
+        }
 
-        // TODO .addCredentials
-        await servient.addClientFactory(new HttpClientFactory({}));
-        // await servient.addClientFactory(new HttpClientFactory({ port: 8080 }));
-        await servient.addClientFactory(new HttpsClientFactory({}));
+        if (this.protocols.indexOf('http') !== -1) {
+            await servient.addClientFactory(new HttpClientFactory({}));
+        }
+
+        if (this.protocols.indexOf('https') !== -1) {
+            await servient.addClientFactory(new HttpsClientFactory({}));
+        }
+
         // await servient.addClientFactory(new WebSocketClientFactory());
         // await servient.addClientFactory(new WebSocketSecureClientFactory());
-        await servient.addClientFactory(new CoapClientFactory());
-        // await servient.addClientFactory(new CoapClientFactory(coapServer));
-        await servient.addClientFactory(new CoapsClientFactory());
-
-        await servient.addClientFactory(new MqttClientFactory());
 
         await servient.start().then((thingFactory) => {
             this.tdConsumed = thingFactory.consume(JSON.stringify(this.tdJson));

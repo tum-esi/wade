@@ -1,4 +1,6 @@
-import { ElementTypeEnum, ElementTitleEnum } from '@/util/enums';
+import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum } from '@/util/enums';
+import * as Api from '@/backend/Api';
+
 export default {
     namespaced: true,
     state: {
@@ -159,6 +161,19 @@ export default {
                 }
             }
         },
+        // Saves the protocols avauílable in a td to the td element
+        saveTdProtocols(state: any, payload: { id: string, td: any }) {
+            let tdElement: { id: string, type: string, config: any, content?: any, protocols?: ProtocolEnum[] | null};
+            const protocols: ProtocolEnum[] | null = Api.retrieveProtocols(payload.td);
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    tdElement = td;
+                    tdElement.protocols = protocols;
+                    state.tds[state.tds.indexOf(td)] = tdElement;
+                    break;
+                }
+            }
+        },
         // Find td element and save content to it
         saveTd(state: any, payload: { content: any, id: string }) {
             let tdElement: { id: string, type: string, content: any, config: any };
@@ -252,6 +267,16 @@ export default {
                     }
                 }
                 return '';
+            };
+        },
+        getProtocols(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id && td.protocols) {
+                        return td.protocols;
+                    }
+                }
+                return [];
             };
         },
         getSavedTd(state: any) {
