@@ -88,7 +88,10 @@ export default Vue.extend({
                     this.td = args.td;
                 }
             }
+            // Update protocol list
             (this as any).saveTdProtocols({id: this.id, td: args.td});
+
+            // Consume td
             (this as any).processChangedTd({
                 td: args.td,
                 config: JSON.parse((this as any).getConfig(this.id)),
@@ -100,9 +103,9 @@ export default Vue.extend({
 
             // Reset result fields and interaction fields
             (this as any).resetInteractions();
+            (this as any).resetSelections();
             (this as any).resetResults();
-
-            // Update possible protocol list
+            this.$eventHub.$emit('selections-reseted');
         }
     },
     watch: {

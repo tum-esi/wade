@@ -187,6 +187,7 @@ export default Vue.extend({
     width: 49%;
     padding: 5px;
     margin: 0;
+    font-size: 13px;
 }
 
 .interaction-container-all {

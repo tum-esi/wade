@@ -120,8 +120,9 @@ button:disabled {
 .unsubscribe-btn {
   font-size: 14px;
   border: 1px solid #b5dfdd;
-  padding: 7px;
   margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .unsubscribe-btn:hover {

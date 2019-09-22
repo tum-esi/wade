@@ -90,6 +90,7 @@ export default Vue.extend({
 .result-container {
     display: flex;
     width: 100%;
+    padding-top: 5px;
 }
 
 .result-outcome {
@@ -97,7 +98,6 @@ export default Vue.extend({
     height: 35px;
     border: 1px solid #393B3A;
     border-radius: 3px;
-    margin: 5px 0 0 0;
     background: #939C9E;
     width: 100%;
 }
@@ -105,7 +105,7 @@ export default Vue.extend({
 .result-unsubscribe {
     width: 30%;
     height: 35px;
-    margin: 5px 0 0 5px;
+    padding-left: 5px;
 }
 
 .is-subscription {
