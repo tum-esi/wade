@@ -187,7 +187,7 @@ export default Vue.extend({
 
 .url-bar {
   width: 100%;
-  height: 10%;
+  height: 8%;
 }
 
 .editor-full {
@@ -195,6 +195,6 @@ export default Vue.extend({
 }
 
 .editor-showUrlBar {
-  height: 90%;
+  height: 92%;
 }
 </style>
