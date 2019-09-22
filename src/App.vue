@@ -162,8 +162,14 @@ export default Vue.extend({
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   width: 100%;
+  height: 100%;
 }
 
 textarea:focus, input:focus{
@@ -219,7 +225,7 @@ textarea:focus, input:focus{
   background: #B4BAB9;
   width: 100%;
   display: flex;
-  height: 600px;
+  height: 100%;
 }
 
 #sidebar {
@@ -228,7 +234,7 @@ textarea:focus, input:focus{
 
 #main-content {
   width: 80%;
-  height: 600px;
+  height: 100%;
 }
 
 </style>

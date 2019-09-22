@@ -74,7 +74,7 @@ export default Vue.extend({
 }
 
 .sidebar-header {
-  height: 10%;
+  height: 7%;
   background: #b5dfdd;
 }
 
@@ -87,7 +87,7 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   padding: 7px;
-  height: 10%;
+  height: 7%;
   border-bottom: 1px solid #393b3a;
   align-items: center;
 }

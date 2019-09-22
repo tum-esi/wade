@@ -150,11 +150,11 @@ export default Vue.extend({
 }
 
 .td-editor {
-  height: 90%;
+  height: 93%;
 }
 
 .td-config {
-  height: 90%;
+  height: 93%;
   width: 100%;
   display: flex;
 }
@@ -166,7 +166,7 @@ export default Vue.extend({
 
 .td-main {
   display: flex;
-  height: 90%;
+  height: 93%;
 }
 
 .td-main-left {

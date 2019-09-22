@@ -100,7 +100,7 @@ export default Vue.extend({
 
 .results-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     border: 1px solid #393B3A;
     border-radius: 3px;
 }

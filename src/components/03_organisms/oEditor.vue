@@ -135,7 +135,7 @@ export default Vue.extend({
 
 .editor-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     max-height: 800px;
 }
 
@@ -149,7 +149,7 @@ export default Vue.extend({
 }
 
 .config-btns {
-    height: 10%;
+    height: 8%;
     padding-top: 7px;
     display: flex;
     justify-content: space-between;

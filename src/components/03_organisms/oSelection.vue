@@ -158,7 +158,7 @@ export default Vue.extend({
 
 .selection-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     border: 1px solid #393B3A;
     border-radius: 3px;
     background: #B4BAB9;
@@ -176,7 +176,7 @@ export default Vue.extend({
 }
 
 .selection-btn {
-    height: 12%;
+    height: 10%;
     padding-top: 7px;
     width: 100%;
     display: flex;
