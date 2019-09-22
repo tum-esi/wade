@@ -26,6 +26,13 @@ declare global {
       MASHUP = 'mashup'
     }
 
+    interface MqttConfigInterface {
+      broker: string;
+      username: string | undefined;
+      password: string | undefined;
+      clientId: string | undefined;
+    }
+
     interface ModalAddElementInterface {
       type: string;
       src: string;

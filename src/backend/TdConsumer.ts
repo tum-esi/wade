@@ -5,12 +5,10 @@ import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
 
-// const DEFAULT_COAP_PORT = 5683;
-// const DEFAULT_COAP_PORT = 5055;
-// const DEFAULT_HTTP_PORT = 8080;
-// const DEFAULT_MQTT_PORT = 1883;
-
 export default class TdConsumer {
+    // default coap port = 5683;
+    // default mqtt port = 1883;
+    // default http port = 8080;
 
     private td: string;
     private config: any;
@@ -32,6 +30,8 @@ export default class TdConsumer {
 
     public async getConsumedTd() {
         await this.parseTdJson(this.td);
+
+        // if the td is in valid json format, consume it.
         if (this.tdState === TdStateEnum.VALID_TD_JSON) await this.consumeThing();
 
         return {
@@ -65,41 +65,42 @@ export default class TdConsumer {
     // Tries to consume given td json object
     private async consumeThing() {
         const servient = new Servient();
-        console.log('protocols:', this.protocols);
 
         // Get config of td, possibly altered by user
         if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
 
-        if (this.protocols.indexOf('mqtt') !== -1) {
-            // Default mqtt config
-            const MQTT_CONFIG = {
-                uri: 'mqtt://localhost:1883',
-                username: undefined,
-                password: undefined,
-                clientId: undefined
-            };
+        // Now check which ClientFactories need to be added (based on the given protocols)
 
-            // Add mqtt config entered by user
-            if (this.config && this.config.mqtt) {
-                MQTT_CONFIG.uri = this.config.mqtt.broker || '';
-                MQTT_CONFIG.username = this.config.mqtt.username || undefined;
-                MQTT_CONFIG.password = this.config.mqtt.password || undefined;
-                MQTT_CONFIG.clientId = this.config.mqtt.clientId || undefined;
+        if (this.protocols.indexOf('mqtt') !== -1) {
+            if (!this.config || !this.config.mqtt) {
+                // mqtt config was found -> cannot connect to broker
+                this.tdState = TdStateEnum.INVALID_CONSUMED_TD;
+                this.errorMsg = 'No mqtt broker credentials were found in config';
+                return;
             }
 
+            // Set mqtt config from config (possibily entered by user)
+            const MQTT_CONFIG: WADE.MqttConfigInterface = {
+                broker: this.config.mqtt.broker || '',
+                username: this.config.mqtt.username || undefined,
+                password: this.config.mqtt.password || undefined,
+                clientId: this.config.mqtt.clientId || undefined
+            };
+
             // Add broker credentials
-            const mqttBrokerServer =
-                new MqttBrokerServer(MQTT_CONFIG.uri, MQTT_CONFIG.username, MQTT_CONFIG.password, MQTT_CONFIG.clientId);
+            const mqttBrokerServer = new MqttBrokerServer(
+                MQTT_CONFIG.broker,
+                MQTT_CONFIG.username,
+                MQTT_CONFIG.password,
+                MQTT_CONFIG.clientId
+            );
             servient.addServer(mqttBrokerServer);
 
             await servient.addClientFactory(new MqttClientFactory());
         }
 
         if (this.protocols.indexOf('coap') !== -1) {
-            // const coapServer = new CoapServer(DEFAULT_COAP_PORT);
-            // await servient.addServer(coapServer);
             await servient.addClientFactory(new CoapClientFactory());
-            // await servient.addClientFactory(new CoapClientFactory(coapServer));
         }
 
         if (this.protocols.indexOf('coaps') !== -1) {
