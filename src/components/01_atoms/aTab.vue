@@ -109,7 +109,9 @@ export default Vue.extend({
 .tab-container {
   display: flex;
   align-items: center;
-  text-align: center;
+}
+
+.tab-container label {
   overflow: hidden;
 }
 
