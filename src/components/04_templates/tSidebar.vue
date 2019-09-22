@@ -78,6 +78,10 @@ export default Vue.extend({
   background: #b5dfdd;
 }
 
+.sidebar-header:hover {
+  background: #92afae !important;
+}
+
 .sidebar-content {
   height: 90%;
 }

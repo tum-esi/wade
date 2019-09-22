@@ -128,10 +128,15 @@ export default Vue.extend({
 
 .tab-btn-header {
   padding: 15px 7px 15px 7px;
+  background: none;
 }
 
 .tab-btn-header:hover {
-  background: #b5dfdd;
+  background: none;
+}
+
+.tab-label:hover {
+  cursor: pointer;
 }
 
 .isActive {
