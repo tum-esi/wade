@@ -13,6 +13,7 @@ What happens if the prop title is super long? -> in UI?
 
 change default config: 
 
+```json
   "http": {
     "port": 8080,
     "allowSelfSigned": true
@@ -38,6 +39,7 @@ change default config:
     }
   }
 }
+```
 
 Add description for config
 
@@ -90,6 +92,19 @@ Add description for config
 - (+) Scrollbar: Restyle
 - (o) Selection: Show error if input is not in correct format
 - (+) Errors: Show connection errors in statusbar
+
+## Known Problems
+- (x) Install node-aead-crypto to avoid failing dev build and build,
+   because coap-binding seems to need it might be necessary (it isn't installed
+   with current node version because it shouldn't be needed anymore)
+   (found on windows):  
+  ```
+  npm install -f node-aead-crypto
+  ```  
+  After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
+  comes with other disadvantages)
+- (x) correct the name conflict with "interfaces" in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for "Unexpected token: name (interface):  
+change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
 
 ## Project setup
 ```
