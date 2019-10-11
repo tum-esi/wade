@@ -65,7 +65,6 @@ export default class TdConsumer {
     // Tries to consume given td json object
     private async consumeThing() {
         const servient = new Servient();
-        console.log('protocols:', this.protocols);
 
         // Get config of td, possibly altered by user
         if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
