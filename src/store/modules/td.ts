@@ -56,6 +56,13 @@ export default {
                 tabStyle: 'tab-container-in-tabbar',
                 tabLink: '/performance',
                 tabIsActive: false
+            },
+            {
+                tabId: 'virtual',
+                tabTitle: 'Virtual-Thing',
+                tabStyle: 'tab-container-in-tabbar',
+                tabLink: '/virtual',
+                tabIsActive: false
             }
         ],
         tdSelectionBtn: {

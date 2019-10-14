@@ -82,6 +82,18 @@ export default {
                 }
             }
         },
+        // TODO check default config
+        virtualConfigDefault: {
+            servient: {
+                staticAddress: '127.0.0.10',
+                http: {
+                    port: 80
+                }
+            },
+            log: {
+                level: 1
+            }
+        },
         // ===== DYNAMIC STORE STATE ===== //
         sidebarElements: [],
         folders: [],
@@ -110,7 +122,8 @@ export default {
                         id: newElement.id,
                         type: newElement.type,
                         content: '',
-                        config: state.configDefault
+                        config: state.configDefault,
+                        vconfig: state.virtualConfigDefault
                     });
                     return newElement;
                 case ElementTypeEnum.FOLDER:
@@ -161,6 +174,19 @@ export default {
                 }
             }
         },
+        saveTdVirtualConfig(state: any, payload: { vconfig: any, id: string }) {
+            let tdElement: { id: string, type: string, vconfig: any, content?: any };
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.vconfig = payload.vconfig;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
+        },
         // Saves the protocols avauílable in a td to the td element
         saveTdProtocols(state: any, payload: { id: string, td: any }) {
             let tdElement: { id: string, type: string, config: any, content?: any, protocols?: ProtocolEnum[] | null};
@@ -176,7 +202,7 @@ export default {
         },
         // Find td element and save content to it
         saveTd(state: any, payload: { content: any, id: string }) {
-            let tdElement: { id: string, type: string, content: any, config: any };
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any};
             let index: number;
             for (const element of state.tds) {
                 if (element.id === payload.id) {
@@ -249,6 +275,9 @@ export default {
         getDefaultConfig(state: any) {
             return JSON.stringify(state.configDefault);
         },
+        getDefaultVirtualConfig(state: any) {
+            return JSON.stringify(state.virtualConfigDefault);
+        },
         getConfig(state: any) {
             return (id: string) => {
                 for (const td of state.tds) {
@@ -263,6 +292,26 @@ export default {
                                 config = td.config.toString();
                             }
                             return config;
+                        }
+                    }
+                }
+                return '';
+            };
+        },
+        getVirtualConfig(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (!td.vconfig || td.vconfig.length <= 0) {
+                            return JSON.stringify(state.virtualConfigDefault);
+                        } else {
+                            let vconfig;
+                            try {
+                                vconfig = JSON.stringify(td.vconfig);
+                            } catch (error) {
+                                vconfig = td.vconfig.toString();
+                            }
+                            return vconfig;
                         }
                     }
                 }

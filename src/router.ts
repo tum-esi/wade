@@ -29,6 +29,11 @@ export default new Router({
       path: '/:type/:id/:tab',
       name: 'config',
       component: () => import('@/components/03_organisms/oConfig.vue')
+    },
+    {
+      path: '/:type/:id/:tab',
+      name: 'virtual',
+      component: () => import('@/components/03_organisms/oVirtual.vue')
     }
   ],
 });

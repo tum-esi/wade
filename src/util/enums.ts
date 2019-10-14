@@ -55,6 +55,17 @@ export enum TdConfigEnum {
   ERROR = 'Error: Wrong data format. Change config to make it saveable.'
 }
 
+/* The enum values indexes of SAVE_SUCCESS and ERROR must be equal
+ to the indexes at the TdConfigEnum, to ensure that aConfigStatusBar
+ highliting works */
+export enum TdVirtualConfigEnum {
+  INFO = 'This config will be used to generate a virtual-thing for your TD',
+  UNSAVED = 'Please save your changes to apply them',
+  SAVE_SUCCESS = 'Virtual thing config was safe successfully.',
+  RESET = 'Virtual thing config was resetted to default config. Save to apply!',
+  ERROR = 'Error: Wrong data format. Change virtual thing config to make it saveable.'
+}
+
 export enum ProtocolEnum {
   HTTP = 'http',
   HTTPS = 'https',
