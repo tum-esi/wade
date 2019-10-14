@@ -12,12 +12,14 @@ export default class VtCall {
     private givenVtConfig: string;
     private usedTempFolder: string|null;
     private createTempTimeout: NodeJS.Timeout;
+    private givenTdId: string;
 
-    constructor(givenTD: WoT.ThingDescription | null, givenVtConfig: string) {
+    constructor(givenTD: WoT.ThingDescription | null, givenVtConfig: string, givenTdId: string) {
         this.givenTD = givenTD;
         this.givenVtConfig = givenVtConfig;
         this.debug = '';
         this.usedTempFolder = null;
+        this.givenTdId = givenTdId;
 
         fs.mkdtemp(path.join(os.tmpdir(), 'virtualthing-'), (err, genfolder) => {
             if (err) {
@@ -48,11 +50,19 @@ export default class VtCall {
     private writeTD() {
         return new Promise( (resolve, reject) => {
             if ( this.givenTD === null) {
-                // TODO write default TD (coffeemachine) if null
+                fs.copyFileSync(
+                    path.join(
+                        __dirname, 'node_modules', 'virtual-thing', 'examples', 'td', 'coffee_machine_td.json'
+                    ),
+                    path.join(
+                        this.usedTempFolder as string, 'coffee_machine_td.json'
+                    )
+                );
+                resolve();
             } else {
-                // TODO write TD if received one to the tmp folder
+                fs.writeFileSync(path.join( this.usedTempFolder as string, this.givenTdId ), this.givenTD);
+                resolve();
             }
-            reject();
         });
     }
     private writeVtConfig() {
