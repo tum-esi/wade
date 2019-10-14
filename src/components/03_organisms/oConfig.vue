@@ -23,7 +23,7 @@
             </div>
             <div v-if="!showHelp" class="show-config">
                 <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
-                <div v-if="format === 'raw'"class="config-area">
+                <div v-if="format === 'raw'" class="config-area">
                     <textarea spellcheck="false" wrap="off" v-model="currentConfig"></textarea>
                 </div>
                 <div v-else class="config-area">
