@@ -85,13 +85,21 @@ export default {
         // TODO check default config
         virtualConfigDefault: {
             servient: {
-                staticAddress: '127.0.0.10',
+                staticAddress: '127.0.0.1',
                 http: {
-                    port: 80
+                    port: 8080
                 }
             },
             log: {
-                level: 1
+                level: 2
+            },
+            things: {
+                'de:tum:ei:esi:fp:coffee': {
+                    eventIntervals: {
+                        maintenance: 15,
+                        error: 15
+                    }
+                }
             }
         },
         // ===== DYNAMIC STORE STATE ===== //
