@@ -2,6 +2,8 @@ import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
 import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
 import MessageHandler from './MessageHandler';
+import VtCall from './VtCall';
+import * as stream from 'stream';
 
 export function retrieveProtocols(td: string): ProtocolEnum[] | null {
     const protocols = [] as ProtocolEnum[];
@@ -163,4 +165,22 @@ export async function invokeInteractions(selectedInteractions) {
         resultActions,
         resultEvents
     };
+}
+
+export async function createNewVt(
+    VtConfig: string,
+    TdId: string,
+    writeOut: stream.Writable,
+    writeError: stream.Writable,
+    TD?: string
+    ) {
+        const newVtCall = new VtCall(VtConfig, TdId, writeOut, writeError, TD);
+
+        await newVtCall.launchVt();
+        return newVtCall;
+}
+
+export async function removeVt(VT: VtCall) {
+    await VT.stopVt();
+    VT = null as any;
 }

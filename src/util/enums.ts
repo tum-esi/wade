@@ -73,3 +73,11 @@ export enum ProtocolEnum {
   COAPS = 'coaps',
   MQTT = 'mqtt'
 }
+
+export enum VtStatus {
+  NOT_CREATED = 'virtual thing is not created for this TD',
+  STARTUP = 'a virtual thing is currently being created',
+  RUNNING = 'the virtual thing should be up and running',
+  STOPPED = 'the virtualization is being stopped',
+  ERROR = 'there has been an error with virtual-thing'
+}
