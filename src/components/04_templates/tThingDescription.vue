@@ -34,6 +34,7 @@
     </div>
     <div v-if="currentTabId === 'virtual'" class="td-virtual">
       <oVirtual style="td-config-child-el"/>
+      <oVirtualThing style="td-config-child-el"/>
     </div>
   </div>
 </template>
@@ -47,6 +48,7 @@ import mUrlBar from '@/components/02_molecules/mUrlBar.vue';
 import oConfig from '@/components/03_organisms/oConfig.vue';
 import oEditor from '@/components/03_organisms/oEditor.vue';
 import oVirtual from '@/components/03_organisms/oVirtual.vue';
+import oVirtualThing from '@/components/03_organisms/oVirtualThing.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
@@ -62,6 +64,7 @@ export default Vue.extend({
     oProtocolSelection,
     oEditor,
     oVirtual,
+    oVirtualThing,
     oSelection,
     oResults,
     mTabbar,

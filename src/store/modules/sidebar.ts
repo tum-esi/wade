@@ -82,7 +82,7 @@ export default {
                 }
             }
         },
-        // TODO check default config
+        /* the same as in virtual thing */
         virtualConfigDefault: {
             servient: {
                 staticAddress: '127.0.0.1',
@@ -197,7 +197,9 @@ export default {
         },
         // Saves the protocols avauílable in a td to the td element
         saveTdProtocols(state: any, payload: { id: string, td: any }) {
-            let tdElement: { id: string, type: string, config: any, content?: any, protocols?: ProtocolEnum[] | null};
+            let tdElement: {
+                id: string, type: string, config: any, vconfig: any, content?: any, protocols?: ProtocolEnum[] | null
+            };
             const protocols: ProtocolEnum[] | null = Api.retrieveProtocols(payload.td);
             for (const td of state.tds) {
                 if (td.id === payload.id) {
