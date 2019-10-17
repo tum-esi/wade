@@ -1,6 +1,6 @@
 <template>
     <div class="outputbar-container border-bottom" :class="style">
-        <output>{{ outputContent }}</output>
+        <output class="output-bar">{{ outputContent }}</output>
     </div>
 </template>
 
@@ -14,17 +14,20 @@ export default Vue.extend({
         outputContent: {
             type: String,
             required: true
+        },
+        isErrorOutput: {
+            type: Boolean,
+            required: false
         }
     },
     data() {
         return {
-            isErrorOutput: false,
             style: ''
         };
     },
     watch: {
-        outputContent() {
-            if (this.isErrorOutput === true) {
+        isErrorOutput() {
+            if (this.isErrorOutput) {
                 this.style = 'error';
             } else {
                 this.style = '';
@@ -46,10 +49,18 @@ export default Vue.extend({
     border-top-right-radius: 3px;
     border: 1px solid #393B3A;
     border-bottom: none;
+    width: 100%;
+    height: 100%;
 }
 
-.output-container output {
+.output-bar {
     font-weight: lighter;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 /* .error {

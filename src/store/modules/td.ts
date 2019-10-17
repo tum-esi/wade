@@ -1,6 +1,8 @@
 import * as Api from '@/backend/Api';
 import { RESULT_MESSAGES, VtStatus } from '@/util/enums';
 import { InteractionStateEnum, TdStateEnum, ProtocolEnum } from '@/util/enums';
+import * as stream from 'stream';
+import VtCall from '@/backend/VtCall';
 
 export default {
     namespaced: true,
@@ -22,7 +24,10 @@ export default {
         resultProps: [],
         resultActions: [],
         resultEvents: [],
-        virtualThing: [],
+        virtualThing: undefined,
+        VtExists: false,
+        vtOutputStd: '',
+        vtOutputErr: '',
         // ===== STATIC STORE STATES ===== //
         tdTabs: [
             {
@@ -186,26 +191,6 @@ export default {
             commit('setResultProps', results.resultProps);
             commit('setResultActions', results.resultActions);
             commit('setResultEvents', results.resultEvents);
-        },
-        async addVt({ commit, state, getters }, payload) {
-            if ( state.virtualThing === [] && getters.isValidTd() ) {
-                const createdVt = await Api.createNewVt(
-                    payload.VtConfig, payload.TdId, payload.writeOut, payload.writeError
-                    );
-                // TODO think about how to best parse parameters
-                commit('setVirtualThing', createdVt);
-            } else {
-                // do nothing
-                // TODO add error mgt
-            }
-        },
-        async remVt({commit, state }) {
-            if( state.virtualThing !== [] ) {
-                await Api.removeVt(state.virtualThing);
-                commit('setVirtualThing', []);
-            } else {
-                // do nothing, because no virtual thing exists on the td
-            }
         }
     },
     mutations: {
@@ -257,9 +242,6 @@ export default {
         },
         setValidTd(state: any, payload: boolean) {
             state.isValidTd = payload;
-        },
-        setVirtualThing(state: any, payload: any) {
-            state.virtualThing = payload;
         }
     },
     getters: {
@@ -329,13 +311,6 @@ export default {
             }
             if (!state.areInteractionsInvoked) {
                 return RESULT_MESSAGES.NO_INTERACTIONS_INVOKED;
-            }
-        },
-        getVtStatus(state: any) {
-            if ( state.virtualThing === [] ) {
-                return VtStatus.NOT_CREATED;
-            } else {
-                return state.virtualThing.status;
             }
         }
     }

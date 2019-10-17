@@ -27,7 +27,7 @@
             </div>
             <div class="show-vconfig">
                 <aConfigStatusBar class="vconfig-status" :statusMessage="vconfigStatus"></aConfigStatusBar>
-                <div v-if="format === 'raw'" class="vconfig-area">
+                <div class="vconfig-area">
                     <textarea spellcheck="false" wrap="off" v-model="currentVirtualConfig"></textarea>
                 </div>
                 <!-- Hide form fields

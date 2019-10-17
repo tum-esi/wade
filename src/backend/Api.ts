@@ -169,15 +169,22 @@ export async function invokeInteractions(selectedInteractions) {
 
 export async function createNewVt(
     VtConfig: string,
-    TdId: string,
+    /*TdId: string,*/
     writeOut: stream.Writable,
     writeError: stream.Writable,
     TD?: string
     ) {
-        const newVtCall = new VtCall(VtConfig, TdId, writeOut, writeError, TD);
+        console.log('in createNewVt');
+        const newVtCall = new VtCall(VtConfig, /*TdId,*/ writeOut, writeError, TD);
 
-        await newVtCall.launchVt();
-        return newVtCall;
+        await newVtCall.launchVt()
+        .then( () => {
+            console.debug('newVtCall launched with success, debug: ', newVtCall);
+            return newVtCall;
+        }, (err) => {
+            console.debug('creating Virtual Thing had problems: ', err);
+            console.debug('for debugging: ', newVtCall.debug);
+        });
 }
 
 export async function removeVt(VT: VtCall) {

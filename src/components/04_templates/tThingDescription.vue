@@ -6,7 +6,7 @@
       <!-- <oProtocolSelection class="td-config-child-el" /> -->
     </div>
     <div v-if="currentTabId === 'editor'" class="td-editor">
-      <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
+      <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" /> <!-- TODO no property statusMessage exists on aStatusbar! can be removed? -->
       <div class="td-main">
         <div class="td-main-left border-right">
           <mUrlBar

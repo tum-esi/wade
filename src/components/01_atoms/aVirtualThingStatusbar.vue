@@ -1,6 +1,6 @@
 <template>
-    <div class="statusbar-container border-bottom" :class="{style}">
-        <label>{{ getVtStatus }}</label>
+    <div class="statusbar-container border-bottom" :class="{'error' : getVtStatus.err}">
+        <label>{{ getVtStatus.msg }}</label>
     </div>
 </template>
 
@@ -8,33 +8,12 @@
 
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { VtStatus } from '../../util/enums';
 
 
 export default Vue.extend({
     name: 'aVirtualThingStatusbar',
     computed: {
-        ...mapGetters('TdStore', ['getVtStatus']),
-    },
-    data() {
-        return{
-            style:''
-        };
-    },
-    watch: {
-        // getVtStatus(cont) {
-        //     if(cont === VtStatus.ERROR){
-        //         this.style = 'error';
-        //     }
-        // }
-        
-        // Check if router id changed
-        '$route.params.id'(id) {
-            this.vconfig = this.getSavedVirtualConfig();
-            if(this.getVtStatus() === VtStatus.ERROR){
-                 this.style = 'error';
-             }
-        }
+        ...mapGetters('SidebarStore', ['getVtStatus'])
     }
 });
 </script>
@@ -49,6 +28,8 @@ export default Vue.extend({
     padding: 7px;
     font-size: 14px;
     color: rgb(184, 179, 179);
+    width: 100%;
+    height: 100%;
 }
 
 .statusbar-container label {
