@@ -1,6 +1,6 @@
 <template>
-    <div class="statusbar-container border-bottom" :class="{'error' : getVtStatus.err}">
-        <label>{{ getVtStatus.msg }}</label>
+    <div class="statusbar-container border-bottom" :class="{'error' : StatusMessage.err, 'active-status': StatusMessage.active}">
+        <label>{{ StatusMessage.msg }}</label>
     </div>
 </template>
 
@@ -12,8 +12,8 @@ import { mapGetters } from 'vuex';
 
 export default Vue.extend({
     name: 'aVirtualThingStatusbar',
-    computed: {
-        ...mapGetters('SidebarStore', ['getVtStatus'])
+    props: {
+        StatusMessage: Object
     }
 });
 </script>
@@ -22,12 +22,12 @@ export default Vue.extend({
 .statusbar-container {
     font-family: 'Courier New', Courier, monospace;
     height: 10%;
-    background: #393B3A;
+    background: azure;
     display: flex;
     align-items: center;
     padding: 7px;
     font-size: 14px;
-    color: rgb(184, 179, 179);
+    color: #333333;
     width: 100%;
     height: 100%;
 }
@@ -36,7 +36,7 @@ export default Vue.extend({
     font-family: inherit;
 }
 
-.error {
-    background-color: #ff8585;
+.active-status{
+    background-color: lightgreen;
 }
 </style>

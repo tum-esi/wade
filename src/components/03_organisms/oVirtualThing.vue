@@ -6,7 +6,7 @@
         </div>
 
         <div class="vthing-status">
-                <aVirtualThingStatusbar :vstatusmessage="vstatusmessage"/>
+                <aVirtualThingStatusbar :StatusMessage="getVtStatus(id)" />
         </div>
 
         <div class="vthing-btns">
@@ -27,8 +27,8 @@
         </div>
 
         <div class="vthing-output">
-            <aOutputBar :outputContent="normOut" :isErrorOutput="false" class="outNorm" />
-            <aOutputBar :outputContent="errOut" :isErrorOutput="true" class="outErr error" />
+            <aOutputBar :outputContent="getVtOutputStd(id)" class="outNorm" />
+            <aOutputBar :outputContent="getVtOutputErr(id)" class="outErr error" />
         </div> 
     </div>
 </template>
@@ -52,15 +52,11 @@ export default Vue.extend({
     },
     created() {
         this.isVtActive = (this as any).getVtStatus.active;
-        this.normOut = (this as any).getVtOutputStd(this.id);
-        this.errOut = (this as any).getVtOutputErr(this.id);
     },
     data() {
         return {
             vstatusmessage: '',
             isVtActive: false,
-            normOut: '',
-            errOut: '',
             createVtBtn: {
                 btnLabel: 'Create a virtual thing',
                 btnClass: 'btn-config-small',
@@ -101,8 +97,6 @@ export default Vue.extend({
     watch: {
         // Check if router id changed
         '$route.params.id'(id) {
-            this.normOut = (this as any).getVtOutputStd(this.id);
-            this.errOut = (this as any).getVtOutputErr(this.id);
             this.isVtActive = (this as any).getVtStatus(this.id).active;
         }
     }
@@ -159,6 +153,10 @@ export default Vue.extend({
     width: 90%;
     height: 40%;
     background-color:white;
+}
+
+.active-status{
+    background-color: lightgreen;
 }
 
 </style>

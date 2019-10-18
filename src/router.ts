@@ -33,7 +33,10 @@ export default new Router({
     {
       path: '/:type/:id/:tab',
       name: 'virtual',
-      component: () => import('@/components/03_organisms/oVirtual.vue')
+      component: () => {
+        import('@/components/03_organisms/oVirtual.vue');
+        import('@/components/03_organisms/oVirtualThing.vue');
+      }
     }
   ],
 });

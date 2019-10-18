@@ -1,5 +1,5 @@
 <template>
-    <div class="outputbar-container border-bottom" :class="style">
+    <div class="outputbar-container border-bottom">
         <output class="output-bar">{{ outputContent }}</output>
     </div>
 </template>
@@ -19,20 +19,6 @@ export default Vue.extend({
             type: Boolean,
             required: false
         }
-    },
-    data() {
-        return {
-            style: ''
-        };
-    },
-    watch: {
-        isErrorOutput() {
-            if (this.isErrorOutput) {
-                this.style = 'error';
-            } else {
-                this.style = '';
-            }
-        },
     }
 });
 </script>

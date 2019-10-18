@@ -605,7 +605,7 @@ export default {
                     if (td.id === id) {
                         // return td.content || '';
                         if ( td.virtualthing.vt ) {
-                            retStatus = td.virtualthing.status;
+                            retStatus = td.virtualthing.vt.status;
                             if ( retStatus === VtStatus.ERROR || retStatus === VtStatus.NONEWVT) {
                                 retError = true;
                             } else if ( retStatus === VtStatus.STARTUP ||
@@ -613,6 +613,9 @@ export default {
                                         retStatus === VtStatus.RUNNING) {
                                 retActive = true;
                             }
+                        }
+                        else {
+                            console.debug('no td status there');
                         }
                         return {msg: retStatus, err: retError, active: retActive};
                     }

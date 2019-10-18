@@ -214,6 +214,10 @@ textarea:focus, input:focus{
     color: #393B3A !important;
 }
 
+.active-status {
+  background-color: lightgreen;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;
