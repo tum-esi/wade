@@ -88,13 +88,13 @@ export default Vue.extend({
             console.debug('VtConf', VtConf);
             console.debug('Saved Td: ', TdSaved);
             await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved});
-            this.isVtActive = (this as any).getVtStatus.active;
+            this.isVtActive = (this as any).getVtStatus(this.id).active;
             console.debug('finished create Virtual Thing Btn Clicked, isVtActive: ', this.isVtActive);
         },
         async removeVirtualThingBtnClicked() {
             console.debug('started removeVirtualThingBtnClicked');
-            await (this as any).remVt(this.id);
-            this.isVtActive = (this as any).getVtStatus.active;
+            await (this as any).remVt({id: this.id});
+            this.isVtActive = (this as any).getVtStatus(this.id).active;
             console.debug('finished remove Virtual Thing Btn Clicked');
         }
     },
@@ -103,7 +103,7 @@ export default Vue.extend({
         '$route.params.id'(id) {
             this.normOut = (this as any).getVtOutputStd(this.id);
             this.errOut = (this as any).getVtOutputErr(this.id);
-            this.isVtActive = (this as any).getVtStatus.active;
+            this.isVtActive = (this as any).getVtStatus(this.id).active;
         }
     }
 });

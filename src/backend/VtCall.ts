@@ -98,6 +98,7 @@ export default class VtCall {
                 }
             } else {
                 rej(new Error('Vt Process does not exist -> can\'t exit'));
+                console.debug('no VTProcess to be killed');
             }
         });
     }
@@ -163,27 +164,66 @@ export default class VtCall {
     }
     private startVt() {
         return new Promise( (res, rej) => {
-            this.VtProcess = child_process.exec(
-                'node '
-                + path.join(__dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'dist', 'cli') + ' -c '
-                + path.join(this.usedTempFolder as string, /* this.givenTdId,*/ 'vt-config.json') + ' '
-                + path.join(this.usedTempFolder as string, /* this.givenTdId,*/ 'vt-td.json'),
-                 (error, stdout, stderr) => {
-                    if (error) {
-                        throw error;
-                    }
-                    this.writeOutTo.write(stdout, (err) => {
-                        if (err) {
-                            throw new Error('can\'t write to writeOutTo');
-                        }
-                    });
-                    this.writeErrorTo.write(stderr, (err) => {
-                        if (err) {
-                            throw new Error('can\'t write to writeErrorTo');
-                        }
-                    });
+                this.VtProcess = child_process.spawn(
+                    'node',
+                    [
+                        path.join(__dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'dist', 'cli'),
+                        '-c',
+                        path.join(this.usedTempFolder as string, 'vt-config.json'),
+                        path.join(this.usedTempFolder as string, 'vt-td.json')
+                    ]
+                );
+
+                this.VtProcess.on('error', (err) => {
+                    this.writeErrorTo.write('Vt subprocess could not be spawned: '  + err);
+                    rej();
                 });
-            res();
-        });
-    }
+
+                if (this.VtProcess.stdout !== null) {
+                    this.VtProcess.stdout.on('data', (cont) => {
+                        console.debug('STD-out: ', cont);
+                        this.writeOutTo.write(cont, (err) => {
+                            if (err) {
+                                throw new Error('can\'t write to writeOutTo');
+                            }
+                        });
+                    }
+                    );
+                } else {
+                    throw new Error('Stdout does not exist');
+                }
+
+                if (this.VtProcess.stderr !== null) {
+                    this.VtProcess.stderr.on('data', (cont) => {
+                        console.debug('STD-err: ', cont);
+                        this.writeErrorTo.write(cont, (err) => {
+                            if (err) {
+                                throw new Error('>>> can\'t write to writeErrTo <br>');
+                            }
+                        });
+                    }
+                    );
+                } else {
+                    throw new Error('>>> StdErr does not exist <br>');
+                }
+
+                this.VtProcess.on('close', (code) => {
+                    if (code === 0) {
+                        this.writeOutTo.write('>>> Vt process exited normally <br>');
+                    } else {
+                        this.writeErrorTo.write('>>> Vt exited with code: ' + code + '<br>');
+                    }
+                });
+
+                this.VtProcess.on('exit', (code) => {
+                    if (code === 0) {
+                        this.writeOutTo.write('>>> EXIT: Vt process exited normally <br>');
+                    } else {
+                        this.writeErrorTo.write('>>> EXIT: Vt exited with code: ' + code + '<br>');
+                    }
+                });
+
+                res();
+            });
+        }
 }

@@ -167,27 +167,31 @@ export async function invokeInteractions(selectedInteractions) {
     };
 }
 
-export async function createNewVt(
+export function createNewVt(
     VtConfig: string,
     /*TdId: string,*/
     writeOut: stream.Writable,
     writeError: stream.Writable,
     TD?: string
     ) {
-        console.log('in createNewVt');
-        const newVtCall = new VtCall(VtConfig, /*TdId,*/ writeOut, writeError, TD);
+        return new Promise ( async (res, rej) => {
+            console.debug('in createNewVt');
+            const newVtCall = new VtCall(VtConfig, /*TdId,*/ writeOut, writeError, TD);
 
-        await newVtCall.launchVt()
-        .then( () => {
-            console.debug('newVtCall launched with success, debug: ', newVtCall);
-            return newVtCall;
-        }, (err) => {
-            console.debug('creating Virtual Thing had problems: ', err);
-            console.debug('for debugging: ', newVtCall.debug);
+            await newVtCall.launchVt()
+            .then( () => {
+                console.debug('newVtCall launched with success, debug: ', newVtCall);
+                res(newVtCall);
+            }, (err) => {
+                console.debug('creating Virtual Thing had problems: ', err);
+                console.debug('for debugging: ', newVtCall.debug);
+                rej();
+            });
         });
 }
 
 export async function removeVt(VT: VtCall) {
+    console.debug('rm VT');
     await VT.stopVt();
     VT = null as any;
 }
