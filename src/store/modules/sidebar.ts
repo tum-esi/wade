@@ -136,8 +136,8 @@ export default {
                         vconfig: state.virtualConfigDefault,
                         virtualthing: {
                             status: VtStatus.NOT_CREATED,
-                            outStd: 'a: ',
-                            outErr: 'b: ',
+                            outStd: 'StdOut: ',
+                            outErr: 'StdErr: ',
                             vt: undefined // not necessary, but used to remember that property is used
                         }
                     });
@@ -179,8 +179,10 @@ export default {
             console.debug('in addVt : id:', payload.id, ' vtconf:', payload.VtConfig, ' TD:', payload.GivenTd);
             for (const element of state.tds) {
                 if (element.id === payload.id) {
-                    console.debug( ' in main addVt loop');
+                    console.debug( 'in main addVt loop');
                     console.debug('td element: ', element);
+
+                    commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STARTUP});
 
                     // Check if there is already a Vt-process attached to the Td element
                     if (!element.virtualthing.vt ) {
@@ -251,6 +253,7 @@ export default {
                         // TODO add Thing description
                         commit('setVirtualThing', {id: payload.id, vt: createdVt});
                         console.debug('addVt finished');
+                        commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.RUNNING});
                     } else {
                         const rememberStatus = element.virtualthing.status;
                         element.virtualthing.status = VtStatus.NONEWVT;
@@ -271,6 +274,7 @@ export default {
                 if (element.id === payload.id) {
                     tdElement = element;
                     if (tdElement.virtualthing.vt) {
+                        commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STOPPED});
                         console.debug('element.virtualthing: ', element.virtualthing, ' tdElement: ', tdElement);
                         Api.removeVt(element.virtualthing.vt)
                         .then( () => {
@@ -284,7 +288,8 @@ export default {
                             index = state.tds.indexOf(element);
                             state.tds[index] = tdElement;
                         }, (err) => {
-                            console.debug('virtual thing process could not be killed, reason unknown', err);
+                            tdElement.virtualthing.outErr += 'virtual thing process could not be killed: ' + err;
+                            commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});
                         });
                     } else {
                         console.debug('found no vt on the td');
@@ -452,6 +457,19 @@ export default {
                     break;
                 }
             }
+        },
+        setVtStatus(state: any, payload: {id: string, vtStatus: VtStatus}) {
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.virtualthing.status = payload.vtStatus;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
         }
     },
     getters: {
@@ -604,8 +622,8 @@ export default {
                 for (const td of state.tds) {
                     if (td.id === id) {
                         // return td.content || '';
-                        if ( td.virtualthing.vt ) {
-                            retStatus = td.virtualthing.vt.status;
+                        if ( td.virtualthing.status ) {
+                            retStatus = td.virtualthing.status;
                             if ( retStatus === VtStatus.ERROR || retStatus === VtStatus.NONEWVT) {
                                 retError = true;
                             } else if ( retStatus === VtStatus.STARTUP ||
@@ -613,9 +631,8 @@ export default {
                                         retStatus === VtStatus.RUNNING) {
                                 retActive = true;
                             }
-                        }
-                        else {
-                            console.debug('no td status there');
+                        } else {
+                            console.debug('virtual thing status does not exist -> strange');
                         }
                         return {msg: retStatus, err: retError, active: retActive};
                     }

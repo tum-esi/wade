@@ -15,14 +15,14 @@
                 :btnClass="createVtBtn.btnClass"
                 :btnLabel="createVtBtn.btnLabel"
                 :btnOnClick="createVtBtn.btnOnClick"
-                :btnActive="!isVtActive"
+                :btnActive="!getVtStatus(id).active"
             />
             <aButtonBasic 
                 @remove-vt="removeVirtualThingBtnClicked"
                 :btnClass="removeVtBtn.btnClass"
                 :btnLabel="removeVtBtn.btnLabel"
                 :btnOnClick="removeVtBtn.btnOnClick"
-                :btnActive="isVtActive"
+                :btnActive="getVtStatus(id).active"
             />
         </div>
 
