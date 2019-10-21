@@ -2,6 +2,7 @@ import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus } from '@/uti
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingDebug } from '@/util/helpers';
+import { virtualConfigDefault } from '@/util/defaults';
 
 
 export default {
@@ -85,26 +86,6 @@ export default {
                 }
             }
         },
-        /* the same as in virtual thing EDIT: changed log level */
-        virtualConfigDefault: {
-            servient: {
-                staticAddress: '127.0.0.1',
-                http: {
-                    port: 80
-                }
-            },
-            log: {
-                level: 2
-            },
-            things: {
-                'de:tum:ei:esi:fp:coffee': {
-                    eventIntervals: {
-                        maintenance: 15,
-                        error: 15
-                    }
-                }
-            }
-        },
         // ===== DYNAMIC STORE STATE ===== //
         sidebarElements: [],
         folders: [],
@@ -134,7 +115,7 @@ export default {
                         type: newElement.type,
                         content: '',
                         config: state.configDefault,
-                        vconfig: state.virtualConfigDefault,
+                        vconfig: virtualConfigDefault,
                         virtualthing: {
                             status: VtStatus.NOT_CREATED,
                             outMsg: [],
@@ -472,7 +453,7 @@ export default {
             return JSON.stringify(state.configDefault);
         },
         getDefaultVirtualConfig(state: any) {
-            return JSON.stringify(state.virtualConfigDefault);
+            return JSON.stringify(virtualConfigDefault);
         },
         getConfig(state: any) {
             return (id: string) => {
@@ -499,7 +480,7 @@ export default {
                 for (const td of state.tds) {
                     if (td.id === id) {
                         if (!td.vconfig || td.vconfig.length <= 0) {
-                            return JSON.stringify(state.virtualConfigDefault);
+                            return JSON.stringify(virtualConfigDefault);
                         } else {
                             let vconfig;
                             try {
