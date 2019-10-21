@@ -27,8 +27,7 @@
         </div>
 
         <div class="vthing-output">
-            <aOutputBar :outputContent="getVtOutputStd(id)" class="outNorm" />
-            <aOutputBar :outputContent="getVtOutputErr(id)" class="outErr error" />
+            <aOutputBar :outputMessages="getVtOutputMsg(id)" class="outNorm" />
         </div> 
     </div>
 </template>
@@ -70,7 +69,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters('SidebarStore', ['getVirtualConfig', 'getSavedTd', 'getVtOutputStd', 'getVtOutputErr', 'getVtStatus']),
+        ...mapGetters('SidebarStore', ['getVirtualConfig', 'getSavedTd', 'getVtOutputMsg', 'getVtStatus']),
         id() {
             return this.$route.params.id;
         },
@@ -144,15 +143,9 @@ export default Vue.extend({
 }
 
 .outNorm {
-    width: 90%;
-    height: 60%;
+    width: 95%;
+    height: 100%;
     background-color: darkgrey;
-}
-
-.outErr {
-    width: 90%;
-    height: 40%;
-    background-color:white;
 }
 
 .active-status{

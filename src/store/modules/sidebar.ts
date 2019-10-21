@@ -1,6 +1,7 @@
 import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus } from '@/util/enums';
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
+import { loggingDebug } from '@/util/helpers';
 
 
 export default {
@@ -84,12 +85,12 @@ export default {
                 }
             }
         },
-        /* the same as in virtual thing EDIT: changed address and port to avoid conflicts */
+        /* the same as in virtual thing EDIT: changed log level */
         virtualConfigDefault: {
             servient: {
-                staticAddress: '127.0.0.13',
+                staticAddress: '127.0.0.1',
                 http: {
-                    port: 82
+                    port: 80
                 }
             },
             log: {
@@ -136,8 +137,7 @@ export default {
                         vconfig: state.virtualConfigDefault,
                         virtualthing: {
                             status: VtStatus.NOT_CREATED,
-                            outStd: 'StdOut: ',
-                            outErr: 'StdErr: ',
+                            outMsg: [],
                             vt: undefined // not necessary, but used to remember that property is used
                         }
                     });
@@ -176,11 +176,11 @@ export default {
             }
         },
         async addVt({ commit, state }, payload: {id: string, VtConfig: string, GivenTd?: string}) {
-            console.debug('in addVt : id:', payload.id, ' vtconf:', payload.VtConfig, ' TD:', payload.GivenTd);
+            loggingDebug('in addVt : id:', payload.id, ' vtconf:', payload.VtConfig, ' TD:', payload.GivenTd);
             for (const element of state.tds) {
                 if (element.id === payload.id) {
-                    console.debug( 'in main addVt loop');
-                    console.debug('td element: ', element);
+                    loggingDebug( 'in main addVt loop');
+                    loggingDebug('td element: ', element);
 
                     commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STARTUP});
 
@@ -191,51 +191,18 @@ export default {
                         // create new Writable streams for error and std output
                         const stdStream = new stream.Writable();
                         stdStream._write = (chunk, encoding, done) => {
-                            const maxStringStd = 2000;
-                            const content = chunk.toString();
-                            const oldString = element.virtualthing.outStd;
-
-                            if ( oldString && chunk ) {
-                                const estimatedlength = oldString.length + content.length;
-                                let newString: string;
-
-                                if ( estimatedlength > maxStringStd) {
-                                    newString = oldString.slice(estimatedlength - maxStringStd) + content;
-                                } else {
-                                    newString = oldString + content;
-                                }
-                                newString = newString;
-
-                                commit('setVtOutputStd', {id: payload.id, vtOut: newString});
-                                console.debug('--stdStream: ', newString);
-
-                            } else {
-                                console.debug('could not write to stdStream, oldString: ', oldString, 'chunk: ', chunk);
-                            }
+                            const cont = chunk.toString();
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: cont, isProgram: true}
+                            });
                             done();
                         };
                         const errStream = new stream.Writable();
                         errStream._write = (chunk, encoding, done) => {
-                            const maxStringStd = 1000;
-                            let content: string;
-                            content = chunk.toString();
-                            const oldString = element.virtualthing.outErr;
-
-                            if (oldString && chunk) {
-                                const estimatedlength = oldString.length + content.length;
-                                let newString: string;
-
-                                if ( estimatedlength > maxStringStd) {
-                                    newString = oldString.slice(estimatedlength - maxStringStd) + content;
-                                } else {
-                                    newString = oldString + content;
-                                }
-                                newString = newString;
-                                commit('setVtOutputErr', {id: payload.id, vtErr: newString});
-                                console.debug('--errStream: ', newString);
-                            } else {
-                                console.debug('could not write to errStream, oldString: ', oldString, 'chunk: ', chunk);
-                            }
+                            const cont = chunk.toString();
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: cont, isError: true, isProgram: true}
+                            });
                             done();
                         };
 
@@ -244,15 +211,15 @@ export default {
                         //  state.tdState === TdStateEnum.VALID_CONSUMED_TD ) {
                         //     payload.GivenTd = undefined;
                         // }
-                        // DEBUG
+                        // TODO change this, only for debugging
                         virtTd = undefined;
 
                         // create new Vt
                         const createdVt = await Api.createNewVt(payload.VtConfig, stdStream, errStream, virtTd);
-                        console.debug('addVT: createdVT: ', createdVt);
+                        loggingDebug('addVT: createdVT: ', createdVt);
                         // TODO add Thing description
                         commit('setVirtualThing', {id: payload.id, vt: createdVt});
-                        console.debug('addVt finished');
+                        loggingDebug('addVt finished');
                         commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.RUNNING});
                     } else {
                         const rememberStatus = element.virtualthing.status;
@@ -260,10 +227,10 @@ export default {
                         setTimeout( () => {
                             element.virtualthing.status = rememberStatus;
                         }, 2000);
-                        console.debug('vt not unexisting');
+                        loggingDebug('vt not unexisting');
                     }
                 } else {
-                    console.debug('could not find a element with the given id');
+                    loggingDebug('could not find a element with the given id');
                 }
             }
         },
@@ -275,24 +242,26 @@ export default {
                     tdElement = element;
                     if (tdElement.virtualthing.vt) {
                         commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STOPPED});
-                        console.debug('element.virtualthing: ', element.virtualthing, ' tdElement: ', tdElement);
+                        loggingDebug('element.virtualthing: ', element.virtualthing, ' tdElement: ', tdElement);
                         Api.removeVt(element.virtualthing.vt)
                         .then( () => {
-                            console.debug('virtual thing process was stopped, start deleting');
+                            loggingDebug('virtual thing process was stopped, start deleting');
                             tdElement.virtualthing = {
                                 status: VtStatus.NOT_CREATED,
-                                outStd: element.virtualthing.outStd,
-                                outErr: element.virtualthing.outErr,
+                                outMsg: element.virtualthing.outMsg,
                                 vt: undefined
                             };
                             index = state.tds.indexOf(element);
                             state.tds[index] = tdElement;
                         }, (err) => {
-                            tdElement.virtualthing.outErr += 'virtual thing process could not be killed: ' + err;
+                            commit('setVtOutputMsg', {id: payload.id, outMsg: {
+                                cont: 'virtual thing process could not be killed: ' + err,
+                                isError: true
+                            }});
                             commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});
                         });
                     } else {
-                        console.debug('found no vt on the td');
+                        loggingDebug('found no vt on the td');
                     }
                     break;
                 }
@@ -418,40 +387,66 @@ export default {
             state.activeElementId = payload;
         },
         setVirtualThing(state: any, payload: {id: string, vt: any}) {
-            console.debug('set vt payload: ', payload);
+            loggingDebug('set vt payload: ', payload);
             let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
             for (const element of state.tds) {
                 if (element.id === payload.id) {
                     tdElement = element;
                     tdElement.virtualthing.vt = payload.vt;
-                    console.debug('set vt: ', tdElement.virtualthing.vt);
+                    loggingDebug('set vt: ', tdElement.virtualthing.vt);
                     index = state.tds.indexOf(element);
                     state.tds[index] = tdElement;
                     break;
                 }
             }
         },
-        setVtOutputStd(state: any, payload: {id: string, vtOut: any}) {
+        /**
+         * Adds the given outMsg to the output field in the
+         * virtual thing tab. In addition to that, the function
+         * also adds the current time to the message and checks
+         * whether the maximum array size of the output field is
+         * reached
+         *
+         * @param state given vuex state
+         * @param payload id of the td, outMsg to add
+         */
+        setVtOutputMsg(state: any, payload: {
+                                id: string, outMsg: {
+                                    content: string,
+                                    isError?: boolean,
+                                    isProgram?: boolean,
+                                    isDebug?: boolean
+                                }}) {
             let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
+            const maxOutMsg = 500;
+
             for (const element of state.tds) {
                 if (element.id === payload.id) {
+                    const daytime = new Date(Date.now());
+                    const newMsg = {
+                                    time: {
+                                        full: // to be used as vue-key attribute
+                                            daytime.getDate().toString() +
+                                            daytime.getHours().toString() +
+                                            daytime.getMinutes().toString() +
+                                            daytime.getSeconds().toString() +
+                                            daytime.getMilliseconds().toString(),
+                                        h: ('0' + daytime.getHours()).slice(-2),
+                                        m: ('0' + daytime.getMinutes()).slice(-2),
+                                        s: ('0' + daytime.getSeconds()).slice(-2)
+                                    },
+                                    content: payload.outMsg.content,
+                                    isError: payload.outMsg.isError ? true : false,
+                                    isProgram: payload.outMsg.isProgram ? true : false,
+                                    isDebug: payload.outMsg.isDebug ? true : false
+                                };
                     tdElement = element;
-                    tdElement.virtualthing.outStd = payload.vtOut;
-                    index = state.tds.indexOf(element);
-                    state.tds[index] = tdElement;
-                    break;
-                }
-            }
-        },
-        setVtOutputErr(state: any, payload: {id: string, vtErr: any}) {
-            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
-            let index: number;
-            for (const element of state.tds) {
-                if (element.id === payload.id) {
-                    tdElement = element;
-                    tdElement.virtualthing.outErr = payload.vtErr;
+                    tdElement.virtualthing.outMsg.unshift(newMsg);
+                    if (tdElement.virtualthing.outMsg.length > maxOutMsg) {
+                        tdElement.virtualthing.outMsg.pop();
+                    }
                     index = state.tds.indexOf(element);
                     state.tds[index] = tdElement;
                     break;
@@ -632,7 +627,7 @@ export default {
                                 retActive = true;
                             }
                         } else {
-                            console.debug('virtual thing status does not exist -> strange');
+                            loggingDebug('virtual thing status does not exist -> strange');
                         }
                         return {msg: retStatus, err: retError, active: retActive};
                     }
@@ -640,21 +635,11 @@ export default {
                 return '';
             };
         },
-        getVtOutputStd(state: any) {
+        getVtOutputMsg(state: any) {
             return (id: string) => {
                 for (const td of state.tds) {
                     if (td.id === id) {
-                        return td.virtualthing.outStd || '';
-                    }
-                }
-                return '';
-            };
-        },
-        getVtOutputErr(state: any) {
-            return (id: string) => {
-                for (const td of state.tds) {
-                    if (td.id === id) {
-                        return td.virtualthing.outErr || '';
+                        return td.virtualthing.outMsg || [];
                     }
                 }
                 return '';

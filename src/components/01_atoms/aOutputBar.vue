@@ -1,6 +1,15 @@
 <template>
     <div class="outputbar-container border-bottom">
-        <output class="output-bar">{{ outputContent }}</output>
+        <table class="output-bar">
+            <tr v-for="msg in outputMessages" 
+            :key="msg.time.full" 
+            :class="{
+                error: msg.isError,
+                normTR: !msg.isError}" >
+                <td>{{ msg.time.h }}:{{ msg.time.m }}:{{ msg.time.s }}</td>
+                <td><span v-if="msg.isDebug">DEBUG: </span>{{ msg.content }}</td>
+            </tr>
+        </table>
     </div>
 </template>
 
@@ -11,14 +20,9 @@ import Vue from 'vue';
 export default Vue.extend({
     name: 'aOutputBar',
     props: {
-        outputContent: {
-            type: String,
-            required: true
-        },
-        isErrorOutput: {
-            type: Boolean,
-            required: false
-        }
+        outputMessages: {
+            type: Array
+            }
     }
 });
 </script>
@@ -49,6 +53,9 @@ export default Vue.extend({
     height: 100%;
 }
 
+.normTR {
+    background-color: white;
+}
 /* .error {
     color: #a81900;
 } */

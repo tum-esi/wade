@@ -4,7 +4,8 @@ import * as WoT from 'wot-typescript-definitions';
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as stream from 'stream';
-import {VtStatus} from '@/util/enums';
+import { VtStatus } from '@/util/enums';
+import { loggingDebug } from '@/util/helpers';
 // import { readFile , readFileSync } from "fs";
 // import { join } from "path";
 
@@ -49,7 +50,7 @@ export default class VtCall {
             this.status = VtStatus.STARTUP;
             this.initTmpFolder()
             .then( () => {
-                console.debug('tmp folder created: ', this.usedTempFolder);
+                loggingDebug('tmp folder created: ', this.usedTempFolder);
                 this.writeTD();
             }, () => {
                 this.debug += '<problem with init tmp folder';
@@ -86,7 +87,7 @@ export default class VtCall {
                 if (this.usedTempFolder !== null) {
                     fs.rmdir(this.usedTempFolder, (err) => {
                         if (err) {
-                            this.writeErrorTo.write('unable to delete tmp dir');
+                            this.writeErrorTo.write('unable to delete tmp dir: ' + err);
                             res();
                         } else {
                             this.writeOutTo.write('tmp dir is removed');
@@ -95,10 +96,11 @@ export default class VtCall {
                     });
                 } else {
                     this.writeErrorTo.write('no tmp folder was found');
+                    res();
                 }
             } else {
                 rej(new Error('Vt Process does not exist -> can\'t exit'));
-                console.debug('no VTProcess to be killed');
+                this.writeErrorTo.write('no VTProcess to be killed');
             }
         });
     }
@@ -128,7 +130,7 @@ export default class VtCall {
         return new Promise( (res, rej) => {
             if ( this.givenTD === null) {
                 try {
-                    console.debug(path.join(
+                    loggingDebug(path.join(
                         __dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'examples', 'td', 'coffee_machine_td.json'
                     ));
                     fs.copyFileSync(
@@ -181,7 +183,7 @@ export default class VtCall {
 
                 if (this.VtProcess.stdout !== null) {
                     this.VtProcess.stdout.on('data', (cont) => {
-                        console.debug('STD-out: ', cont);
+                        loggingDebug('STD-out: ', cont);
                         this.writeOutTo.write(cont, (err) => {
                             if (err) {
                                 throw new Error('can\'t write to writeOutTo');
@@ -195,7 +197,7 @@ export default class VtCall {
 
                 if (this.VtProcess.stderr !== null) {
                     this.VtProcess.stderr.on('data', (cont) => {
-                        console.debug('STD-err: ', cont);
+                        loggingDebug('STD-err: ', cont);
                         this.writeErrorTo.write(cont, (err) => {
                             if (err) {
                                 throw new Error('>>> can\'t write to writeErrTo <br>');
