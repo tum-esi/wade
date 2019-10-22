@@ -2,7 +2,8 @@
     <div class="vthing-container">
 
          <div class="vthing-header">
-            <label>Start a Virtual thing within W-ADE</label>
+            <label>Start a Virtual thing within W-ADE</label> <br>
+            <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ VtLink }}</a>
         </div>
 
         <div class="vthing-status">
@@ -36,11 +37,12 @@
 import Vue from 'vue';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { TdVirtualConfigEnum, TdStateEnum } from '@/util/enums';
-import { getFormattedJsonString } from '@/util/helpers';
+import { getFormattedJsonString, loggingInfo } from '@/util/helpers';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aOutputBar from '@/components/01_atoms/aOutputBar.vue';
 import aVirtualThingStatusbar from '@/components/01_atoms/aVirtualThingStatusbar.vue';
 import { setTimeout } from 'timers';
+import { shell } from 'electron';
 
 export default Vue.extend({
     name: 'oVirtualThing',
@@ -56,6 +58,7 @@ export default Vue.extend({
         return {
             vstatusmessage: '',
             isVtActive: false,
+            VtLink: '',
             createVtBtn: {
                 btnLabel: 'Create a virtual thing',
                 btnClass: 'btn-config-small',
@@ -83,6 +86,9 @@ export default Vue.extend({
             const VtConf = (this as any).getVirtualConfig(this.id);
             const TdSaved = (this as any).getSavedTd(this.id);
             let ReqTdState: TdStateEnum;
+            let VtConfAdr = '';
+            let VtConfPort = 0;
+            let VtConfTitle = '';
 
             /* check which TdState the saved Td results in */
             (this as any).processChangedTd({
@@ -94,10 +100,26 @@ export default Vue.extend({
 
             await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved, TdState: ReqTdState});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
+
+            // TODO add links for different protocols
+            // set link to the virtual thing
+            try {
+                const VtConfParsed = JSON.parse(VtConf);
+                const TdParsed = JSON.parse(TdSaved);
+                VtConfAdr = VtConfParsed.servient.staticAddress;
+                VtConfPort = VtConfParsed.servient.http.port;
+                VtConfTitle = TdParsed.title;
+            } catch (err) {
+                loggingInfo(err);
+            }
+            this.VtLink = 'http://' + VtConfAdr + ':' + VtConfPort.toString() + '/' + VtConfTitle;
         },
         async removeVirtualThingBtnClicked() {
             await (this as any).remVt({id: this.id});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
+        },
+        async openVtTd() {
+            shell.openExternal(this.VtLink);
         }
     },
     watch: {
