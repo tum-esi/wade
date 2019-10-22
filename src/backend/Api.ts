@@ -174,10 +174,10 @@ export function createNewVt(
     VtConfig: string,
     writeOut: stream.Writable,
     writeError: stream.Writable,
-    TD?: string
+    Td: string
     ) {
         return new Promise ( (res, rej) => {
-            const newVtCall = new VtCall(VtConfig, writeOut, writeError, TD);
+            const newVtCall = new VtCall(VtConfig, writeOut, writeError, Td);
 
             newVtCall.launchVt()
             .then( () => {

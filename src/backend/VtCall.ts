@@ -13,7 +13,7 @@ export default class VtCall {
     public debug: string;
     public status: VtStatus;
 
-    private givenTD: string|null;
+    private givenTD: string;
     private givenVtConfig: string;
     private usedTempFolder: string|null;
    /* private givenTdId: string;*/
@@ -23,26 +23,18 @@ export default class VtCall {
 
     constructor(
             givenVtConfig: string,
-            // givenTdId: string,
             writeOutTo: stream.Writable,
             writeErrorTo: stream.Writable,
-            givenTD?: WoT.ThingDescription,
+            givenTD: WoT.ThingDescription,
         ) {
         this.givenVtConfig = givenVtConfig;
         this.debug = '';
         this.usedTempFolder = null;
-        // this.givenTdId = givenTdId;
         this.VtProcess = null;
         this.writeOutTo = writeOutTo;
         this.writeErrorTo = writeErrorTo;
         this.status = VtStatus.STARTUP;
-        if (givenTD === undefined) {
-            this.givenTD = null;
-        } else {
-            this.givenTD = givenTD;
-        }
-
-
+        this.givenTD = givenTD;
     }
 
     public launchVt() {

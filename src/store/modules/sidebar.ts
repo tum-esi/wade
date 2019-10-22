@@ -157,7 +157,7 @@ export default {
             }
         },
         async addVt({ commit, state },
-                    payload: {id: string, VtConfig: string, GivenTd?: string, TdState: TdStateEnum}) {
+                    payload: {id: string, VtConfig: string, GivenTd: string, TdState: TdStateEnum}) {
             for (const element of state.tds) {
                 if (element.id === payload.id) {
 

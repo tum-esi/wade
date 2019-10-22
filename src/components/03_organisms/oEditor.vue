@@ -126,7 +126,7 @@ export default Vue.extend({
             .then( (fileList) => {
                 this.TdFileList = fileList as any;
             }, (reason) => {
-                loggingError('(oEditor)(loadTdFiles) getExampleTDs failed due reason:', reason);
+                loggingError(new Error('getExampleTDs failed due reason:' + reason));
             });
         },
         dropDownReaction(eventObject) {
@@ -137,7 +137,7 @@ export default Vue.extend({
                         this.tdChanged({td: exampleTD});
                     }
                 }, (reason) => {
-                    loggingError('(oEditor)(dropDownReaction) load Example TDs failed due to reason:', reason);
+                    loggingError(new Error('load Example TDs failed due to reason:' + reason));
                 });
             } else {
                 // event not relevant for this function

@@ -36,7 +36,7 @@
 import Vue from 'vue';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { TdVirtualConfigEnum, TdStateEnum } from '@/util/enums';
-import { getFormattedJsonString, loggingDebug } from '@/util/helpers';
+import { getFormattedJsonString } from '@/util/helpers';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aOutputBar from '@/components/01_atoms/aOutputBar.vue';
 import aVirtualThingStatusbar from '@/components/01_atoms/aVirtualThingStatusbar.vue';
@@ -92,18 +92,12 @@ export default Vue.extend({
             });
             ReqTdState = (this as any).getTdState;
 
-            loggingDebug('started createVirtualThingBtnClicked');
-            loggingDebug('VtConf', VtConf);
-            loggingDebug('Saved Td: ', TdSaved);
             await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved, TdState: ReqTdState});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
-            loggingDebug('finished create Virtual Thing Btn Clicked, isVtActive: ', this.isVtActive);
         },
         async removeVirtualThingBtnClicked() {
-            loggingDebug('started removeVirtualThingBtnClicked');
             await (this as any).remVt({id: this.id});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
-            loggingDebug('finished remove Virtual Thing Btn Clicked');
         }
     },
     watch: {
