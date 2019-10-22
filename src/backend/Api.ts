@@ -4,7 +4,7 @@ import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, Protoc
 import MessageHandler from './MessageHandler';
 import VtCall from './VtCall';
 import * as stream from 'stream';
-import { loggingDebug, getFormattedJsonString } from '@/util/helpers';
+import { loggingError } from '@/util/helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -177,36 +177,35 @@ export function createNewVt(
     TD?: string
     ) {
         return new Promise ( (res, rej) => {
-            loggingDebug('in createNewVt');
             const newVtCall = new VtCall(VtConfig, writeOut, writeError, TD);
 
             newVtCall.launchVt()
             .then( () => {
-                loggingDebug('newVtCall launched with success, debug: ', newVtCall);
                 res(newVtCall);
             }, (err) => {
-                loggingDebug('creating Virtual Thing had problems: ', err);
-                loggingDebug('for debugging: ', newVtCall);
-                rej();
+                rej(new Error('creating Virtual Thing had problems:' + err));
             });
         });
 }
 
-export async function removeVt(VT: VtCall) {
-    loggingDebug('rm VT');
-    await VT.stopVt();
-    VT = null as any;
+export function removeVt(VT: VtCall) {
+    return new Promise( (res, rej) => {
+        VT.stopVt()
+        .then( () => {
+            VT = null as any;
+        }, (err) => {
+            rej(err);
+        });
+    });
 }
 
 export function showExampleTds() {
     return new Promise( (res, rej) => {
-        loggingDebug('show example Tds:', path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds'));
         fs.readdir(path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds'),
             (err, fileList) => {
                 if (err) {
                     rej(new Error('Problem at reading example tds: ' + err));
                 } else {
-                    loggingDebug('file list: ', fileList);
                     const output = [] as WADE.DropdownOptionInterface[];
                     fileList.forEach( (file, ind) => {
                         output.push( {title: file.slice(0, -5), key: file} );
@@ -219,8 +218,6 @@ export function showExampleTds() {
 
 export function loadExampleTd(exampleTdPath: string) {
     return new Promise( (res, rej) => {
-        const mytest = __dirname;
-        loggingDebug('mytest:', mytest);
         fs.readFile(path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds', exampleTdPath),
             (err, data) => {
                 if (err) {
@@ -228,7 +225,6 @@ export function loadExampleTd(exampleTdPath: string) {
                 } else {
                     let output: string;
                     output = data.toString();
-                    loggingDebug('the td to return:', output);
                     res(output);
                 }
         });

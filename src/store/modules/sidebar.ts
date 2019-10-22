@@ -1,7 +1,7 @@
-import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus } from '@/util/enums';
+import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum } from '@/util/enums';
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
-import { loggingDebug } from '@/util/helpers';
+import { loggingError } from '@/util/helpers';
 import { virtualConfigDefault } from '@/util/defaults';
 
 
@@ -156,18 +156,16 @@ export default {
                     break;
             }
         },
-        async addVt({ commit, state }, payload: {id: string, VtConfig: string, GivenTd?: string}) {
-            loggingDebug('in addVt : id:', payload.id, ' vtconf:', payload.VtConfig, ' TD:', payload.GivenTd);
+        async addVt({ commit, state },
+                    payload: {id: string, VtConfig: string, GivenTd?: string, TdState: TdStateEnum}) {
             for (const element of state.tds) {
                 if (element.id === payload.id) {
-                    loggingDebug( 'in main addVt loop');
-                    loggingDebug('td element: ', element);
 
                     commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STARTUP});
 
                     // Check if there is already a Vt-process attached to the Td element
                     if (!element.virtualthing.vt ) {
-                        let virtTd = payload.GivenTd;
+                        const virtTd = payload.GivenTd;
 
                         // create new Writable streams for error and std output
                         const stdStream = new stream.Writable();
@@ -187,31 +185,50 @@ export default {
                             done();
                         };
 
-                        // check if Td is okay, give undefined elsewise, to trigger use of default TD
-                        // if ( state.tdState === TdStateEnum.VALID_TD ||
-                        //  state.tdState === TdStateEnum.VALID_CONSUMED_TD ) {
-                        //     payload.GivenTd = undefined;
-                        // }
-                        // TODO change this, only for debugging
-                        virtTd = undefined;
+                        // check if Td is okay, give error message elsewise
+                         if (   payload.TdState === TdStateEnum.VALID_TD ||
+                                payload.TdState === TdStateEnum.VALID_CONSUMED_TD ) {
 
-                        // create new Vt
-                        const createdVt = await Api.createNewVt(payload.VtConfig, stdStream, errStream, virtTd);
-                        loggingDebug('addVT: createdVT: ', createdVt);
-                        // TODO add Thing description
-                        commit('setVirtualThing', {id: payload.id, vt: createdVt});
-                        loggingDebug('addVt finished');
-                        commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.RUNNING});
+                            // create new Vt
+                            Api.createNewVt(payload.VtConfig, stdStream, errStream, virtTd)
+                            .then( (createdVt) => {
+                                commit('setVirtualThing', {id: payload.id, vt: createdVt});
+                                commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.RUNNING});
+                            }, (err) => {
+                                const errMSG = 'cannot virtualize the thing, there has been an error';
+                                commit('setVtOutputMsg', {
+                                    id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                                });
+                                element.virtualthing.status = VtStatus.ERROR;
+                                setTimeout( () => {
+                                    element.virtualthing.status = VtStatus.NOT_CREATED;
+                                }, 2000);
+                                loggingError(new Error('internal error:' + err));
+                            });
+                        } else {
+                            const errMSG = 'cannot virtualize the thing,' +
+                            ' because the saved TD is not valid or no TD is saved';
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                            });
+                            element.virtualthing.status = VtStatus.ERROR;
+                            setTimeout( () => {
+                                element.virtualthing.status = VtStatus.NOT_CREATED;
+                            }, 2000);
+                        }
+
                     } else {
-                        const rememberStatus = element.virtualthing.status;
-                        element.virtualthing.status = VtStatus.NONEWVT;
+                        const errMSG = 'cannot virtualize the td, because vt is already running on this thing';
+                        commit('setVtOutputMsg', {
+                            id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                        });
+                        element.virtualthing.status = VtStatus.ERROR;
                         setTimeout( () => {
-                            element.virtualthing.status = rememberStatus;
+                            element.virtualthing.status = VtStatus.NOT_CREATED;
                         }, 2000);
-                        loggingDebug('vt not unexisting');
                     }
                 } else {
-                    loggingDebug('could not find a element with the given id');
+                    loggingError(new Error('could not find a element with the given id'));
                 }
             }
         },
@@ -223,10 +240,8 @@ export default {
                     tdElement = element;
                     if (tdElement.virtualthing.vt) {
                         commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STOPPED});
-                        loggingDebug('element.virtualthing: ', element.virtualthing, ' tdElement: ', tdElement);
                         Api.removeVt(element.virtualthing.vt)
                         .then( () => {
-                            loggingDebug('virtual thing process was stopped, start deleting');
                             tdElement.virtualthing = {
                                 status: VtStatus.NOT_CREATED,
                                 outMsg: element.virtualthing.outMsg,
@@ -234,15 +249,23 @@ export default {
                             };
                             index = state.tds.indexOf(element);
                             state.tds[index] = tdElement;
-                        }, (err) => {
                             commit('setVtOutputMsg', {id: payload.id, outMsg: {
-                                cont: 'virtual thing process could not be killed: ' + err,
+                                cont: 'virtual thing was stopped!',
+                                isError: false
+                            }});
+                        }, (err) => {
+                            loggingError('could not stop virtual thing: ' + err);
+                            commit('setVtOutputMsg', {id: payload.id, outMsg: {
+                                cont: 'virtual thing could not be stopped properly' ,
                                 isError: true
                             }});
                             commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});
+                            setTimeout( () => {
+                                element.virtualthing.status = VtStatus.RUNNING;
+                            }, 2000);
                         });
                     } else {
-                        loggingDebug('found no vt on the td');
+                        loggingError(new Error('found no vt on the td'));
                     }
                     break;
                 }
@@ -368,14 +391,12 @@ export default {
             state.activeElementId = payload;
         },
         setVirtualThing(state: any, payload: {id: string, vt: any}) {
-            loggingDebug('set vt payload: ', payload);
             let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
             for (const element of state.tds) {
                 if (element.id === payload.id) {
                     tdElement = element;
                     tdElement.virtualthing.vt = payload.vt;
-                    loggingDebug('set vt: ', tdElement.virtualthing.vt);
                     index = state.tds.indexOf(element);
                     state.tds[index] = tdElement;
                     break;
@@ -495,20 +516,6 @@ export default {
                 return '';
             };
         },
-        getVirtualThingOut(state: any) {
-            return (id: string) => {
-                for (const td of state.tds) {
-                    if (td.id === id) {
-                        if (!td.vtOutputStd || !td.vtOutputErr) {
-                            return {std: '', err: ''};
-                        } else {
-                            return {std: td.vtOutputStd, err: td.vtOutputErr};
-                        }
-                    }
-                }
-                return {std: '', err: 'some error!'};
-            };
-        },
         getProtocols(state: any) {
             return (id: string) => {
                 for (const td of state.tds) {
@@ -600,7 +607,7 @@ export default {
                         // return td.content || '';
                         if ( td.virtualthing.status ) {
                             retStatus = td.virtualthing.status;
-                            if ( retStatus === VtStatus.ERROR || retStatus === VtStatus.NONEWVT) {
+                            if ( retStatus === VtStatus.ERROR ) {
                                 retError = true;
                             } else if ( retStatus === VtStatus.STARTUP ||
                                         retStatus === VtStatus.STOPPED ||
@@ -608,7 +615,7 @@ export default {
                                 retActive = true;
                             }
                         } else {
-                            loggingDebug('virtual thing status does not exist -> strange');
+                            loggingError(new Error('virtual thing status does not exist'));
                         }
                         return {msg: retStatus, err: retError, active: retActive};
                     }

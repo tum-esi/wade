@@ -41,7 +41,7 @@ import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { TdStateEnum } from '@/util/enums';
-import { getFormattedJsonString, loggingDebug } from '@/util/helpers';
+import { getFormattedJsonString, loggingError } from '@/util/helpers';
 import * as Api from '@/backend/Api';
 
 export default Vue.extend({
@@ -124,23 +124,20 @@ export default Vue.extend({
         loadTdFiles() {
             Api.showExampleTds()
             .then( (fileList) => {
-                loggingDebug('from getExampleTDs:', fileList);
                 this.TdFileList = fileList as any;
             }, (reason) => {
-                loggingDebug('from getExampleTDs failed due reason:', reason);
+                loggingError('(oEditor)(loadTdFiles) getExampleTDs failed due reason:', reason);
             });
         },
         dropDownReaction(eventObject) {
-            loggingDebug('log dropdown menu: ', eventObject);
             if (eventObject.btnKey === 'insert-example-td') {
                 Api.loadExampleTd(eventObject.btnValue)
                 .then( (exampleTD) => {
-                    loggingDebug('typeof test:', typeof(exampleTD));
                     if (typeof(exampleTD) === 'string') {
                         this.tdChanged({td: exampleTD});
                     }
                 }, (reason) => {
-                    loggingDebug('from load Example TDs failed due to reason:', reason);
+                    loggingError('(oEditor)(dropDownReaction) load Example TDs failed due to reason:', reason);
                 });
             } else {
                 // event not relevant for this function

@@ -12,3 +12,13 @@ export function loggingDebug(message: any, ...optionalParams: any[]) {
         return null; // Do nothing, because in production environment
     }
 }
+
+export function loggingError(message: any, ...optionalParams: any[]) {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    if (isDevelopment) {
+            // tslint:disable-next-line: no-console
+            console.error(message, optionalParams);
+    } else {
+        return null; // Do nothing, because in production environment
+    }
+}

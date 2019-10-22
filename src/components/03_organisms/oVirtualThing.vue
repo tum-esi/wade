@@ -35,7 +35,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import { TdVirtualConfigEnum } from '@/util/enums';
+import { TdVirtualConfigEnum, TdStateEnum } from '@/util/enums';
 import { getFormattedJsonString, loggingDebug } from '@/util/helpers';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aOutputBar from '@/components/01_atoms/aOutputBar.vue';
@@ -69,20 +69,33 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters('SidebarStore', ['getVirtualConfig', 'getSavedTd', 'getVtOutputMsg', 'getVtStatus']),
+        ...mapGetters('SidebarStore',
+                ['getVirtualConfig', 'getSavedTd', 'getVtOutputMsg', 'getVtStatus', 'getConfig', 'getProtocols']),
+        ...mapGetters('TdStore', ['getTdState']),
         id() {
             return this.$route.params.id;
         },
     },
     methods: {
         ...mapActions('SidebarStore', ['addVt', 'remVt']),
+        ...mapActions('TdStore', ['processChangedTd']),
         async createVirtualThingBtnClicked() {
             const VtConf = (this as any).getVirtualConfig(this.id);
             const TdSaved = (this as any).getSavedTd(this.id);
+            let ReqTdState: TdStateEnum;
+
+            /* check which TdState the saved Td results in */
+            (this as any).processChangedTd({
+                td: TdSaved,
+                config: JSON.parse((this as any).getConfig(this.id)),
+                protocols: (this as any).getProtocols(this.id)
+            });
+            ReqTdState = (this as any).getTdState;
+
             loggingDebug('started createVirtualThingBtnClicked');
             loggingDebug('VtConf', VtConf);
             loggingDebug('Saved Td: ', TdSaved);
-            await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved});
+            await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved, TdState: ReqTdState});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
             loggingDebug('finished create Virtual Thing Btn Clicked, isVtActive: ', this.isVtActive);
         },

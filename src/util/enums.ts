@@ -79,6 +79,5 @@ export enum VtStatus {
   STARTUP = 'a virtual thing is currently being created',
   RUNNING = 'the virtual thing should be up and running',
   STOPPED = 'the virtualization is being stopped',
-  ERROR = 'there has been an error with virtual-thing',
-  NONEWVT = 'cannot virtualize the td, because vt is already running on this thing'
+  ERROR = 'there has been an error with virtual-thing'
 }
