@@ -408,12 +408,12 @@ export default {
                     const daytime = new Date(Date.now());
                     const newMsg = {
                                     time: {
-                                        full: // to be used as vue-key attribute
-                                            daytime.getDate().toString() +
+                                        full: // to be used as vue-key attribute (-> should be unique)
                                             daytime.getHours().toString() +
                                             daytime.getMinutes().toString() +
                                             daytime.getSeconds().toString() +
-                                            daytime.getMilliseconds().toString(),
+                                            daytime.getMilliseconds().toString() +
+                                            payload.outMsg.content,
                                         h: ('0' + daytime.getHours()).slice(-2),
                                         m: ('0' + daytime.getMinutes()).slice(-2),
                                         s: ('0' + daytime.getSeconds()).slice(-2)

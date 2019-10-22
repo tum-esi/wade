@@ -36,7 +36,7 @@
 import Vue from 'vue';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { TdVirtualConfigEnum } from '@/util/enums';
-import { getFormattedJsonString } from '@/util/helpers';
+import { getFormattedJsonString, loggingDebug } from '@/util/helpers';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aOutputBar from '@/components/01_atoms/aOutputBar.vue';
 import aVirtualThingStatusbar from '@/components/01_atoms/aVirtualThingStatusbar.vue';
@@ -77,20 +77,20 @@ export default Vue.extend({
     methods: {
         ...mapActions('SidebarStore', ['addVt', 'remVt']),
         async createVirtualThingBtnClicked() {
-            let VtConf = (this as any).getVirtualConfig(this.id);
-            let TdSaved = (this as any).getSavedTd(this.id);
-            console.debug('started createVirtualThingBtnClicked');
-            console.debug('VtConf', VtConf);
-            console.debug('Saved Td: ', TdSaved);
+            const VtConf = (this as any).getVirtualConfig(this.id);
+            const TdSaved = (this as any).getSavedTd(this.id);
+            loggingDebug('started createVirtualThingBtnClicked');
+            loggingDebug('VtConf', VtConf);
+            loggingDebug('Saved Td: ', TdSaved);
             await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
-            console.debug('finished create Virtual Thing Btn Clicked, isVtActive: ', this.isVtActive);
+            loggingDebug('finished create Virtual Thing Btn Clicked, isVtActive: ', this.isVtActive);
         },
         async removeVirtualThingBtnClicked() {
-            console.debug('started removeVirtualThingBtnClicked');
+            loggingDebug('started removeVirtualThingBtnClicked');
             await (this as any).remVt({id: this.id});
             this.isVtActive = (this as any).getVtStatus(this.id).active;
-            console.debug('finished remove Virtual Thing Btn Clicked');
+            loggingDebug('finished remove Virtual Thing Btn Clicked');
         }
     },
     watch: {
