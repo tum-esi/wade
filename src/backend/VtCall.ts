@@ -69,7 +69,19 @@ export default class VtCall {
         return new Promise( (res, rej) => {
             if (this.VtProcess !== null) {
                 this.VtProcess.kill();
+
+                // delete vt config, td and the tmp directory
                 if (this.usedTempFolder !== null) {
+                    try {
+                        fs.unlinkSync(path.join(this.usedTempFolder, 'vt-td.json'));
+                    } catch (err) {
+                        loggingError('cannot del virtual thing td in temp' + err);
+                    }
+                    try {
+                        fs.unlinkSync(path.join(this.usedTempFolder as string, 'vt-config.json'));
+                    } catch (err) {
+                        loggingError('cannot del virtual thing config in temp' + err);
+                    }
                     fs.rmdir(this.usedTempFolder, (err) => {
                         if (err) {
                             loggingError('unable to delete tmp dir: ' + err);
@@ -182,10 +194,10 @@ export default class VtCall {
                 }
 
                 this.VtProcess.on('close', (code, signal) => {
-                    if (code === 0) {
-                        this.writeOutTo.write('Vt process exited normally');
+                    if (code === 0 || code === null) {
+                        // do nothing, process exited normally
                     } else {
-                        this.writeErrorTo.write('Vt exited with code: ' + code);
+                        loggingError(new Error('Vt exited with code: ' + code + 'on Signal: ' + signal));
                     }
                 });
 

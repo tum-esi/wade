@@ -227,8 +227,7 @@ export default {
                             element.virtualthing.status = VtStatus.NOT_CREATED;
                         }, 2000);
                     }
-                } else {
-                    loggingError(new Error('could not find a element with the given id'));
+                    break;
                 }
             }
         },
@@ -250,13 +249,13 @@ export default {
                             index = state.tds.indexOf(element);
                             state.tds[index] = tdElement;
                             commit('setVtOutputMsg', {id: payload.id, outMsg: {
-                                cont: 'virtual thing was stopped!',
+                                content: 'virtual thing was stopped!',
                                 isError: false
                             }});
                         }, (err) => {
                             loggingError('could not stop virtual thing: ' + err);
                             commit('setVtOutputMsg', {id: payload.id, outMsg: {
-                                cont: 'virtual thing could not be stopped properly' ,
+                                content: 'virtual thing could not be stopped properly' ,
                                 isError: true
                             }});
                             commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});
