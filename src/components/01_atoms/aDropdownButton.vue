@@ -201,6 +201,10 @@ export default Vue.extend({
     justify-content: center;
 }
 
+.button-label {
+    margin: 3px;
+}
+
 /* btn style for sidebar dropdown options */
 .sidebar-element-icon-options {
   padding: 7px 0px 7px 0px;
@@ -214,5 +218,18 @@ export default Vue.extend({
 .mashup-icon-style {
     width: 6%;
     padding: 7px 3px 7px 7px;
+}
+
+/* === Styles for the dropdown box in the TD Editor Tab (Load Example TD) */
+.dropdown-custom-editor {
+    left: 0px;
+    width: max-content;
+    max-width: 300px;
+    top: 30px;
+    margin-top: 0;
+}
+
+.dropdown-custom-editor div:hover{
+    background-color: #8aaba9;
 }
 </style>
