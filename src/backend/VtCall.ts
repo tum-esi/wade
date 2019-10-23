@@ -4,13 +4,14 @@ import * as WoT from 'wot-typescript-definitions';
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as stream from 'stream';
-import { VtStatus } from '@/util/enums';
+import { VtStatus, ProtocolEnum } from '@/util/enums';
 import { loggingError } from '@/util/helpers';
 // import { readFile , readFileSync } from "fs";
 // import { join } from "path";
 
 export default class VtCall {
-    public debug: string;
+    public link: string;
+    public copyLinks: string[];
     public status: VtStatus;
 
     private givenTD: string;
@@ -28,7 +29,8 @@ export default class VtCall {
             givenTD: WoT.ThingDescription,
         ) {
         this.givenVtConfig = givenVtConfig;
-        this.debug = '';
+        this.link = '';
+        this.copyLinks = [];
         this.usedTempFolder = null;
         this.VtProcess = null;
         this.writeOutTo = writeOutTo;
@@ -57,10 +59,18 @@ export default class VtCall {
                 rej(err);
             })
             .then( () => {
+                this.linkVt();
+            }, (err) => {
+                rej(err);
+            })
+            .then( () => {
                 this.status = VtStatus.RUNNING;
                 res();
             }, (err) => {
-                rej(err);
+                loggingError(new Error('creating a link for Vt in launch Vt was not possible: ' + err));
+                /* Virtual Thing should be started even if Link generation failed*/
+                this.status = VtStatus.RUNNING;
+                res();
             });
         });
     }
@@ -203,5 +213,74 @@ export default class VtCall {
 
                 res();
             });
-        }
+    }
+
+    private linkVt() {
+        return new Promise( (res, rej) => {
+            let VtConfParsed: any;
+            let TdParsed: any;
+            let VtConfAdr = '';
+            let VtConfProtocol = '';
+            let VtConfPort: string;
+            let VtConfTitle = '';
+            const Protocols = Object.keys(ProtocolEnum);
+
+            try {
+                VtConfParsed = JSON.parse(this.givenVtConfig);
+                TdParsed = JSON.parse(this.givenTD);
+            } catch (err) {
+                rej(new Error('Could not parse a JSON object: ' + err));
+            }
+
+            if (VtConfParsed.servient.staticAddress) {
+                VtConfAdr = VtConfParsed.servient.staticAddress;
+            } else {
+                this.writeErrorTo.write('Cannot create Virtual thing link, because not static Address is given in VT config');
+                rej(new Error('no static address for vt given'));
+            }
+
+            if (TdParsed.title) {
+                VtConfTitle = TdParsed.title;
+            } else {
+                loggingError('there was no title in the Thing description');
+            }
+
+            // Try to generate a link, prefer http because it is often more applied for testing
+            if (VtConfParsed.servient.http) {
+                VtConfProtocol = 'http';
+                if (VtConfParsed.servient.http.port) {
+                    VtConfPort = VtConfParsed.servient.http.port;
+                } else {
+                    VtConfPort = '';
+                }
+                this.link = VtConfProtocol + '://' + VtConfAdr + ':' + VtConfPort + '/' + VtConfTitle;
+            } else if (VtConfParsed.servient.https) {
+                VtConfProtocol = 'https';
+                if (VtConfParsed.servient.https.port) {
+                    VtConfPort = VtConfParsed.servient.https.port;
+                } else {
+                    VtConfPort = '';
+                }
+                this.link = VtConfProtocol + '://' + VtConfAdr + ':' + VtConfPort + '/' + VtConfTitle;
+            }
+
+            // Try to generate Linklist
+            Protocols.forEach( (prot) => {
+                VtConfProtocol = ProtocolEnum[prot];
+                if (VtConfParsed.servient[VtConfProtocol]) {
+                    if (VtConfParsed.servient[VtConfProtocol].port) {
+                        VtConfPort = VtConfParsed.servient[VtConfProtocol].port;
+                    } else {
+                        VtConfPort = '';
+                    }
+                    this.copyLinks.push(VtConfProtocol + '://' + VtConfAdr + ':' + VtConfPort + '/' + VtConfTitle);
+                } else {
+                    // Protocoll is not mentioned in virtual thing config
+                }
+            });
+
+        });
+    }
 }
+
+

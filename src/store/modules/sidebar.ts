@@ -437,21 +437,32 @@ export default {
                     }
 
                     newContent = provContent.split('[32minfo[39m:');
-                    console.debug('newC:', newContent);
 
 
                     newContent.forEach((msg, ind) => {
                         let checkAction = false;
                         let checkProperty = false;
                         let checkEvent = false;
+                        let message = msg;
 
-                        if (msg.search('Action') !== -1) {
-                            checkAction = true;
-                        } else if (msg.search('Property') !== -1) {
-                            checkProperty = true;
-                        } else if (msg.search('Emitting event') !== -1) {
-                            checkEvent = true;
+                        while (message.slice(0, 1) === ' ') {
+                            message = message.slice(1);
                         }
+
+                        if (payload.outMsg.isProgram === true) {
+                            const checkType = message.slice(0, 2);
+                            message = message.slice(2);
+                            if (checkType === 'A:') {
+                                checkAction = true;
+                            } else if (checkType === 'P:') {
+                                checkProperty = true;
+                            } else if (checkType === 'E:') {
+                                checkEvent = true;
+                            } else {
+                                message = checkType + message;
+                            }
+                        }
+
 
                         const newMsg = {
                             time: {
@@ -460,21 +471,19 @@ export default {
                                 daytime.getMinutes().toString() +
                                 daytime.getSeconds().toString() +
                                 daytime.getMilliseconds().toString() +
-                                msg + ind.toString(),
+                                message + ind.toString(),
                                 h: ('0' + daytime.getHours()).slice(-2),
                                 m: ('0' + daytime.getMinutes()).slice(-2),
                                 s: ('0' + daytime.getSeconds()).slice(-2)
                             },
-                            content: msg,
+                            content: message,
                             isError: payload.outMsg.isError ? true : false,
                             isProgram: payload.outMsg.isProgram ? true : false,
                             isDebug: payload.outMsg.isDebug ? true : false,
+                            isVtAction: checkAction,
                             isVtProperty: checkProperty,
-                            isVtEvent: checkEvent,
-                            isVtAction: checkAction
+                            isVtEvent: checkEvent
                         };
-                        console.debug('msg: ', newMsg.content, 'full: ', newMsg.time.full);
-                        console.debug(newMsg);
                         tdElement.virtualthing.outMsg.unshift(newMsg);
                         if (tdElement.virtualthing.outMsg.length > maxOutMsg) {
                             tdElement.virtualthing.outMsg.pop();
@@ -650,6 +659,30 @@ export default {
                             loggingError(new Error('virtual thing status does not exist'));
                         }
                         return {msg: retStatus, err: retError, active: retActive};
+                    }
+                }
+                return '';
+            };
+        },
+        getVtLink(state: any) {
+            return (id: string) => {
+                let retLink: string;
+                let retCopy: string[];
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (td.virtualthing.vt) {
+                            if ( td.virtualthing.vt.link ) {
+                                retLink = td.virtualthing.vt.link;
+                            } else {
+                                retLink = '';
+                            }
+                            if (td.virtualthing.vt.copyLinks) {
+                                retCopy = td.virtualthing.vt.copyLinks;
+                            } else {
+                                retCopy = [];
+                            }
+                            return {link: retLink, copyLinks: retCopy};
+                        }
                     }
                 }
                 return '';

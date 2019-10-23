@@ -3,7 +3,7 @@
 
          <div class="vthing-header">
             <label>Start a Virtual thing within W-ADE</label> <br>
-            <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ VtLink }}</a>
+            <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ getVtLink(id).link }}</a>
         </div>
 
         <div class="vthing-status">
@@ -51,14 +51,9 @@ export default Vue.extend({
         aOutputBar,
         aVirtualThingStatusbar
     },
-    created() {
-        this.isVtActive = (this as any).getVtStatus.active;
-    },
     data() {
         return {
             vstatusmessage: '',
-            isVtActive: false,
-            VtLink: '',
             createVtBtn: {
                 btnLabel: 'Create a virtual thing',
                 btnClass: 'btn-config-small',
@@ -73,7 +68,8 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('SidebarStore',
-                ['getVirtualConfig', 'getSavedTd', 'getVtOutputMsg', 'getVtStatus', 'getConfig', 'getProtocols']),
+                ['getVirtualConfig', 'getSavedTd', 'getVtOutputMsg', 'getVtLink',
+                 'getVtStatus', 'getConfig', 'getProtocols']),
         ...mapGetters('TdStore', ['getTdState']),
         id() {
             return this.$route.params.id;
@@ -86,9 +82,6 @@ export default Vue.extend({
             const VtConf = (this as any).getVirtualConfig(this.id);
             const TdSaved = (this as any).getSavedTd(this.id);
             let ReqTdState: TdStateEnum;
-            let VtConfAdr = '';
-            let VtConfPort = 0;
-            let VtConfTitle = '';
 
             /* check which TdState the saved Td results in */
             (this as any).processChangedTd({
@@ -99,33 +92,13 @@ export default Vue.extend({
             ReqTdState = (this as any).getTdState;
 
             await (this as any).addVt({id: this.id, VtConfig: VtConf, GivenTd: TdSaved, TdState: ReqTdState});
-            this.isVtActive = (this as any).getVtStatus(this.id).active;
 
-            // TODO add links for different protocols
-            // set link to the virtual thing
-            try {
-                const VtConfParsed = JSON.parse(VtConf);
-                const TdParsed = JSON.parse(TdSaved);
-                VtConfAdr = VtConfParsed.servient.staticAddress;
-                VtConfPort = VtConfParsed.servient.http.port;
-                VtConfTitle = TdParsed.title;
-            } catch (err) {
-                loggingInfo(err);
-            }
-            this.VtLink = 'http://' + VtConfAdr + ':' + VtConfPort.toString() + '/' + VtConfTitle;
         },
         async removeVirtualThingBtnClicked() {
             await (this as any).remVt({id: this.id});
-            this.isVtActive = (this as any).getVtStatus(this.id).active;
         },
         async openVtTd() {
-            shell.openExternal(this.VtLink);
-        }
-    },
-    watch: {
-        // Check if router id changed
-        '$route.params.id'(id) {
-            this.isVtActive = (this as any).getVtStatus(this.id).active;
+            shell.openExternal((this as any).getVtLink(this.id).link);
         }
     }
 });

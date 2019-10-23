@@ -6,12 +6,12 @@
             :class="{
                 error: msg.isError,
                 normTR: !msg.isError}" >
-                <td>{{ msg.time.h }}:{{ msg.time.m }}:{{ msg.time.s }}</td>
-                <td><span v-if="msg.isProgram">VT-Out:</span>{{ msg.content }}</td>
-                <td>
-                    <i v-if="msg.isVtEvent" class="fa fa-flash"></i>
-                    <i v-if="msg.isVtAction" class="fa fa-play"></i>
-                    <i v-if="msg.isVtProperty" class="fa fa-sign-in"></i>
+                <td class="output-td-t">{{ msg.time.h }}:{{ msg.time.m }}:{{ msg.time.s }}</td>
+                <td class="output-td-c"><span v-if="msg.isProgram">VT-Out:</span>{{ msg.content }}</td>
+                <td class="output-td-i">
+                    <i v-if="msg.isVtAction" class="fa fa-rocket" title="Action"></i>
+                    <i v-else-if="msg.isVtProperty" class="fa fa-database" title="Property"></i>
+                    <i v-else-if="msg.isVtEvent" class="fa fa-flash" title="Event"></i>
                 </td>
             </tr>
         </table>
@@ -57,20 +57,42 @@ export default Vue.extend({
     display: block;
     width: 100%;
     height: 100%;
+    border-spacing: 0;
 }
 
 .normTR {
     background-color: white;
 }
 
-.output-tr {
-    border-radius: 8px;
+.output-tr td{
+    vertical-align: middle;
 }
 
 .fa {
     padding: 2px;
 }
-/* .error {
-    color: #a81900;
-} */
+
+.output-td-t {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border: solid black 2px;
+    padding: 4px;
+    text-align: center;
+}
+
+.output-td-c {
+    border: solid black 2px;
+    padding: 4px;
+}
+
+.output-td-i {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: solid black 2px;
+    padding: 8px;
+    text-align: center;
+}
+
 </style>
