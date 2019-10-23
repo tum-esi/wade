@@ -136,7 +136,7 @@ export default Vue.extend({
 
 .vthing-container {
     height: 100%;
-    width: 50%;
+    width: 65%;
     display: block;
     padding: 10px 12px 10px 12px;
 }

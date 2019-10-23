@@ -426,28 +426,61 @@ export default {
             for (const element of state.tds) {
                 if (element.id === payload.id) {
                     const daytime = new Date(Date.now());
-                    const newMsg = {
-                                    time: {
-                                        full: // to be used as vue-key attribute (-> should be unique)
-                                            daytime.getHours().toString() +
-                                            daytime.getMinutes().toString() +
-                                            daytime.getSeconds().toString() +
-                                            daytime.getMilliseconds().toString() +
-                                            payload.outMsg.content,
-                                        h: ('0' + daytime.getHours()).slice(-2),
-                                        m: ('0' + daytime.getMinutes()).slice(-2),
-                                        s: ('0' + daytime.getSeconds()).slice(-2)
-                                    },
-                                    content: payload.outMsg.content,
-                                    isError: payload.outMsg.isError ? true : false,
-                                    isProgram: payload.outMsg.isProgram ? true : false,
-                                    isDebug: payload.outMsg.isDebug ? true : false
-                                };
                     tdElement = element;
-                    tdElement.virtualthing.outMsg.unshift(newMsg);
-                    if (tdElement.virtualthing.outMsg.length > maxOutMsg) {
-                        tdElement.virtualthing.outMsg.pop();
+                    let provContent: string;
+                    let newContent: string[];
+
+                    if (payload.outMsg.content.slice(0, 15) === '[32minfo[39m:') {
+                        provContent = payload.outMsg.content.slice(15);
+                    } else {
+                        provContent = payload.outMsg.content;
                     }
+
+                    newContent = provContent.split('[32minfo[39m:');
+                    console.debug('newC:', newContent);
+
+
+                    newContent.forEach((msg, ind) => {
+                        let checkAction = false;
+                        let checkProperty = false;
+                        let checkEvent = false;
+
+                        if (msg.search('Action') !== -1) {
+                            checkAction = true;
+                        } else if (msg.search('Property') !== -1) {
+                            checkProperty = true;
+                        } else if (msg.search('Emitting event') !== -1) {
+                            checkEvent = true;
+                        }
+
+                        const newMsg = {
+                            time: {
+                                // "full" to be used as vue-key attribute (-> has to be unique)
+                                full: daytime.getHours().toString() +
+                                daytime.getMinutes().toString() +
+                                daytime.getSeconds().toString() +
+                                daytime.getMilliseconds().toString() +
+                                msg + ind.toString(),
+                                h: ('0' + daytime.getHours()).slice(-2),
+                                m: ('0' + daytime.getMinutes()).slice(-2),
+                                s: ('0' + daytime.getSeconds()).slice(-2)
+                            },
+                            content: msg,
+                            isError: payload.outMsg.isError ? true : false,
+                            isProgram: payload.outMsg.isProgram ? true : false,
+                            isDebug: payload.outMsg.isDebug ? true : false,
+                            isVtProperty: checkProperty,
+                            isVtEvent: checkEvent,
+                            isVtAction: checkAction
+                        };
+                        console.debug('msg: ', newMsg.content, 'full: ', newMsg.time.full);
+                        console.debug(newMsg);
+                        tdElement.virtualthing.outMsg.unshift(newMsg);
+                        if (tdElement.virtualthing.outMsg.length > maxOutMsg) {
+                            tdElement.virtualthing.outMsg.pop();
+                        }
+                    });
+                    // write to the state element
                     index = state.tds.indexOf(element);
                     state.tds[index] = tdElement;
                     break;

@@ -1,13 +1,18 @@
 <template>
     <div class="outputbar-container border-bottom">
         <table class="output-bar">
-            <tr v-for="msg in outputMessages" 
+            <tr v-for="msg in outputMessages" class="output-tr"
             :key="msg.time.full" 
             :class="{
                 error: msg.isError,
                 normTR: !msg.isError}" >
                 <td>{{ msg.time.h }}:{{ msg.time.m }}:{{ msg.time.s }}</td>
-                <td><span v-if="msg.isDebug">DEBUG: </span>{{ msg.content }}</td>
+                <td><span v-if="msg.isProgram">VT-Out:</span>{{ msg.content }}</td>
+                <td>
+                    <i v-if="msg.isVtEvent" class="fa fa-flash"></i>
+                    <i v-if="msg.isVtAction" class="fa fa-play"></i>
+                    <i v-if="msg.isVtProperty" class="fa fa-sign-in"></i>
+                </td>
             </tr>
         </table>
     </div>
@@ -16,6 +21,7 @@
 <script lang="ts">
 
 import Vue from 'vue';
+import '@/assets/font-awesome-4.7.0/css/font-awesome.min.css';
 
 export default Vue.extend({
     name: 'aOutputBar',
@@ -55,6 +61,14 @@ export default Vue.extend({
 
 .normTR {
     background-color: white;
+}
+
+.output-tr {
+    border-radius: 8px;
+}
+
+.fa {
+    padding: 2px;
 }
 /* .error {
     color: #a81900;

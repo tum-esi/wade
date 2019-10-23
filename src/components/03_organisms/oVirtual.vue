@@ -4,39 +4,14 @@
             <div class="vconfig-header">
                 <div class="vconfig-title">
                     <label>Virtual Thing Configuration</label>
-                    <!-- Hide format "raw"/"form-field" option
-                    <div class="format-option">
-                        <input type="radio" name="format" id="raw" value="raw" v-model="format"/>
-                        <label for="raw">Raw</label>
-                    </div>
-                    <div class="format-option">
-                        <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format"/>
-                        <label for="form-fields">Form-Fields</label>
-                    </div>
-                    -->
                 </div>
-                <!-- Hide "Show Config Format Help" Button
-                <aButtonBasic
-                    v-on:show-help="showHelpClicked"
-                    :btnClass="showHelp ? showHelpBtn.btnClassHide : showHelpBtn.btnClassShow"
-                    :btnLabel="showHelp  ? showHelpBtn.btnLabelHide : showHelpBtn.btnLabelShow"
-                    :btnOnClick="showHelpBtn.btnOnClick"
-
-                />
-                -->
             </div>
             <div class="show-vconfig">
                 <aConfigStatusBar class="vconfig-status" :statusMessage="vconfigStatus"></aConfigStatusBar>
                 <div class="vconfig-area">
                     <textarea spellcheck="false" wrap="off" v-model="currentVirtualConfig"></textarea>
                 </div>
-                <!-- Hide form fields
-                <div v-else class="config-area">
-                    <div class="config-area-form-container">
-                        <p>Hint: Only usable with default config.</p>
-                        !-- TODO: mFormConfigOptions --
-                    </div>
-                </div> -->
+
                 <div class="vconfig-btns">
                     <aButtonBasic
                         v-on:reset-config="resetVirtualConfigBtnClicked"
@@ -54,46 +29,7 @@
                     />
                 </div>
             </div>
-            <!-- Hide Config Help window 
-            <div v-if="showHelp" class="config-help-container">
-                <div class="help-area">
-                    <div class="help-area-text">
-                        <textarea disabled>
-                            Config needs to be in valid JSON format. Else it cannot be saved. 
-                            Config interface:
-                            {
-                                http: {
-                                    port: number,
-                                    proxy: string,
-                                    allowSelfSigned: boolean
-                                },
-                                coap: {
-                                    port: number
-                                },
-                                mqtt: {
-                                    broker: string,                     // Broker URL
-                                    username: string,
-                                    password: string,
-                                    clientId: string
-                                    port: number
-                                },
-                                credentials: {                          // There can be multiple credentials properties 
-                                    thing-id: {                           // for multiple things.
-                                        username: string,
-                                        password: string
-                                    }, 
-                                    other-thing-id: {
-                                        identity: string,
-                                        psk: string
-                                    },
-                                    other-thing-id: {
-                                        token: string
-                                    }}
-                            }
-                        </textarea>
-                    </div>
-                </div>
-            </div> -->
+            
         </div>
     </div>
 </template>
@@ -220,7 +156,7 @@ export default Vue.extend({
 
 .vconfig-container {
     height: 100%;
-    width: 50%;
+    width: 35%;
     display: flex;
     padding: 0px 12px 10px 12px;
 }

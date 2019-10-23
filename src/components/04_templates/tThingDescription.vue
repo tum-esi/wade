@@ -33,8 +33,8 @@
       </div>
     </div>
     <div v-if="currentTabId === 'virtual'" class="td-virtual">
-      <oVirtual style="td-config-child-el"/>
-      <oVirtualThing style="td-config-child-el"/>
+      <oVirtual/>
+      <oVirtualThing/>
     </div>
   </div>
 </template>
