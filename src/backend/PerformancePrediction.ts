@@ -33,6 +33,7 @@ export default class PerformancePrediction {
     private delayFirst: number;
     private delayBeforeEach: number;
     private measurementType: MeasurementTypeEnum;
+    private measureMultipleTimes: number;
 
     // Input determined by TD
     private interactions: any;
@@ -44,7 +45,8 @@ export default class PerformancePrediction {
         durationsRuns?: number,
         numClients?: number,
         delayFirst?: number,
-        delayBeforeEach?: number
+        delayBeforeEach?: number,
+        measureMultipleTimes?: number
     ) {
         this.interactions = interactions;
         this.measurementType = measurementType;
@@ -53,6 +55,7 @@ export default class PerformancePrediction {
         this.numClients = numClients || 1;
         this.delayFirst = delayFirst || 0;
         this.delayBeforeEach = delayBeforeEach || 0;
+        this.measureMultipleTimes = measureMultipleTimes || 1;
     }
 
     // Get performance measurements for all interactions
@@ -102,48 +105,54 @@ export default class PerformancePrediction {
             measuredExecutions: null
         };
 
-        // Measured executions for interaction
-        let measuredExecutions: number[] = [];
+        const mainResults: any[] = [];
 
-        // Check which kind of performance testing should be executed
-        switch (this.measurementType) {
-            case MeasurementTypeEnum.NUM_CLIENTS_NUM_RUN:
-                break;
-            case MeasurementTypeEnum.NUM_CLIENTS_DURATION_RUN:
-                break;
-            case MeasurementTypeEnum.NUM_RUNS:
-                measuredExecutions = await this.executeWithNumRuns(interaction);
-                mainResult.numRuns = this.numRuns;
-                break;
-            case MeasurementTypeEnum.DURATION_RUN:
-                measuredExecutions = await this.executeWithDuration(interaction);
-                mainResult.numRuns = this.numRuns;
-                break;
-            default:
-                this.generateError();
-                break;
+        // If it should be executed more than once
+        for (let i = 0; i < this.measureMultipleTimes; i++) {
+            // Measured executions for interaction
+            let measuredExecutions: number[] = [];
+
+            // Check which kind of performance testing should be executed
+            switch (this.measurementType) {
+                case MeasurementTypeEnum.NUM_CLIENTS_NUM_RUN:
+                    break;
+                case MeasurementTypeEnum.NUM_CLIENTS_DURATION_RUN:
+                    break;
+                case MeasurementTypeEnum.NUM_RUNS:
+                    measuredExecutions = await this.executeWithNumRuns(interaction);
+                    mainResult.numRuns = this.numRuns;
+                    break;
+                case MeasurementTypeEnum.DURATION_RUN:
+                    measuredExecutions = await this.executeWithDuration(interaction);
+                    mainResult.numRuns = this.numRuns;
+                    break;
+                default:
+                    this.generateError();
+                    break;
+            }
+            // Set default measured executions without editing
+            mainResult.measuredExecutions = [...measuredExecutions]
+            ;
+            // Set first measured execution
+            mainResult.firstMeasured = mainResult.measuredExecutions[0];
+
+            // Get Possible WCET, BCET, AET
+            mainResult.possible = this.calculateExecutionTimes(measuredExecutions);
+
+            // Get Realistic WCET, BCET, AET (remove outliers)
+            mainResult.realistic = this.calculateExecutionTimes(this.findOutliers(measuredExecutions));
+
+            // Remove first execution for calculations without first
+            measuredExecutions.shift();
+            // Get Possible WCET, BCET, AET without first execution
+            mainResult.possibleWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
+            // Get Realistic WCET, BCET, AET without first execution (remove outliers)
+            mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
+
+            console.log('=== in Performance Prediction', mainResult);
+            mainResults.push(mainResult);
         }
-        // Set default measured executions without editing
-        mainResult.measuredExecutions = [...measuredExecutions]
-        ;
-        // Set first measured execution
-        mainResult.firstMeasured = mainResult.measuredExecutions[0];
-
-        // Get Possible WCET, BCET, AET
-        mainResult.possible = this.calculateExecutionTimes(measuredExecutions);
-
-        // Get Realistic WCET, BCET, AET (remove outliers)
-        mainResult.realistic = this.calculateExecutionTimes(this.findOutliers(measuredExecutions));
-
-        // Remove first execution for calculations without first
-        measuredExecutions.shift();
-        // Get Possible WCET, BCET, AET without first execution
-        mainResult.possibleWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
-        // Get Realistic WCET, BCET, AET without first execution (remove outliers)
-        mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
-
-        console.log('=== in Performance Prediction', mainResult);
-        return mainResult;
+        if (mainResults.length >= 1) return mainResults[0];
     }
 
     // Execute the interaction a specific number of times
