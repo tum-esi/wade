@@ -19,6 +19,7 @@
     "curly": false,
     "align": [true, "parameters"],
     "arrow-parens": false,
-    "no-bitwise": false
+    "no-bitwise": false,
+    "no-shadowed-variable": true
   }
 }

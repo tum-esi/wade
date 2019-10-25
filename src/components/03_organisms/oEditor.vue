@@ -1,7 +1,8 @@
 <template>
     <div class="editor-container"> 
         <div class="editor-title">
-            <label>Thing Description</label>
+            <label>Thing Description:</label>
+            <label>{{this.id}}</label>
         </div>
         <div class="editor-area">
             <textarea :placeholder="getEditorPlaceholder" spellcheck="false" wrap="off" v-model="currentTd"></textarea>
@@ -131,6 +132,7 @@ export default Vue.extend({
 
 .editor-title label {
     font-size: 14px;
+    padding-right: 7px;
 }
 
 .editor-area {

@@ -1,20 +1,25 @@
 <template>
-    <div class="result-container">
-        <div class="result-outcome" :class="{ 'is-subscription' : isSubscription }">
-            <div class="result-title"><label>{{ resultTitle }}</label></div>
-            <div class="result-values" :class="{ 'error' : resultError }">
-                <label> 
-                    {{ isSubscription ? resultValText : resultValue }}
-                </label>
+    <div class="overall-result-container">
+        <div class="result-container">
+            <div class="result-outcome" :class="{ 'is-subscription' : isSubscription }">
+                <div class="result-title"><label>{{ resultTitle }}</label></div>
+                <div class="result-values" :class="{ 'error' : resultError }">
+                    <label> 
+                        {{ isSubscription ? resultValText : resultValue }}
+                    </label>
+                </div>
+            </div>
+            <div v-if="isSubscription" class="result-unsubscribe">
+                <aButtonBasic
+                    v-on:unsubscribe="unsubscribe()"
+                    :btnClass="unsubscribed ? unsubscribedBtn.btnClass : unsubscribeBtn.btnClass "
+                    :btnLabel="unsubscribed ? unsubscribedBtn.btnLabel : unsubscribeBtn.btnLabel"
+                    :btnOnClick="unsubscribeBtn.btnOnClick"
+                />
             </div>
         </div>
-        <div v-if="isSubscription" class="result-unsubscribe">
-            <aButtonBasic
-                v-on:unsubscribe="unsubscribe()"
-                :btnClass="'unsubscribe-btn'"
-                :btnLabel="'Unsubscribe'"
-                :btnOnClick="'unsubscribe'"
-            />
+        <div class="result-timing"> 
+            <label>Time: {{ resultTime }}, Size: {{resultSize }}</label>
         </div>
     </div>
 </template>
@@ -45,6 +50,14 @@ export default Vue.extend({
             type: Boolean,
             required: false,
             default: false
+        },
+        resultTime: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        resultSize: {
+            required: false
         }
     },
     created() {
@@ -58,12 +71,31 @@ export default Vue.extend({
         return {
             isSubscription: this.resultType === PossibleInteractionTypesEnum.EVENT_SUB,
             resultValText: 'Waiting...',
-            subscription: null as any
+            subscription: null as any,
+            unsubscribed: false,
+            unsubscribeBtn: {
+                btnClass: 'unsubscribe-btn',
+                btnLabel: 'Unsubscribe',
+                btnOnClick: 'unsubscribe'
+            },
+            unsubscribedBtn: {
+                btnClass: 'unsubscribed-btn',
+                btnLabel: 'Unsubscribed'
+            }
         };
     },
     methods: {
         getResultValue() {
             try {
+                /**
+                 * Subscribing to an event is triggered here.
+                 * This is due to the fact, that with node-wot v0.6.2
+                 * it is not possible to directly unsubscribe an interaction.
+                 * You have to unsubscribe the 'subscription'
+                 * (it is returned when subscribing).
+                 * Once you deleted the subscription via 'unsubscribe()',
+                 * you need to restart the servient.
+                 */
                 if (this.subscription) this.subscription.unsubscribe();
                 this.subscription = (this as any).resultValue.subscribe(
                     res => this.resultValText = res,
@@ -75,6 +107,8 @@ export default Vue.extend({
             }
         },
         unsubscribe() {
+            if (this.unsubscribed) return;
+            this.unsubscribed = !this.unsubscribed;
             if (!this.subscription) return;
             try {
                 this.subscription.unsubscribe();
@@ -132,5 +166,9 @@ export default Vue.extend({
 .result-values label {
     overflow: auto;
     max-height: 100%;
+}
+
+.result-timing label{
+    font-size: 12px;
 }
 </style>

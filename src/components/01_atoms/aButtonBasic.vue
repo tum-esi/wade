@@ -117,12 +117,23 @@ button:disabled {
 }
 
 /* Unique style for unsubscribe btn */
-.unsubscribe-btn {
+.unsubscribe-btn, .unsubscribed-btn {
   font-size: 14px;
   border: 1px solid #b5dfdd;
   margin: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  padding: 3px;
+}
+
+.unsubscribed-btn {
+  background: #305E5C !important;
+  border: 1px solid #305E5C;
+}
+
+.unsubscribed-btn:hover {
+  color: #000;
 }
 
 .unsubscribe-btn:hover {

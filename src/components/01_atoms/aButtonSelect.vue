@@ -20,7 +20,6 @@ export default Vue.extend({
   name: 'aButtonSelect',
   created() {
     this.$eventHub.$on('selections-reseted', () => {
-      if (!this.btnSelected) return;
       this.btnSelected = false;
       this.currentSrc = this.srcUnselected;
     });

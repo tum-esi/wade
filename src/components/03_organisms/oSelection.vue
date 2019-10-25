@@ -68,7 +68,7 @@
                     :btnLabel="getSelectionBtn.btnLabel"
                     :btnOnClick="getSelectionBtn.btnOnClick"
                     :btnActive="isBtnActive"
-                    v-on:invoke-interactions="invokeInteractions"
+                    v-on:invoke-interactions="invoke"
                 />
             </div>
         </div>
@@ -109,6 +109,7 @@ export default Vue.extend({
                 'removeFromSelectedInteractions',
                 'addToSelectedInteractions',
                 'invokeInteractions',
+                'getPerformancePrediction',
                 'resetInteractions',
                 'resetSelections']),
         // Add clicked interaction to selected interactions.
@@ -128,10 +129,14 @@ export default Vue.extend({
             await (this as any).removeFromSelectedInteractions({ interactionToRemove: element});
         },
         // Remove all interactions from selected interacitons.
-        async resetAll() {
+        resetAll() {
+            this.$eventHub.$emit('selections-reseted');
             this.$eventHub.$emit('unsubscribe');
             (this as any).resetSelections();
-            this.$eventHub.$emit('selections-reseted');
+        },
+        invoke() {
+            (this as any).invokeInteractions();
+            (this as any).getPerformancePrediction();
         }
     },
     watch: {

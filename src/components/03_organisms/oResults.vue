@@ -13,6 +13,8 @@
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
                         :resultError="element.resultError"
+                        :resultTime="element.resultTime"
+                        :resultSize="element.resultSize"
                     />
                 </div>
             </div>

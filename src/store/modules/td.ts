@@ -178,6 +178,20 @@ export default {
             commit('setResultProps', results.resultProps);
             commit('setResultActions', results.resultActions);
             commit('setResultEvents', results.resultEvents);
+        },
+        // Invoke interactions for performance prediction
+        async getPerformancePrediction({ commit, state }) {
+            const interactions: Array<{ name: string, type: string, input: any, interaction: any}> = [];
+
+            (state.selections).forEach(selection => {
+                interactions.push({
+                    name: selection.interactionName,
+                    type: selection.interactionType,
+                    input: selection.interactionSelectBtn.input,
+                    interaction: selection.interactionSelectBtn.interaction
+                });
+            });
+            const performanceOutput = await Api.startPerformancePrediction(interactions);
         }
     },
     mutations: {

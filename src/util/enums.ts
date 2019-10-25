@@ -62,3 +62,10 @@ export enum ProtocolEnum {
   COAPS = 'coaps',
   MQTT = 'mqtt'
 }
+
+export enum MeasurementTypeEnum {
+  NUM_RUNS = 'num-runs',
+  DURATION_RUN = 'duration-run',
+  NUM_CLIENTS_NUM_RUN = 'num-clients-num-run',
+  NUM_CLIENTS_DURATION_RUN = 'num-clients-duration-run',
+}

@@ -4,6 +4,7 @@ import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/bin
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
+import * as WoT from 'wot-typescript-definitions';
 
 export default class TdConsumer {
     // default coap port = 5683;
@@ -18,6 +19,8 @@ export default class TdConsumer {
     private tdState: TdStateEnum | null;
     private errorMsg: string | null;
 
+    private servient: any | null; // TODO: there is no servient type in wot-typescript-definitions
+
     constructor(td: string, config: any, protocols: string[]) {
         this.td = td;
         this.config = config;
@@ -26,6 +29,13 @@ export default class TdConsumer {
         this.tdConsumed = null;
         this.tdState = null;
         this.errorMsg = null;
+        this.servient = null;
+    }
+
+    public setConsumer(td: string, config: any, protocols: string[]) {
+        this.td = td;
+        this.config = config;
+        this.protocols = protocols;
     }
 
     public async getConsumedTd() {
@@ -41,6 +51,7 @@ export default class TdConsumer {
             errorMsg: this.errorMsg
         };
     }
+
 
     // Tries to parse given td-string to a json object
     private async parseTdJson(td: string) {
@@ -64,10 +75,12 @@ export default class TdConsumer {
 
     // Tries to consume given td json object
     private async consumeThing() {
-        const servient = new Servient();
+        // console.log('servient:', this.servient);
+        // if (this.servient) this.servient.shutdown();
+        this.servient = new Servient();
 
         // Get config of td, possibly altered by user
-        if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
+        if (this.config && this.config.credentials) this.servient.addCredentials(this.config.credentials);
 
         // Now check which ClientFactories need to be added (based on the given protocols)
 
@@ -94,32 +107,32 @@ export default class TdConsumer {
                 MQTT_CONFIG.password,
                 MQTT_CONFIG.clientId
             );
-            servient.addServer(mqttBrokerServer);
+            this.servient.addServer(mqttBrokerServer);
 
-            await servient.addClientFactory(new MqttClientFactory());
+            await this.servient.addClientFactory(new MqttClientFactory());
         }
 
         if (this.protocols.indexOf('coap') !== -1) {
-            await servient.addClientFactory(new CoapClientFactory());
+            await this.servient.addClientFactory(new CoapClientFactory());
         }
 
         if (this.protocols.indexOf('coaps') !== -1) {
-            await servient.addClientFactory(new CoapsClientFactory());
+            await this.servient.addClientFactory(new CoapsClientFactory());
         }
 
         if (this.protocols.indexOf('http') !== -1) {
-            await servient.addClientFactory(new HttpClientFactory({}));
+            await this.servient.addClientFactory(new HttpClientFactory({}));
         }
 
         if (this.protocols.indexOf('https') !== -1) {
-            await servient.addClientFactory(new HttpsClientFactory({}));
+            await this.servient.addClientFactory(new HttpsClientFactory({}));
         }
 
         // await servient.addClientFactory(new WebSocketClientFactory());
         // await servient.addClientFactory(new WebSocketSecureClientFactory());
 
-        await servient.start().then((thingFactory) => {
-            this.tdConsumed = thingFactory.consume(JSON.stringify(this.tdJson));
+        await this.servient.start().then((factory: WoT.WoTFactory) => {
+            this.tdConsumed = factory.consume(JSON.stringify(this.tdJson));
             this.tdState = TdStateEnum.VALID_CONSUMED_TD;
             this.errorMsg = null;
         }).catch((err) => {
@@ -127,5 +140,6 @@ export default class TdConsumer {
             this.tdState = TdStateEnum.INVALID_CONSUMED_TD;
             this.errorMsg = err;
         });
+        this.servient.shutdown();
     }
 }

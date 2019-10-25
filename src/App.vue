@@ -22,6 +22,7 @@ import { mapGetters, mapActions, mapMutations } from 'vuex';
 import tSidebar from '@/components/04_templates/tSidebar.vue';
 import oModal from '@/components/03_organisms/oModal.vue';
 import { ElementTypeEnum } from '@/util/enums';
+import { remote } from 'electron';
 
 export default Vue.extend({
   name: 'App',
@@ -33,36 +34,46 @@ export default Vue.extend({
     return {
       modalElement: {} as WADE.ModalAddElementInterface,
       isModalVisible: false,
+      width: 0,
+      windowHeight: 0
     };
   },
   created() {
     this.$eventHub.$on('open-modal-element', this.openModal);
+    window.addEventListener('resize', this.changeWindowSize);
   },
   beforeDestroy() {
     this.$eventHub.$off('open-modal-element');
+    window.addEventListener('resize', this.changeWindowSize);
   },
   computed: {
     ...mapGetters('ModalStore', ['getElementTd', 'getElementMashup', 'getElementFolder']),
+    windowStyle() {
+      return `width: ${(this as any).windowSize[0]}; height: ${(this as any).windowSize[1]}`;
+    }
   },
   methods: {
     ...mapActions('SidebarStore', ['addNewElement']),
     ...mapMutations('SidebarStore', ['addSidebarElement']),
+    changeWindowSize() {
+      console.log('windowSize:', remote.getCurrentWindow().getSize());
+    },
     openModal(element: any) {
       switch (element.btnValue) {
         case ElementTypeEnum.FOLDER:
-          this.modalElement = this.getElementFolder;
+          this.modalElement = (this as any).getElementFolder;
           this.modalElement.parentId = element.parentId;
           break;
         case ElementTypeEnum.MASHUP:
-          this.modalElement = this.getElementMashup;
+          this.modalElement = (this as any).getElementMashup;
           this.modalElement.parentId = element.parentId;
           break;
         case ElementTypeEnum.TD:
-          this.modalElement = this.getElementTd;
+          this.modalElement = (this as any).getElementTd;
           this.modalElement.parentId = element.parentId;
           break;
         default:
-          this.modalElement = this.getElementTd;
+          this.modalElement = (this as any).getElementTd;
           this.modalElement.parentId = element.parentId;
       }
       this.isModalVisible = true;
@@ -80,8 +91,8 @@ export default Vue.extend({
         id: newElement.data[0].value,
         parentId: newElement.parentId ? newElement.parentId : 'parent'
       };
-      const newSidebarEl = await this.addNewElement(newEl);
-      this.addSidebarElement(newSidebarEl);
+      const newSidebarEl = await (this as any).addNewElement(newEl);
+      (this as any).addSidebarElement(newSidebarEl);
       switch (newElement.type) {
         case ElementTypeEnum.TD:
           this.$router.push({
