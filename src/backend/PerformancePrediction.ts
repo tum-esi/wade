@@ -12,43 +12,50 @@ import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from 
 // -> Methodology proven?!
 // Test with all protocols and several clients from third parties
 
+    // Outputs
+    // private PWCET: number | undefined; // Possible worst case execution time (including outliers)
+    // private PBCET: number | undefined; // Possible best case execution time (including outliers)
+    // private PAET: number | undefined; // Possible average executiontime (including outliers)
+    // private RWCET: number | undefined; // Realistic worst case execution time (excluding outliers)
+    // private RBCET: number | undefined; // Realistic best case execution time (excluding outliers)
+    // private RAET: number | undefined; // Realistic average executiontime (excluding outliers)
+
+    // private inputSize: number | undefined;
+    // private outputSize: number | undefined;
+    // private protocol: ProtocolEnum | undefined;
+
 export default class PerformancePrediction {
 
-    // Inputs, determined by user
+    // Inputs determined by user
     private numRuns: number;
     private durationRuns: number;
     private numClients: number;
-
-    // Inputs, determined by TD
-    private interactions: any;
+    private delayFirst: number;
+    private delayBeforeEach: number;
     private measurementType: MeasurementTypeEnum;
 
-    // Outputs
-    private PWCET: number | undefined; // Possible worst case execution time (including outliers)
-    private PBCET: number | undefined; // Possible best case execution time (including outliers)
-    private PAET: number | undefined; // Possible average executiontime (including outliers)
-    private RWCET: number | undefined; // Realistic worst case execution time (excluding outliers)
-    private RBCET: number | undefined; // Realistic best case execution time (excluding outliers)
-    private RAET: number | undefined; // Realistic average executiontime (excluding outliers)
-
-    private inputSize: number | undefined;
-    private outputSize: number | undefined;
-    private protocol: ProtocolEnum | undefined;
+    // Input determined by TD
+    private interactions: any;
 
     constructor(
         interactions: any,
         measurementType: MeasurementTypeEnum,
         numRuns?: number,
         durationsRuns?: number,
-        numClients?: number
+        numClients?: number,
+        delayFirst?: number,
+        delayBeforeEach?: number
     ) {
         this.interactions = interactions;
+        this.measurementType = measurementType;
         this.numRuns = numRuns || 0;
         this.durationRuns = durationsRuns || 0;
         this.numClients = numClients || 1;
-        this.measurementType = measurementType;
+        this.delayFirst = delayFirst || 0;
+        this.delayBeforeEach = delayBeforeEach || 0;
     }
 
+    // Get performance measurements for all interactions
     public async getPerformance() {
         const results: any = [];
         this.interactions.forEach(async interaction => {
@@ -57,7 +64,7 @@ export default class PerformancePrediction {
         return results;
     }
 
-    // Execute for each interaction
+    // Execute timing performance for each interaction
     private async execute(interaction: {
         name: string,
         type: PossibleInteractionTypesEnum,
@@ -65,14 +72,19 @@ export default class PerformancePrediction {
         interaction: any
     }) {
         // Result object
-        const performancePredictionResult: {
+        const mainResult: {
             name: string,
             size: string,
             type: PossibleInteractionTypesEnum,
             numClients: number,
+            firstMeasured: number,
+            delayFirst: number | boolean,
+            delayBeforeEach: number | boolean,
             realistic: { WCET: number, BCET: number, AET: number } | null,
             possible: { WCET: number, BCET: number, AET: number } | null,
-            measuredExecutions: number[],
+            realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
+            possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
+            measuredExecutions: number[] | null,
             numRuns?: number,
             durationRuns?: number
         } = {
@@ -80,13 +92,20 @@ export default class PerformancePrediction {
             size: interaction.size,
             type: interaction.type,
             numClients: this.numClients,
+            firstMeasured: 0,
+            delayFirst: this.delayFirst > 0 ? this.delayFirst : false,
+            delayBeforeEach: this.delayBeforeEach > 0 ? this.delayBeforeEach : false,
             realistic: null,
             possible: null,
-            measuredExecutions: [] as number[]
+            realisticWithoutFirst: null,
+            possibleWithoutFirst: null,
+            measuredExecutions: null
         };
+
         // Measured executions for interaction
         let measuredExecutions: number[] = [];
 
+        // Check which kind of performance testing should be executed
         switch (this.measurementType) {
             case MeasurementTypeEnum.NUM_CLIENTS_NUM_RUN:
                 break;
@@ -94,31 +113,58 @@ export default class PerformancePrediction {
                 break;
             case MeasurementTypeEnum.NUM_RUNS:
                 measuredExecutions = await this.executeWithNumRuns(interaction);
-                performancePredictionResult.numRuns = this.numRuns;
+                mainResult.numRuns = this.numRuns;
                 break;
             case MeasurementTypeEnum.DURATION_RUN:
                 measuredExecutions = await this.executeWithDuration(interaction);
-                performancePredictionResult.numRuns = this.numRuns;
+                mainResult.numRuns = this.numRuns;
                 break;
             default:
                 this.generateError();
                 break;
         }
-        performancePredictionResult.measuredExecutions = measuredExecutions;
-        performancePredictionResult.possible = this.calculateExecutionTimes(measuredExecutions);
-        // Remove outliers
-        performancePredictionResult.realistic = this.calculateExecutionTimes(this.findOutliers(measuredExecutions));
+        // Set default measured executions without editing
+        mainResult.measuredExecutions = [...measuredExecutions]
+        ;
+        // Set first measured execution
+        mainResult.firstMeasured = mainResult.measuredExecutions[0];
 
-        console.log('=== in Performance Prediction', performancePredictionResult);
-        return performancePredictionResult;
+        // Get Possible WCET, BCET, AET
+        mainResult.possible = this.calculateExecutionTimes(measuredExecutions);
+
+        // Get Realistic WCET, BCET, AET (remove outliers)
+        mainResult.realistic = this.calculateExecutionTimes(this.findOutliers(measuredExecutions));
+
+        // Remove first execution for calculations without first
+        measuredExecutions.shift();
+        // Get Possible WCET, BCET, AET without first execution
+        mainResult.possibleWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
+        // Get Realistic WCET, BCET, AET without first execution (remove outliers)
+        mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
+
+        console.log('=== in Performance Prediction', mainResult);
+        return mainResult;
     }
 
     // Execute the interaction a specific number of times
     private async executeWithNumRuns(interaction: any): Promise<number[]> {
         const executionTimes: number[] = [];
+
+        const hasDelayBeforeEach = this.delayBeforeEach > 0 && typeof this.delayBeforeEach === 'number';
+
+        const hasDelayFirst = this.delayFirst > 0 && typeof this.delayBeforeEach === 'number';
+
+        const delay = hasDelayFirst ? this.delayFirst : hasDelayBeforeEach ? this.delayBeforeEach : 0;
         for (let i = 0; i < this.numRuns; i++) {
-            const result = await interaction.interaction();
-            executionTimes.push(result.s * 1000 + result.ms);
+            if (hasDelayBeforeEach || (hasDelayFirst && i === 0)) {
+                setTimeout(async () => {
+                    const result = await interaction.interaction();
+                    executionTimes.push(result.s * 1000 + result.ms);
+                }, delay);
+            } else {
+                const result = await interaction.interaction();
+                executionTimes.push(result.s * 1000 + result.ms);
+            }
         }
         return executionTimes;
     }
@@ -144,7 +190,7 @@ export default class PerformancePrediction {
 
     // Inspired by : https://gist.github.com/ogun/f19dc055e6b84d57e8186cbc9eaa8e45
     private findOutliers(executionTimes: number[]): number[] {
-        let realistic: number[] = executionTimes;
+        let realistic: number[] = [...executionTimes];
         if (executionTimes.length > 4) {
             let values: number[];
             let q1: number;
@@ -175,12 +221,12 @@ export default class PerformancePrediction {
     }
 
     private calculateExecutionTimes(executionTimes: number[]): { WCET: number, BCET: number, AET: number} {
-        console.log('=== execution Times', executionTimes);
-        executionTimes.sort();
+        const executions = [...executionTimes];
+        executions.sort();
         const getAverage = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
-        const WCET = executionTimes[executionTimes.length - 1];
-        const BCET = executionTimes[0];
-        const AET = getAverage(executionTimes);
+        const WCET = executions[executions.length - 1];
+        const BCET = executions[0];
+        const AET = getAverage(executions);
         return {
             WCET,
             BCET,
