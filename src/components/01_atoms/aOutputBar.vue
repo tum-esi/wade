@@ -10,7 +10,8 @@
                 <td class="output-td-c"><span v-if="msg.isProgram">VT-Out:</span>{{ msg.content }}</td>
                 <td class="output-td-i">
                     <i v-if="msg.isVtAction" class="fa fa-rocket" title="Action"></i>
-                    <i v-else-if="msg.isVtProperty" class="fa fa-database" title="Property"></i>
+                    <i v-else-if="msg.isVtPropertyRead" class="fa fa-database" title="Property Read"></i>
+                    <i v-else-if="msg.isVtPropertyWrite" class="fa fa-edit" title="Property Write"></i>
                     <i v-else-if="msg.isVtEvent" class="fa fa-flash" title="Event"></i>
                 </td>
             </tr>

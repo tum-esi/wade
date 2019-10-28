@@ -441,7 +441,8 @@ export default {
 
                     newContent.forEach((msg, ind) => {
                         let checkAction = false;
-                        let checkProperty = false;
+                        let checkPropertyRead = false;
+                        let checkPropertyWrite = false;
                         let checkEvent = false;
                         let message = msg;
 
@@ -450,16 +451,20 @@ export default {
                         }
 
                         if (payload.outMsg.isProgram === true) {
-                            const checkType = message.slice(0, 2);
-                            message = message.slice(2);
-                            if (checkType === 'A:') {
+                            const checkType = message.slice(0, 3);
+
+                            if (checkType === 'A: ') {
                                 checkAction = true;
-                            } else if (checkType === 'P:') {
-                                checkProperty = true;
-                            } else if (checkType === 'E:') {
+                                message = message.slice(2);
+                            } else if (checkType === 'PR:') {
+                                checkPropertyRead = true;
+                                message = message.slice(3);
+                            } else if (checkType === 'PW:') {
+                                checkPropertyWrite = true;
+                                message = message.slice(3);
+                            } else if (checkType === 'E: ') {
                                 checkEvent = true;
-                            } else {
-                                message = checkType + message;
+                                message = message.slice(2);
                             }
                         }
 
@@ -481,7 +486,8 @@ export default {
                             isProgram: payload.outMsg.isProgram ? true : false,
                             isDebug: payload.outMsg.isDebug ? true : false,
                             isVtAction: checkAction,
-                            isVtProperty: checkProperty,
+                            isVtPropertyRead: checkPropertyRead,
+                            isVtPropertyWrite: checkPropertyWrite,
                             isVtEvent: checkEvent
                         };
                         tdElement.virtualthing.outMsg.unshift(newMsg);

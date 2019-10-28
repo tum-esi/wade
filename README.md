@@ -106,7 +106,8 @@ Add description for config
   comes with other disadvantages)
 - correct the name conflict with "interfaces" in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for "Unexpected token: name (interface):  
 change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
-- The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build
+- The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of virtual thing fails under windows and so would
+the installation of WADE if Virtual Thing was added to the packet.
 
 ## Project setup
 ```
