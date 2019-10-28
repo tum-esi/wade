@@ -229,6 +229,13 @@ export default Vue.extend({
     margin-top: 0;
 }
 
+.dropdown-custom-vt {
+    right: 5px;
+    top: 10px;
+    width: max-content;
+    min-width: 30px;
+}
+
 .dropdown-custom-editor div:hover{
     background-color: #8aaba9;
 }

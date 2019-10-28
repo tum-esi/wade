@@ -75,13 +75,13 @@ export default Vue.extend({
 .output-td-t {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
-    border: solid black 2px;
+    border: solid black 1px;
     padding: 4px;
     text-align: center;
 }
 
 .output-td-c {
-    border: solid black 2px;
+    border: solid black 1px;
     padding: 4px;
 }
 
@@ -90,7 +90,7 @@ export default Vue.extend({
     border-bottom-right-radius: 8px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    border: solid black 2px;
+    border: solid black 1px;
     padding: 8px;
     text-align: center;
 }

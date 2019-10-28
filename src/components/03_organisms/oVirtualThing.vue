@@ -2,8 +2,17 @@
     <div class="vthing-container">
 
          <div class="vthing-header">
-            <label>Start a Virtual thing within W-ADE</label> <br>
-            <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ getVtLink(id).link }}</a>
+             <div class="vthing-label-link">
+                <label>Start a Virtual thing within W-ADE</label> <br>
+                <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ getVtLink(id).link }}</a>
+             </div>
+             <aDropdownButton
+                v-if="getVtStatus(id).active"
+                btnKey="copy-vt-link"
+                :btnDropdownOptions="getVtLink(id).copyLinks"
+                btnStyle="dropdown-custom-vt"
+                class="style-aDropdownButton"
+            />
         </div>
 
         <div class="vthing-status">
@@ -37,16 +46,18 @@
 import Vue from 'vue';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { TdVirtualConfigEnum, TdStateEnum } from '@/util/enums';
-import { getFormattedJsonString, loggingInfo } from '@/util/helpers';
+import { getFormattedJsonString } from '@/util/helpers';
+import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aOutputBar from '@/components/01_atoms/aOutputBar.vue';
 import aVirtualThingStatusbar from '@/components/01_atoms/aVirtualThingStatusbar.vue';
 import { setTimeout } from 'timers';
-import { shell } from 'electron';
+import { shell, clipboard } from 'electron';
 
 export default Vue.extend({
     name: 'oVirtualThing',
         components: {
+        aDropdownButton,
         aButtonBasic,
         aOutputBar,
         aVirtualThingStatusbar
@@ -65,6 +76,12 @@ export default Vue.extend({
                 btnOnClick: 'remove-vt'
             }
         };
+    },
+    created() {
+        this.$eventHub.$on('copy-vt-link', (eventObject) => {this.copyLinksToClipboard(eventObject); });
+    },
+    beforeDestroy() {
+        this.$eventHub.$off('copy-vt-link');
     },
     computed: {
         ...mapGetters('SidebarStore',
@@ -99,6 +116,14 @@ export default Vue.extend({
         },
         async openVtTd() {
             shell.openExternal((this as any).getVtLink(this.id).link);
+        },
+        copyLinksToClipboard(eventObject) {
+            if (eventObject.btnKey === 'copy-vt-link') {
+                console.debug('copy Links to clp: ', eventObject);
+                clipboard.writeText(eventObject.btnValue);
+            } else {
+                // event not relevant for this function
+            }
         }
     }
 });
@@ -116,9 +141,10 @@ export default Vue.extend({
 
 
 .vthing-header {
-    width:300px;
+    width:100%;
     height: 10%;
     justify-content: space-between;
+    display: flex;
 }
 
 .vthing-header label {
@@ -152,6 +178,15 @@ export default Vue.extend({
 
 .active-status{
     background-color: lightgreen;
+}
+
+.vthing-label-link {
+    width: 80%;
+}
+
+.style-aDropdownButton{
+    width: 20%;
+    position: relative;
 }
 
 </style>

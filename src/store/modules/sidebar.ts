@@ -685,7 +685,7 @@ export default {
                         }
                     }
                 }
-                return '';
+                return {link: '', copyLinks: []};
             };
         },
         getVtOutputMsg(state: any) {

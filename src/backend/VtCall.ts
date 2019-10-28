@@ -5,13 +5,13 @@ import * as os from 'os';
 import * as child_process from 'child_process';
 import * as stream from 'stream';
 import { VtStatus, ProtocolEnum } from '@/util/enums';
-import { loggingError } from '@/util/helpers';
+import { loggingError, isDevelopment } from '@/util/helpers';
 // import { readFile , readFileSync } from "fs";
 // import { join } from "path";
 
 export default class VtCall {
     public link: string;
-    public copyLinks: string[];
+    public copyLinks: WADE.DropdownOptionInterface[];
     public status: VtStatus;
 
     private givenTD: string;
@@ -163,15 +163,28 @@ export default class VtCall {
     }
     private startVt() {
         return new Promise( (res, rej) => {
-                this.VtProcess = child_process.spawn(
-                    'node',
-                    [
-                        path.join(__dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'dist', 'cli'),
-                        '-c',
-                        path.join(this.usedTempFolder as string, 'vt-config.json'),
-                        path.join(this.usedTempFolder as string, 'vt-td.json')
-                    ]
-                );
+            let pathToVt: string;
+            if (isDevelopment()) {
+                pathToVt = path.join(__dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'dist', 'cli.js');
+
+            } else {
+                this.writeOutTo.write('process resources path: ' + process.resourcesPath);
+                if (process.resourcesPath) {
+                    pathToVt = path.join(process.resourcesPath, 'node_modules', 'virtual-thing', 'dist', 'cli.js');
+                } else {
+                    pathToVt = '';
+                    rej(new Error('process.resourcesPath is undefined'));
+                }
+            }
+            this.VtProcess = child_process.spawn(
+                'node',
+                [
+                    pathToVt,
+                    '-c',
+                    path.join(this.usedTempFolder as string, 'vt-config.json'),
+                    path.join(this.usedTempFolder as string, 'vt-td.json')
+                ]
+            );
 
                 this.VtProcess.on('error', (err) => {
                     rej(new Error ('Vt subprocess could not be spawned: '  + err));
@@ -208,6 +221,7 @@ export default class VtCall {
                         // do nothing, process exited normally
                     } else {
                         loggingError(new Error('Vt exited with code: ' + code + 'on Signal: ' + signal));
+                        this.writeErrorTo.write('There was a Problem with Virtual Thing, it has stopped working!');
                     }
                 });
 
@@ -223,6 +237,7 @@ export default class VtCall {
             let VtConfProtocol = '';
             let VtConfPort: string;
             let VtConfTitle = '';
+            let LinkHelper: string;
             const Protocols = Object.keys(ProtocolEnum);
 
             try {
@@ -245,7 +260,7 @@ export default class VtCall {
                 loggingError('there was no title in the Thing description');
             }
 
-            // Try to generate a link, prefer http because it is often more applied for testing
+            // Try to generate a link, prefer http because it is more often applied for testing
             if (VtConfParsed.servient.http) {
                 VtConfProtocol = 'http';
                 if (VtConfParsed.servient.http.port) {
@@ -273,7 +288,8 @@ export default class VtCall {
                     } else {
                         VtConfPort = '';
                     }
-                    this.copyLinks.push(VtConfProtocol + '://' + VtConfAdr + ':' + VtConfPort + '/' + VtConfTitle);
+                    LinkHelper = VtConfProtocol + '://' + VtConfAdr + ':' + VtConfPort + '/' + VtConfTitle;
+                    this.copyLinks.push({title: LinkHelper, key: LinkHelper});
                 } else {
                     // Protocoll is not mentioned in virtual thing config
                 }

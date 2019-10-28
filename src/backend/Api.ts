@@ -1,10 +1,10 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
 import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
+import { isDevelopment } from '@/util/helpers';
 import MessageHandler from './MessageHandler';
 import VtCall from './VtCall';
 import * as stream from 'stream';
-import { loggingError } from '@/util/helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -202,7 +202,20 @@ export function removeVt(VT: VtCall) {
 
 export function showExampleTds() {
     return new Promise( (res, rej) => {
-        fs.readdir(path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds'),
+
+        let pathToExamples: string;
+        if (isDevelopment()) {
+            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+        } else {
+            if (process.resourcesPath) {
+                pathToExamples = path.join(process.resourcesPath, 'example-tds');
+            } else {
+                pathToExamples = '';
+                rej(new Error('process resources Path is undefined'));
+            }
+        }
+
+        fs.readdir(pathToExamples,
             (err, fileList) => {
                 if (err) {
                     rej(new Error('Problem at reading example tds: ' + err));
@@ -214,12 +227,26 @@ export function showExampleTds() {
                     res(output);
                 }
         });
+
    });
 }
 
 export function loadExampleTd(exampleTdPath: string) {
     return new Promise( (res, rej) => {
-        fs.readFile(path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds', exampleTdPath),
+
+        let pathToExamples: string;
+        if (isDevelopment()) {
+            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+        } else {
+            if (process.resourcesPath) {
+                pathToExamples = path.join(process.resourcesPath, 'example-tds');
+            } else {
+                pathToExamples = '';
+                rej(new Error('process resources Path is undefined'));
+            }
+        }
+
+        fs.readFile(path.join(pathToExamples, exampleTdPath),
             (err, data) => {
                 if (err) {
                     rej(new Error('Problem at reading the example Td file: ' + err));
@@ -229,5 +256,6 @@ export function loadExampleTd(exampleTdPath: string) {
                     res(output);
                 }
         });
+
     });
 }

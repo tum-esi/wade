@@ -3,7 +3,6 @@
         <div class="editor-title">
             <label>Thing Description</label>
             <div class="editor-dropdown-container"> 
-            <!--<aInputSelector :givenData="TdFileList"/>-->
             <aDropdownButton
                 btnLabel="Load Example TD"
                 btnKey="insert-example-td"
