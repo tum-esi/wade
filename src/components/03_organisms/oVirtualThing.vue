@@ -78,10 +78,10 @@ export default Vue.extend({
         };
     },
     created() {
-        this.$eventHub.$on('copy-vt-link', (eventObject) => {this.copyLinksToClipboard(eventObject); });
+        this.$eventHub.$on('dropdown-clicked', (eventObject) => {this.copyLinksToClipboard(eventObject); });
     },
     beforeDestroy() {
-        this.$eventHub.$off('copy-vt-link');
+        this.$eventHub.$off('dropdown-clicked');
     },
     computed: {
         ...mapGetters('SidebarStore',
@@ -119,7 +119,6 @@ export default Vue.extend({
         },
         copyLinksToClipboard(eventObject) {
             if (eventObject.btnKey === 'copy-vt-link') {
-                console.debug('copy Links to clp: ', eventObject);
                 clipboard.writeText(eventObject.btnValue);
             } else {
                 // event not relevant for this function
