@@ -231,6 +231,14 @@ textarea:focus, input:focus{
     color: #393B3A !important;
 }
 
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;

@@ -79,7 +79,7 @@ export default Vue.extend({
         ...mapMutations('SidebarStore', ['saveTdProtocols']),
         ...mapActions('TdStore',
             ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
-        // Executed when td changd: via loading saved td/ fetching td/ user changed td
+        // Executed when td changed: via loading saved td/ fetching td/ user changed td
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = '';
             if (args.td) {

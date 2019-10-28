@@ -1,5 +1,16 @@
 import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from '@/util/enums';
 
+/**
+ * Save performance measurements in jsons to store
+ * Handle failed requests
+ * Export / Save results
+ *
+ *
+ *
+ *
+ */
+
+// TODO: For final performance prediction we need to do it asynchronsly
 // TODO: Add timing for events
 // TODO: Caching on device or client side?
 // TODO: Add a delay for first request (user input)
@@ -27,7 +38,7 @@ import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from 
 export default class PerformancePrediction {
 
     // Inputs determined by user
-    private numRuns: number;
+    private iterations: number;
     private durationRuns: number;
     private numClients: number;
     private delayFirst: number;
@@ -41,7 +52,7 @@ export default class PerformancePrediction {
     constructor(
         interactions: any,
         measurementType: MeasurementTypeEnum,
-        numRuns?: number,
+        iterations?: number,
         durationsRuns?: number,
         numClients?: number,
         delayFirst?: number,
@@ -50,7 +61,7 @@ export default class PerformancePrediction {
     ) {
         this.interactions = interactions;
         this.measurementType = measurementType;
-        this.numRuns = numRuns || 0;
+        this.iterations = iterations || 0;
         this.durationRuns = durationsRuns || 0;
         this.numClients = numClients || 1;
         this.delayFirst = delayFirst || 0;
@@ -88,7 +99,7 @@ export default class PerformancePrediction {
             realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
             possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
             measuredExecutions: number[] | null,
-            numRuns?: number,
+            iterations?: number,
             durationRuns?: number
         } = {
             name: interaction.name,
@@ -119,12 +130,12 @@ export default class PerformancePrediction {
                 case MeasurementTypeEnum.NUM_CLIENTS_DURATION_RUN:
                     break;
                 case MeasurementTypeEnum.NUM_RUNS:
-                    measuredExecutions = await this.executeWithNumRuns(interaction);
-                    mainResult.numRuns = this.numRuns;
+                    measuredExecutions = await this.executeWithiterations(interaction);
+                    mainResult.iterations = this.iterations;
                     break;
                 case MeasurementTypeEnum.DURATION_RUN:
                     measuredExecutions = await this.executeWithDuration(interaction);
-                    mainResult.numRuns = this.numRuns;
+                    mainResult.iterations = this.iterations;
                     break;
                 default:
                     this.generateError();
@@ -156,7 +167,7 @@ export default class PerformancePrediction {
     }
 
     // Execute the interaction a specific number of times
-    private async executeWithNumRuns(interaction: any): Promise<number[]> {
+    private async executeWithiterations(interaction: any): Promise<number[]> {
         const executionTimes: number[] = [];
 
         const hasDelayBeforeEach = this.delayBeforeEach > 0 && typeof this.delayBeforeEach === 'number';
@@ -164,7 +175,7 @@ export default class PerformancePrediction {
         const hasDelayFirst = this.delayFirst > 0 && typeof this.delayBeforeEach === 'number';
 
         const delay = hasDelayFirst ? this.delayFirst : hasDelayBeforeEach ? this.delayBeforeEach : 0;
-        for (let i = 0; i < this.numRuns; i++) {
+        for (let i = 0; i < this.iterations; i++) {
             if (hasDelayBeforeEach || (hasDelayFirst && i === 0)) {
                 setTimeout(async () => {
                     const result = await interaction.interaction();
@@ -180,16 +191,16 @@ export default class PerformancePrediction {
 
     // Execute the interaction for a specific duration of time
     private async executeWithDuration(interaction: any) {
-        let numRuns = 0;
+        let iterations = 0;
         const executionTimes: number[] = [];
         const startTime = Date.now();
         const endTime = startTime + this.durationRuns;
         while (Date.now() < endTime) {
-            numRuns++;
+            iterations++;
             const result = await interaction.interaction();
             executionTimes.push(result.s * 1000 + result.ms);
         }
-        this.numRuns = numRuns;
+        this.iterations = iterations;
         return await executionTimes;
     }
 

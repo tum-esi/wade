@@ -5,6 +5,9 @@
       <oConfig class="td-config-child-el"/>
       <!-- <oProtocolSelection class="td-config-child-el" /> -->
     </div>
+    <div v-if="currentTabId === 'performance'" class="td-performance"> 
+      <tPerformance class="" />
+    </div>
     <div v-if="currentTabId === 'editor'" class="td-editor">
       <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
       <div class="td-main">
@@ -46,6 +49,7 @@ import oEditor from '@/components/03_organisms/oEditor.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
+import tPerformance from '@/components/04_templates/tPerformance.vue';
 import { Url } from 'url';
 import { TdStateEnum } from '../../util/enums';
 import { ftruncate } from 'fs';
@@ -60,7 +64,8 @@ export default Vue.extend({
     oSelection,
     oResults,
     mTabbar,
-    mUrlBar
+    mUrlBar,
+    tPerformance
   },
   created() {
     this.$eventHub.$on('dropdown-clicked', this.tabClicked);

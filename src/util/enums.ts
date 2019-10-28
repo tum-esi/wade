@@ -64,8 +64,14 @@ export enum ProtocolEnum {
 }
 
 export enum MeasurementTypeEnum {
-  NUM_RUNS = 'num-runs',
-  DURATION_RUN = 'duration-run',
-  NUM_CLIENTS_NUM_RUN = 'num-clients-num-run',
-  NUM_CLIENTS_DURATION_RUN = 'num-clients-duration-run',
+  NUM_RUNS = 'Iteration',
+  DURATION_RUN = 'Duration',
+  NUM_CLIENTS_NUM_RUN = 'Multiple Clients with iterations',
+  NUM_CLIENTS_DURATION_RUN = 'Multiple Clients with duration',
+}
+
+export enum DelayTypeEnum {
+  NO_DELAY = 'No Delay',
+  BEFORE_EACH = 'Delay before each',
+  BEFORE_BEGIN = 'Delay before beginning'
 }
