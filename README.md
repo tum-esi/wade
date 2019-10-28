@@ -66,6 +66,7 @@ Add description for config
 - (o) Interactions: Reihenfolge & Drag n Drop von Interactions
 - (o) Sidebar: Drag and Drop of elements to change order 
 - (o) Sidebar: Drag and Drop to add a td/ mashup to a folder/ mashup
+- (+) Virtual Thing: Integrate via import instead of launching a subprocess
 
 ### LOW PRIO TODO
 - (+) Limit
@@ -94,7 +95,7 @@ Add description for config
 - (+) Errors: Show connection errors in statusbar
 
 ## Known Problems
-- (x) Install node-aead-crypto to avoid failing dev build and build,
+- Install node-aead-crypto to avoid failing dev build and build,
    because coap-binding seems to need it might be necessary (it isn't installed
    with current node version because it shouldn't be needed anymore)
    (found on windows):  
@@ -103,8 +104,9 @@ Add description for config
   ```  
   After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
   comes with other disadvantages)
-- (x) correct the name conflict with "interfaces" in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for "Unexpected token: name (interface):  
+- correct the name conflict with "interfaces" in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for "Unexpected token: name (interface):  
 change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
+- The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build
 
 ## Project setup
 ```

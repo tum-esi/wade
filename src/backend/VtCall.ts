@@ -250,7 +250,7 @@ export default class VtCall {
             if (VtConfParsed.servient.staticAddress) {
                 VtConfAdr = VtConfParsed.servient.staticAddress;
             } else {
-                this.writeErrorTo.write('Cannot create Virtual thing link, because not static Address is given in VT config');
+                this.writeErrorTo.write('Cannot create Virtual Thing link, because not static Address is given in VT config');
                 rej(new Error('no static address for vt given'));
             }
 

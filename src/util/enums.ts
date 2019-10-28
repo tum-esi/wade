@@ -59,11 +59,11 @@ export enum TdConfigEnum {
  to the indexes at the TdConfigEnum, to ensure that aConfigStatusBar
  highliting works */
 export enum TdVirtualConfigEnum {
-  INFO = 'This config will be used to generate a virtual-thing for your TD',
+  INFO = 'This config will be used to generate a Virtual Thing for your TD',
   UNSAVED = 'Please save your changes to apply them',
-  SAVE_SUCCESS = 'Virtual thing config was safe successfully.',
-  RESET = 'Virtual thing config was resetted to default config. Save to apply!',
-  ERROR = 'Error: Wrong data format. Change virtual thing config to make it saveable.'
+  SAVE_SUCCESS = 'Virtual Thing config was safed successfully.',
+  RESET = 'Virtual Thing config was resetted to default config. Save to apply!',
+  ERROR = 'Error: Wrong data format. Change Virtual Thing config to make it saveable.'
 }
 
 export enum ProtocolEnum {
@@ -75,9 +75,9 @@ export enum ProtocolEnum {
 }
 
 export enum VtStatus {
-  NOT_CREATED = 'virtual thing is not created for this TD',
-  STARTUP = 'a virtual thing is currently being created',
-  RUNNING = 'the virtual thing should be up and running',
+  NOT_CREATED = 'Virtual Thing is not running for this TD',
+  STARTUP = 'a Virtual Thing is currently being created',
+  RUNNING = 'Virtual Thing is up',
   STOPPED = 'the virtualization is being stopped',
-  ERROR = 'there has been an error with virtual-thing'
+  ERROR = 'there has been an error with Virtual Thing'
 }

@@ -218,7 +218,7 @@ export default {
                         }
 
                     } else {
-                        const errMSG = 'cannot virtualize the td, because vt is already running on this thing';
+                        const errMSG = 'cannot virtualize the td, because Virtual Thing is already running on this thing';
                         commit('setVtOutputMsg', {
                             id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
                         });
@@ -249,13 +249,13 @@ export default {
                             index = state.tds.indexOf(element);
                             state.tds[index] = tdElement;
                             commit('setVtOutputMsg', {id: payload.id, outMsg: {
-                                content: 'virtual thing was stopped!',
+                                content: 'Virtual Thing was stopped!',
                                 isError: false
                             }});
                         }, (err) => {
                             loggingError('could not stop virtual thing: ' + err);
                             commit('setVtOutputMsg', {id: payload.id, outMsg: {
-                                content: 'virtual thing could not be stopped properly' ,
+                                content: 'Virtual Thing could not be stopped properly' ,
                                 isError: true
                             }});
                             commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});

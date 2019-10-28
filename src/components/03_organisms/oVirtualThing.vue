@@ -66,12 +66,12 @@ export default Vue.extend({
         return {
             vstatusmessage: '',
             createVtBtn: {
-                btnLabel: 'Create a virtual thing',
+                btnLabel: 'Create a Virtual Thing',
                 btnClass: 'btn-config-small',
                 btnOnClick: 'create-vt'
             },
             removeVtBtn: {
-                btnLabel: 'Stop the virtual thing',
+                btnLabel: 'Stop the Virtual Thing',
                 btnClass: 'btn-config-small',
                 btnOnClick: 'remove-vt'
             }
