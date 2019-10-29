@@ -192,14 +192,8 @@ export default {
                 });
             });
             return Api.startPerformancePrediction(interactions, payload)
-                .then((res) => {
-                    console.log('=== in TD: ', res);
-                    return res;
-                })
-                .catch((err) => {
-                    console.log('=== in TD err', err);
-                    return err;
-                });
+                .then((res) => res)
+                .catch((err) => err);
         }
     },
     mutations: {
@@ -303,11 +297,9 @@ export default {
             return state.selectedInteractions;
         },
         getResultProps(state: any) {
-            console.log('state.resultProps', state.resultProps);
             return state.resultProps;
         },
         getResultActions(state: any) {
-            console.log('state.resulActions', state.resultActions);
             return state.resultActions;
         },
         getResultEvents(state: any) {

@@ -104,7 +104,6 @@ export async function startPerformancePrediction(interactions: any, settings: an
         settings.delayBeforeEach,
         settings.measurementNum);
     const performanceResult = await performancePredictor.getPerformance();
-    console.log('=== in API:', performanceResult);
     return await performanceResult;
 }
 

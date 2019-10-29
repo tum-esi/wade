@@ -76,7 +76,6 @@ export default class PerformancePrediction {
             results.push(await this.execute(interaction));
 
         });
-        console.log('overall results', results);
         return await results;
     }
 
@@ -147,7 +146,7 @@ export default class PerformancePrediction {
             // Get Realistic WCET, BCET, AET without first execution (remove outliers)
             mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
 
-            console.log('=== in Performance Prediction', mainResult);
+            // console.log('=== in Performance Prediction', mainResult);
             return mainResult;
             // mainResults.push(mainResult);
             // return mainResults;

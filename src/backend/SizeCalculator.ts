@@ -7,7 +7,7 @@ export default class SizeCalculator {
         return this.memorySizeOf(el);
     }
 
-    private memorySizeOf(obj: any): string {
+    private memorySizeOf(object: any): string {
         let bytes = 0;
 
         function sizeOf(obj: any): number {
@@ -36,13 +36,13 @@ export default class SizeCalculator {
             return bytes;
         }
 
-        function formatByteSize(bytes: number): string {
-            if (bytes < 1024) return bytes + ' bytes';
-            else if (bytes < 1048576) return(bytes / 1024).toFixed(3) + ' KiB';
-            else if (bytes < 1073741824) return(bytes / 1048576).toFixed(3) + ' MiB';
-            else return(bytes / 1073741824).toFixed(3) + ' GiB';
+        function formatByteSize(byt: number): string {
+            if (byt < 1024) return byt + ' bytes';
+            else if (byt < 1048576) return(byt / 1024).toFixed(3) + ' KiB';
+            else if (byt < 1073741824) return(byt / 1048576).toFixed(3) + ' MiB';
+            else return(byt / 1073741824).toFixed(3) + ' GiB';
         }
 
-        return formatByteSize(sizeOf(obj));
+        return formatByteSize(sizeOf(object));
     }
 }

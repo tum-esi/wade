@@ -176,7 +176,7 @@ export default Vue.extend({
                 measurementType: this.measurementType,
                 iterations: this.iterations,
                 duration: this.duration,
-                delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN 
+                delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN
                     ? this.delayDuration || undefined : undefined,
                 delayBeforeEach: this.typeOfDelay === DelayTypeEnum.BEFORE_EACH
                     ? this.delayDuration || undefined : undefined,

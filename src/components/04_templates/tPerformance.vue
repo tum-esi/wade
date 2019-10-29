@@ -56,7 +56,7 @@ export default Vue.extend({
         },
         saveMeasurements(measurements) {
             // TODO: save measurements
-            console.log('measurements saved');
+            // console.log('measurements saved');
         }
     }
 });

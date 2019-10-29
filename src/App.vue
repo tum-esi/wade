@@ -56,7 +56,7 @@ export default Vue.extend({
     ...mapActions('SidebarStore', ['addNewElement']),
     ...mapMutations('SidebarStore', ['addSidebarElement']),
     changeWindowSize() {
-      console.log('windowSize:', remote.getCurrentWindow().getSize());
+      // console.log('windowSize:', remote.getCurrentWindow().getSize());
     },
     openModal(element: any) {
       switch (element.btnValue) {
