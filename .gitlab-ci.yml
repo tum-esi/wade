@@ -9,7 +9,14 @@ stages:
 
 prepare: 
   stage: .pre
-  script: npm install
+  script:
+    - npm install
+    - npm install -f node-aead-crypto
+
+prepwin:
+  stage: .pre
+  script: (Get-Content -path .\node_modules\coap\lib\server.js) -creplace 'interface\)','_interface)' | Set-Content -Path .\node_modules\coap\lib\server.js
+  tags: [windows]
 
 win:build:
   stage: build
