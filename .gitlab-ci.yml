@@ -1,21 +1,33 @@
-image: node:latest
-
 cache: 
   paths:
     - node_modules/
 
-before_script:
-  - npm install
-
 stages:
+  - .pre
   - build
+  - test
 
+prepare: 
+  stage: .pre
+  script: npm install
+  tags: windows, linux, mac
 
-job 1:
+win:build:
   stage: build
   script: npm run electron:build
+  tags: windows
 
-job 2:
+lin:build:
   stage: build
-  script: npm run electron:serve
-  timeout: 10m
+  script: npm run electron:build --linux
+
+mac:build:
+  stage: build
+  script: npm run electron:build
+  tags: mac
+
+win:test:
+  stage: test
+  needs: ["win:build"]
+  script: "if (Test-Path ./dist_electron) {return 0} else {return 1}"
+  tags: windows
