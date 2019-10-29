@@ -65,7 +65,7 @@ export default {
             },
             {
                 tabId: 'virtual',
-                tabTitle: 'Virtual-Thing',
+                tabTitle: 'Virtual Thing',
                 tabStyle: 'tab-container-in-tabbar',
                 tabLink: '/virtual',
                 tabIsActive: false

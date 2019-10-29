@@ -4,11 +4,13 @@
          <div class="vthing-header">
              <div class="vthing-label-link">
                 <label>Start a Virtual thing within W-ADE</label> <br>
-                <a v-if="getVtStatus(id).active" @click="openVtTd" href="#" title="open Td in Browser">{{ getVtLink(id).link }}</a>
+                <a v-if="getVtStatus(id).active" @click="openVtTd" class="vt-link-to-http" href="#" title="open Td in Browser">{{ getVtLink(id).link }}</a>
              </div>
              <aDropdownButton
                 v-if="getVtStatus(id).active"
                 btnKey="copy-vt-link"
+                btnFaIcon="fa-copy fa-2x"
+                btnTitle="Copy Address of Virtual Thing"
                 :btnDropdownOptions="getVtLink(id).copyLinks"
                 btnStyle="dropdown-custom-vt"
                 class="style-aDropdownButton"
@@ -184,8 +186,15 @@ export default Vue.extend({
 }
 
 .style-aDropdownButton{
-    width: 20%;
     position: relative;
+}
+
+.vt-link-to-http {
+    color: rgb(181, 223, 221);
+}
+
+.vt-link-to-http:hover {
+    color: white;
 }
 
 </style>
