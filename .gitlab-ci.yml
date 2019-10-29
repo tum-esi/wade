@@ -7,7 +7,7 @@ stages:
   - build
   - test
 
-prepare: 
+myprepare: 
   stage: .pre
   script: npm install
   tags: windows, linux, mac
