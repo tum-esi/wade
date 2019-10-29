@@ -188,9 +188,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.performance-selection-container {
-
-}
 .sections-test-options {
     display: flex;
 }

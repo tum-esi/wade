@@ -47,7 +47,6 @@ export default Vue.extend({
             this.resultData = (this as any).getPerformancePrediction(settings)
                 .then((res) => {
                     this.resultStatus = StatusEnum.COMPUTED;
-                    console.log('=== RES:', res);
                     return res;
                 })
                 .catch((err) => {
