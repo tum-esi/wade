@@ -2,8 +2,15 @@
     <div class="performance-container"> 
         <oSelection class="performance-child-container"/>
         <oPerformanceSelection 
-            :selectedInteractions="selectedInteractions" 
             class="performance-child-container"
+            :selectedInteractions="selectedInteractions" 
+            @start-measurement="startPerformancePrediction"
+        />
+        <oPerformanceOutput 
+            class="performance-child-container"
+            :resultStatus="resultStatus"
+            :resultData="resultData"
+            @save-measurements="saveMeasurements"
         />
     </div>
 </template>
@@ -12,34 +19,49 @@
 import Vue from 'vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oPerformanceSelection from '@/components/03_organisms/oPerformanceSelection.vue';
+import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue';
+import { StatusEnum } from '@/util/enums';
+import { mapActions } from 'vuex';
 
 export default Vue.extend({
     name: 'tPerformance',
     components: {
         oSelection,
-        oPerformanceSelection
+        oPerformanceSelection,
+        oPerformanceOutput
     },
     data() {
         return {
+            resultData: undefined as any,
+            resultStatus: StatusEnum.NOT_STARTED,
             // TODO: just a mock, give real interactions later
             selectedInteractions: [
                 { title: 'exampleInteraction' }
             ]
         };
     },
-    created() {
-    },
-    beforeDestroy() {
-    },
-    computed: {
-    },
     methods: {
-        
-    },
-    watch: {
-        '$route.params.id'(id) {
+        ...mapActions('TdStore', ['getPerformancePrediction']),
+        startPerformancePrediction(settings) {
+            this.resultData = undefined;
+            this.resultStatus = StatusEnum.LOADING;
+            (this as any).getPerformancePrediction(settings)
+                .then((res) => {
+                    this.resultStatus = StatusEnum.COMPUTED;
+                    this.resultData = res;
+                    console.log('Result:', res);
+                })
+                .catch((err) => {
+                    this.resultStatus = StatusEnum.ERROR;
+                    this.resultData = err;
+                    console.log('Error:', err);
+                });
+        },
+        saveMeasurements(measurements) {
+            // TODO: save measurements
+            console.log('measurements saved');
         }
-    },
+    }
 });
 </script>
 

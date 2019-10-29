@@ -75,3 +75,10 @@ export enum DelayTypeEnum {
   BEFORE_EACH = 'Delay before each',
   BEFORE_BEGIN = 'Delay before beginning'
 }
+
+export enum StatusEnum {
+  NOT_STARTED = 'not-started',
+  LOADING = 'loading',
+  COMPUTED = 'computed',
+  ERROR = 'error'
+}

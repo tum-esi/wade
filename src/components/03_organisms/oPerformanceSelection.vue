@@ -12,7 +12,7 @@
             </label>
             <label>{{ selectedInteractions }}</label>
         </div>
-        <!-- User can add a delay -->
+        <!-- Delay type selection -->
         <div class="test-delay">
             <label> {{ texts.delayTitle }}</label>
             <aSimpleDropdownButton 
@@ -22,7 +22,7 @@
                 :selectionAction="'get-selected-input'"
             />
         </div>
-        <!-- Duration of delay -->
+        <!-- Duration Delay -->
         <div v-if="typeOfDelay !== getEnumType('NO_DELAY')">
             <label> {{ `${texts.delayTitle} ${texts.durationTitle}` }}</label>
             <aSimpleInputField 
@@ -32,33 +32,43 @@
                 :inputOptions="{ min: 1, max: 100000 }"
             />
         </div>
-        <!-- What type of test should be run -->
+        <!-- Measurement type selection -->
         <div class="sections-test-options">
             <label> {{ texts.titleOptions }}</label>
             <aSimpleDropdownButton 
-                v-on:get-selected-input="typeOfTest=$event"
+                v-on:get-selected-input="measurementType=$event"
                 :defaultOption="typeDefault"
                 :dropdownOptions="typeOptions"
                 :selectionAction="'get-selected-input'"
             />
         </div>
-        <!-- If selected test type is iteration -->
-        <div v-if="typeOfTest === getEnumType('NUM_RUNS')">
-            <label> {{ texts.iterationTitle }}</label>
+        <!--Measurement iterations -->
+        <div v-if="measurementType === getEnumType('NUM_RUNS')">
+            <label> {{ texts.iterationsTitle }}</label>
             <aSimpleInputField 
-                v-on:input-changed="iteration=$event"
+                v-on:input-changed="iterations=$event"
                 :inputType="'number'"
-                :inputPlaceholder="texts.iterationPlaceholder"
+                :inputPlaceholder="texts.iterationsPlaceholder"
                 :inputOptions="{ min: 1, max: 10 }"
             />
         </div>
-        <!-- If selected test type is duration -->
-        <div v-if="typeOfTest === getEnumType('DURATION_RUN')">
+        <!-- Measurment Duration -->
+        <div v-if="measurementType === getEnumType('DURATION_RUN')">
             <label> {{ texts.durationTitle }}</label>
             <aSimpleInputField 
                 v-on:input-changed="duration=$event"
                 :inputType="'number'"
                 :inputPlaceholder="texts.durationPlaceholder"
+                :inputOptions="{ min: 1, max: 10 }"
+            />
+        </div>
+        <!-- Measure multiple times -->
+        <div>
+            <label> {{ texts.measurementNumTitle }}</label>
+            <aSimpleInputField 
+                v-on:input-changed="measurementNum=$event"
+                :inputType="'number'"
+                :inputDefault="1"
                 :inputOptions="{ min: 1, max: 10 }"
             />
         </div>
@@ -94,9 +104,10 @@ export default Vue.extend({
     },
     data() {
         return {
-            iteration: undefined as number | undefined,
+            iterations: undefined as number | undefined,
             duration: undefined as number | undefined,
-
+            measurementNum: undefined as number | undefined,
+            // Delay
             typeOfDelay:  undefined as DelayTypeEnum | undefined,
             delayDefault: DelayTypeEnum.NO_DELAY,
             delayDuration: 0 as number,
@@ -115,8 +126,7 @@ export default Vue.extend({
                 }
             ],
             // TODO: get presets / options from store
-
-            typeOfTest: undefined as MeasurementTypeEnum | undefined,
+            measurementType: undefined as MeasurementTypeEnum | undefined,
             typeDefault: 'Select a measurement type',
             typeOptions: [
                 {
@@ -137,17 +147,18 @@ export default Vue.extend({
                 delayDurationPlaceholder: 'Delay in ms',
                 durationTitle: 'Duration:',
                 durationPlaceholder: 'Duration in ms',
-                iterationTitle: 'Iteration:',
-                iterationPlaceholder: 'Number of iterations',
+                iterationsTitle: 'Iterations:',
+                iterationsPlaceholder: 'Number of iterations',
                 errorNoTypeSelected: 'Please select a measurement option.',
-                btnStart: 'Start measurements'
+                btnStart: 'Start measurements',
+                measurementNumTitle: 'Measure multiple times',
             }
         };
     },
     computed: {
         canStartMeasurement(): boolean {
-           return (this.typeOfTest !== undefined
-            && ((this.iteration !== undefined && this.iteration > 0)
+           return (this.measurementType !== undefined
+            && ((this.iterations !== undefined && this.iterations > 0)
             || (this.duration !== undefined && this.duration > 0)));
         }
     },
@@ -158,6 +169,16 @@ export default Vue.extend({
                 : (DelayTypeEnum[type] ? DelayTypeEnum[type] : undefined);
         },
         startMeasurement() {
+            this.$emit('start-measurement', {
+                measurementType: this.measurementType,
+                iterations: this.iterations,
+                duration: this.duration,
+                delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN 
+                    ? this.delayDuration || undefined : undefined,
+                delayBeforeEach: this.typeOfDelay === DelayTypeEnum.BEFORE_EACH
+                    ? this.delayDuration || undefined : undefined,
+                measurementNum: this.measurementNum
+            });
         }
     }
 });

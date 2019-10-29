@@ -109,7 +109,6 @@ export default Vue.extend({
                 'removeFromSelectedInteractions',
                 'addToSelectedInteractions',
                 'invokeInteractions',
-                'getPerformancePrediction',
                 'resetInteractions',
                 'resetSelections']),
         // Add clicked interaction to selected interactions.
@@ -136,7 +135,6 @@ export default Vue.extend({
         },
         invoke() {
             (this as any).invokeInteractions();
-            (this as any).getPerformancePrediction();
         }
     },
     watch: {

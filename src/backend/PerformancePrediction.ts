@@ -38,13 +38,13 @@ import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from 
 export default class PerformancePrediction {
 
     // Inputs determined by user
+    private measurementType: MeasurementTypeEnum;
     private iterations: number;
-    private durationRuns: number;
+    private duration: number;
     private numClients: number;
     private delayFirst: number;
     private delayBeforeEach: number;
-    private measurementType: MeasurementTypeEnum;
-    private measureMultipleTimes: number;
+    private measurementNum: number;
 
     // Input determined by TD
     private interactions: any;
@@ -53,20 +53,20 @@ export default class PerformancePrediction {
         interactions: any,
         measurementType: MeasurementTypeEnum,
         iterations?: number,
-        durationsRuns?: number,
+        duration?: number,
         numClients?: number,
         delayFirst?: number,
         delayBeforeEach?: number,
-        measureMultipleTimes?: number
+        measurementNum?: number
     ) {
         this.interactions = interactions;
         this.measurementType = measurementType;
         this.iterations = iterations || 0;
-        this.durationRuns = durationsRuns || 0;
+        this.duration = duration || 0;
         this.numClients = numClients || 1;
         this.delayFirst = delayFirst || 0;
         this.delayBeforeEach = delayBeforeEach || 0;
-        this.measureMultipleTimes = measureMultipleTimes || 1;
+        this.measurementNum = measurementNum || 1;
     }
 
     // Get performance measurements for all interactions
@@ -75,7 +75,7 @@ export default class PerformancePrediction {
         this.interactions.forEach(async interaction => {
             results.push(await this.execute(interaction));
         });
-        return results;
+        return await results;
     }
 
     // Execute timing performance for each interaction
@@ -100,7 +100,7 @@ export default class PerformancePrediction {
             possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
             measuredExecutions: number[] | null,
             iterations?: number,
-            durationRuns?: number
+            duration?: number
         } = {
             name: interaction.name,
             size: interaction.size,
@@ -119,7 +119,7 @@ export default class PerformancePrediction {
         const mainResults: any[] = [];
 
         // If it should be executed more than once
-        for (let i = 0; i < this.measureMultipleTimes; i++) {
+        for (let i = 0; i < this.measurementNum; i++) {
             // Measured executions for interaction
             let measuredExecutions: number[] = [];
 
@@ -163,7 +163,8 @@ export default class PerformancePrediction {
             console.log('=== in Performance Prediction', mainResult);
             mainResults.push(mainResult);
         }
-        if (mainResults.length >= 1) return mainResults[0];
+        // if (mainResults.length >= 1) return mainResults[0];
+        return mainResults;
     }
 
     // Execute the interaction a specific number of times
@@ -194,7 +195,7 @@ export default class PerformancePrediction {
         let iterations = 0;
         const executionTimes: number[] = [];
         const startTime = Date.now();
-        const endTime = startTime + this.durationRuns;
+        const endTime = startTime + this.duration;
         while (Date.now() < endTime) {
             iterations++;
             const result = await interaction.interaction();

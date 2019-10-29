@@ -95,14 +95,16 @@ export async function resetAll() {
     // -> rewrite getParsedTd -> TdConsumer/ TdParser global & new methods 'reset', 'init', ..
 }
 
-export async function startPerformancePrediction(interactions: any) {
+export async function startPerformancePrediction(interactions: any, settings: any) {
     // With Duration
     // const performancePredictor = new PerformancePrediction(interactions, MeasurementTypeEnum.DURATION_RUN, undefined, 5000);
     // const performanceResult = await performancePredictor.getPerformance();
 
+    console.log('settings', settings);
     // With num runs
     const performancePredictor = new PerformancePrediction(interactions, MeasurementTypeEnum.NUM_RUNS, 15);
     const performanceResult = await performancePredictor.getPerformance();
+    console.log('performanceResult in TD:', performanceResult);
     return await performanceResult;
 }
 

@@ -37,6 +37,13 @@ export default Vue.extend({
             default: ''
         },
         /**
+         * A Default value for number input
+         */
+        inputDefault: {
+            type: Number,
+            required: false
+        },
+        /**
          * Options for input field. Optional.
          * For numbers: min, max
          * For text: maxChar
@@ -48,7 +55,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            inputValue: undefined as number | string | undefined
+            inputValue: (this.inputDefault ? this.inputDefault : undefined) as number | string | undefined
         };
     },
     computed: {
