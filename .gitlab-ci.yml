@@ -1,0 +1,21 @@
+image: node:latest
+
+cache: 
+  paths:
+    - node_modules/
+
+before_script:
+  - npm install
+
+stages:
+  - build
+
+
+job 1:
+  stage: build
+  script: npm run electron:build
+
+job 2:
+  stage: build
+  script: npm run electron:serve
+  timeout: 10m
