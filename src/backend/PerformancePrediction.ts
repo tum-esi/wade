@@ -74,7 +74,9 @@ export default class PerformancePrediction {
         const results: any = [];
         this.interactions.forEach(async interaction => {
             results.push(await this.execute(interaction));
+
         });
+        console.log('overall results', results);
         return await results;
     }
 
@@ -86,22 +88,7 @@ export default class PerformancePrediction {
         interaction: any
     }) {
         // Result object
-        const mainResult: {
-            name: string,
-            size: string,
-            type: PossibleInteractionTypesEnum,
-            numClients: number,
-            firstMeasured: number,
-            delayFirst: number | boolean,
-            delayBeforeEach: number | boolean,
-            realistic: { WCET: number, BCET: number, AET: number } | null,
-            possible: { WCET: number, BCET: number, AET: number } | null,
-            realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
-            possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null,
-            measuredExecutions: number[] | null,
-            iterations?: number,
-            duration?: number
-        } = {
+        const mainResult: WADE.PerformanceResult = {
             name: interaction.name,
             size: interaction.size,
             type: interaction.type,
@@ -116,10 +103,10 @@ export default class PerformancePrediction {
             measuredExecutions: null
         };
 
-        const mainResults: any[] = [];
+        // const mainResults: any[] = [];
 
         // If it should be executed more than once
-        for (let i = 0; i < this.measurementNum; i++) {
+        // for (let i = 0; i < this.measurementNum; i++) {
             // Measured executions for interaction
             let measuredExecutions: number[] = [];
 
@@ -161,10 +148,10 @@ export default class PerformancePrediction {
             mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
 
             console.log('=== in Performance Prediction', mainResult);
-            mainResults.push(mainResult);
-        }
-        // if (mainResults.length >= 1) return mainResults[0];
-        return mainResults;
+            return mainResult;
+            // mainResults.push(mainResult);
+            // return mainResults;
+        // }
     }
 
     // Execute the interaction a specific number of times
@@ -179,11 +166,15 @@ export default class PerformancePrediction {
         for (let i = 0; i < this.iterations; i++) {
             if (hasDelayBeforeEach || (hasDelayFirst && i === 0)) {
                 setTimeout(async () => {
-                    const result = await interaction.interaction();
+                    const result = interaction.input ?
+                    await interaction.interaction(interaction.input) :
+                    await interaction.interaction();
                     executionTimes.push(result.s * 1000 + result.ms);
                 }, delay);
             } else {
-                const result = await interaction.interaction();
+                const result = interaction.input ?
+                    await interaction.interaction(interaction.input) :
+                    await interaction.interaction();
                 executionTimes.push(result.s * 1000 + result.ms);
             }
         }
@@ -198,7 +189,9 @@ export default class PerformancePrediction {
         const endTime = startTime + this.duration;
         while (Date.now() < endTime) {
             iterations++;
-            const result = await interaction.interaction();
+            const result = interaction.input ?
+            await interaction.interaction(interaction.input) :
+            await interaction.interaction();
             executionTimes.push(result.s * 1000 + result.ms);
         }
         this.iterations = iterations;
@@ -206,7 +199,7 @@ export default class PerformancePrediction {
     }
 
     private executeWithClients() {
-        // TODO: add many clients
+        // TODO: add multiple clients
     }
 
     // Inspired by : https://gist.github.com/ogun/f19dc055e6b84d57e8186cbc9eaa8e45

@@ -303,9 +303,11 @@ export default {
             return state.selectedInteractions;
         },
         getResultProps(state: any) {
+            console.log('state.resultProps', state.resultProps);
             return state.resultProps;
         },
         getResultActions(state: any) {
+            console.log('state.resulActions', state.resultActions);
             return state.resultActions;
         },
         getResultEvents(state: any) {

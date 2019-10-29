@@ -43,18 +43,16 @@ export default Vue.extend({
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),
         startPerformancePrediction(settings) {
-            this.resultData = undefined;
             this.resultStatus = StatusEnum.LOADING;
-            (this as any).getPerformancePrediction(settings)
+            this.resultData = (this as any).getPerformancePrediction(settings)
                 .then((res) => {
                     this.resultStatus = StatusEnum.COMPUTED;
-                    this.resultData = res;
-                    console.log('Result:', res);
+                    console.log('=== RES:', res);
+                    return res;
                 })
                 .catch((err) => {
                     this.resultStatus = StatusEnum.ERROR;
-                    this.resultData = err;
-                    console.log('Error:', err);
+                    return err;
                 });
         },
         saveMeasurements(measurements) {

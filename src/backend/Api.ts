@@ -1,7 +1,7 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
 import PerformancePrediction from './PerformancePrediction';
-import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum, MeasurementTypeEnum } from '@/util/enums';
+import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
 import MessageHandler from './MessageHandler';
 
 let tdConsumer: any = null;
@@ -63,13 +63,9 @@ export async function consumeAndParseTd(td: string, config: object, protocols: P
     if (!tdConsumer) {
         tdConsumer = new TdConsumer(td, config, protocols);
         consumedTd = await tdConsumer.getConsumedTd();
-        console.log('consumedTd:', consumedTd);
-        console.log('tdConsumer was just newly set', tdConsumer);
     } else {
-        console.log('tdConsumer already set', tdConsumer);
         tdConsumer.setConsumer(td, config, protocols);
         consumedTd = await tdConsumer.getConsumedTd();
-        console.log('consumedTd:', consumedTd);
 
     }
 
@@ -96,15 +92,19 @@ export async function resetAll() {
 }
 
 export async function startPerformancePrediction(interactions: any, settings: any) {
-    // With Duration
-    // const performancePredictor = new PerformancePrediction(interactions, MeasurementTypeEnum.DURATION_RUN, undefined, 5000);
-    // const performanceResult = await performancePredictor.getPerformance();
-
-    console.log('settings', settings);
+    // console.log('settings', settings);
     // With num runs
-    const performancePredictor = new PerformancePrediction(interactions, MeasurementTypeEnum.NUM_RUNS, 15);
+    const performancePredictor = new PerformancePrediction(
+        interactions,
+        settings.measurementType,
+        settings.iterations,
+        settings.duration,
+        settings.numClients,
+        settings.delayFirst,
+        settings.delayBeforeEach,
+        settings.measurementNum);
     const performanceResult = await performancePredictor.getPerformance();
-    console.log('performanceResult in TD:', performanceResult);
+    console.log('=== in API:', performanceResult);
     return await performanceResult;
 }
 
@@ -119,7 +119,7 @@ export async function invokeInteractions(selectedInteractions) {
         switch (selectedInteractions[interaction].interactionType) {
             case PossibleInteractionTypesEnum.PROP_READ:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
-                    // Invoke interaction
+                    // Invoke property read (no input)
                     const resultProp =
                         await selectedInteractions[interaction].interactionSelectBtn.interaction();
 
@@ -136,10 +136,13 @@ export async function invokeInteractions(selectedInteractions) {
                 break;
             case PossibleInteractionTypesEnum.PROP_WRITE:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
+                    // Invoke property write (with input)
                     const resultProp =
                         await selectedInteractions[interaction]
                             .interactionSelectBtn.interaction(selectedInteractions[interaction]
                             .interactionSelectBtn.input);
+
+                    // Set property object for component
                     resultProps.push({
                         resultType: PossibleInteractionTypesEnum.PROP_READ,
                         resultTitle: selectedInteractions[interaction].interactionName,
@@ -177,15 +180,27 @@ export async function invokeInteractions(selectedInteractions) {
                 break;
             case PossibleInteractionTypesEnum.ACTION:
                 if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
-                    let resultAction =
+                    // Invoke action (possibily with input)
+                    const resultAction =
                         await selectedInteractions[interaction]
-                            .interactionSelectBtn.interaction(selectedInteractions[interaction].interactionSelectBtn.input);
-                    resultAction = resultAction.error ? resultAction.error : resultAction;
+                            .interactionSelectBtn.interaction
+                            (selectedInteractions[interaction].interactionSelectBtn.input);
+
+                    // Set property object for component
                     resultActions.push({
                         resultType: PossibleInteractionTypesEnum.ACTION,
                         resultTitle: selectedInteractions[interaction].interactionName,
-                        resultValue: resultAction
+                        resultValue: resultAction.error ? resultAction.error : resultAction.res,
+                        resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
+                        resultError: resultAction.error ? true : false,
+                        resultSize: resultAction.size
                     });
+                    // resultAction = resultAction.error ? resultAction.error : resultAction;
+                    // resultActions.push({
+                    //     resultType: PossibleInteractionTypesEnum.ACTION,
+                    //     resultTitle: selectedInteractions[interaction].interactionName,
+                    //     resultValue: resultAction
+                    // })
                 }
                 break;
             default:

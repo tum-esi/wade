@@ -88,6 +88,7 @@ import { MeasurementTypeEnum, DelayTypeEnum } from '@/util/enums';
 import aSimpleDropdownButton from '@/components/01_atoms/aSimpleDropdownButton.vue';
 import aSimpleInputField from '@/components/01_atoms/aSimpleInputField.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import { mapGetters } from 'vuex';
 
 export default Vue.extend({
     name: 'oPerformanceSelection',
@@ -156,10 +157,12 @@ export default Vue.extend({
         };
     },
     computed: {
+        ...mapGetters('TdStore', ['getSelections']),
         canStartMeasurement(): boolean {
            return (this.measurementType !== undefined
             && ((this.iterations !== undefined && this.iterations > 0)
-            || (this.duration !== undefined && this.duration > 0)));
+                || (this.duration !== undefined && this.duration > 0))
+            && ((this as any).getSelections.length > 0));
         }
     },
     methods: {

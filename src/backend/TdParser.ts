@@ -135,7 +135,7 @@ export default class TdParser {
                             res: 'Success',
                             s: endTime[0],
                             ms: endTime[1] / 1000000,
-                            size: undefined
+                            size: 'n.A.'
                         };
                     })
                     .catch(async (err) => {
@@ -145,7 +145,7 @@ export default class TdParser {
                             error: err,
                             s: endTime[0],
                             ms: endTime[1] / 1000000,
-                            size: undefined
+                            size: 'n.A.'
                         };
                     });
                 if (response.res) {
@@ -179,7 +179,6 @@ export default class TdParser {
             });
 
             async function getActionsWithTiming(consumedTd: any, sizeCalculator: SizeCalculator, input?: any) {
-                //
                 if (!consumedTd) return { error: 'No consumed Thing available.' };
                 const startTime = process.hrtime();
                 const response = await consumedTd.actions[action].invoke(input)
@@ -189,7 +188,8 @@ export default class TdParser {
                         return {
                             res: res || 'Success',
                             s: endTime[0],
-                            ms: endTime[1] / 1000000
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
                         };
                     })
                     .catch(async (err) => {
@@ -198,11 +198,12 @@ export default class TdParser {
                         return {
                             error: err,
                             s: endTime[0],
-                            ms: endTime[1] / 1000000
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
                         };
                     });
-                // Don't measure size if there is only an error or it's the default 'Success' message
-                if (response.res && response.res !== 'Success') response.size = sizeCalculator.getSize(response.res);
+                // Measure size of input, if there is an input
+                if (input) response.size = `Input ${sizeCalculator.getSize(input)}`;
                 return await response;
             }
         }
