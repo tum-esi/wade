@@ -13,20 +13,20 @@ prepare:
 
 win:build:
   stage: build
-  script: npm run electron:build
+  script:
+    - npm run electron:build
+    - "if (Test-Path ./dist_electron/win-unpacked/w-ade.exe) {exit 0} else {exit 1}"
   tags: [windows]
+  artifacts:
+    paths: ['./dist_electron/win-unpacked/','./dist_electron/w-ade*']
 
 lin:build:
   stage: build
-  script: npm run electron:build --linux
+  script: 
+    - npm run electron:build
+  tags: [linux]
 
 mac:build:
   stage: build
   script: npm run electron:build
   tags: [mac]
-
-win:test:
-  stage: test
-  needs: ["win:build"]
-  script: "if (Test-Path ./dist_electron) {return 0} else {return 1}"
-  tags: [windows]
