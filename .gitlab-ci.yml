@@ -15,7 +15,9 @@ prepare:
 
 prepwin:
   stage: .pre
-  script: (Get-Content -path .\node_modules\coap\lib\server.js) -creplace 'interface\)','_interface)' | Set-Content -Path .\node_modules\coap\lib\server.js
+  script: 
+    - (Get-Content -path .\node_modules\coap\lib\server.js) -creplace 'interface\)','_interface)' | Set-Content -Path .\node_modules\coap\lib\server.js
+    - exit 0
   tags: [windows]
 
 win:build:
