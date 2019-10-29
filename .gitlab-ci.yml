@@ -10,7 +10,6 @@ stages:
 prepare: 
   stage: .pre
   script: npm install
-  tags: [windows, linux, mac]
 
 win:build:
   stage: build
