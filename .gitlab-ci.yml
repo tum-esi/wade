@@ -39,3 +39,4 @@ mac:build:
   stage: build
   script: npm run electron:build
   tags: [mac]
+  
