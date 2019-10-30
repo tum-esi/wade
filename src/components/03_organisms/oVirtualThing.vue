@@ -81,6 +81,7 @@ export default Vue.extend({
     },
     created() {
         this.$eventHub.$on('dropdown-clicked', (eventObject) => {this.copyLinksToClipboard(eventObject); });
+        this.tdChanged({ td: (this as any).getSavedTd(this.id)});
     },
     beforeDestroy() {
         this.$eventHub.$off('dropdown-clicked');
@@ -96,7 +97,9 @@ export default Vue.extend({
     },
     methods: {
         ...mapActions('SidebarStore', ['addVt', 'remVt']),
-        ...mapActions('TdStore', ['processChangedTd']),
+        ...mapMutations('SidebarStore', ['saveTdProtocols']),
+        ...mapActions('TdStore',
+            ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
         async createVirtualThingBtnClicked() {
             const VtConf = (this as any).getVirtualConfig(this.id);
             const TdSaved = (this as any).getSavedTd(this.id);
@@ -125,6 +128,22 @@ export default Vue.extend({
             } else {
                 // event not relevant for this function
             }
+        },
+        // Executed when td changd: via loading saved td/ fetching td/ user changed td
+        tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
+
+            (this as any).saveTdProtocols({id: this.id, td: args.td});
+            (this as any).processChangedTd({
+                td: args.td,
+                config: JSON.parse((this as any).getConfig(this.id)),
+                protocols: (this as any).getProtocols(this.id)
+            });
+        }
+    },
+    watch: {
+        // watch if the id changes to set the status of the current TD correct in the TD-store
+        '$route.params.id'(id) {
+            this.tdChanged({ td: (this as any).getSavedTd(this.id)});
         }
     }
 });
@@ -174,7 +193,6 @@ export default Vue.extend({
 .outNorm {
     width: 95%;
     height: 100%;
-    background-color: darkgrey;
 }
 
 .active-status{

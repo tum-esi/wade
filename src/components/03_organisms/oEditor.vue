@@ -200,4 +200,8 @@ export default Vue.extend({
     margin-left: 10px;
     text-align:center;
 }
+
+.style-aDropdownButton:hover {
+    border-color: #8aaba9;
+}
 </style>
