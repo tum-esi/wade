@@ -410,18 +410,20 @@ export default {
          * reached
          *
          * @param state given vuex state
-         * @param payload id of the td, outMsg to add
+         * @param payload id of the td, outMsg to add:
+         *                              - content The message to display
+         *                              - isError Is it an Error message?
+         *                              - isProgram Is it output of a Program? (listening to stdout of a cli)
          */
         setVtOutputMsg(state: any, payload: {
                                 id: string, outMsg: {
                                     content: string,
                                     isError?: boolean,
-                                    isProgram?: boolean,
-                                    isDebug?: boolean
+                                    isProgram?: boolean
                                 }}) {
             let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
-            const maxOutMsg = 500;
+            const maxOutMsg = 200;
 
             for (const element of state.tds) {
                 if (element.id === payload.id) {
@@ -472,7 +474,8 @@ export default {
                         const newMsg = {
                             time: {
                                 // "full" to be used as vue-key attribute (-> has to be unique)
-                                full: daytime.getHours().toString() +
+                                full: daytime.getDate().toString() +
+                                daytime.getHours().toString() +
                                 daytime.getMinutes().toString() +
                                 daytime.getSeconds().toString() +
                                 daytime.getMilliseconds().toString() +
@@ -484,7 +487,6 @@ export default {
                             content: message,
                             isError: payload.outMsg.isError ? true : false,
                             isProgram: payload.outMsg.isProgram ? true : false,
-                            isDebug: payload.outMsg.isDebug ? true : false,
                             isVtAction: checkAction,
                             isVtPropertyRead: checkPropertyRead,
                             isVtPropertyWrite: checkPropertyWrite,

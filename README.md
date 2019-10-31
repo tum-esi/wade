@@ -70,6 +70,7 @@ Add description for config
 
 ### LOW PRIO TODO
 - (+) Reload virtual thing config after save (-> to intend correct)
+- (+) Place dropdown field of copy vt-link better for different sized content 
 - (x) Paste a example-TD does not work after every previous view (click on tab config and then editor it always works) -> make it work always
 - (+) Limit
 - (+) Results UI: Make id smaller (write -> w, read -> r ...) and response bigger -> display as obj
