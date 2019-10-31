@@ -69,6 +69,8 @@ Add description for config
 - (+) Virtual Thing: Integrate via import instead of launching a subprocess
 
 ### LOW PRIO TODO
+- (+) Reload virtual thing config after save (-> to intend correct)
+- (x) Paste a example-TD does not work after every previous view (click on tab config and then editor it always works) -> make it work always
 - (+) Limit
 - (+) Results UI: Make id smaller (write -> w, read -> r ...) and response bigger -> display as obj
 - (o) Output/Input Results: Validating interaction response data schema: Error Message (A WoT Thing Description MUST accurately describe the data returned and accepted by each interaction)
