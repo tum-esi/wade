@@ -55,7 +55,9 @@
             </div>
             <div class="selection-btn">
                 <aBasicButton 
+                    v-if="showButtons.indexOf('selection-btn-reset') !== -1"
                     class="selection-btn-reset"
+                    :class="{'full-width' : showButtons.indexOf(' ') === -1}"
                     :btnClass="getSelectionResetBtn.btnClass"
                     :btnLabel="getSelectionResetBtn.btnLabel"
                     :btnOnClick="getSelectionResetBtn.btnOnClick"
@@ -63,7 +65,9 @@
                     v-on:reset-selections="resetAll"
                 />
                 <aBasicButton
+                    v-if="showButtons.indexOf('selection-btn-invoke') !== -1"
                     class="selection-btn-invoke"
+                    :class="{'full-width' : showButtons.indexOf(' ') === -1}"
                     :btnClass="getSelectionBtn.btnClass"
                     :btnLabel="getSelectionBtn.btnLabel"
                     :btnOnClick="getSelectionBtn.btnOnClick"
@@ -87,6 +91,19 @@ export default Vue.extend({
     components: {
         aBasicButton,
         mInteraction
+    },
+    props: {
+        /**
+         * Indicates which buttons should be shown
+         * Can be either 'selection-btn-reset selection-btn-invoke' -> both
+         * or 'selection-btn-reset' -> only reset btn
+         * or 'selection-btn-invoke' -> only invoke btn
+         */
+        showButtons: {
+            type: String,
+            required: false,
+            default: 'selection-btn-reset selection-btn-invoke'
+        }
     },
     beforeDestroy() {
         (this as any).resetInteractions();

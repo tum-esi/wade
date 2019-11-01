@@ -232,7 +232,7 @@ textarea:focus, input:focus{
 }
 
 .full-width {
-  width: 100%;
+  width: 100% !important;
 }
 
 .full-height {

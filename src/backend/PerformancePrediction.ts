@@ -212,6 +212,7 @@ export default class PerformancePrediction {
             let maxValue: number;
             let minValue: number;
             // copy array fast and sort
+            // TODO: do this with JS Set
             values = executionTimes.slice().sort( (a, b) => a - b);
 
             // find quartiles
@@ -233,8 +234,10 @@ export default class PerformancePrediction {
         return realistic;
     }
 
-    private calculateExecutionTimes(executionTimes: number[]): { WCET: number, BCET: number, AET: number} {
+    private calculateExecutionTimes(executionTimes: number[]):
+        { WCET: number, BCET: number, AET: number, all: number[]} {
         const executions = [...executionTimes];
+        const all = [...executions];
         executions.sort();
         const getAverage = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
         const WCET = executions[executions.length - 1];
@@ -244,6 +247,7 @@ export default class PerformancePrediction {
             WCET,
             BCET,
             AET,
+            all
         };
     }
 

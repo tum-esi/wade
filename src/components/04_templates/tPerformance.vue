@@ -1,6 +1,6 @@
 <template>
     <div class="performance-container"> 
-        <oSelection class="performance-child-container"/>
+        <oSelection class="performance-child-container" :showButtons="'selection-btn-reset'"/>
         <oPerformanceSelection 
             class="performance-child-container"
             :selectedInteractions="selectedInteractions" 
