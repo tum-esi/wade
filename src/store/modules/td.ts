@@ -245,6 +245,12 @@ export default {
         },
         setValidTd(state: any, payload: boolean) {
             state.isValidTd = payload;
+        },
+        setActiveTab(state: any, payload: { tabbarKey: string, activeTab: string}) {
+            for (const tab of Object.keys(state[payload.tabbarKey])) {
+                const currentTab = state[payload.tabbarKey][tab];
+                currentTab.tabIsActive = currentTab.tabId === payload.activeTab;
+            }
         }
     },
     getters: {

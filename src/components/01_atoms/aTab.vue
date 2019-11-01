@@ -1,6 +1,6 @@
 <template>
   <div class="tab-container" 
-    :class="tabStyle"
+    :class="`${tabStyle} ${tabIsActive ? 'isActive' : ''}`"
     v-on:click="$emit('tab-clicked', tabId)">
 
       <aIconButton 
@@ -142,7 +142,7 @@ export default Vue.extend({
 }
 
 .isActive {
-  background: #b4bab9;
+  background: #939c9e;
 }
 
 /* Will only be applied for tabbar-tabs */

@@ -4,6 +4,15 @@ export enum ElementTypeEnum {
   MASHUP = 'mashup'
 }
 
+/**
+ * Available Tabs for Thing Description elements
+ */
+export enum TDTabsEnum {
+  EDITOR = 'editor',
+  CONFIG = 'config',
+  PERFORMANCE = 'performance'
+}
+
 export enum ElementTitleEnum {
   FOLDER = 'Folder',
   TD = 'Thing Description',
