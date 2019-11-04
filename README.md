@@ -43,30 +43,6 @@ change default config:
 
 Add description for config
 
-### NEXT: 
-    - Invoke interaction -> timeout
-    - Make option to select protocol (if more than one protocol is available)
-
-    - Finish interface for mashups -> 
-        - Ausklappen und auswählen der TDs 
-        - Ausführen der TDs nacheinander 
-
-- (o) Folders: Create user interface for folders
-- (o) Editor: Add td from local machine
-- (+) Refactor: Deleting / Adding / Merging sidebar elements: strict interface to add / remove in data and in GUI 
-
-
-### IMPORTANT TODO
-
-### TODO 
-- (o) User credentials
-- (o) Tabbar in Element: Handle tabbing (set active tab etc) -> Router!
-- (+) Editor: Real JSON editor (line and error indidaction)
-- (x) Interaction Results: Array and Object type support 
-- (o) Interactions: Reihenfolge & Drag n Drop von Interactions
-- (o) Sidebar: Drag and Drop of elements to change order 
-- (o) Sidebar: Drag and Drop to add a td/ mashup to a folder/ mashup
-- (+) Virtual Thing: Integrate via import instead of launching a subprocess
 
 ### LOW PRIO TODO
 - (+) Reload virtual thing config after save (-> to intend correct)
@@ -98,7 +74,7 @@ Add description for config
 - (+) Errors: Show connection errors in statusbar
 
 ## Known Problems
-- Install node-aead-crypto to avoid failing dev build and build,
+- [Install node-aead-crypto to avoid failing dev build and build](https://gitlab.lrz.de/tum-ei-esi/wade/issues/22),
    because coap-binding seems to need it might be necessary (it isn't installed
    with current node version because it shouldn't be needed anymore)
    (found on windows):  
@@ -106,8 +82,11 @@ Add description for config
   npm install -f node-aead-crypto
   ```  
   After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
-  comes with other disadvantages)
-- correct the name conflict with "interfaces" in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for "Unexpected token: name (interface):  
+  comes with other disadvantages).
+- [Correct the name conflict with "interfaces"](https://gitlab.lrz.de/tum-ei-esi/wade/issues/23) in the coap module [./node_modules/coap/lib/server.js](./node_modules/coap/lib/server.js) line 230 and line 231(two words) to avoid an error for 
+  ```
+  Unexpected token: name (interface): 
+  ``` 
 change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
 - The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of virtual thing fails under windows and so would
 the installation of WADE if Virtual Thing was added to the packet.
