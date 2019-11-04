@@ -96,8 +96,7 @@ export default Vue.extend({
 
 .results-title {
     padding: 7px 0px 7px 2px;
-    max-height: 8%;
-    min-height: 50px;
+    height: 8%;
     display: flex;
     align-items: center;
 }

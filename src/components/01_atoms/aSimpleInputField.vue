@@ -1,3 +1,4 @@
+<!-- A simple input field -->
 <template>
     <div class="input-simple-container">
         <input 
@@ -67,8 +68,6 @@ export default Vue.extend({
             this.inputValue = input;
             this.$emit('input-changed', this.inputValue);
         }
-    },
-    watch: {
     }
 });
 </script>

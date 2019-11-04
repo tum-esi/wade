@@ -187,6 +187,12 @@ export default Vue.extend({
   height: 93%;
 }
 
+.td-performance {
+  height: 93%;
+  width: 100%;
+  display: flex;
+}
+
 .td-main-left {
   width: 33%;
   padding: 0px 7px 7px 7px;

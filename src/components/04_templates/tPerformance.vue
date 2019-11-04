@@ -3,7 +3,7 @@
         <oSelection class="performance-child-container" :showButtons="'selection-btn-reset'"/>
         <oPerformanceSelection 
             class="performance-child-container"
-            :selectedInteractions="selectedInteractions" 
+            :selectedInteractionNames="getSelectionNames" 
             @start-measurement="startPerformancePrediction"
         />
         <oPerformanceOutput 
@@ -21,7 +21,7 @@ import oSelection from '@/components/03_organisms/oSelection.vue';
 import oPerformanceSelection from '@/components/03_organisms/oPerformanceSelection.vue';
 import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue';
 import { StatusEnum } from '@/util/enums';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default Vue.extend({
     name: 'tPerformance',
@@ -33,12 +33,19 @@ export default Vue.extend({
     data() {
         return {
             resultData: undefined as any,
-            resultStatus: StatusEnum.NOT_STARTED,
-            // TODO: just a mock, give real interactions later
-            selectedInteractions: [
-                { title: 'exampleInteraction' }
-            ]
+            resultStatus: StatusEnum.NOT_STARTED
         };
+    },
+    computed: {
+        ...mapGetters('TdStore', ['getSelections']),
+        // Returns name of selected interactions
+        getSelectionNames() {
+            let arrOfSelectionNames: any[] = [];
+            ((this as any).getSelections).forEach(element => {
+                arrOfSelectionNames.push(element.interactionName);
+            });
+            return arrOfSelectionNames;
+        }
     },
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),

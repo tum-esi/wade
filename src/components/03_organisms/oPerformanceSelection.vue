@@ -3,82 +3,87 @@
         <div class="section-title">
             <label>{{ texts.title }}</label>
         </div>
-        <!-- What interactions are selected -->
-        <div class="selected-interaction">
-            <label>
-                {{ selectedInteractions.length > 1 
-                    ?  texts.selectedInteractions 
-                    : texts.selectedInteraction }}
-            </label>
-            <label>{{ selectedInteractions }}</label>
+        <div class="section-body">
+            <!-- What interactions are selected -->
+            <div class="selected-interaction">
+                <label>
+                    {{ selectedInteractionNames.length > 1 
+                        ? texts.selectedInteractions 
+                        : texts.selectedInteraction }}
+                </label>
+                <label>{{ selectedInteractionNames }}</label>
+            </div>
+            <!-- Delay type selection -->
+            <div class="test-delay">
+                <label> {{ texts.delayTitle }}</label>
+                <aSimpleDropdownButton 
+                    v-on:get-selected-input="typeOfDelay=$event"
+                    :defaultOption="delayDefault"
+                    :dropdownOptions="delayOptions"
+                    :selectionAction="'get-selected-input'"
+                />
+            </div>
+            <!-- Duration Delay -->
+            <div v-if="typeOfDelay !== getEnumType('NO_DELAY')">
+                <label> {{ `${texts.delayTitle} ${texts.durationTitle}` }}</label>
+                <aSimpleInputField 
+                    v-on:input-changed="delayDuration=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.delayDurationPlaceholder"
+                    :inputOptions="{ min: 1, max: 100000 }"
+                />
+            </div>
+            <!-- Measurement type selection -->
+            <div class="sections-test-options">
+                <label> {{ texts.titleOptions }}</label>
+                <aSimpleDropdownButton 
+                    v-on:get-selected-input="measurementType=$event"
+                    :defaultOption="typeDefault"
+                    :dropdownOptions="typeOptions"
+                    :selectionAction="'get-selected-input'"
+                />
+            </div>
+            <!--Measurement iterations -->
+            <div v-if="measurementType === getEnumType('NUM_RUNS')">
+                <label> {{ texts.iterationsTitle }}</label>
+                <aSimpleInputField 
+                    v-on:input-changed="iterations=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.iterationsPlaceholder"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </div>
+            <!-- Measurment Duration -->
+            <div v-if="measurementType === getEnumType('DURATION_RUN')">
+                <label> {{ texts.durationTitle }}</label>
+                <aSimpleInputField 
+                    v-on:input-changed="duration=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.durationPlaceholder"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </div>
+            <!-- Measure multiple times -->
+            <div>
+                <label> {{ texts.measurementNumTitle }}</label>
+                <aSimpleInputField 
+                    v-on:input-changed="measurementNum=$event"
+                    :inputType="'number'"
+                    :inputDefault="1"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </div>
         </div>
-        <!-- Delay type selection -->
-        <div class="test-delay">
-            <label> {{ texts.delayTitle }}</label>
-            <aSimpleDropdownButton 
-                v-on:get-selected-input="typeOfDelay=$event"
-                :defaultOption="delayDefault"
-                :dropdownOptions="delayOptions"
-                :selectionAction="'get-selected-input'"
-            />
-        </div>
-        <!-- Duration Delay -->
-        <div v-if="typeOfDelay !== getEnumType('NO_DELAY')">
-            <label> {{ `${texts.delayTitle} ${texts.durationTitle}` }}</label>
-            <aSimpleInputField 
-                v-on:input-changed="delayDuration=$event"
-                :inputType="'number'"
-                :inputPlaceholder="texts.delayDurationPlaceholder"
-                :inputOptions="{ min: 1, max: 100000 }"
-            />
-        </div>
-        <!-- Measurement type selection -->
-        <div class="sections-test-options">
-            <label> {{ texts.titleOptions }}</label>
-            <aSimpleDropdownButton 
-                v-on:get-selected-input="measurementType=$event"
-                :defaultOption="typeDefault"
-                :dropdownOptions="typeOptions"
-                :selectionAction="'get-selected-input'"
-            />
-        </div>
-        <!--Measurement iterations -->
-        <div v-if="measurementType === getEnumType('NUM_RUNS')">
-            <label> {{ texts.iterationsTitle }}</label>
-            <aSimpleInputField 
-                v-on:input-changed="iterations=$event"
-                :inputType="'number'"
-                :inputPlaceholder="texts.iterationsPlaceholder"
-                :inputOptions="{ min: 1, max: 10 }"
-            />
-        </div>
-        <!-- Measurment Duration -->
-        <div v-if="measurementType === getEnumType('DURATION_RUN')">
-            <label> {{ texts.durationTitle }}</label>
-            <aSimpleInputField 
-                v-on:input-changed="duration=$event"
-                :inputType="'number'"
-                :inputPlaceholder="texts.durationPlaceholder"
-                :inputOptions="{ min: 1, max: 10 }"
-            />
-        </div>
-        <!-- Measure multiple times -->
-        <div>
-            <label> {{ texts.measurementNumTitle }}</label>
-            <aSimpleInputField 
-                v-on:input-changed="measurementNum=$event"
-                :inputType="'number'"
-                :inputDefault="1"
-                :inputOptions="{ min: 1, max: 10 }"
-            />
-        </div>
-        <aButtonBasic 
-            :btnLabel="texts.btnStart"
-            :btnClass="'btn-normal'"
-            :btnOnClick="'start-measurement'"
-            :btnActive="canStartMeasurement"
-            @start-measurement="startMeasurement"
-        />
+            <div class="section-button-container">
+                <aButtonBasic 
+                    class="section-button"
+                    :btnLabel="texts.btnStart"
+                    :btnClass="'btn-normal'"
+                    :btnOnClick="'start-measurement'"
+                    :btnActive="canStartMeasurement"
+                    @start-measurement="startMeasurement"
+                />
+            </div>
     </div>
 </template>
 
@@ -98,8 +103,8 @@ export default Vue.extend({
         aButtonBasic
     },
     props: {
-        selectedInteractions: {
-            type: Array || Object,
+        selectedInteractionNames: {
+            type: Array,
             required: true
         }
     },
@@ -140,7 +145,7 @@ export default Vue.extend({
                 }
             ],
             texts: {
-                title: 'Performance Measurements Options:',
+                title: 'Options',
                 titleOptions: 'Type:',
                 selectedInteraction: 'Selected Interaction:',
                 selectedInteractions: 'Selected Interactions:',
@@ -188,6 +193,40 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.performance-selection-container {
+    height: 100%;
+    font-size: 14px;
+}
+
+.section-title {
+    padding: 7px 0px 7px 2px;
+    height: 8%;
+    display: flex;
+    align-items: center;
+}
+
+.section-body {
+    width: 100%;
+    height: 84%;
+    border: 1px solid #393B3A;
+    border-radius: 3px;
+    background: #B4BAB9;
+}
+
+.section-button-container {
+    height: 8%;
+    padding-top: 7px;
+    width: 100%;
+    display: flex;
+}
+
+.section-button {
+    width: 100%;
+    padding: 5px;
+    margin: 0;
+    font-size: 13px;
+}
+
 .sections-test-options {
     display: flex;
 }
