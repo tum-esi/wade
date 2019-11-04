@@ -46,25 +46,13 @@ Add description for config
 
 ### LOW PRIO TODO
 - (+) Limit
-- (o) Sidebar: Implement filter functionality
-- (+) Results: Improve error handling (right now just the full response is shown)
-- (+) Uri Bar: Fetch error handling when connection timed out
 - (o) Throbber: Indicate loading in fetch url, results, ...
 - (o) Statusbar: History functionality
 - (+) Interaction Selection: Input Button -> only click on outer div 
 - (+) Statusbar: Add zeros to current time in statusbar to prevent different length of statusbar-time
 - (x) Design: WoT-Logo is a button right now -> NO!
 - (o) Td Names: Basic validation for naming of Td (default node regex)
-- (-) Bindings: Test Websocket bindings
-- (+) Dropdown: Hide all open dropdowns if anything else was clicked
-- (o) Duplicate Tds: There should be duplicate tds for mashup. (To share Tds among several mashup)
-- (+) Electron Interface: 
-        Hide developer console on start. 
-        Do not allow resizing of window (to a very small window).
-        Remove gap to window (Make "full screen")
-- (+) Scrollbar: Restyle
-- (o) Selection: Show error if input is not in correct format
-- (+) Errors: Show connection errors in statusbar
+
 
 ## Known Problems
 - [Install node-aead-crypto to avoid failing dev build and build](https://gitlab.lrz.de/tum-ei-esi/wade/issues/22),
