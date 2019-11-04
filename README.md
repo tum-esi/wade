@@ -44,16 +44,6 @@ change default config:
 Add description for config
 
 
-### LOW PRIO TODO
-- (+) Limit
-- (o) Throbber: Indicate loading in fetch url, results, ...
-- (o) Statusbar: History functionality
-- (+) Interaction Selection: Input Button -> only click on outer div 
-- (+) Statusbar: Add zeros to current time in statusbar to prevent different length of statusbar-time
-- (x) Design: WoT-Logo is a button right now -> NO!
-- (o) Td Names: Basic validation for naming of Td (default node regex)
-
-
 ## Known Problems
 - [Install node-aead-crypto to avoid failing dev build and build](https://gitlab.lrz.de/tum-ei-esi/wade/issues/22),
    because coap-binding seems to need it might be necessary (it isn't installed
