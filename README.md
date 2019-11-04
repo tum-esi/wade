@@ -45,14 +45,7 @@ Add description for config
 
 
 ### LOW PRIO TODO
-- (+) Reload virtual thing config after save (-> to intend correct)
-- (+) Place dropdown field of copy vt-link better for different sized content 
-- (x) Paste a example-TD does not work after every previous view (click on tab config and then editor it always works) -> make it work always
 - (+) Limit
-- (+) Results UI: Make id smaller (write -> w, read -> r ...) and response bigger -> display as obj
-- (o) Output/Input Results: Validating interaction response data schema: Error Message (A WoT Thing Description MUST accurately describe the data returned and accepted by each interaction)
-- (x) Mashup: Should only have td as childern (not folders or other mashups) 
-- (+) Sidebar: Delete element -> confirm deletion
 - (o) Sidebar: Implement filter functionality
 - (+) Results: Improve error handling (right now just the full response is shown)
 - (+) Uri Bar: Fetch error handling when connection timed out
@@ -76,8 +69,7 @@ Add description for config
 ## Known Problems
 - [Install node-aead-crypto to avoid failing dev build and build](https://gitlab.lrz.de/tum-ei-esi/wade/issues/22),
    because coap-binding seems to need it might be necessary (it isn't installed
-   with current node version because it shouldn't be needed anymore)
-   (found on windows):  
+   with current node version because it shouldn't be needed anymore):  
   ```
   npm install -f node-aead-crypto
   ```  
