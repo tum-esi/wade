@@ -4,6 +4,26 @@
             <label>{{ texts.title }}</label>
         </div>
         <div class="section-body">
+            <!-- Measurement type selection -->
+            <div class="sections-test-options">
+                <label> {{ texts.titleOptions }}</label>
+                <aSimpleDropdownButton 
+                    v-on:get-selected-input="measurementType=$event"
+                    :defaultOption="typeDefault"
+                    :dropdownOptions="typeOptions"
+                    :selectionAction="'get-selected-input'"
+                />
+            </div>
+            <!--Measurement iterations -->
+            <div v-if="measurementType === getEnumType('NUM_RUNS')">
+                <label> {{ texts.iterationsTitle }}</label>
+                <aSimpleInputField 
+                    v-on:input-changed="iterations=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.iterationsPlaceholder"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </div>
             <!-- What interactions are selected -->
             <div class="selected-interaction">
                 <label>
@@ -31,26 +51,6 @@
                     :inputType="'number'"
                     :inputPlaceholder="texts.delayDurationPlaceholder"
                     :inputOptions="{ min: 1, max: 100000 }"
-                />
-            </div>
-            <!-- Measurement type selection -->
-            <div class="sections-test-options">
-                <label> {{ texts.titleOptions }}</label>
-                <aSimpleDropdownButton 
-                    v-on:get-selected-input="measurementType=$event"
-                    :defaultOption="typeDefault"
-                    :dropdownOptions="typeOptions"
-                    :selectionAction="'get-selected-input'"
-                />
-            </div>
-            <!--Measurement iterations -->
-            <div v-if="measurementType === getEnumType('NUM_RUNS')">
-                <label> {{ texts.iterationsTitle }}</label>
-                <aSimpleInputField 
-                    v-on:input-changed="iterations=$event"
-                    :inputType="'number'"
-                    :inputPlaceholder="texts.iterationsPlaceholder"
-                    :inputOptions="{ min: 1, max: 10 }"
                 />
             </div>
             <!-- Measurment Duration -->
@@ -96,7 +96,7 @@ import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import { mapGetters } from 'vuex';
 
 export default Vue.extend({
-    name: 'oPerformanceSelection',
+    name: 'oPerformanceOptions',
     components: {
         aSimpleDropdownButton,
         aSimpleInputField,
@@ -110,6 +110,7 @@ export default Vue.extend({
     },
     data() {
         return {
+            texts: this.$store.state.TextStore.performance.performanceOptions,
             iterations: undefined as number | undefined,
             duration: undefined as number | undefined,
             measurementNum: undefined as number | undefined,
@@ -143,22 +144,7 @@ export default Vue.extend({
                     title: MeasurementTypeEnum.DURATION_RUN,
                     style: 'full-width'
                 }
-            ],
-            texts: {
-                title: 'Options',
-                titleOptions: 'Type:',
-                selectedInteraction: 'Selected Interaction:',
-                selectedInteractions: 'Selected Interactions:',
-                delayTitle: 'Delay:',
-                delayDurationPlaceholder: 'Delay in ms',
-                durationTitle: 'Duration:',
-                durationPlaceholder: 'Duration in ms',
-                iterationsTitle: 'Iterations:',
-                iterationsPlaceholder: 'Number of iterations',
-                errorNoTypeSelected: 'Please select a measurement option.',
-                btnStart: 'Start measurements',
-                measurementNumTitle: 'Measure multiple times',
-            }
+            ]
         };
     },
     computed: {

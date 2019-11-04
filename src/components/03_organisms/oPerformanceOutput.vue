@@ -1,7 +1,7 @@
 <template>
     <div class="performance-output-container"> 
         <div class="status-container">
-            Status: {{ resultStatus }}
+            <label> {{ texts.title + resultStatus }}</label>
         </div>
         <div class="results-container">
             <div class="result" v-for="(element, index) in formattedData" :key="element + index">
@@ -74,9 +74,7 @@ export default Vue.extend({
     data() {
         return {
             measurementWasComputed: false,
-            texts: {
-                btnSaveComputer: 'Save Performance Measurement to computer',
-            },
+            texts: this.$store.state.TextStore.performance.performanceOutput,
             formattedData: [{
                 name: undefined,
                 size: undefined,

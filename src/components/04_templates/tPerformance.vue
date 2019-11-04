@@ -1,7 +1,7 @@
 <template>
     <div class="performance-container"> 
         <oSelection class="performance-child-container" :showButtons="'selection-btn-reset'"/>
-        <oPerformanceSelection 
+        <oPerformanceOptions 
             class="performance-child-container"
             :selectedInteractionNames="getSelectionNames" 
             @start-measurement="startPerformancePrediction"
@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
-import oPerformanceSelection from '@/components/03_organisms/oPerformanceSelection.vue';
+import oPerformanceOptions from '@/components/03_organisms/oPerformanceOptions.vue';
 import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue';
 import { StatusEnum } from '@/util/enums';
 import { mapActions, mapGetters } from 'vuex';
@@ -27,7 +27,7 @@ export default Vue.extend({
     name: 'tPerformance',
     components: {
         oSelection,
-        oPerformanceSelection,
+        oPerformanceOptions,
         oPerformanceOutput
     },
     data() {
