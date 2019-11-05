@@ -2,6 +2,7 @@
 <template>
     <div class="input-simple-container">
         <input 
+            :disabled="disabled"
             v-if="inputType === 'number'"
             class="input-number" 
             type="number" 
@@ -52,6 +53,14 @@ export default Vue.extend({
         inputOptions: {
             type: Object,
             required: false
+        },
+        /**
+         * Optional disabled flag.
+         */
+        disabled: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     data() {
@@ -68,6 +77,11 @@ export default Vue.extend({
             this.inputValue = input;
             this.$emit('input-changed', this.inputValue);
         }
+    },
+    watch: {
+        disabled() {
+            if (this.disabled) this.inputValue = undefined;
+        }
     }
 });
 </script>
@@ -80,10 +94,16 @@ export default Vue.extend({
     padding: 3px;
     font-size: 14px;
     width: 70%;
-    background: none; 
+    background: #b5dfdd; 
     position: relative;
     display: inline-block;
 }
 
-
+.input-simple-container input{
+    height: 100%;
+    font-size: 14px;
+    width: 100%;
+    background: none;
+    border: none;
+}
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="selection-container">
         <div class="selection-title">
-            <label>Selection</label>
+            <label>Interaction Selection</label>
         </div>
         <div class="selection-area" v-if="isValidTd">
             <!-- Properties -->

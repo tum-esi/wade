@@ -235,8 +235,17 @@ textarea:focus, input:focus{
   width: 100% !important;
 }
 
+.width-80 {
+  width: 80% !important;
+}
+
 .full-height {
   height: 100%;
+}
+
+.disabled {
+  background-color: #939C9E;
+  color: #B4BAB9;
 }
 
 /* Styling for start page */

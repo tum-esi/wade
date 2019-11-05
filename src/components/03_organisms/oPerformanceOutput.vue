@@ -1,9 +1,9 @@
 <template>
     <div class="performance-output-container"> 
-        <div class="status-container">
+        <div class="output-title">
             <label> {{ texts.title + resultStatus }}</label>
         </div>
-        <div class="results-container">
+        <div class="output-body">
             <div class="result" v-for="(element, index) in formattedData" :key="element + index">
                 <br>
                 Name: {{ element.name }}
@@ -35,13 +35,24 @@
                 Duration: {{ element.duration }}
             </div>
         </div>
-        <aButtonBasic 
-            :btnLabel="texts.btnSaveComputer"
-            :btnClass="'btn-normal'"
-            :btnOnClick="'save-measurements'"
-            :btnActive="measurementWasComputed"
-            @save-measurements="$emit('save-measurements', formattedData)"
-        />
+        <div class="output-button-container">
+            <aButtonBasic 
+                class="output-button"
+                :btnLabel="texts.btnSaveComputer"
+                :btnClass="'btn-normal'"
+                :btnOnClick="'save-measurements'"
+                :btnActive="measurementWasComputed"
+                @save-measurements="$emit('save-measurements', formattedData)"
+            />
+            <aButtonBasic 
+                class="output-button"
+                :btnLabel="texts.btnAnnotateTD"
+                :btnClass="'btn-normal'"
+                :btnOnClick="'save-measurements'"
+                :btnActive="measurementWasComputed"
+                @save-measurements="$emit('save-measurements', formattedData)"
+            />
+        </div>
     </div>
 </template>
 
@@ -105,5 +116,38 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.performance-output-container {
+    height: 100%;
+    font-size: 14px;
+}
 
+.output-title {
+    padding: 7px 0px 7px 2px;
+    height: 8%;
+    display: flex;
+    align-items: center;
+}
+
+.output-body {
+    width: 100%;
+    height: 84%;
+    border: 1px solid #393B3A;
+    border-radius: 3px;
+    background: #B4BAB9;
+}
+
+.output-button-container {
+    height: 8%;
+    padding-top: 7px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.output-button {
+    width: 49%;
+    padding: 5px;
+    margin: 0;
+    font-size: 13px;
+}
 </style>

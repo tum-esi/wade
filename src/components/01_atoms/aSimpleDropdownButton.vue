@@ -1,21 +1,35 @@
 <template>
-    <div class="dropdown-simple-container">
+    <div 
+        class="dropdown-simple-container"
+        @click.prevent="dropdownVisible = !dropdownVisible"
+    >
+        <!-- Dropdown button -->
         <button 
-            :class="optionalStyle"
+            :class="optionalIconPaths 
+                ? `${optionalStyle} width-80` 
+                : `${optionalStyle} full-width`"
             class="input-dropdown-btn" 
-            @click.prevent="dropdownVisible = !dropdownVisible"
         >
             {{ getSelectedOption }}
         </button>
+        <!-- Dropdown elements -->
         <div class="input-dropdown-content" 
             :class="{'input-dropdown-content-visible' : dropdownVisible}">
             <label 
                 v-for="(el, index) in this.dropdownOptions"
                 :key="index"
                 :class="el.style"
-                @click.prevent="changeSelection(el.title)">
+                @click.prevent="changeSelection(el.title), dropdownVisible = !dropdownVisible">
                 {{ el.title }}
             </label>
+        </div>
+        <!-- Optional dropdown icon (can change when dropdown visible) -->
+        <div v-if="optionalIconPaths" class="dropdown-icon">
+            <img 
+                :src="dropdownVisible 
+                ? getIcon(optionalIconPaths.iconPathDropdownClosed) 
+                : getIcon(optionalIconPaths.iconPathDropdownActive)"
+            >
         </div>
     </div>
 </template>
@@ -59,6 +73,15 @@ export default Vue.extend({
         selectionAction: {
             type: String,
             required: false
+        },
+        /**
+         * Optional icon for dropdown.
+         * Can change if dropdown is shown.
+         */
+        optionalIconPaths: {
+            type: Object as () => { iconPathDropdownClosed: string, iconPathDropdownActive: string } | null,
+            required: false,
+            default: null
         }
     },
     data() {
@@ -86,9 +109,13 @@ export default Vue.extend({
             this.dropdownVisible = !this.dropdownVisible;
             this.selectedOption = selectedElement;
             this.$emit(this.selectionAction, this.selectedOption);
+        },
+        /**
+         * Require desired icon
+         */
+        getIcon(path: string) {
+           return require(`@/assets/${path}.png`);
         }
-    },
-    watch: {
     }
 });
 </script>
@@ -100,15 +127,13 @@ export default Vue.extend({
     height: 100%;
     padding: 3px;
     font-size: 14px;
-    width: 70%;
-    background: none; 
+    background: #b5dfdd; 
     position: relative;
-    display: inline-block;
+    display: flex;
 }
 
 .input-dropdown-btn {
     height: 100%;
-    width: 100%;
     font-size: 14px;
     outline: none;
     border: none;
@@ -128,10 +153,22 @@ export default Vue.extend({
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     border-radius: 3px;
+    top: 102%;
 }
 
 .input-dropdown-content-visible {
     display: flex;
     flex-wrap: wrap;
+}
+
+.dropdown-icon {
+    height: 100%;
+}
+
+.dropdown-icon img{
+    max-height: 100%;
+    object-fit: contain;
+    max-width: 100%;
+    padding: 5px;
 }
 </style>

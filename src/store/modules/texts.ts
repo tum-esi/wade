@@ -9,17 +9,19 @@ export default {
                 selectedInteractions: 'Selected Interactions:',
                 delayTitle: 'Delay:',
                 delayDurationPlaceholder: 'Delay in ms',
+                delayDurationTitle: 'Delay Duration:',
                 durationTitle: 'Duration:',
                 durationPlaceholder: 'Duration in ms',
                 iterationsTitle: 'Iterations:',
-                iterationsPlaceholder: 'Number of iterations',
+                iterationsPlaceholder: 'Number',
                 errorNoTypeSelected: 'Please select a measurement option.',
                 btnStart: 'Start measurements',
-                measurementNumTitle: 'Measure multiple times',
+                measurementNumTitle: 'Repetitions',
             },
             performanceOutput: {
                 title: 'Output',
-                btnSaveComputer: 'Save Performance Measurement to computer'
+                btnSaveComputer: 'Save output',
+                btnAnnotateTD: 'Annotate TD'
             }
         }
 

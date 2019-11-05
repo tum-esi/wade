@@ -5,73 +5,91 @@
         </div>
         <div class="section-body">
             <!-- Measurement type selection -->
-            <div class="sections-test-options">
-                <label> {{ texts.titleOptions }}</label>
+            <aPerformanceOption :optionLabel="texts.titleOptions" >
                 <aSimpleDropdownButton 
+                    class="option-input"
                     v-on:get-selected-input="measurementType=$event"
                     :defaultOption="typeDefault"
                     :dropdownOptions="typeOptions"
                     :selectionAction="'get-selected-input'"
+                    :optionalIconPaths="{iconPathDropdownClosed: 'arrow_down', iconPathDropdownActive: 'arrow_right'}"
                 />
-            </div>
+            </aPerformanceOption>
             <!--Measurement iterations -->
-            <div v-if="measurementType === getEnumType('NUM_RUNS')">
-                <label> {{ texts.iterationsTitle }}</label>
-                <aSimpleInputField 
+            <aPerformanceOption 
+                v-if="measurementType === getEnumType('NUM_RUNS')" 
+                :optionLabel="texts.iterationsTitle"
+            >
+                <aSimpleInputField
+                    class="option-input"
                     v-on:input-changed="iterations=$event"
                     :inputType="'number'"
                     :inputPlaceholder="texts.iterationsPlaceholder"
                     :inputOptions="{ min: 1, max: 10 }"
                 />
-            </div>
-            <!-- What interactions are selected -->
+            </aPerformanceOption>
+            <!-- Measurment Duration -->
+            <aPerformanceOption 
+                v-if="measurementType === getEnumType('DURATION_RUN')" 
+                :optionLabel="texts.durationTitle"
+            >
+                <aSimpleInputField
+                    class="option-input"
+                    v-on:input-changed="duration=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.durationPlaceholder"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </aPerformanceOption>
+            <!-- Delay type selection -->
+            <aPerformanceOption :optionLabel="texts.delayTitle" >
+                <aSimpleDropdownButton 
+                    class="option-input"
+                    v-on:get-selected-input="typeOfDelay=$event"
+                    :defaultOption="delayDefault"
+                    :dropdownOptions="delayOptions"
+                    :selectionAction="'get-selected-input'"
+                    :optionalIconPaths="{iconPathDropdownClosed: 'arrow_down', iconPathDropdownActive: 'arrow_right'}"
+                />
+            </aPerformanceOption>
+            <!-- Duration Delay -->
+            <aPerformanceOption 
+                :optionLabel="texts.delayDurationTitle"
+                :class="{'disabled': typeOfDelay === getEnumType('NO_DELAY')}"
+            >
+                <aSimpleInputField
+                    class="option-input"
+                    v-on:input-changed="delayDuration=$event"
+                    :inputType="'number'"
+                    :inputPlaceholder="texts.delayDurationPlaceholder"
+                    :inputOptions="{ min: 1, max: 10 }"
+                    :disabled="typeOfDelay === getEnumType('NO_DELAY')"
+                />
+            </aPerformanceOption>
+            <!-- Measure multiple times -->
+            <aPerformanceOption :optionLabel="texts.measurementNumTitle">
+                <aSimpleInputField
+                    class="option-input"
+                    v-on:input-changed="measurementNum=$event"
+                    :inputType="'number'"
+                    :inputDefault="1"
+                    :inputOptions="{ min: 1, max: 10 }"
+                />
+            </aPerformanceOption>
+            <!-- Selected interactions -->
             <div class="selected-interaction">
                 <label>
                     {{ selectedInteractionNames.length > 1 
                         ? texts.selectedInteractions 
                         : texts.selectedInteraction }}
                 </label>
-                <label>{{ selectedInteractionNames }}</label>
-            </div>
-            <!-- Delay type selection -->
-            <div class="test-delay">
-                <label> {{ texts.delayTitle }}</label>
-                <aSimpleDropdownButton 
-                    v-on:get-selected-input="typeOfDelay=$event"
-                    :defaultOption="delayDefault"
-                    :dropdownOptions="delayOptions"
-                    :selectionAction="'get-selected-input'"
-                />
-            </div>
-            <!-- Duration Delay -->
-            <div v-if="typeOfDelay !== getEnumType('NO_DELAY')">
-                <label> {{ `${texts.delayTitle} ${texts.durationTitle}` }}</label>
-                <aSimpleInputField 
-                    v-on:input-changed="delayDuration=$event"
-                    :inputType="'number'"
-                    :inputPlaceholder="texts.delayDurationPlaceholder"
-                    :inputOptions="{ min: 1, max: 100000 }"
-                />
-            </div>
-            <!-- Measurment Duration -->
-            <div v-if="measurementType === getEnumType('DURATION_RUN')">
-                <label> {{ texts.durationTitle }}</label>
-                <aSimpleInputField 
-                    v-on:input-changed="duration=$event"
-                    :inputType="'number'"
-                    :inputPlaceholder="texts.durationPlaceholder"
-                    :inputOptions="{ min: 1, max: 10 }"
-                />
-            </div>
-            <!-- Measure multiple times -->
-            <div>
-                <label> {{ texts.measurementNumTitle }}</label>
-                <aSimpleInputField 
-                    v-on:input-changed="measurementNum=$event"
-                    :inputType="'number'"
-                    :inputDefault="1"
-                    :inputOptions="{ min: 1, max: 10 }"
-                />
+                <div 
+                    v-for="(element, index) in selectedInteractionNames"
+                    :key="element + index"
+                    class="interaction-element"
+                >
+                    <label class="full-height">{{ element }}</label>
+                </div>
             </div>
         </div>
             <div class="section-button-container">
@@ -93,6 +111,7 @@ import { MeasurementTypeEnum, DelayTypeEnum } from '@/util/enums';
 import aSimpleDropdownButton from '@/components/01_atoms/aSimpleDropdownButton.vue';
 import aSimpleInputField from '@/components/01_atoms/aSimpleInputField.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import aPerformanceOption from '@/components/01_atoms/aPerformanceOption.vue';
 import { mapGetters } from 'vuex';
 
 export default Vue.extend({
@@ -100,7 +119,8 @@ export default Vue.extend({
     components: {
         aSimpleDropdownButton,
         aSimpleInputField,
-        aButtonBasic
+        aButtonBasic,
+        aPerformanceOption
     },
     props: {
         selectedInteractionNames: {
@@ -115,7 +135,7 @@ export default Vue.extend({
             duration: undefined as number | undefined,
             measurementNum: undefined as number | undefined,
             // Delay
-            typeOfDelay:  undefined as DelayTypeEnum | undefined,
+            typeOfDelay:  DelayTypeEnum.NO_DELAY as DelayTypeEnum | undefined,
             delayDefault: DelayTypeEnum.NO_DELAY,
             delayDuration: 0 as number,
             delayOptions: [
@@ -133,8 +153,8 @@ export default Vue.extend({
                 }
             ],
             // TODO: get presets / options from store
-            measurementType: undefined as MeasurementTypeEnum | undefined,
-            typeDefault: 'Select a measurement type',
+            measurementType: MeasurementTypeEnum.NUM_RUNS as MeasurementTypeEnum | undefined,
+            typeDefault: MeasurementTypeEnum.NUM_RUNS,
             typeOptions: [
                 {
                     title: MeasurementTypeEnum.NUM_RUNS,
@@ -197,6 +217,7 @@ export default Vue.extend({
     border: 1px solid #393B3A;
     border-radius: 3px;
     background: #B4BAB9;
+    padding: 2px 7px 0px 7px;
 }
 
 .section-button-container {
@@ -213,7 +234,29 @@ export default Vue.extend({
     font-size: 13px;
 }
 
-.sections-test-options {
+.option-input {
+    width: 50%;
+}
+
+.interaction-element {
+    border: 1px solid #393B3A;
+    border-radius: 3px;    
     display: flex;
+    width: 100%;
+    height: 35px;
+    margin: 5px 0 5px 0;
+    background: #305E5C;
+    padding: 3px;
+}
+
+.interaction-element label {
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+}
+
+.selected-interaction {
+    padding-top: 7px;
+    border-top: 2px solid #393B3A;
 }
 </style>
