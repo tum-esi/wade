@@ -20,6 +20,7 @@
     "@node-wot/core": "^0.6.2-SNAPSHOT.1",
     "coap": "^0.23.1",
     "core-js": "^2.6.5",
+    "electron-json-storage": "^4.1.8",
     "node-aead-crypto": "^2.1.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
