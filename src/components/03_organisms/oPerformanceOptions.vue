@@ -62,7 +62,7 @@
                     v-on:input-changed="delayDuration=$event"
                     :inputType="'number'"
                     :inputPlaceholder="texts.delayDurationPlaceholder"
-                    :inputOptions="{ min: 1, max: 10 }"
+                    :inputOptions="{ min: 1000, max: 5000 }"
                     :disabled="typeOfDelay === getEnumType('NO_DELAY')"
                 />
             </aPerformanceOption>
@@ -83,13 +83,12 @@
                         ? texts.selectedInteractions 
                         : texts.selectedInteraction }}
                 </label>
-                <div 
+                <aOptionElement 
                     v-for="(element, index) in selectedInteractionNames"
                     :key="element + index"
-                    class="interaction-element"
-                >
-                    <label class="full-height">{{ element }}</label>
-                </div>
+                    :firstElement="element"
+                    class="darkgreen"
+                />
             </div>
         </div>
             <div class="section-button-container">
@@ -112,6 +111,7 @@ import aSimpleDropdownButton from '@/components/01_atoms/aSimpleDropdownButton.v
 import aSimpleInputField from '@/components/01_atoms/aSimpleInputField.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aPerformanceOption from '@/components/01_atoms/aPerformanceOption.vue';
+import aOptionElement from '@/components/01_atoms/aOptionElement.vue';
 import { mapGetters } from 'vuex';
 
 export default Vue.extend({
@@ -120,7 +120,8 @@ export default Vue.extend({
         aSimpleDropdownButton,
         aSimpleInputField,
         aButtonBasic,
-        aPerformanceOption
+        aPerformanceOption,
+        aOptionElement
     },
     props: {
         selectedInteractionNames: {
@@ -236,23 +237,6 @@ export default Vue.extend({
 
 .option-input {
     width: 50%;
-}
-
-.interaction-element {
-    border: 1px solid #393B3A;
-    border-radius: 3px;    
-    display: flex;
-    width: 100%;
-    height: 35px;
-    margin: 5px 0 5px 0;
-    background: #305E5C;
-    padding: 3px;
-}
-
-.interaction-element label {
-    display: flex;
-    align-items: center;
-    padding-left: 4px;
 }
 
 .selected-interaction {

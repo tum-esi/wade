@@ -21,7 +21,8 @@ export default {
             performanceOutput: {
                 title: 'Output',
                 btnSaveComputer: 'Save output',
-                btnAnnotateTD: 'Annotate TD'
+                btnAnnotateTD: 'Annotate TD',
+                outputSettingType: 'Type'
             }
         }
 

@@ -1,22 +1,15 @@
 import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from '@/util/enums';
 
 /**
+ * TODOS:
+ * Loading state for UI (while computing)
  * Save performance measurements in jsons to store
- * Handle failed requests
  * Export / Save results
- *
- *
- *
+ * Add timing for events
+ * Caching on device or client side?
  *
  */
 
-// TODO: For final performance prediction we need to do it asynchronsly
-// TODO: Add timing for events
-// TODO: Caching on device or client side?
-// TODO: Add a delay for first request (user input)
-// TODO: Add a delay for every request (user input)
-// TODO: Mind first request
-// TODO: Standard Deviation
 
 // Test with implemented virtual thing (add delay of x sec)
 // Test with real implented devices with 2 (controlled by us)
@@ -45,6 +38,7 @@ export default class PerformancePrediction {
     private delayFirst: number;
     private delayBeforeEach: number;
     private measurementNum: number;
+    private measuredDuration: number; // in ms
 
     // Input determined by TD
     private interactions: any;
@@ -67,6 +61,7 @@ export default class PerformancePrediction {
         this.delayFirst = delayFirst || 0;
         this.delayBeforeEach = delayBeforeEach || 0;
         this.measurementNum = measurementNum || 1;
+        this.measuredDuration = 0;
     }
 
     // Get performance measurements for all interactions
@@ -102,12 +97,9 @@ export default class PerformancePrediction {
             measuredExecutions: null
         };
 
-        // const mainResults: any[] = [];
-
-        // If it should be executed more than once
-        // for (let i = 0; i < this.measurementNum; i++) {
-            // Measured executions for interaction
             let measuredExecutions: number[] = [];
+            mainResult.iterations = 0;
+            mainResult.measuredDuration = 0;
 
             // Check which kind of performance testing should be executed
             switch (this.measurementType) {
@@ -116,12 +108,18 @@ export default class PerformancePrediction {
                 case MeasurementTypeEnum.NUM_CLIENTS_DURATION_RUN:
                     break;
                 case MeasurementTypeEnum.NUM_RUNS:
-                    measuredExecutions = await this.executeWithiterations(interaction);
-                    mainResult.iterations = this.iterations;
+                    for (let i = 0; i < this.measurementNum; i++) {
+                        measuredExecutions = measuredExecutions.concat(await this.executeWithiterations(interaction));
+                        mainResult.iterations = + this.iterations + mainResult.iterations;
+                        mainResult.measuredDuration =  + mainResult.measuredDuration + this.measuredDuration;
+                    }
                     break;
                 case MeasurementTypeEnum.DURATION_RUN:
-                    measuredExecutions = await this.executeWithDuration(interaction);
-                    mainResult.iterations = this.iterations;
+                    for (let i = 0; i < this.measurementNum; i++) {
+                        measuredExecutions = measuredExecutions.concat(await this.executeWithDuration(interaction));
+                        mainResult.iterations = + this.iterations + mainResult.iterations;
+                        mainResult.measuredDuration =  + mainResult.measuredDuration + this.measuredDuration;
+                    }
                     break;
                 default:
                     this.generateError();
@@ -146,11 +144,7 @@ export default class PerformancePrediction {
             // Get Realistic WCET, BCET, AET without first execution (remove outliers)
             mainResult.realisticWithoutFirst = this.calculateExecutionTimes(measuredExecutions);
 
-            // console.log('=== in Performance Prediction', mainResult);
             return mainResult;
-            // mainResults.push(mainResult);
-            // return mainResults;
-        // }
     }
 
     // Execute the interaction a specific number of times
@@ -162,38 +156,140 @@ export default class PerformancePrediction {
         const hasDelayFirst = this.delayFirst > 0 && typeof this.delayBeforeEach === 'number';
 
         const delay = hasDelayFirst ? this.delayFirst : hasDelayBeforeEach ? this.delayBeforeEach : 0;
-        for (let i = 0; i < this.iterations; i++) {
-            if (hasDelayBeforeEach || (hasDelayFirst && i === 0)) {
-                setTimeout(async () => {
-                    const result = interaction.input ?
+
+        let startTime;
+        let endTime;
+
+        // Execute with a delay duration before saving measurements
+        if (hasDelayFirst) {
+            let keepExecuting = true;
+            let startMeasurements = false;
+            let iterations = 0;
+            setTimeout(() => { keepExecuting = false; startMeasurements = true; }, delay);
+            startTime = Date.now();
+            while (keepExecuting || startMeasurements) {
+                const result = interaction.input ?
+                await interaction.interaction(interaction.input) :
+                await interaction.interaction();
+                if (startMeasurements) {
+                    executionTimes.push(result.s * 1000 + result.ms);
+                    iterations ++;
+                    if (iterations >= this.iterations) startMeasurements = false;
+                }
+            }
+            startTime = Date.now();
+        // Execute with a delay each time before saving measurement
+        } else if (hasDelayBeforeEach) {
+            let result;
+            let iterations = 0;
+            startTime = Date.now();
+            while (iterations <= this.iterations) {
+                // Execute the desired amount of duration without measuring
+                let keepExecuting = true;
+                setTimeout(() => {
+                    keepExecuting = false;
+                }, this.delayBeforeEach);
+                while (keepExecuting) {
+                    result = interaction.input ?
                     await interaction.interaction(interaction.input) :
                     await interaction.interaction();
-                    executionTimes.push(result.s * 1000 + result.ms);
-                }, delay);
-            } else {
+                }
+
+                result = interaction.input ?
+                    await interaction.interaction(interaction.input) :
+                    await interaction.interaction();
+                executionTimes.push(result.s * 1000 + result.ms);
+                iterations++;
+            }
+            endTime = Date.now();
+        // Just execute for a specific number of times
+        } else {
+            startTime = Date.now();
+            for (let i = 0; i < this.iterations; i++) {
                 const result = interaction.input ?
                     await interaction.interaction(interaction.input) :
                     await interaction.interaction();
                 executionTimes.push(result.s * 1000 + result.ms);
             }
+            endTime = Date.now();
         }
+        this.measuredDuration = endTime - startTime;
         return executionTimes;
     }
 
     // Execute the interaction for a specific duration of time
     private async executeWithDuration(interaction: any) {
+        const hasDelayBeforeEach = this.delayBeforeEach > 0 && typeof this.delayBeforeEach === 'number';
+        const hasDelayFirst = this.delayFirst > 0 && typeof this.delayFirst === 'number';
+        const delay = hasDelayFirst ? this.delayFirst : hasDelayBeforeEach ? this.delayBeforeEach : 0;
+
+        if (hasDelayFirst) this.duration = + this.duration + delay;
+
         let iterations = 0;
         const executionTimes: number[] = [];
-        const startTime = Date.now();
-        const endTime = startTime + this.duration;
-        while (Date.now() < endTime) {
-            iterations++;
-            const result = interaction.input ?
-            await interaction.interaction(interaction.input) :
-            await interaction.interaction();
-            executionTimes.push(result.s * 1000 + result.ms);
+        let keepExecuting = true;
+        let startTime: any;
+        let endTime: any;
+
+        // Stops executing after desired duration
+        setTimeout(() => {
+            keepExecuting = false;
+        }, this.duration);
+
+        // If a delay in the beginning is selected, only save measurements after this delay duration.
+        if (hasDelayFirst) {
+            startTime = Date.now();
+            while (keepExecuting) {
+                const result = interaction.input ?
+                await interaction.interaction(interaction.input) :
+                await interaction.interaction();
+                if (Date.now() >= (startTime + delay)) {
+                    executionTimes.push(result.s * 1000 + result.ms);
+                    iterations++;
+                }
+            }
+            endTime = Date.now();
+        // If a delay before each is selected, before each measurement is
+        // measured it needs to be executed for a specific duration.
+        } else if (hasDelayBeforeEach) {
+            let result;
+            let loopEnd = + this.duration + Date.now();
+            startTime = Date.now();
+            while (Date.now() < loopEnd) {
+                // Execute the desired amount of duration without measuring
+                keepExecuting = true;
+                setTimeout(() => {
+                    keepExecuting = false;
+                }, this.delayBeforeEach);
+                const loopStartTime = Date.now();
+                while (keepExecuting) {
+                    result = interaction.input ?
+                    await interaction.interaction(interaction.input) :
+                    await interaction.interaction();
+                }
+                // Add the delay duration time to overall duration time
+                loopEnd = + loopEnd + (Date.now() - loopStartTime);
+
+                result = interaction.input ?
+                await interaction.interaction(interaction.input) :
+                await interaction.interaction();
+                executionTimes.push(result.s * 1000 + result.ms);
+                iterations++;
+            }
+            endTime = Date.now();
+        } else {
+            startTime = Date.now();
+            while (keepExecuting) {
+                iterations++;
+                const result = interaction.input ?
+                await interaction.interaction(interaction.input) :
+                await interaction.interaction();
+                executionTimes.push(result.s * 1000 + result.ms);
+            }
+            endTime = Date.now();
         }
         this.iterations = iterations;
+        this.measuredDuration = endTime - startTime;
         return await executionTimes;
     }
 
@@ -255,21 +351,3 @@ export default class PerformancePrediction {
         // TODO: generate Error
     }
 }
-
-// Don't execute when there's an error to begin with
-
-// Case #1 specific number: Execute n times (n is given by the user)
-
-// Case #2 amount of time: Execute as often as possible in a given time n
-
-// Addition: Do one of the above with x clients (== stress test)
-
-// (Remove Complete outliers (may have another reason))
-
-
-// Number of runs: || Number of runs in x time
-// Input: none || loadsize
-// Protocol:
-
-
-// Edge cases: input -> check with different inputs? or at least show size of input

@@ -248,6 +248,18 @@ textarea:focus, input:focus{
   color: #B4BAB9;
 }
 
+.darkgreen {
+  background: #305E5C;
+}
+
+.grey {
+  background-color: #939C9E;
+}
+
+.turqouise {
+  background-color: #b5dfdd;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;

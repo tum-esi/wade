@@ -183,6 +183,7 @@ declare global {
       measuredExecutions: number[] | null;
       iterations?: number;
       duration?: number;
+      measuredDuration?: number; // Duration it actually took
     }
   }
 }

@@ -40,7 +40,7 @@ export default Vue.extend({
         ...mapGetters('TdStore', ['getSelections']),
         // Returns name of selected interactions
         getSelectionNames() {
-            let arrOfSelectionNames: any[] = [];
+            const arrOfSelectionNames: any[] = [];
             ((this as any).getSelections).forEach(element => {
                 arrOfSelectionNames.push(element.interactionName);
             });
@@ -50,6 +50,14 @@ export default Vue.extend({
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),
         startPerformancePrediction(settings) {
+            const {BrowserWindow} = require('electron');
+
+            const win = BrowserWindow.getAllWindows()[0];
+            const ses = win.webContents.session;
+
+            ses.clearCache(() => {
+            alert("Cache cleared!");
+            });
             this.resultStatus = StatusEnum.LOADING;
             this.resultData = (this as any).getPerformancePrediction(settings)
                 .then((res) => {
@@ -62,8 +70,18 @@ export default Vue.extend({
                 });
         },
         saveMeasurements(measurements) {
-            // TODO: save measurements
-            // console.log('measurements saved');
+            const storage = require('electron-json-storage');
+            storage.set(`${measurements[0].name}_${new Date()}`, measurements[0], function(error) {
+                if (error) throw error;
+            });
+
+            storage.getAll(function(error, data) {
+            if (error) throw error;
+            
+            console.log('ALL: ', data);
+            const dataPath = storage.getDataPath();
+            console.log(dataPath);
+            });
         }
     }
 });

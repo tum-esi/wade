@@ -31,7 +31,6 @@ export default Vue.extend({
     margin: 5px 0 5px 0;
     background: #939C9E;
     padding: 3px;
-    overflow: hidden;
 }
 
 .option-title {
@@ -40,5 +39,6 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     padding-left: 4px;
+    overflow: hidden;
 }
 </style>

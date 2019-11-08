@@ -100,8 +100,10 @@ export async function startPerformancePrediction(interactions: any, settings: an
         settings.iterations,
         settings.duration,
         settings.numClients,
-        settings.delayFirst,
-        settings.delayBeforeEach,
+        typeof settings.delayFirst === 'string'
+            ? parseInt(settings.delayFirst, 10) : settings.delayFirst,
+        typeof settings.delayBeforeEach === 'string'
+            ? parseInt(settings.delayBeforeEach, 10) : settings.delayBeforeEach,
         settings.measurementNum);
     const performanceResult = await performancePredictor.getPerformance();
     return await performanceResult;

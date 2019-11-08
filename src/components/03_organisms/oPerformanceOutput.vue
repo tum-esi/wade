@@ -3,6 +3,11 @@
         <div class="output-title">
             <label> {{ texts.title + resultStatus }}</label>
         </div>
+        <mPerformanceOutputElement 
+            v-for="(element, index) in formattedData"
+            :key="element + index"
+            :name="element.name"
+        />
         <div class="output-body">
             <div class="result" v-for="(element, index) in formattedData" :key="element + index">
                 <br>
@@ -33,6 +38,8 @@
                 Iterations: {{ element.iterations }}
                 <br>
                 Duration: {{ element.duration }}
+                <br> 
+                Measured Duration {{ element.measuredDuration}}
             </div>
         </div>
         <div class="output-button-container">
@@ -60,11 +67,13 @@
 import Vue from 'vue';
 import { StatusEnum } from '@/util/enums';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import mPerformanceOutputElement from '@/components/02_molecules/mPerformanceOutputElement.vue';
 
 export default Vue.extend({
     name: 'oPerformanceOutput',
     components: {
-        aButtonBasic
+        aButtonBasic,
+        mPerformanceOutputElement
     },
     props: {
         /**
