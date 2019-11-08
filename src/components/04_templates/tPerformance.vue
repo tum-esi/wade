@@ -50,14 +50,14 @@ export default Vue.extend({
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),
         startPerformancePrediction(settings) {
-            const {BrowserWindow} = require('electron');
+            // const {BrowserWindow} = require('electron');
 
-            const win = BrowserWindow.getAllWindows()[0];
-            const ses = win.webContents.session;
+            // const win = BrowserWindow.getAllWindows()[0];
+            // const ses = win.webContents.session;
 
-            ses.clearCache(() => {
-            alert("Cache cleared!");
-            });
+            // ses.clearCache(() => {
+            // alert("Cache cleared!");
+            // });
             this.resultStatus = StatusEnum.LOADING;
             this.resultData = (this as any).getPerformancePrediction(settings)
                 .then((res) => {
