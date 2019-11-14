@@ -71,13 +71,13 @@ export default Vue.extend({
         },
         saveMeasurements(measurements) {
             const storage = require('electron-json-storage');
-            storage.set(`${measurements[0].name}_${new Date()}`, measurements[0], function(error) {
+            storage.set(`${measurements[0].name}_${new Date()}`, measurements[0], (error) => {
                 if (error) throw error;
             });
 
-            storage.getAll(function(error, data) {
+            storage.getAll( (error, data) => {
             if (error) throw error;
-            
+
             console.log('ALL: ', data);
             const dataPath = storage.getDataPath();
             console.log(dataPath);
