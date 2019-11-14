@@ -21,7 +21,6 @@
     "coap": "^0.23.1",
     "core-js": "^2.6.5",
     "electron-json-storage": "^4.1.8",
-    "node-aead-crypto": "^2.1.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0",
     "vue-property-decorator": "^8.3.0",
