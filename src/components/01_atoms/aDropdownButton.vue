@@ -1,10 +1,12 @@
 <template>
-    <div class="dropdown-btn-container" v-on:click.prevent="showDropdown =! showDropdown">
+    <div class="dropdown-btn-container" v-on:click.prevent="showDropdown =! showDropdown" :title="btnTitle">
         <div v-if="btnLabel" class="button-label-container">
             <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
         </div>
 
         <img class="button-icon" v-if="btnSrc" v-bind:src="iconSrc" :class="btnIconStyle">
+
+        <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
 
         <div class="dropdown-container" v-if="showDropdown" :class="btnStyle">
             <div
@@ -34,6 +36,20 @@ export default Vue.extend({
         type: String,
         required: false,
         default: ''
+        },
+        /**
+         * Font awesome Icon to be displayed.
+         */
+        btnFaIcon: {
+            type: String,
+            required: false
+        },
+        /**
+         * Title of the button
+         */
+        btnTitle: {
+            type: String,
+            required: false
         },
         /**
          * The key should explain the main purpose of the button.
@@ -199,6 +215,17 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 5px;
+    border: none;
+}
+
+.button-label-container:hover {
+    color: white;
+    background-color: #8aaba9;
+}
+
+.button-label {
+    font-size: 13px;
 }
 
 /* btn style for sidebar dropdown options */
@@ -214,5 +241,25 @@ export default Vue.extend({
 .mashup-icon-style {
     width: 6%;
     padding: 7px 3px 7px 7px;
+}
+
+/* === Styles for the dropdown box in the TD Editor Tab (Load Example TD) */
+.dropdown-custom-editor {
+    left: 0px;
+    width: max-content;
+    max-width: 300px;
+    top: 30px;
+    margin-top: 0;
+}
+
+.dropdown-custom-vt {
+    width: max-content;
+    min-width: 30px;
+    margin-top: 45px;
+    left: -220px;
+}
+
+.dropdown-custom-editor div:hover{
+    background-color: #8aaba9;
 }
 </style>

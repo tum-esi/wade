@@ -1,8 +1,17 @@
 <template>
     <div class="editor-container"> 
         <div class="editor-title">
-            <label>Thing Description:</label>
+            <label>Thing Description</label>
             <label>{{this.id}}</label>
+            <div class="editor-dropdown-container"> 
+            <aDropdownButton
+                btnLabel="Load Example TD"
+                btnKey="insert-example-td"
+                :btnDropdownOptions="TdFileList"
+                btnStyle="dropdown-custom-editor"
+                class="style-aDropdownButton"
+            />
+            </div>
         </div>
         <div class="editor-area">
             <textarea :placeholder="getEditorPlaceholder" spellcheck="false" wrap="off" v-model="currentTd"></textarea>
@@ -29,18 +38,22 @@
 <script lang="ts">
 import Vue from 'vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import { TdStateEnum } from '@/util/enums';
-import { getFormattedJsonString } from '@/util/helpers';
+import { getFormattedJsonString, loggingError } from '@/util/helpers';
+import * as Api from '@/backend/Api';
 
 export default Vue.extend({
     name: 'oEditor',
     components: {
         aButtonBasic,
+        aDropdownButton
     },
     data() {
         return {
             td: '',
+            TdFileList: [] as WADE.DropdownOptionInterface[],
             configButton: {
                 btnLabel: 'Change Configuration',
                 btnClass: 'btn-config-big',
@@ -55,10 +68,13 @@ export default Vue.extend({
     },
     created() {
         this.$eventHub.$on('fetched-td', this.tdChanged);
+        this.$eventHub.$on('dropdown-clicked', (eventObject) => {this.dropDownReaction(eventObject); });
         this.tdChanged({ td: (this as any).getSavedTd(this.id)});
+        this.loadTdFiles();
     },
     beforeDestroy() {
         this.$eventHub.$off('fetched-td');
+        this.$eventHub.$off('dropdown-clicked');
     },
     computed: {
         ...mapGetters('TdStore', ['getEditorPlaceholder']),
@@ -106,7 +122,31 @@ export default Vue.extend({
             (this as any).resetInteractions();
             (this as any).resetSelections();
             (this as any).resetResults();
+
+            // Update possible protocol list
             this.$eventHub.$emit('selections-reseted');
+        },
+        loadTdFiles() {
+            Api.showExampleTds()
+            .then( (fileList) => {
+                this.TdFileList = fileList as any;
+            }, (reason) => {
+                loggingError(new Error('getExampleTDs failed due reason:' + reason));
+            });
+        },
+        dropDownReaction(eventObject) {
+            if (eventObject.btnKey === 'insert-example-td') {
+                Api.loadExampleTd(eventObject.btnValue)
+                .then( (exampleTD) => {
+                    if (typeof(exampleTD) === 'string') {
+                        this.tdChanged({td: exampleTD});
+                    }
+                }, (reason) => {
+                    loggingError(new Error('load Example TDs failed due to reason:' + reason));
+                });
+            } else {
+                // event not relevant for this function
+            }
         }
     },
     watch: {
@@ -123,6 +163,7 @@ export default Vue.extend({
 }
 
 .editor-title {
+    position: relative;
     padding: 7px 0px 7px 2px;
     max-height: 8%;
     min-height: 50px;
@@ -155,5 +196,19 @@ export default Vue.extend({
     padding-top: 7px;
     display: flex;
     justify-content: space-between;
+}
+
+.editor-dropdown-container{
+    right: 0px;
+    display: inline-block;
+}
+
+.style-aDropdownButton {
+    margin-left: 10px;
+    text-align:center;
+}
+
+.style-aDropdownButton:hover {
+    border-color: #8aaba9;
 }
 </style>

@@ -2,7 +2,12 @@ import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
 import PerformancePrediction from './PerformancePrediction';
 import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
+import { isDevelopment } from '@/util/helpers';
 import MessageHandler from './MessageHandler';
+import VtCall from './VtCall';
+import * as stream from 'stream';
+import * as fs from 'fs';
+import * as path from 'path';
 
 let tdConsumer: any = null;
 
@@ -214,4 +219,94 @@ export async function invokeInteractions(selectedInteractions) {
         resultActions,
         resultEvents
     };
+}
+
+export function createNewVt(
+    VtConfig: string,
+    writeOut: stream.Writable,
+    writeError: stream.Writable,
+    Td: string
+    ) {
+        return new Promise ( (res, rej) => {
+            const newVtCall = new VtCall(VtConfig, writeOut, writeError, Td);
+
+            newVtCall.launchVt()
+            .then( () => {
+                res(newVtCall);
+            }, (err) => {
+                rej(new Error('creating Virtual Thing had problems:' + err));
+            });
+        });
+}
+
+export function removeVt(VT: VtCall) {
+    return new Promise( (res, rej) => {
+        VT.stopVt()
+        .then( () => {
+            VT = null as any;
+            res();
+        }, (err) => {
+            rej(err);
+        });
+    });
+}
+
+export function showExampleTds() {
+    return new Promise( (res, rej) => {
+
+        let pathToExamples: string;
+        if (isDevelopment()) {
+            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+        } else {
+            if (process.resourcesPath) {
+                pathToExamples = path.join(process.resourcesPath, 'example-tds');
+            } else {
+                pathToExamples = '';
+                rej(new Error('process resources Path is undefined'));
+            }
+        }
+
+        fs.readdir(pathToExamples,
+            (err, fileList) => {
+                if (err) {
+                    rej(new Error('Problem at reading example tds: ' + err));
+                } else {
+                    const output = [] as WADE.DropdownOptionInterface[];
+                    fileList.forEach( (file, ind) => {
+                        output.push( {title: file.slice(0, -5), key: file} );
+                    });
+                    res(output);
+                }
+        });
+
+   });
+}
+
+export function loadExampleTd(exampleTdPath: string) {
+    return new Promise( (res, rej) => {
+
+        let pathToExamples: string;
+        if (isDevelopment()) {
+            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+        } else {
+            if (process.resourcesPath) {
+                pathToExamples = path.join(process.resourcesPath, 'example-tds');
+            } else {
+                pathToExamples = '';
+                rej(new Error('process resources Path is undefined'));
+            }
+        }
+
+        fs.readFile(path.join(pathToExamples, exampleTdPath),
+            (err, data) => {
+                if (err) {
+                    rej(new Error('Problem at reading the example Td file: ' + err));
+                } else {
+                    let output: string;
+                    output = data.toString();
+                    res(output);
+                }
+        });
+
+    });
 }

@@ -119,7 +119,7 @@ declare global {
       selectable?: boolean;
       editable?: boolean;
       type?: AvailablePropertyDataTypesEnum;
-      inputValue?: undefined | null | string | number; // TODO: get alll available input
+      inputValue?: undefined | null | string | number; // TODO: get all available input
     }
 
     interface SidebarElement {

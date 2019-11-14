@@ -1,6 +1,8 @@
 import * as Api from '@/backend/Api';
-import { RESULT_MESSAGES } from '@/util/enums';
+import { RESULT_MESSAGES, VtStatus } from '@/util/enums';
 import { InteractionStateEnum, TdStateEnum, ProtocolEnum } from '@/util/enums';
+import * as stream from 'stream';
+import VtCall from '@/backend/VtCall';
 
 export default {
     namespaced: true,
@@ -22,6 +24,10 @@ export default {
         resultProps: [],
         resultActions: [],
         resultEvents: [],
+        virtualThing: undefined,
+        VtExists: false,
+        vtOutputStd: '',
+        vtOutputErr: '',
         // ===== STATIC STORE STATES ===== //
         tdTabs: [
             {
@@ -55,6 +61,13 @@ export default {
                 tabTitle: 'Performance',
                 tabStyle: 'tab-container-in-tabbar',
                 tabLink: '/performance',
+                tabIsActive: false
+            },
+            {
+                tabId: 'virtual',
+                tabTitle: 'Virtual Thing',
+                tabStyle: 'tab-container-in-tabbar',
+                tabLink: '/virtual',
                 tabIsActive: false
             }
         ],

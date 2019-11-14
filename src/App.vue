@@ -231,6 +231,10 @@ textarea:focus, input:focus{
     color: #393B3A !important;
 }
 
+.active-status {
+  background-color: lightgreen;
+}
+
 .full-width {
   width: 100% !important;
 }

@@ -64,12 +64,31 @@ export enum TdConfigEnum {
   ERROR = 'Error: Wrong data format. Change config to make it saveable.'
 }
 
+/* The enum values indexes of SAVE_SUCCESS and ERROR must be equal
+ to the indexes at the TdConfigEnum, to ensure that aConfigStatusBar
+ highliting works */
+export enum TdVirtualConfigEnum {
+  INFO = 'This config will be used to generate a Virtual Thing for your TD',
+  UNSAVED = 'Please save your changes to apply them',
+  SAVE_SUCCESS = 'Virtual Thing config was safed successfully.',
+  RESET = 'Virtual Thing config was resetted to default config. Save to apply!',
+  ERROR = 'Error: Wrong data format. Change Virtual Thing config to make it saveable.'
+}
+
 export enum ProtocolEnum {
   HTTP = 'http',
   HTTPS = 'https',
   COAP = 'coap',
   COAPS = 'coaps',
   MQTT = 'mqtt'
+}
+
+export enum VtStatus {
+  NOT_CREATED = 'Virtual Thing is not running for this TD',
+  STARTUP = 'a Virtual Thing is currently being created',
+  RUNNING = 'Virtual Thing is up',
+  STOPPED = 'the virtualization is being stopped',
+  ERROR = 'there has been an error with Virtual Thing'
 }
 
 export enum MeasurementTypeEnum {

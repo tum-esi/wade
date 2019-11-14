@@ -1,5 +1,9 @@
-import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum } from '@/util/enums';
+import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum } from '@/util/enums';
 import * as Api from '@/backend/Api';
+import * as stream from 'stream';
+import { loggingError } from '@/util/helpers';
+import { virtualConfigDefault } from '@/util/defaults';
+
 
 export default {
     namespaced: true,
@@ -110,7 +114,13 @@ export default {
                         id: newElement.id,
                         type: newElement.type,
                         content: '',
-                        config: state.configDefault
+                        config: state.configDefault,
+                        vconfig: virtualConfigDefault,
+                        virtualthing: {
+                            status: VtStatus.NOT_CREATED,
+                            outMsg: [],
+                            vt: undefined // not necessary, but used to remember that property is used
+                        }
                     });
                     return newElement;
                 case ElementTypeEnum.FOLDER:
@@ -146,6 +156,120 @@ export default {
                     break;
             }
         },
+        async addVt({ commit, state },
+                    payload: {id: string, VtConfig: string, GivenTd: string, TdState: TdStateEnum}) {
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+
+                    commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STARTUP});
+
+                    // Check if there is already a Vt-process attached to the Td element
+                    if (!element.virtualthing.vt ) {
+                        const virtTd = payload.GivenTd;
+
+                        // create new Writable streams for error and std output
+                        const stdStream = new stream.Writable();
+                        stdStream._write = (chunk, encoding, done) => {
+                            const cont = chunk.toString();
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: cont, isProgram: true}
+                            });
+                            done();
+                        };
+                        const errStream = new stream.Writable();
+                        errStream._write = (chunk, encoding, done) => {
+                            const cont = chunk.toString();
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: cont, isError: true, isProgram: true}
+                            });
+                            done();
+                        };
+
+                        // check if Td is okay, give error message elsewise
+                         if (   payload.TdState === TdStateEnum.VALID_TD ||
+                                payload.TdState === TdStateEnum.VALID_CONSUMED_TD ) {
+
+                            // create new Vt
+                            Api.createNewVt(payload.VtConfig, stdStream, errStream, virtTd)
+                            .then( (createdVt) => {
+                                commit('setVirtualThing', {id: payload.id, vt: createdVt});
+                                commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.RUNNING});
+                            }, (err) => {
+                                const errMSG = 'cannot virtualize the thing, there has been an error';
+                                commit('setVtOutputMsg', {
+                                    id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                                });
+                                element.virtualthing.status = VtStatus.ERROR;
+                                setTimeout( () => {
+                                    element.virtualthing.status = VtStatus.NOT_CREATED;
+                                }, 2000);
+                                loggingError(new Error('internal error:' + err));
+                            });
+                        } else {
+                            const errMSG = 'cannot virtualize the thing,' +
+                            ' because the saved TD is not valid or no TD is saved';
+                            commit('setVtOutputMsg', {
+                                id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                            });
+                            element.virtualthing.status = VtStatus.ERROR;
+                            setTimeout( () => {
+                                element.virtualthing.status = VtStatus.NOT_CREATED;
+                            }, 2000);
+                        }
+
+                    } else {
+                        const errMSG = 'cannot virtualize the td, because Virtual Thing is already running on this thing';
+                        commit('setVtOutputMsg', {
+                            id: payload.id, outMsg: {content: errMSG, isError: true, isProgram: false}
+                        });
+                        element.virtualthing.status = VtStatus.ERROR;
+                        setTimeout( () => {
+                            element.virtualthing.status = VtStatus.NOT_CREATED;
+                        }, 2000);
+                    }
+                    break;
+                }
+            }
+        },
+        async remVt({commit, state }, payload: {id: string}) {
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    if (tdElement.virtualthing.vt) {
+                        commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.STOPPED});
+                        Api.removeVt(element.virtualthing.vt)
+                        .then( () => {
+                            tdElement.virtualthing = {
+                                status: VtStatus.NOT_CREATED,
+                                outMsg: element.virtualthing.outMsg,
+                                vt: undefined
+                            };
+                            index = state.tds.indexOf(element);
+                            state.tds[index] = tdElement;
+                            commit('setVtOutputMsg', {id: payload.id, outMsg: {
+                                content: 'Virtual Thing was stopped!',
+                                isError: false
+                            }});
+                        }, (err) => {
+                            loggingError('could not stop virtual thing: ' + err);
+                            commit('setVtOutputMsg', {id: payload.id, outMsg: {
+                                content: 'Virtual Thing could not be stopped properly' ,
+                                isError: true
+                            }});
+                            commit('setVtStatus', {id: payload.id, vtStatus: VtStatus.ERROR});
+                            setTimeout( () => {
+                                element.virtualthing.status = VtStatus.RUNNING;
+                            }, 2000);
+                        });
+                    } else {
+                        loggingError(new Error('found no vt on the td'));
+                    }
+                    break;
+                }
+            }
+        }
     },
     mutations: {
         saveTdConfig(state: any, payload: { config: any, id: string }) {
@@ -161,9 +285,30 @@ export default {
                 }
             }
         },
-        // Saves the protocols avauílable in a td to the td element
+        saveTdVirtualConfig(state: any, payload: { vconfig: any, id: string }) {
+            let tdElement: { id: string, type: string, vconfig: any, content?: any };
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.vconfig = payload.vconfig;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
+        },
+        // Saves the protocols available in a td to the td element
         saveTdProtocols(state: any, payload: { id: string, td: any }) {
-            let tdElement: { id: string, type: string, config: any, content?: any, protocols?: ProtocolEnum[] | null};
+            let tdElement: {
+                id: string,
+                type: string,
+                config: any,
+                vconfig: any,
+                content?: any,
+                protocols?: ProtocolEnum[] | null,
+                virtualthing: any
+            };
             const protocols: ProtocolEnum[] | null = Api.retrieveProtocols(payload.td);
             for (const td of state.tds) {
                 if (td.id === payload.id) {
@@ -176,7 +321,7 @@ export default {
         },
         // Find td element and save content to it
         saveTd(state: any, payload: { content: any, id: string }) {
-            let tdElement: { id: string, type: string, content: any, config: any };
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
             for (const element of state.tds) {
                 if (element.id === payload.id) {
@@ -243,11 +388,142 @@ export default {
         // Sets active sidebar element (shown in UI)
         setActiveElement(state: any, payload: any) {
             state.activeElementId = payload;
+        },
+        setVirtualThing(state: any, payload: {id: string, vt: any}) {
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.virtualthing.vt = payload.vt;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
+        },
+        /**
+         * Adds the given outMsg to the output field in the
+         * virtual thing tab. In addition to that, the function
+         * also adds the current time to the message and checks
+         * whether the maximum array size of the output field is
+         * reached
+         *
+         * @param state given vuex state
+         * @param payload id of the td, outMsg to add:
+         *                              - content The message to display
+         *                              - isError Is it an Error message?
+         *                              - isProgram Is it output of a Program? (listening to stdout of a cli)
+         */
+        setVtOutputMsg(state: any, payload: {
+                                id: string, outMsg: {
+                                    content: string,
+                                    isError?: boolean,
+                                    isProgram?: boolean
+                                }}) {
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
+            let index: number;
+            const maxOutMsg = 200;
+
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    const daytime = new Date(Date.now());
+                    tdElement = element;
+                    let provContent: string;
+                    let newContent: string[];
+
+                    if (payload.outMsg.content.slice(0, 15) === '[32minfo[39m:') {
+                        provContent = payload.outMsg.content.slice(15);
+                    } else {
+                        provContent = payload.outMsg.content;
+                    }
+
+                    newContent = provContent.split('[32minfo[39m:');
+
+
+                    newContent.forEach((msg, ind) => {
+                        let checkAction = false;
+                        let checkPropertyRead = false;
+                        let checkPropertyWrite = false;
+                        let checkEvent = false;
+                        let message = msg;
+
+                        while (message.slice(0, 1) === ' ') {
+                            message = message.slice(1);
+                        }
+
+                        if (payload.outMsg.isProgram === true) {
+                            const checkType = message.slice(0, 3);
+
+                            if (checkType === 'A: ') {
+                                checkAction = true;
+                                message = message.slice(2);
+                            } else if (checkType === 'PR:') {
+                                checkPropertyRead = true;
+                                message = message.slice(3);
+                            } else if (checkType === 'PW:') {
+                                checkPropertyWrite = true;
+                                message = message.slice(3);
+                            } else if (checkType === 'E: ') {
+                                checkEvent = true;
+                                message = message.slice(2);
+                            }
+                        }
+
+
+                        const newMsg = {
+                            time: {
+                                // "full" to be used as vue-key attribute (-> has to be unique)
+                                full: daytime.getDate().toString() +
+                                daytime.getHours().toString() +
+                                daytime.getMinutes().toString() +
+                                daytime.getSeconds().toString() +
+                                daytime.getMilliseconds().toString() +
+                                message + ind.toString(),
+                                h: ('0' + daytime.getHours()).slice(-2),
+                                m: ('0' + daytime.getMinutes()).slice(-2),
+                                s: ('0' + daytime.getSeconds()).slice(-2)
+                            },
+                            content: message,
+                            isError: payload.outMsg.isError ? true : false,
+                            isProgram: payload.outMsg.isProgram ? true : false,
+                            isVtAction: checkAction,
+                            isVtPropertyRead: checkPropertyRead,
+                            isVtPropertyWrite: checkPropertyWrite,
+                            isVtEvent: checkEvent
+                        };
+                        tdElement.virtualthing.outMsg.unshift(newMsg);
+                        if (tdElement.virtualthing.outMsg.length > maxOutMsg) {
+                            tdElement.virtualthing.outMsg.pop();
+                        }
+                    });
+                    // write to the state element
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
+        },
+        setVtStatus(state: any, payload: {id: string, vtStatus: VtStatus}) {
+            let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
+            let index: number;
+            for (const element of state.tds) {
+                if (element.id === payload.id) {
+                    tdElement = element;
+                    tdElement.virtualthing.status = payload.vtStatus;
+                    index = state.tds.indexOf(element);
+                    state.tds[index] = tdElement;
+                    break;
+                }
+            }
         }
     },
     getters: {
         getDefaultConfig(state: any) {
             return JSON.stringify(state.configDefault);
+        },
+        getDefaultVirtualConfig(state: any) {
+            return JSON.stringify(virtualConfigDefault);
         },
         getConfig(state: any) {
             return (id: string) => {
@@ -263,6 +539,26 @@ export default {
                                 config = td.config.toString();
                             }
                             return config;
+                        }
+                    }
+                }
+                return '';
+            };
+        },
+        getVirtualConfig(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (!td.vconfig || td.vconfig.length <= 0) {
+                            return JSON.stringify(virtualConfigDefault);
+                        } else {
+                            let vconfig;
+                            try {
+                                vconfig = JSON.stringify(td.vconfig);
+                            } catch (error) {
+                                vconfig = td.vconfig.toString();
+                            }
+                            return vconfig;
                         }
                     }
                 }
@@ -348,6 +644,66 @@ export default {
                 }
                 checkId(id, state.sidebarElements);
                 return doesExist;
+            };
+        },
+        getVtStatus(state: any) {
+            return (id: string) => {
+                let retStatus = VtStatus.NOT_CREATED;
+                let retError = false;
+                let retActive = false;
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        // return td.content || '';
+                        if ( td.virtualthing.status ) {
+                            retStatus = td.virtualthing.status;
+                            if ( retStatus === VtStatus.ERROR ) {
+                                retError = true;
+                            } else if ( retStatus === VtStatus.STARTUP ||
+                                        retStatus === VtStatus.STOPPED ||
+                                        retStatus === VtStatus.RUNNING) {
+                                retActive = true;
+                            }
+                        } else {
+                            loggingError(new Error('virtual thing status does not exist'));
+                        }
+                        return {msg: retStatus, err: retError, active: retActive};
+                    }
+                }
+                return '';
+            };
+        },
+        getVtLink(state: any) {
+            return (id: string) => {
+                let retLink: string;
+                let retCopy: string[];
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (td.virtualthing.vt) {
+                            if ( td.virtualthing.vt.link ) {
+                                retLink = td.virtualthing.vt.link;
+                            } else {
+                                retLink = '';
+                            }
+                            if (td.virtualthing.vt.copyLinks) {
+                                retCopy = td.virtualthing.vt.copyLinks;
+                            } else {
+                                retCopy = [];
+                            }
+                            return {link: retLink, copyLinks: retCopy};
+                        }
+                    }
+                }
+                return {link: '', copyLinks: []};
+            };
+        },
+        getVtOutputMsg(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.virtualthing.outMsg || [];
+                    }
+                }
+                return '';
             };
         }
     }

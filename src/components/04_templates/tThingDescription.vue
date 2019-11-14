@@ -12,7 +12,7 @@
     </div>
     <!-- Tab Editor & Selection & Results -->
     <div v-if="currentTabId === 'editor'" class="td-editor">
-      <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
+      <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" /> <!-- TODO no property statusMessage exists on aStatusbar! can be removed? -->
       <div class="td-main">
         <div class="td-main-left border-right">
           <mUrlBar
@@ -38,6 +38,10 @@
         </div>
       </div>
     </div>
+    <div v-if="currentTabId === 'virtual'" class="td-virtual">
+      <oVirtual/>
+      <oVirtualThing/>
+    </div>
   </div>
 </template>
 
@@ -49,6 +53,8 @@ import mTabbar from '@/components/02_molecules/mTabbar.vue';
 import mUrlBar from '@/components/02_molecules/mUrlBar.vue';
 import oConfig from '@/components/03_organisms/oConfig.vue';
 import oEditor from '@/components/03_organisms/oEditor.vue';
+import oVirtual from '@/components/03_organisms/oVirtual.vue';
+import oVirtualThing from '@/components/03_organisms/oVirtualThing.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
@@ -64,6 +70,8 @@ export default Vue.extend({
     oConfig,
     oProtocolSelection,
     oEditor,
+    oVirtual,
+    oVirtualThing,
     oSelection,
     oResults,
     mTabbar,
@@ -173,6 +181,12 @@ export default Vue.extend({
 
 .td-config {
   height: 93%;
+  width: 100%;
+  display: flex;
+}
+
+.td-virtual {
+  height: 80%;
   width: 100%;
   display: flex;
 }

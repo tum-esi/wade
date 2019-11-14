@@ -11,7 +11,8 @@ router.beforeEach((to, from, next) => {
   const pathAvailable = to.name === 'home' ? true : (to.name === 'thingDescription'
       || to.name === 'folder'
       || to.name === 'mashup'
-      || to.name === 'config')
+      || to.name === 'config'
+      || to.name === 'virtual')
       && to.params && to.params.id
       && store.getters['SidebarStore/doesIdAlreadyExist'](to.params.id);
 
