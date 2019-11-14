@@ -26,6 +26,13 @@ declare global {
       MASHUP = 'mashup'
     }
 
+    interface MqttConfigInterface {
+      broker: string;
+      username: string | undefined;
+      password: string | undefined;
+      clientId: string | undefined;
+    }
+
     interface ModalAddElementInterface {
       type: string;
       src: string;
@@ -159,6 +166,24 @@ declare global {
       tabLink?: string;
       // If tab is active / should have indication to be active.
       tabIsActive?: boolean;
+    }
+
+    interface PerformanceResult {
+      name: string;
+      size: string;
+      type: any; // PossibleInteractionTypesEnu
+      numClients: number;
+      firstMeasured: number;
+      delayFirst: number | boolean;
+      delayBeforeEach: number | boolean;
+      realistic: { WCET: number, BCET: number, AET: number } | null;
+      possible: { WCET: number, BCET: number, AET: number } | null;
+      realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
+      possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
+      measuredExecutions: number[] | null;
+      iterations?: number;
+      duration?: number;
+      measuredDuration?: number; // Duration it actually took
     }
   }
 }

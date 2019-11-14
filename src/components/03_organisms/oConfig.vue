@@ -265,8 +265,7 @@ export default Vue.extend({
 
 .config-area {
     width: 100%;
-    height: 73%;
-    max-height: 800px;
+    height: 79%;
 }
 
 .config-area textarea{
@@ -295,7 +294,7 @@ export default Vue.extend({
 }
 
 .config-btns {
-    height: 10%;
+    height: 7%;
     padding-top: 7px;
     display: flex;
     justify-content: space-between;

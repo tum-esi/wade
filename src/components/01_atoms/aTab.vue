@@ -1,6 +1,6 @@
 <template>
   <div class="tab-container" 
-    :class="tabStyle"
+    :class="`${tabStyle} ${tabIsActive ? 'isActive' : ''}`"
     v-on:click="$emit('tab-clicked', tabId)">
 
       <aIconButton 
@@ -109,7 +109,9 @@ export default Vue.extend({
 .tab-container {
   display: flex;
   align-items: center;
-  text-align: center;
+}
+
+.tab-container label {
   overflow: hidden;
 }
 
@@ -128,14 +130,19 @@ export default Vue.extend({
 
 .tab-btn-header {
   padding: 15px 7px 15px 7px;
+  background: none;
 }
 
 .tab-btn-header:hover {
-  background: #b5dfdd;
+  background: none;
+}
+
+.tab-label:hover {
+  cursor: pointer;
 }
 
 .isActive {
-  background: #b4bab9;
+  background: #939c9e;
 }
 
 /* Will only be applied for tabbar-tabs */

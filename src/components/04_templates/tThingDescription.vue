@@ -1,10 +1,16 @@
 <template>
   <div class="td-page-container">
     <mTabbar :tabbarElements="getTdTabbar" v-on:tab-clicked="tabClicked" />
+    <!-- Tab Config -->
     <div v-if="currentTabId === 'config'" class="td-config">
       <oConfig class="td-config-child-el"/>
       <!-- <oProtocolSelection class="td-config-child-el" /> -->
     </div>
+    <!-- Tab Performance -->
+    <div v-if="currentTabId === 'performance'" class="td-performance"> 
+      <tPerformance class="" />
+    </div>
+    <!-- Tab Editor & Selection & Results -->
     <div v-if="currentTabId === 'editor'" class="td-editor">
       <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" /> <!-- TODO no property statusMessage exists on aStatusbar! can be removed? -->
       <div class="td-main">
@@ -41,7 +47,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 import aStatusbar from '@/components/01_atoms/aStatusbar.vue';
 import mTabbar from '@/components/02_molecules/mTabbar.vue';
 import mUrlBar from '@/components/02_molecules/mUrlBar.vue';
@@ -52,8 +58,9 @@ import oVirtualThing from '@/components/03_organisms/oVirtualThing.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
+import tPerformance from '@/components/04_templates/tPerformance.vue';
 import { Url } from 'url';
-import { TdStateEnum } from '../../util/enums';
+import { TdStateEnum, TDTabsEnum } from '../../util/enums';
 import { ftruncate } from 'fs';
 
 export default Vue.extend({
@@ -68,9 +75,11 @@ export default Vue.extend({
     oSelection,
     oResults,
     mTabbar,
-    mUrlBar
+    mUrlBar,
+    tPerformance
   },
   created() {
+    this.changeActiveTab();
     this.$eventHub.$on('dropdown-clicked', this.tabClicked);
     this.$store.commit('SidebarStore/setActiveElement', this.$route.params.id);
   },
@@ -80,7 +89,7 @@ export default Vue.extend({
   data() {
     return {
       tdId: '',
-      currentTabId: 'editor',
+      currentTabId: TDTabsEnum.EDITOR as TDTabsEnum | string,
       statusMessage: '',
       showUrlBar: false,
       fetchButton: {
@@ -127,10 +136,11 @@ export default Vue.extend({
     }
   },
   methods: {
+    ...mapMutations('TdStore', ['setActiveTab']),
     hideUrlBar() {
       if (this.showUrlBar) this.showUrlBar = false;
     },
-    tabClicked(args: any) {
+    tabClicked(args: any | TDTabsEnum) {
       if (args.btnValue === 'td-url') {
         this.showUrlBar = true;
       }
@@ -139,6 +149,9 @@ export default Vue.extend({
       //   name: 'config',
       //   params: { type: 'td', id: this.id, tab: 'config' }
       // });
+    },
+    changeActiveTab(): void {
+      (this as any).setActiveTab({tabbarKey: 'tdTabs', activeTab: this.currentTabId});
     }
   },
   watch: {
@@ -146,6 +159,11 @@ export default Vue.extend({
     '$route.params.id'(id) {
       this.$store.commit('SidebarStore/setActiveElement', id);
       this.tdId = id;
+      this.currentTabId = TDTabsEnum.EDITOR;
+    },
+    // Change active tab if tab id changed
+    'currentTabId'() {
+      this.changeActiveTab();
     }
   }
 });
@@ -158,11 +176,11 @@ export default Vue.extend({
 }
 
 .td-editor {
-  height: 90%;
+  height: 93%;
 }
 
 .td-config {
-  height: 90%;
+  height: 93%;
   width: 100%;
   display: flex;
 }
@@ -180,7 +198,13 @@ export default Vue.extend({
 
 .td-main {
   display: flex;
-  height: 90%;
+  height: 93%;
+}
+
+.td-performance {
+  height: 93%;
+  width: 100%;
+  display: flex;
 }
 
 .td-main-left {
@@ -201,7 +225,7 @@ export default Vue.extend({
 
 .url-bar {
   width: 100%;
-  height: 10%;
+  height: 8%;
 }
 
 .editor-full {
@@ -209,6 +233,6 @@ export default Vue.extend({
 }
 
 .editor-showUrlBar {
-  height: 90%;
+  height: 92%;
 }
 </style>

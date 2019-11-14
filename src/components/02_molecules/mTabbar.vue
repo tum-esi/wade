@@ -46,7 +46,7 @@ export default Vue.extend({
   display: inline-block;
   border-bottom: 1px solid #393B3A;
   width: 100%;
-  height: 10%;
+  height: 7%;
 }
 .tabbar-elements {
   height: 100%;

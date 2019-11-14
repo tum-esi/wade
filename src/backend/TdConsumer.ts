@@ -4,13 +4,12 @@ import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/bin
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
-
-// const DEFAULT_COAP_PORT = 5683;
-// const DEFAULT_COAP_PORT = 5055;
-// const DEFAULT_HTTP_PORT = 8080;
-// const DEFAULT_MQTT_PORT = 1883;
+import * as WoT from 'wot-typescript-definitions';
 
 export default class TdConsumer {
+    // default coap port = 5683;
+    // default mqtt port = 1883;
+    // default http port = 8080;
 
     private td: string;
     private config: any;
@@ -20,6 +19,8 @@ export default class TdConsumer {
     private tdState: TdStateEnum | null;
     private errorMsg: string | null;
 
+    private servient: any | null; // TODO: there is no servient type in wot-typescript-definitions
+
     constructor(td: string, config: any, protocols: string[]) {
         this.td = td;
         this.config = config;
@@ -28,10 +29,19 @@ export default class TdConsumer {
         this.tdConsumed = null;
         this.tdState = null;
         this.errorMsg = null;
+        this.servient = null;
+    }
+
+    public setConsumer(td: string, config: any, protocols: string[]) {
+        this.td = td;
+        this.config = config;
+        this.protocols = protocols;
     }
 
     public async getConsumedTd() {
         await this.parseTdJson(this.td);
+
+        // if the td is in valid json format, consume it.
         if (this.tdState === TdStateEnum.VALID_TD_JSON) await this.consumeThing();
 
         return {
@@ -41,6 +51,7 @@ export default class TdConsumer {
             errorMsg: this.errorMsg
         };
     }
+
 
     // Tries to parse given td-string to a json object
     private async parseTdJson(td: string) {
@@ -64,60 +75,64 @@ export default class TdConsumer {
 
     // Tries to consume given td json object
     private async consumeThing() {
-        const servient = new Servient();
+        // console.log('servient:', this.servient);
+        // if (this.servient) this.servient.shutdown();
+        this.servient = new Servient();
 
         // Get config of td, possibly altered by user
-        if (this.config && this.config.credentials) servient.addCredentials(this.config.credentials);
+        if (this.config && this.config.credentials) this.servient.addCredentials(this.config.credentials);
+
+        // Now check which ClientFactories need to be added (based on the given protocols)
 
         if (this.protocols.indexOf('mqtt') !== -1) {
-            // Default mqtt config
-            const MQTT_CONFIG = {
-                uri: 'mqtt://localhost:1883',
-                username: undefined,
-                password: undefined,
-                clientId: undefined
-            };
-
-            // Add mqtt config entered by user
-            if (this.config && this.config.mqtt) {
-                MQTT_CONFIG.uri = this.config.mqtt.broker || '';
-                MQTT_CONFIG.username = this.config.mqtt.username || undefined;
-                MQTT_CONFIG.password = this.config.mqtt.password || undefined;
-                MQTT_CONFIG.clientId = this.config.mqtt.clientId || undefined;
+            if (!this.config || !this.config.mqtt) {
+                // mqtt config was found -> cannot connect to broker
+                this.tdState = TdStateEnum.INVALID_CONSUMED_TD;
+                this.errorMsg = 'No mqtt broker credentials were found in config';
+                return;
             }
 
-            // Add broker credentials
-            const mqttBrokerServer =
-                new MqttBrokerServer(MQTT_CONFIG.uri, MQTT_CONFIG.username, MQTT_CONFIG.password, MQTT_CONFIG.clientId);
-            servient.addServer(mqttBrokerServer);
+            // Set mqtt config from config (possibily entered by user)
+            const MQTT_CONFIG: WADE.MqttConfigInterface = {
+                broker: this.config.mqtt.broker || '',
+                username: this.config.mqtt.username || undefined,
+                password: this.config.mqtt.password || undefined,
+                clientId: this.config.mqtt.clientId || undefined
+            };
 
-            await servient.addClientFactory(new MqttClientFactory());
+            // Add broker credentials
+            const mqttBrokerServer = new MqttBrokerServer(
+                MQTT_CONFIG.broker,
+                MQTT_CONFIG.username,
+                MQTT_CONFIG.password,
+                MQTT_CONFIG.clientId
+            );
+            this.servient.addServer(mqttBrokerServer);
+
+            await this.servient.addClientFactory(new MqttClientFactory());
         }
 
         if (this.protocols.indexOf('coap') !== -1) {
-            // const coapServer = new CoapServer(DEFAULT_COAP_PORT);
-            // await servient.addServer(coapServer);
-            await servient.addClientFactory(new CoapClientFactory());
-            // await servient.addClientFactory(new CoapClientFactory(coapServer));
+            await this.servient.addClientFactory(new CoapClientFactory());
         }
 
         if (this.protocols.indexOf('coaps') !== -1) {
-            await servient.addClientFactory(new CoapsClientFactory());
+            await this.servient.addClientFactory(new CoapsClientFactory());
         }
 
         if (this.protocols.indexOf('http') !== -1) {
-            await servient.addClientFactory(new HttpClientFactory({}));
+            await this.servient.addClientFactory(new HttpClientFactory({}));
         }
 
         if (this.protocols.indexOf('https') !== -1) {
-            await servient.addClientFactory(new HttpsClientFactory({}));
+            await this.servient.addClientFactory(new HttpsClientFactory({}));
         }
 
         // await servient.addClientFactory(new WebSocketClientFactory());
         // await servient.addClientFactory(new WebSocketSecureClientFactory());
 
-        await servient.start().then((thingFactory) => {
-            this.tdConsumed = thingFactory.consume(JSON.stringify(this.tdJson));
+        await this.servient.start().then((factory: WoT.WoTFactory) => {
+            this.tdConsumed = factory.consume(JSON.stringify(this.tdJson));
             this.tdState = TdStateEnum.VALID_CONSUMED_TD;
             this.errorMsg = null;
         }).catch((err) => {
@@ -125,5 +140,6 @@ export default class TdConsumer {
             this.tdState = TdStateEnum.INVALID_CONSUMED_TD;
             this.errorMsg = err;
         });
+        this.servient.shutdown();
     }
 }

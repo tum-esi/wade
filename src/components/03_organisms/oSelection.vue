@@ -1,6 +1,8 @@
 <template>
     <div class="selection-container">
-        <div class="selection-title"><label>Selection</label></div>
+        <div class="selection-title">
+            <label>Interaction Selection</label>
+        </div>
         <div class="selection-area" v-if="isValidTd">
             <!-- Properties -->
             <div class="properties border-bottom-bold selection-area-el">
@@ -55,7 +57,9 @@
             </div>
             <div class="selection-btn">
                 <aBasicButton 
+                    v-if="showButtons.indexOf('selection-btn-reset') !== -1"
                     class="selection-btn-reset"
+                    :class="{'full-width' : showButtons.indexOf(' ') === -1}"
                     :btnClass="getSelectionResetBtn.btnClass"
                     :btnLabel="getSelectionResetBtn.btnLabel"
                     :btnOnClick="getSelectionResetBtn.btnOnClick"
@@ -63,12 +67,14 @@
                     v-on:reset-selections="resetAll"
                 />
                 <aBasicButton
+                    v-if="showButtons.indexOf('selection-btn-invoke') !== -1"
                     class="selection-btn-invoke"
+                    :class="{'full-width' : showButtons.indexOf(' ') === -1}"
                     :btnClass="getSelectionBtn.btnClass"
                     :btnLabel="getSelectionBtn.btnLabel"
                     :btnOnClick="getSelectionBtn.btnOnClick"
                     :btnActive="isBtnActive"
-                    v-on:invoke-interactions="invokeInteractions"
+                    v-on:invoke-interactions="invoke"
                 />
             </div>
         </div>
@@ -87,6 +93,19 @@ export default Vue.extend({
     components: {
         aBasicButton,
         mInteraction
+    },
+    props: {
+        /**
+         * Indicates which buttons should be shown
+         * Can be either 'selection-btn-reset selection-btn-invoke' -> both
+         * or 'selection-btn-reset' -> only reset btn
+         * or 'selection-btn-invoke' -> only invoke btn
+         */
+        showButtons: {
+            type: String,
+            required: false,
+            default: 'selection-btn-reset selection-btn-invoke'
+        }
     },
     beforeDestroy() {
         (this as any).resetInteractions();
@@ -128,10 +147,13 @@ export default Vue.extend({
             await (this as any).removeFromSelectedInteractions({ interactionToRemove: element});
         },
         // Remove all interactions from selected interacitons.
-        async resetAll() {
+        resetAll() {
+            this.$eventHub.$emit('selections-reseted');
             this.$eventHub.$emit('unsubscribe');
             (this as any).resetSelections();
-            this.$eventHub.$emit('selections-reseted');
+        },
+        invoke() {
+            (this as any).invokeInteractions();
         }
     },
     watch: {
@@ -150,15 +172,14 @@ export default Vue.extend({
 
 .selection-title {
     padding: 7px 0px 7px 2px;
-    max-height: 8%;
-    min-height: 50px;
+    height: 8%;
     display: flex;
     align-items: center;
 }
 
 .selection-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     border: 1px solid #393B3A;
     border-radius: 3px;
     background: #B4BAB9;
@@ -176,7 +197,7 @@ export default Vue.extend({
 }
 
 .selection-btn {
-    height: 12%;
+    height: 10%;
     padding-top: 7px;
     width: 100%;
     display: flex;
@@ -187,6 +208,7 @@ export default Vue.extend({
     width: 49%;
     padding: 5px;
     margin: 0;
+    font-size: 13px;
 }
 
 .interaction-container-all {

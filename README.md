@@ -2,6 +2,14 @@
 http://plugfest.thingweb.io:8083/TestThing
 
 ## TODOs and BUGS 
+
+TODO: 
+- Add UI for performance 
+- Measure performance 
+- Think about how to annotate a TD (what metrics)
+- Generate an annotated TD
+- Implement Mashups
+
 ### LEGENDE:
 (+) = IMPROVEMENT
 (o) = NEW FEATURE

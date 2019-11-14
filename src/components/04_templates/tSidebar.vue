@@ -74,12 +74,16 @@ export default Vue.extend({
 }
 
 .sidebar-header {
-  height: 10%;
+  height: 7%;
   background: #b5dfdd;
 }
 
+.sidebar-header:hover {
+  background: #92afae !important;
+}
+
 .sidebar-content {
-  height: 90%;
+  height: 100%;
 }
 
 /* Contains searchbar and add-dropdown-btn */
@@ -87,7 +91,7 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   padding: 7px;
-  height: 10%;
+  height: 6.5%;
   border-bottom: 1px solid #393b3a;
   align-items: center;
 }
@@ -108,7 +112,7 @@ export default Vue.extend({
 
 /* Contains sidebar elements (tds, folders, mashups) */
 .sidebar-elements-container {
-  height: 90%;
+  height: 93.5%;;
   overflow: scroll;
 }
 </style>

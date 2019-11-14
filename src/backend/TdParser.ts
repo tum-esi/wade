@@ -1,11 +1,14 @@
+// Parses a consumed Td to Vue 'Interaction' Component readable data
+
 import * as WoT from 'wot-typescript-definitions';
 import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
+import SizeCalculator from '@/backend/SizeCalculator';
 
-// Parses a consumed Td to Vue 'Interaction' Component readable data
 export default class TdParser {
     private consumedTd: WoT.ConsumedThing | null;
     private parsedTd: any;
     private protocols: ProtocolEnum[];
+    private SizeCalculator: any;
 
     constructor(consumedTd: WoT.ConsumedThing | null, protocols: ProtocolEnum[] | any = []) {
         this.consumedTd = consumedTd;
@@ -15,6 +18,8 @@ export default class TdParser {
             eventInteractions: []
         };
         this.protocols = protocols;
+
+        this.SizeCalculator = new SizeCalculator();
 
         this.parseProperties();
         this.parseActions();
@@ -30,6 +35,8 @@ export default class TdParser {
         for (const property in this.consumedTd.properties) {
             if (!this.consumedTd.properties.hasOwnProperty(property)) { continue; }
 
+            // If it's MQTT you cannot write or read a property
+            // You can only subscribe
             if (this.protocols.indexOf(ProtocolEnum.MQTT) !== -1) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Observe`,
@@ -40,15 +47,15 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.'};
+                            if (!this.consumedTd) return { error: 'No consumed Thing available.' };
                             const response = await this.consumedTd.properties[property]
-                            .subscribe(
-                                async (res) => {
-                                    return await res;
-                                },
-                                async (err) => {
-                                    return await err;
-                                });
+                                .subscribe(
+                                    async (res) => {
+                                        return await res;
+                                    },
+                                    async (err) => {
+                                        return await err;
+                                    });
                             return await response;
                         }
                     }
@@ -66,18 +73,36 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                            const response = await this.consumedTd.properties[property].read()
-                                .then(async (res) => {
-                                    return await res;
-                                })
-                                .catch(async (err) => {
-                                    return await { error: err };
-                                });
-                            return await response;
+                            return getReadResponseWithTiming(this.consumedTd, this.SizeCalculator);
                         }
                     },
                 });
+            }
+
+            async function getReadResponseWithTiming(consumedTd: any, sizeCalculator: SizeCalculator) {
+                if (!consumedTd) return { error: 'No consumed Thing available.' };
+                const startTime = process.hrtime();
+                const response = await consumedTd.properties[property].read()
+                    .then(async (res) => {
+                        await res;
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            res,
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000
+                        };
+                    })
+                    .catch(async (err) => {
+                        await err;
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            error: err,
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000
+                        };
+                    });
+                if (response.res) response.size = sizeCalculator.getSize(response.res);
+                return await response;
             }
 
             // Writeable properties (have input)
@@ -91,18 +116,45 @@ export default class TdParser {
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async (val: any, options?: any) => {
-                            if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                            const response = await this.consumedTd.properties[property].write(val, options)
-                                .then(async (res) => {
-                                    return await 'Success';
-                                })
-                                .catch(async (err) => {
-                                    return await { error: err };
-                                });
-                            return await response;
+                            return getWriteResponseWithTiming(this.consumedTd, val, this.SizeCalculator, options);
                         }
                     },
                 });
+            }
+
+            async function getWriteResponseWithTiming(
+                consumedTd: any,
+                val: any, sizeCalculator: SizeCalculator,
+                options?: any) {
+                if (!consumedTd) return { error: 'No consumed Thing available.' };
+                const startTime = process.hrtime();
+                const response = await consumedTd.properties[property].write(val, options)
+                    .then(async (res) => {
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            res: 'Success',
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
+                        };
+                    })
+                    .catch(async (err) => {
+                        await err;
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            error: err,
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
+                        };
+                    });
+                if (response.res) {
+                    response.size =
+                        options !== undefined ?
+                        sizeCalculator.getSize(val) + sizeCalculator.getSize(options)
+                        : sizeCalculator.getSize(val);
+                }
+                return await response;
             }
         }
     }
@@ -121,18 +173,39 @@ export default class TdParser {
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
                     interaction: async (input?: any) => {
-                        if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                        const response = await this.consumedTd.actions[action].invoke(input)
-                            .then(async (res) => {
-                                if (res) { return await res; } else { return 'Success'; }
-                            })
-                            .catch(async (err) => {
-                                return await { error: err };
-                            });
-                        return await response;
+                        return getActionsWithTiming(this.consumedTd, this.SizeCalculator, input);
                     }
                 },
             });
+
+            async function getActionsWithTiming(consumedTd: any, sizeCalculator: SizeCalculator, input?: any) {
+                if (!consumedTd) return { error: 'No consumed Thing available.' };
+                const startTime = process.hrtime();
+                const response = await consumedTd.actions[action].invoke(input)
+                    .then(async (res) => {
+                        await res;
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            res: res || 'Success',
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
+                        };
+                    })
+                    .catch(async (err) => {
+                        await err;
+                        const endTime = process.hrtime(startTime);
+                        return {
+                            error: err,
+                            s: endTime[0],
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
+                        };
+                    });
+                // Measure size of input, if there is an input
+                if (input) response.size = `Input ${sizeCalculator.getSize(input)}`;
+                return await response;
+            }
         }
     }
 

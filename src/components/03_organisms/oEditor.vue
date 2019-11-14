@@ -2,6 +2,7 @@
     <div class="editor-container"> 
         <div class="editor-title">
             <label>Thing Description</label>
+            <label>{{this.id}}</label>
             <div class="editor-dropdown-container"> 
             <aDropdownButton
                 btnLabel="Load Example TD"
@@ -94,7 +95,7 @@ export default Vue.extend({
         ...mapMutations('SidebarStore', ['saveTdProtocols']),
         ...mapActions('TdStore',
             ['resetInteractions', 'resetSelections', 'resetResults', 'processChangedTd']),
-        // Executed when td changd: via loading saved td/ fetching td/ user changed td
+        // Executed when td changed: via loading saved td/ fetching td/ user changed td
         tdChanged( args: { td: string, tdState?: TdStateEnum | null, errorMsg?: string} ) {
             this.td = '';
             if (args.td) {
@@ -104,7 +105,10 @@ export default Vue.extend({
                     this.td = args.td;
                 }
             }
+            // Update protocol list
             (this as any).saveTdProtocols({id: this.id, td: args.td});
+
+            // Consume td
             (this as any).processChangedTd({
                 td: args.td,
                 config: JSON.parse((this as any).getConfig(this.id)),
@@ -116,9 +120,11 @@ export default Vue.extend({
 
             // Reset result fields and interaction fields
             (this as any).resetInteractions();
+            (this as any).resetSelections();
             (this as any).resetResults();
 
             // Update possible protocol list
+            this.$eventHub.$emit('selections-reseted');
         },
         loadTdFiles() {
             Api.showExampleTds()
@@ -167,11 +173,12 @@ export default Vue.extend({
 
 .editor-title label {
     font-size: 14px;
+    padding-right: 7px;
 }
 
 .editor-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     max-height: 800px;
 }
 
@@ -185,7 +192,7 @@ export default Vue.extend({
 }
 
 .config-btns {
-    height: 10%;
+    height: 8%;
     padding-top: 7px;
     display: flex;
     justify-content: space-between;

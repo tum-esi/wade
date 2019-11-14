@@ -13,6 +13,8 @@
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
                         :resultError="element.resultError"
+                        :resultTime="element.resultTime"
+                        :resultSize="element.resultSize"
                     />
                 </div>
             </div>
@@ -27,6 +29,8 @@
                         :resultTitle="element.resultTitle"
                         :resultValue="element.resultValue"
                         :resultError="element.resultError"
+                        :resultTime="element.resultTime"
+                        :resultSize="element.resultSize"
                     />
                 </div>
             </div>
@@ -92,15 +96,14 @@ export default Vue.extend({
 
 .results-title {
     padding: 7px 0px 7px 2px;
-    max-height: 8%;
-    min-height: 50px;
+    height: 8%;
     display: flex;
     align-items: center;
 }
 
 .results-area {
     width: 100%;
-    height: 80%;
+    height: 84%;
     border: 1px solid #393B3A;
     border-radius: 3px;
 }

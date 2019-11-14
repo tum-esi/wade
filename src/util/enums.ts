@@ -4,6 +4,15 @@ export enum ElementTypeEnum {
   MASHUP = 'mashup'
 }
 
+/**
+ * Available Tabs for Thing Description elements
+ */
+export enum TDTabsEnum {
+  EDITOR = 'editor',
+  CONFIG = 'config',
+  PERFORMANCE = 'performance'
+}
+
 export enum ElementTitleEnum {
   FOLDER = 'Folder',
   TD = 'Thing Description',
@@ -80,4 +89,24 @@ export enum VtStatus {
   RUNNING = 'Virtual Thing is up',
   STOPPED = 'the virtualization is being stopped',
   ERROR = 'there has been an error with Virtual Thing'
+}
+
+export enum MeasurementTypeEnum {
+  NUM_RUNS = 'Iteration',
+  DURATION_RUN = 'Duration',
+  NUM_CLIENTS_NUM_RUN = 'Multiple Clients with iterations',
+  NUM_CLIENTS_DURATION_RUN = 'Multiple Clients with duration',
+}
+
+export enum DelayTypeEnum {
+  NO_DELAY = 'No Delay',
+  BEFORE_EACH = 'Delay before each',
+  BEFORE_BEGIN = 'Delay before beginning'
+}
+
+export enum StatusEnum {
+  NOT_STARTED = 'not-started',
+  LOADING = 'loading',
+  COMPUTED = 'computed',
+  ERROR = 'error'
 }

@@ -18,7 +18,7 @@ export default Vue.extend({
 <style scoped>
 .statusbar-container {
     font-family: 'Courier New', Courier, monospace;
-    height: 10%;
+    height: 7%;
     background: #393B3A;
     display: flex;
     align-items: center;
