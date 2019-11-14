@@ -14,6 +14,7 @@ What happens if the prop title is super long? -> in UI?
 change default config: 
 
 ```json
+{
   "http": {
     "port": 8080,
     "allowSelfSigned": true
@@ -57,9 +58,10 @@ Add description for config
   ```
   Unexpected token: name (interface): 
   ``` 
-change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
+  change "interface" to "_interface" or any other valid expression in both lines. (found on windows). Should be resolved as soon as the wot coap-binding uses version 0.22.0 of the coap module.
 - The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of virtual thing fails under windows and so would
 the installation of WADE if Virtual Thing was added to the packet.
+- Vuex version 3.1.2 leads to build problems -> [Issue 55](https://gitlab.lrz.de/tum-ei-esi/wade/issues/55)
 
 ## Project setup
 ```
