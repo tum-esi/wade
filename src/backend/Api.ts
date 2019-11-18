@@ -255,8 +255,13 @@ export function showExampleTds() {
     return new Promise( (res, rej) => {
 
         let pathToExamples: string;
+
         if (isDevelopment()) {
-            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+            if (process.platform === 'darwin') {
+                pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', 'example-tds');
+            } else {
+                pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+            }
         } else {
             if (process.resourcesPath) {
                 pathToExamples = path.join(process.resourcesPath, 'example-tds');
@@ -286,8 +291,13 @@ export function loadExampleTd(exampleTdPath: string) {
     return new Promise( (res, rej) => {
 
         let pathToExamples: string;
+
         if (isDevelopment()) {
-            pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+            if (process.platform === 'darwin') {
+                pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', 'example-tds');
+            } else {
+                pathToExamples = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'example-tds');
+            }
         } else {
             if (process.resourcesPath) {
                 pathToExamples = path.join(process.resourcesPath, 'example-tds');
