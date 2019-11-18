@@ -13,7 +13,19 @@ declare global {
   }
 
   namespace WADE {
-    // TODO: get alll available input types
+    enum DelayTypeEnum {
+      NO_DELAY = 'No Delay',
+      BEFORE_EACH = 'Delay before each',
+      BEFORE_BEGIN = 'Delay before beginning'
+    }
+
+    enum MeasurementTypeEnum {
+      NUM_RUNS = 'Iteration',
+      DURATION_RUN = 'Duration',
+      NUM_CLIENTS_NUM_RUN = 'Multiple Clients with iterations',
+      NUM_CLIENTS_DURATION_RUN = 'Multiple Clients with duration',
+    }
+
     enum AvailablePropertyDataTypesEnum {
       STRING = 'string',
       NUMBER = 'number',
@@ -169,6 +181,13 @@ declare global {
     }
 
     interface PerformanceResult {
+      settingsMeasurementType: MeasurementTypeEnum;
+      settingsIterations: number;
+      settingsDuration: number;
+      settingsDelayType: DelayTypeEnum;
+      settingsDelayDuration: number;
+      settingsNumMeasurements: number;
+      settingsNumClients: number;
       name: string;
       size: string;
       type: any; // PossibleInteractionTypesEnu
@@ -184,6 +203,17 @@ declare global {
       iterations?: number;
       duration?: number;
       measuredDuration?: number; // Duration it actually took
+      measurementNum: number; // Number of measurement rounds
+    }
+
+    interface PerformanceMeasurementSettings {
+      settingsMeasurementType: MeasurementTypeEnum;
+      settingsIterations?: number;
+      settingsDuration?: number;
+      settingsDelayType: DelayTypeEnum;
+      settingsDelayDuration?: number;
+      settingsNumMeasurements: number;
+      settingsNumClients?: number; // TODO: for later
     }
   }
 }

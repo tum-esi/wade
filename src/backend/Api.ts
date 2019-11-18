@@ -96,20 +96,20 @@ export async function resetAll() {
     // -> rewrite getParsedTd -> TdConsumer/ TdParser global & new methods 'reset', 'init', ..
 }
 
-export async function startPerformancePrediction(interactions: any, settings: any) {
-    // console.log('settings', settings);
-    // With num runs
+export async function startPerformancePrediction(interactions: any, settings: WADE.PerformanceMeasurementSettings) {
+
+    // Alien vs. Predictor
     const performancePredictor = new PerformancePrediction(
         interactions,
-        settings.measurementType,
-        settings.iterations,
-        settings.duration,
-        settings.numClients,
-        typeof settings.delayFirst === 'string'
-            ? parseInt(settings.delayFirst, 10) : settings.delayFirst,
-        typeof settings.delayBeforeEach === 'string'
-            ? parseInt(settings.delayBeforeEach, 10) : settings.delayBeforeEach,
-        settings.measurementNum);
+        settings.settingsMeasurementType,
+        settings.settingsDelayType,
+        settings.settingsDelayDuration,
+        settings.settingsIterations,
+        settings.settingsDuration,
+        settings.settingsNumMeasurements,
+        settings.settingsNumClients);
+
+    // Return performance measurements
     const performanceResult = await performancePredictor.getPerformance();
     return await performanceResult;
 }

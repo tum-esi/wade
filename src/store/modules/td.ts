@@ -194,8 +194,11 @@ export default {
         },
         // Invoke interactions for performance prediction
         async getPerformancePrediction({ commit, state }, payload) {
+
+            // Correct format of selected interactions for timing measurements
             const interactions: Array<{ name: string, type: string, input: any, interaction: any}> = [];
 
+            // Add all timing meaurement relevant data of selected interactions
             (state.selections).forEach(selection => {
                 interactions.push({
                     name: selection.interactionName,
@@ -204,6 +207,8 @@ export default {
                     interaction: selection.interactionSelectBtn.interaction
                 });
             });
+
+            // Invoke measurement and wait for them to be finished
             return Api.startPerformancePrediction(interactions, payload)
                 .then((res) => res)
                 .catch((err) => err);

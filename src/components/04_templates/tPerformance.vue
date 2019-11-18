@@ -10,7 +10,7 @@
             class="performance-child-container"
             :resultStatus="resultStatus"
             :resultData="resultData"
-            @save-measurements="saveMeasurements"
+            @save-measurements="saveMeasurement"
         />
     </div>
 </template>
@@ -49,7 +49,7 @@ export default Vue.extend({
     },
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),
-        startPerformancePrediction(settings) {
+        startPerformancePrediction(settings: WADE.PerformanceMeasurementSettings) {
             // const {BrowserWindow} = require('electron');
 
             // const win = BrowserWindow.getAllWindows()[0];
@@ -69,18 +69,20 @@ export default Vue.extend({
                     return err;
                 });
         },
-        saveMeasurements(measurements) {
+        saveMeasurement(measurements) {
             const storage = require('electron-json-storage');
-            storage.set(`${measurements[0].name}_${new Date()}`, measurements[0], (error) => {
-                if (error) throw error;
-            });
+            for (let i = 0, l = measurements.length; i < l; i++) {
+                const key = `${(measurements[i].name).replace(/\s/g, '')}`
+                    + `_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`;
+                storage.set(key, measurements[i], (error) => {
+                    if (error) throw error;
+                });
+            }
 
             storage.getAll( (error, data) => {
-            if (error) throw error;
-
-            console.log('ALL: ', data);
-            const dataPath = storage.getDataPath();
-            console.log(dataPath);
+                if (error) throw error;
+                const dataPath = storage.getDataPath();
+                console.log('Saved to: ', dataPath);
             });
         }
     }

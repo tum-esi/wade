@@ -1,4 +1,4 @@
-import { ProtocolEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from '@/util/enums';
+import { DelayTypeEnum, MeasurementTypeEnum, PossibleInteractionTypesEnum } from '@/util/enums';
 
 /**
  * TODOS:
@@ -35,6 +35,7 @@ export default class PerformancePrediction {
     private iterations: number;
     private duration: number;
     private numClients: number;
+    private delayType: DelayTypeEnum;
     private delayFirst: number;
     private delayBeforeEach: number;
     private measurementNum: number;
@@ -46,20 +47,21 @@ export default class PerformancePrediction {
     constructor(
         interactions: any,
         measurementType: MeasurementTypeEnum,
+        delayType: WADE.DelayTypeEnum,
+        delayDuration?: number,
         iterations?: number,
         duration?: number,
-        numClients?: number,
-        delayFirst?: number,
-        delayBeforeEach?: number,
-        measurementNum?: number
+        measurementNum?: number,
+        numClients?: number
     ) {
         this.interactions = interactions;
         this.measurementType = measurementType;
         this.iterations = iterations || 0;
         this.duration = duration || 0;
         this.numClients = numClients || 1;
-        this.delayFirst = delayFirst || 0;
-        this.delayBeforeEach = delayBeforeEach || 0;
+        this.delayType = delayType;
+        this.delayFirst = delayType === DelayTypeEnum.BEFORE_BEGIN && delayDuration ? delayDuration : 0;
+        this.delayBeforeEach = delayType === DelayTypeEnum.BEFORE_EACH && delayDuration ? delayDuration : 0;
         this.measurementNum = measurementNum || 1;
         this.measuredDuration = 0;
     }
@@ -83,6 +85,13 @@ export default class PerformancePrediction {
     }) {
         // Result object
         const mainResult: WADE.PerformanceResult = {
+            settingsMeasurementType: this.measurementType,
+            settingsIterations: this.iterations,
+            settingsDuration: this.duration,
+            settingsDelayType: this.delayType,
+            settingsDelayDuration: this.delayFirst ? this.delayFirst : this.delayBeforeEach ? this.delayBeforeEach : 0,
+            settingsNumMeasurements: this.measurementNum,
+            settingsNumClients: this.numClients,
             name: interaction.name,
             size: interaction.size,
             type: interaction.type,
@@ -94,7 +103,8 @@ export default class PerformancePrediction {
             possible: null,
             realisticWithoutFirst: null,
             possibleWithoutFirst: null,
-            measuredExecutions: null
+            measuredExecutions: null,
+            measurementNum: this.measurementNum
         };
 
             let measuredExecutions: number[] = [];

@@ -162,7 +162,8 @@ export default Vue.extend({
   Color Red Medium: #A36A5B
 
   Background Grey: #b4bab9
-  Dark Grey: #393B3A;
+  Medium Grey: #939C9E
+  Dark Grey: #393B3A; (e.g. borders)
 */
 
 /* General styles */
@@ -241,6 +242,10 @@ textarea:focus, input:focus{
 
 .width-80 {
   width: 80% !important;
+}
+
+.width-50 {
+  width: 50% !important; 
 }
 
 .full-height {

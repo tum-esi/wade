@@ -134,9 +134,9 @@ export default Vue.extend({
             texts: this.$store.state.TextStore.performance.performanceOptions,
             iterations: undefined as number | undefined,
             duration: undefined as number | undefined,
-            measurementNum: undefined as number | undefined,
+            measurementNum: 1 as number,
             // Delay
-            typeOfDelay:  DelayTypeEnum.NO_DELAY as DelayTypeEnum | undefined,
+            typeOfDelay:  DelayTypeEnum.NO_DELAY as DelayTypeEnum,
             delayDefault: DelayTypeEnum.NO_DELAY,
             delayDuration: 0 as number,
             delayOptions: [
@@ -153,8 +153,7 @@ export default Vue.extend({
                     style: 'full-width'
                 }
             ],
-            // TODO: get presets / options from store
-            measurementType: MeasurementTypeEnum.NUM_RUNS as MeasurementTypeEnum | undefined,
+            measurementType: MeasurementTypeEnum.NUM_RUNS as MeasurementTypeEnum,
             typeDefault: MeasurementTypeEnum.NUM_RUNS,
             typeOptions: [
                 {
@@ -184,16 +183,28 @@ export default Vue.extend({
                 : (DelayTypeEnum[type] ? DelayTypeEnum[type] : undefined);
         },
         startMeasurement() {
-            this.$emit('start-measurement', {
-                measurementType: this.measurementType,
-                iterations: this.iterations,
-                duration: this.duration,
-                delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN
-                    ? this.delayDuration || undefined : undefined,
-                delayBeforeEach: this.typeOfDelay === DelayTypeEnum.BEFORE_EACH
-                    ? this.delayDuration || undefined : undefined,
-                measurementNum: this.measurementNum
-            });
+            const settings: WADE.PerformanceMeasurementSettings = {
+                settingsMeasurementType: this.measurementType,
+                settingsIterations: this.iterations,
+                settingsDuration: this.duration,
+                settingsDelayType: this.typeOfDelay,
+                settingsDelayDuration: this.delayDuration,
+                settingsNumMeasurements: this.measurementNum,
+                settingsNumClients: 1 // TODO: for later
+            };
+
+            this.$emit('start-measurement', settings);
+
+            // this.$emit('start-measurement', {
+            //     measurementType: this.measurementType,
+            //     iterations: this.iterations,
+            //     duration: this.duration,
+            //     delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN
+            //         ? this.delayDuration || undefined : undefined,
+            //     delayBeforeEach: this.typeOfDelay === DelayTypeEnum.BEFORE_EACH
+            //         ? this.delayDuration || undefined : undefined,
+            //     measurementNum: this.measurementNum
+            // });
         }
     }
 });

@@ -1,46 +1,34 @@
 <template>
     <div class="performance-output-container"> 
         <div class="output-title">
-            <label> {{ texts.title + resultStatus }}</label>
+            <label> {{ texts.title }}</label>
         </div>
-        <mPerformanceOutputElement 
-            v-for="(element, index) in formattedData"
-            :key="element + index"
-            :name="element.name"
-        />
         <div class="output-body">
-            <div class="result" v-for="(element, index) in formattedData" :key="element + index">
-                <br>
-                Name: {{ element.name }}
-                <br>
-                Size: {{ element.size }}
-                <br>
-                Type: {{ element.type }}
-                <br>
-                Number Clients: {{ element.numClients }}
-                <br>
-                First Measured: {{ element.firstMeasured }}
-                <br>
-                Delay First: {{ element.delayFirst }}
-                <br>
-                Delay before each: {{ element.delayBeforeEach }}
-                <br>
-                Realistic: {{ element.realistic }}
-                <br>
-                Possible: {{ element.possible }}
-                <br>
-                Realistic Without First: {{ element.realisticWithoutFirst }}
-                <br>
-                Possible Without First: {{ element.possibleWithoutFirst }}
-                <br>
-                Measured Executions: {{ element.measuredExecutions }}
-                <br>
-                Iterations: {{ element.iterations }}
-                <br>
-                Duration: {{ element.duration }}
-                <br> 
-                Measured Duration {{ element.measuredDuration}}
-            </div>
+            <mPerformanceOutputElement 
+                v-for="(element, index) in formattedData"
+                :key="element + index"
+                :name="element.name"
+                :settings="{
+                    type: element.settingsMeasurementType,
+                    iterations: element.settingsIteration,
+                    duration: element.settingsDuration,
+                    delayType: element.settingsDelayType,
+                    delayDuration: element.settingsDelayDuration,
+                    numMeasurements: element.settingsNumMeasurements,
+                    numClients: element.settingsNumClients
+                }"
+                :results="{
+                    size: element.size,
+                    firstMeasured: element.firstMeasured,
+                    realistic: element.realistic,    
+                    possible: element.possible,
+                    realisticWithoutFirst: element.realisticWithoutFirst,
+                    possibleWithoutFirst: element.possibleWithoutFirst,
+                    overallIteration: element.iterations,
+                    overallDuration: element.measuredDuration
+                }"
+                :allMeasurements="element.measuredExecutions"
+            />
         </div>
         <div class="output-button-container">
             <aButtonBasic 
@@ -95,22 +83,7 @@ export default Vue.extend({
         return {
             measurementWasComputed: false,
             texts: this.$store.state.TextStore.performance.performanceOutput,
-            formattedData: [{
-                name: undefined,
-                size: undefined,
-                type: undefined,
-                numClients: undefined,
-                firstMeasured: undefined,
-                delayFirst: undefined,
-                delayBeforeEach: undefined,
-                realistic: undefined,
-                possible: undefined,
-                realisticWithoutFirst: undefined,
-                possibleWithoutFirst: undefined,
-                measuredExecutions: undefined,
-                iterations: undefined,
-                duration: undefined
-            }] as any,
+            formattedData: [] as any[]
         };
     },
     watch: {
@@ -143,6 +116,7 @@ export default Vue.extend({
     border: 1px solid #393B3A;
     border-radius: 3px;
     background: #B4BAB9;
+    padding: 7px 7px 0 7px;
 }
 
 .output-button-container {

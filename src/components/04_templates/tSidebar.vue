@@ -112,7 +112,7 @@ export default Vue.extend({
 
 /* Contains sidebar elements (tds, folders, mashups) */
 .sidebar-elements-container {
-  height: 93.5%;;
+  height: 86.5%;
   overflow: scroll;
 }
 </style>

@@ -2,8 +2,8 @@
 With multiple inputs: The first is viewed on the left, the second on the right, divided by a line. -->
 <template>
   <div class="option-element-container">
-    <label class="full-height">{{ firstElement }}</label>
-    <label v-if="secondElement">{{ secondElement }}</label>
+    <label class="full-height option-element" :class="{'width-50 border-right' : secondElement}">{{ firstElement }}</label>
+    <label v-if="secondElement" class="width-50 option-element second">{{ secondElement }}</label>
   </div>
 </template>
 
@@ -36,13 +36,21 @@ export default Vue.extend({
     width: 100%;
     height: 35px;
     margin: 5px 0 5px 0;
-    padding: 3px;
 }
 
 .option-element-container label {
     display: flex;
     align-items: center;
     padding-left: 4px;
+    overflow: scroll;
+}
+
+.option-element {
+    padding: 0 3px 0 3px;
+}
+
+.second {
+    align-items: flex-start !important;
 }
 </style>
 
