@@ -1,10 +1,10 @@
 {
-    "@context": "http://www.w3.org/ns/td",
+    "@context": "https://www.w3.org/2019/wot/td/v1",
     "@type": "Thing",
     "id": "de:tum:ei:esi:fp:coffee",
     "title": "Virtual-Coffee-Machine",
     "description": "A virtual coffee machine to learn the WoT TD standard",
-    "security": [{"scheme": "nosec"}],
+    "security": "nosec",
     "properties": {
         "state": {
             "type": "string",
@@ -66,6 +66,11 @@
                 "href": "http://localhost:8080/virtual-coffee-machine/events/error",
                 "subprotocol": "longpoll"
             }]
+        }
+    },
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
         }
     }
 }
