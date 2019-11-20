@@ -4,7 +4,7 @@
     "id": "de:tum:ei:esi:fp:coffee",
     "title": "Virtual-Coffee-Machine",
     "description": "A virtual coffee machine to learn the WoT TD standard",
-    "security": "nosec",
+    "security": "nosec_sc",
     "properties": {
         "state": {
             "type": "string",
