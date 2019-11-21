@@ -131,15 +131,22 @@ export default class TdConsumer {
         // await servient.addClientFactory(new WebSocketClientFactory());
         // await servient.addClientFactory(new WebSocketSecureClientFactory());
 
-        await this.servient.start().then((factory: WoT.WoTFactory) => {
-            this.tdConsumed = factory.consume(JSON.stringify(this.tdJson));
-            this.tdState = TdStateEnum.VALID_CONSUMED_TD;
-            this.errorMsg = null;
+        await this.servient.start().then( async (factory: WoT.WoT) => {
+            if (this.tdJson) {
+                const TdPromise = factory.consume(this.tdJson);
+                await TdPromise.then( (Td) => {this.tdConsumed = Td; },
+                (err) => {throw new Error('Td was not consumed successfully' + err); } );
+                this.tdState = TdStateEnum.VALID_CONSUMED_TD;
+                this.errorMsg = null;
+                this.servient.shutdown();
+            } else {
+                throw new Error('tdJson is undefined');
+            }
         }).catch((err) => {
             this.tdConsumed = null;
             this.tdState = TdStateEnum.INVALID_CONSUMED_TD;
             this.errorMsg = err;
+            this.servient.shutdown();
         });
-        this.servient.shutdown();
     }
 }
