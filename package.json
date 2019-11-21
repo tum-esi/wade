@@ -31,12 +31,14 @@
     "wot-typescript-definitions": "^0.6.2"
   },
   "devDependencies": {
+    "@types/node": "^12.12.11",
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-typescript": "^3.12.1",
     "@vue/cli-service": "^3.12.1",
     "electron": "^5.0.12",
     "less": "^3.10.3",
     "less-loader": "^4.1.0",
+    "tslint": "^5.20.1",
     "typescript": "^3.4.3",
     "vue-cli-plugin-electron-builder": "^1.4.0",
     "vue-template-compiler": "^2.6.10"
