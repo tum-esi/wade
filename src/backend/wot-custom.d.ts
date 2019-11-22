@@ -1,6 +1,10 @@
 declare type customExtension = {
-    [key: string]: any;
+    // [property: string]: any;
+    properties: any,
+    actions: any,
+    events: any
 }
+
 
 /**
  * Extend Thing description for new API

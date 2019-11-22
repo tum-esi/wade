@@ -161,8 +161,8 @@ export async function invokeInteractions(selectedInteractions) {
                 break;
             case PossibleInteractionTypesEnum.EVENT_SUB:
                 if (selectedInteractions[interaction].interactionSelectBtn.subscribe) {
-                    let resultEvent = await selectedInteractions[interaction].interactionSelectBtn.subscribe();
-                    resultEvent = resultEvent.error ? resultEvent.error : resultEvent;
+                    let resultEvent = await selectedInteractions[interaction].interactionSelectBtn.subscribe()
+                    .then( (event) => {resultEvent = event; }, (err) => { resultEvent = err; } );
                     resultEvents.push({
                         resultType: PossibleInteractionTypesEnum.EVENT_SUB,
                         resultTitle: selectedInteractions[interaction].interactionName,
@@ -171,6 +171,15 @@ export async function invokeInteractions(selectedInteractions) {
                 }
                 break;
             case PossibleInteractionTypesEnum.EVENT_UNSUB:
+                if (selectedInteractions[interaction].interactionSelectBtn.unsubscribe) {
+                    let resultEvent = await selectedInteractions[interaction].interactionSelectBtn.unsubscribe()
+                    .then( (event) => {resultEvent = event; }, (err) => { resultEvent = err; } );
+                    resultEvents.push({
+                        resultType: PossibleInteractionTypesEnum.EVENT_SUB,
+                        resultTitle: selectedInteractions[interaction].interactionName,
+                        resultValue: resultEvent
+                    });
+                }
                 break;
             case PossibleInteractionTypesEnum.PROP_OBSERVE_READ:
             case PossibleInteractionTypesEnum.PROP_OBSERVE_WRITE:
