@@ -3,6 +3,7 @@
 import * as WoT from 'wot-typescript-definitions';
 import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
 import SizeCalculator from '@/backend/SizeCalculator';
+import { customThingDescription } from './wot-custom';
 
 export default class TdParser {
     private consumedTd: WoT.ConsumedThing | null;
@@ -32,8 +33,13 @@ export default class TdParser {
 
     private parseProperties() {
         if (!this.consumedTd) return;
-        for (const property in this.consumedTd.properties) {
-            if (!this.consumedTd.properties.hasOwnProperty(property)) { continue; }
+
+        for (const property of (this.consumedTd.getThingDescription() as customThingDescription).properties) {
+            if (
+                !(this.consumedTd.getThingDescription() as customThingDescription).properties.hasOwnProperty(property)
+            ) {
+                 continue;
+            }
 
             // If it's MQTT you cannot write or read a property
             // You can only subscribe
@@ -42,13 +48,16 @@ export default class TdParser {
                     interactionName: `${property}: Observe`,
                     interactionType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
                     interactionSelectBtn: {
-                        btnInputType: this.getCorrectInputType(this.consumedTd.properties[property]),
+                        btnInputType: this.getCorrectInputType(
+                            (this.consumedTd.getThingDescription() as customThingDescription).properties[property]
+                        ),
                         btnKey: `property-${property}-observe`,
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
                             if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                            const response = await this.consumedTd.properties[property]
+                            const response = await (
+                                this.consumedTd.getThingDescription() as customThingDescription).properties[property]
                                 .subscribe(
                                     async (res) => {
                                         return await res;
@@ -64,7 +73,7 @@ export default class TdParser {
             }
 
             // Readable properties
-            if (!this.consumedTd.properties[property].writeOnly) {
+            if (!(this.consumedTd.getThingDescription() as customThingDescription).properties[property].writeOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Read`,
                     interactionType: PossibleInteractionTypesEnum.PROP_READ,
@@ -106,12 +115,14 @@ export default class TdParser {
             }
 
             // Writeable properties (have input)
-            if (!this.consumedTd.properties[property].readOnly) {
+            if (!(this.consumedTd.getThingDescription() as customThingDescription).properties[property].readOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Write`,
                     interactionType: PossibleInteractionTypesEnum.PROP_WRITE,
                     interactionSelectBtn: {
-                        btnInputType: this.getCorrectInputType(this.consumedTd.properties[property]),
+                        btnInputType: this.getCorrectInputType(
+                            (this.consumedTd.getThingDescription() as customThingDescription).properties[property]
+                        ),
                         btnKey: `property-${property}-write`,
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
@@ -161,14 +172,18 @@ export default class TdParser {
 
     private parseActions() {
         if (!this.consumedTd) return;
-        for (const action in this.consumedTd.actions) {
-            if (!this.consumedTd.actions.hasOwnProperty(action)) { continue; }
+        for (const action in (this.consumedTd.getThingDescription() as customThingDescription).actions) {
+            if (!(this.consumedTd.getThingDescription() as customThingDescription).actions.hasOwnProperty(action)) {
+                continue;
+            }
 
             this.parsedTd.actionInteractions.push({
                 interactionName: action,
                 interactionType: PossibleInteractionTypesEnum.ACTION,
                 interactionSelectBtn: {
-                    btnInputType: this.getCorrectInputTypeActions(this.consumedTd.actions[action]),
+                    btnInputType: this.getCorrectInputTypeActions(
+                        (this.consumedTd.getThingDescription() as customThingDescription).actions[action]
+                    ),
                     btnKey: `action-${action}`,
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
@@ -211,8 +226,10 @@ export default class TdParser {
 
     private parseEvents() {
         if (!this.consumedTd) return;
-        for (const event in this.consumedTd.events) {
-            if (!this.consumedTd.events.hasOwnProperty(event)) { continue; }
+        for (const event in (this.consumedTd.getThingDescription() as customThingDescription).events) {
+            if ( !(this.consumedTd.getThingDescription() as customThingDescription).events.hasOwnProperty(event)) {
+                continue;
+            }
             const eventInteraction = {
                 interactionName: event,
                 interactionType: PossibleInteractionTypesEnum.EVENT_SUB,
@@ -222,10 +239,12 @@ export default class TdParser {
                     btnSelectedStyle: 'btn-event-interaction-selected',
                     subscribe: () => {
                         if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                        return this.consumedTd.events[event];
+                        return (this.consumedTd.getThingDescription() as customThingDescription).events[event];
                     },
                     unsubscribe: () => {
-                        if (this.consumedTd) return this.consumedTd.events[event];
+                        if (this.consumedTd) {
+                            return (this.consumedTd.getThingDescription() as customThingDescription).events[event];
+                        }
                     }
                 }
             };
@@ -234,7 +253,7 @@ export default class TdParser {
     }
 
     // Get possible input types from property for interactions
-    private getCorrectInputType(property: WoT.ThingProperty) {
+    private getCorrectInputType(property: any) {
         const propEnum = property.enum ? property.enum :
             (property.input ? (property.input.enum ? property.input.enum : null) : null);
         const propType = property.type ? property.type :
