@@ -39,7 +39,7 @@
     "less": "^3.10.3",
     "less-loader": "^4.1.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.4.3",
+    "typescript": "^3.7.2",
     "vue-cli-plugin-electron-builder": "^1.4.0",
     "vue-template-compiler": "^2.6.10"
   },
