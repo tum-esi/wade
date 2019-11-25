@@ -96,7 +96,7 @@ export default Vue.extend({
                  * (it is returned when subscribing).
                  * Once you deleted the subscription via 'unsubscribe()',
                  * you need to restart the servient.
-                 * 
+                 *
                  * TODO: could be now restructured (because of the new API)
                  */
                 if (this.subscription) (this as any).resultValue.unsubscribe();
@@ -105,9 +105,8 @@ export default Vue.extend({
                         // this.resultValText = res;
                         this.resultBuffer = res;
                         this.writeResult();
-                        }
+                    }
                 );
-              //  console.log("this.subscription", this.subscription);
             } catch (error) {
                 return `Error: ${error}`;
             }
@@ -120,7 +119,7 @@ export default Vue.extend({
                 (this as any).resultValue.unsubscribe();
             } catch (error) {
                 // Show error here
-                console.log('unsubscribe error' + error);
+                // TODO add error treatment
             }
         },
         // Workaround function, because unsubscribeEvent() does not work in APIv070-SNAP3
