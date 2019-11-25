@@ -62,7 +62,7 @@ export default Vue.extend({
     },
     created() {
         // this.$eventHub.$on('unsubscribe', this.unsubscribe());
-        // if (this.isSubscription) this.getResultValue();
+        if (this.isSubscription) this.getResultValue();
     },
     beforeDestroy() {
         // this.$eventHub.$off('unsubscribe');
@@ -71,6 +71,7 @@ export default Vue.extend({
         return {
             isSubscription: this.resultType === PossibleInteractionTypesEnum.EVENT_SUB,
             resultValText: 'Waiting...',
+            resultBuffer: '',
             subscription: null as any,
             unsubscribed: false,
             unsubscribeBtn: {
@@ -85,27 +86,32 @@ export default Vue.extend({
         };
     },
     methods: {
-        // getResultValue() {
-        //     try {
-        //         /**
-        //          * Subscribing to an event is triggered here.
-        //          * This is due to the fact, that with node-wot v0.6.2
-        //          * it is not possible to directly unsubscribe an interaction.
-        //          * You have to unsubscribe the 'subscription'
-        //          * (it is returned when subscribing).
-        //          * Once you deleted the subscription via 'unsubscribe()',
-        //          * you need to restart the servient.
-        //          */
-        //         // if (this.subscription) this.subscription.unsubscribe();
-        //         // this.subscription = (this as any).resultValue.subscribe(
-        //         //     res => this.resultValText = res,
-        //         //     error => this.resultValText = error,
-        //         //     () => this.resultValText = 'Completed'
-        //         // );
-        //     } catch (error) {
-        //         return `Error: ${error}`;
-        //     }
-        // },
+        getResultValue() {
+            try {
+                /**
+                 * Subscribing to an event is triggered here.
+                 * This is due to the fact, that with node-wot v0.6.2
+                 * it is not possible to directly unsubscribe an interaction.
+                 * You have to unsubscribe the 'subscription'
+                 * (it is returned when subscribing).
+                 * Once you deleted the subscription via 'unsubscribe()',
+                 * you need to restart the servient.
+                 * 
+                 * TODO: could be now restructured (because of the new API)
+                 */
+                if (this.subscription) (this as any).resultValue.unsubscribe();
+                this.subscription = (this as any).resultValue.subscribe(
+                    (res) => {
+                        // this.resultValText = res;
+                        this.resultBuffer = res;
+                        this.writeResult();
+                        }
+                );
+              //  console.log("this.subscription", this.subscription);
+            } catch (error) {
+                return `Error: ${error}`;
+            }
+        },
         unsubscribe() {
             if (this.unsubscribed) return;
             this.unsubscribed = !this.unsubscribed;
@@ -115,6 +121,14 @@ export default Vue.extend({
             } catch (error) {
                 // Show error here
                 console.log('unsubscribe error' + error);
+            }
+        },
+        // Workaround function, because unsubscribeEvent() does not work in APIv070-SNAP3
+        writeResult() {
+            if (this.unsubscribed) {
+                return;
+            } else {
+                this.resultValText = this.resultBuffer;
             }
         }
     }

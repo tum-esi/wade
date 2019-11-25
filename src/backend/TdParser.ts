@@ -249,21 +249,26 @@ export default class TdParser {
                     btnKey: `select-${event}`,
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
-                    subscribe: async () => {
-                        if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                        const response = await (
-                        this.consumedTd.subscribeEvent(event,
-                            async (res) => {
-                                return await res;
-                            })
-                        );
-                        return response;
-                    },
-                    unsubscribe: async () => {
-                        if (this.consumedTd) {
-                            const response = await this.consumedTd.unsubscribeEvent(event);
-                            return response;
-                        }
+                    interaction: () => {
+                        return {
+                            subscribe: async (cbFunc: (data: any) => void) => {
+                                if (!this.consumedTd) return { error: 'No consumed Thing available.' };
+                                const response = await (
+                                this.consumedTd.subscribeEvent(event,
+                                    async (res) => {
+                                        await res;
+                                        cbFunc(res);
+                                    })
+                                );
+                                return response;
+                            },
+                            unsubscribe: async () => {
+                                if (this.consumedTd) {
+                                    const response = await this.consumedTd.unsubscribeEvent(event);
+                                    return response;
+                                }
+                            }
+                        };
                     }
                 }
             };
