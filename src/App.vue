@@ -4,6 +4,7 @@
       v-on:open-module-element="openModal"
       v-on:sidebar-element-clicked="sidebarElementClicked"
       v-on:home-clicked="homeClicked"
+      v-on:mage-clicked="mageClicked"
     />
     <router-view id="main-content"/>
     <oModal 
@@ -121,6 +122,12 @@ export default Vue.extend({
       if (this.$router.currentRoute.name === 'home') return;
       this.$router.push({
         name: 'home'
+      });
+    },
+    mageClicked() {
+      if (this.$router.currentRoute.name === 'mage') return;
+      this.$router.push({
+        name: 'mage'
       });
     },
     sidebarElementClicked(elementId: string, elementType: string) {

@@ -11,6 +11,11 @@ export default new Router({
       component: () => import ('@/components/04_templates/tHomePage.vue')
     },
     {
+      path: '/mage',
+      name: 'mage',
+      component: () => import('@/components/04_templates/tMaGe.vue')
+    },
+    {
       path: '/td/:id',
       name: 'thingDescription',
       component: () => import('@/components/04_templates/tThingDescription.vue')

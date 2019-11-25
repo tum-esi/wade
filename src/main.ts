@@ -8,7 +8,7 @@ Vue.prototype.$eventHub = new Vue(); // Global event bus
 
 // Check if element of path url is available, if not navigate home
 router.beforeEach((to, from, next) => {
-  const pathAvailable = to.name === 'home' ? true : (to.name === 'thingDescription'
+  const pathAvailable = to.name === 'home' || to.name === 'mage' ? true : (to.name === 'thingDescription'
       || to.name === 'folder'
       || to.name === 'mashup'
       || to.name === 'config'

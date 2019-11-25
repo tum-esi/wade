@@ -9,6 +9,26 @@
       :tabIconButton="getHeaderTab.tabIconButton"
       v-on:tab-clicked="homeClicked"
     />
+    <aTab
+      class="sidebar-header"
+      :tabId="'mageButton'"
+      :tabTitle="'MaGe'"
+      :tabStyle="'border-bottom'"
+      :tabButtonStyle="'btn-left tab-btn-small tab-btn-header'"
+      :tabIconButton="{iconBtnSrcPath: 'mage', iconBtnOnClick: 'mage'}"
+      v-on:tab-clicked="mageClicked"
+    />
+    <!-- sidebarMaGeTab: {
+            tabId: 'homeButton',
+            tabTitle: 'W-ADE',
+            tabStyle: 'border-bottom',
+            tabIconButton: {
+                iconBtnSrcPath: 'settings',
+                iconBtnOnClick: 'settings'
+            },
+            tabButtonStyle: 'btn-left tab-btn-small tab-btn-header',
+            tabLink: 'settings'
+        }, -->
     <div class="sidebar-content">
       <div class="sidebar-search">
         <!-- <aSearchbar class="searchbar" /> -->
@@ -57,6 +77,9 @@ export default Vue.extend({
   methods: {
     homeClicked() {
       this.$emit('home-clicked');
+    },
+    mageClicked() {
+      this.$emit('mage-clicked');
     },
     sidebarElementClicked(elementId: string, elementType: string) {
       this.$emit('sidebar-element-clicked', elementId, elementType);
