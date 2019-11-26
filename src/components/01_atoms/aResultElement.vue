@@ -71,6 +71,7 @@ export default Vue.extend({
         return {
             isSubscription: this.resultType === PossibleInteractionTypesEnum.EVENT_SUB,
             resultValText: 'Waiting...',
+            resultBuffer: '',
             subscription: null as any,
             unsubscribed: false,
             unsubscribeBtn: {
@@ -95,12 +96,16 @@ export default Vue.extend({
                  * (it is returned when subscribing).
                  * Once you deleted the subscription via 'unsubscribe()',
                  * you need to restart the servient.
+                 *
+                 * TODO: could be now restructured (because of the new API)
                  */
-                if (this.subscription) this.subscription.unsubscribe();
+                if (this.subscription) (this as any).resultValue.unsubscribe();
                 this.subscription = (this as any).resultValue.subscribe(
-                    res => this.resultValText = res,
-                    error => this.resultValText = error,
-                    () => this.resultValText = 'Completed'
+                    (res) => {
+                        // this.resultValText = res;
+                        this.resultBuffer = res;
+                        this.writeResult();
+                    }
                 );
             } catch (error) {
                 return `Error: ${error}`;
@@ -111,9 +116,18 @@ export default Vue.extend({
             this.unsubscribed = !this.unsubscribed;
             if (!this.subscription) return;
             try {
-                this.subscription.unsubscribe();
+                (this as any).resultValue.unsubscribe();
             } catch (error) {
                 // Show error here
+                // TODO add error treatment
+            }
+        },
+        // Workaround function, because unsubscribeEvent() does not work in APIv070-SNAP3
+        writeResult() {
+            if (this.unsubscribed) {
+                return;
+            } else {
+                this.resultValText = this.resultBuffer;
             }
         }
     }

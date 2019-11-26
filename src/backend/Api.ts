@@ -160,8 +160,8 @@ export async function invokeInteractions(selectedInteractions) {
                 }
                 break;
             case PossibleInteractionTypesEnum.EVENT_SUB:
-                if (selectedInteractions[interaction].interactionSelectBtn.subscribe) {
-                    let resultEvent = await selectedInteractions[interaction].interactionSelectBtn.subscribe();
+                if (selectedInteractions[interaction].interactionSelectBtn.interaction) {
+                    let resultEvent = await selectedInteractions[interaction].interactionSelectBtn.interaction();
                     resultEvent = resultEvent.error ? resultEvent.error : resultEvent;
                     resultEvents.push({
                         resultType: PossibleInteractionTypesEnum.EVENT_SUB,

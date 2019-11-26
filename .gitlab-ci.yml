@@ -31,19 +31,6 @@ lin:fix:crypto:
     - merge_requests
     - tags
 
-lin:fix:interface:
-  stage: fixes
-  script: 
-    - grep 'interface)' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js -n
-    - sed -i 's/(interface)/(_interface)/g' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js
-    - sed -i 's/, interface)/, _interface)/g' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js
-    - grep 'interface)' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js -n
-  tags: [linux]
-  needs: ['lin:install']
-  only:
-    - master
-    - merge_requests
-    - tags
 
 lin:build:
   stage: build
@@ -53,7 +40,7 @@ lin:build:
     - npm run electron:build
     - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
   tags: [linux]
-  needs: ['lin:fix:interface', 'lin:fix:crypto']
+  needs: ['lin:fix:crypto']
   only:
     - master
     - merge_requests
@@ -72,7 +59,7 @@ lin:prod:
     paths: 
       - './dist_electron/*.AppImage'
   tags: [linux]
-  needs: ['lin:fix:interface', 'lin:fix:crypto']
+  needs: ['lin:fix:crypto']
   only:
     - tags
 
@@ -91,7 +78,7 @@ lin:prod:
 #     paths: 
 #       - './dist_electron/*.AppImage'
 #   tags: [linux]
-#   needs: ['lin:fix:interface', 'lin:fix:crypto']
+#   needs: ['lin:fix:crypto']
 #   only:
 #     - tags
 
@@ -139,21 +126,6 @@ win:fix:crypto:
   only:
     - tags
 
-win:fix:interface:
-  stage: fixes
-  script: 
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js -TotalCount 230)[-1]
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js -TotalCount 231)[-1]
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js) -creplace '\(interface\)','(_interface)' | Set-Content -Path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js) -creplace ', interface\)',', _interface)' | Set-Content -Path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js -TotalCount 230)[-1]
-    - (Get-Content -path .\node_modules\@node-wot\binding-coap\node_modules\coap\lib\server.js -TotalCount 231)[-1]
-    - exit 0
-  tags: [windows]
-  needs: ['win:install']
-  only:
-    - tags
-
 win:fix:tdtools:
   stage: fixes
   script: npm install @node-wot/td-tools
@@ -174,7 +146,7 @@ win:build:
     name: "WADE-Win"
     paths: 
       - './dist_electron/*.exe'
-  needs: ['win:fix:interface', 'win:fix:crypto']
+  needs: ['win:fix:crypto']
   only:
     - tags
 
@@ -210,20 +182,6 @@ win:cleanup:
 #   only:
 #     - tags
 #   allow_failure: true
-  
-
-# mac:fix:interface:
-#   stage: fixes
-#   script: 
-#     - grep 'interface)' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js -n
-#     - sed -i 's/(interface)/(_interface)/g' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js
-#     - sed -i 's/, interface)/, _interface)/g' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js
-#     - grep 'interface)' ./node_modules/@node-wot/binding-coap/node_modules/coap/lib/server.js -n
-#   tags: [mac]
-#   needs: ['mac:install']
-#   only:
-#     - tags
-#   allow_failure: true
 
 # mac:build:
 #   stage: build
@@ -237,7 +195,7 @@ win:cleanup:
 #     paths: 
 #       - './dist_electron/*.AppImage'
 #   tags: [mac]
-#   needs: ['mac:fix:interface', 'mac:fix:crypto']
+#   needs: ['mac:fix:crypto']
 #   only:
 #     - tags
 #   allow_failure: true
@@ -258,7 +216,7 @@ win:cleanup:
 #       - './dist_electron/*.AppImage'
 # #    expire_in: 1 month
 #   tags: [mac]
-#   needs: ['mac:fix:interface', 'mac:fix:crypto']
+#   needs: ['mac:fix:crypto']
 #   only:
 #     - tags
 #   allow_failure: true

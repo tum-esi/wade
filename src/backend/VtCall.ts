@@ -26,7 +26,7 @@ export default class VtCall {
             givenVtConfig: string,
             writeOutTo: stream.Writable,
             writeErrorTo: stream.Writable,
-            givenTD: WoT.ThingDescription,
+            givenTD: string,
         ) {
         this.givenVtConfig = givenVtConfig;
         this.link = '';

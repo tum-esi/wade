@@ -32,8 +32,13 @@ export default class TdParser {
 
     private parseProperties() {
         if (!this.consumedTd) return;
-        for (const property in this.consumedTd.properties) {
-            if (!this.consumedTd.properties.hasOwnProperty(property)) { continue; }
+
+        for (const property in this.consumedTd.getThingDescription().properties) {
+            if (
+                !this.consumedTd.getThingDescription().properties.hasOwnProperty(property)
+            ) {
+                 continue;
+            }
 
             // If it's MQTT you cannot write or read a property
             // You can only subscribe
@@ -42,21 +47,23 @@ export default class TdParser {
                     interactionName: `${property}: Observe`,
                     interactionType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
                     interactionSelectBtn: {
-                        btnInputType: this.getCorrectInputType(this.consumedTd.properties[property]),
+                        btnInputType: this.getCorrectInputType(
+                            this.consumedTd.getThingDescription().properties[property]
+                        ),
                         btnKey: `property-${property}-observe`,
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
                         interaction: async () => {
                             if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                            const response = await this.consumedTd.properties[property]
-                                .subscribe(
+                            const response = await (
+                                // TODO check if correct, has been properties[property].subscribe
+                                this.consumedTd.observeProperty(property,
                                     async (res) => {
                                         return await res;
-                                    },
-                                    async (err) => {
-                                        return await err;
-                                    });
-                            return await response;
+                                    }
+                                )
+                            );
+                            return response;
                         }
                     }
                 });
@@ -64,7 +71,7 @@ export default class TdParser {
             }
 
             // Readable properties
-            if (!this.consumedTd.properties[property].writeOnly) {
+            if (!this.consumedTd.getThingDescription().properties[property].writeOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Read`,
                     interactionType: PossibleInteractionTypesEnum.PROP_READ,
@@ -79,39 +86,49 @@ export default class TdParser {
                 });
             }
 
-            async function getReadResponseWithTiming(consumedTd: any, sizeCalculator: SizeCalculator) {
+            async function getReadResponseWithTiming(
+                consumedTd: WoT.ConsumedThing | null,
+                sizeCalculator: SizeCalculator
+            ) {
                 if (!consumedTd) return { error: 'No consumed Thing available.' };
                 const startTime = process.hrtime();
-                const response = await consumedTd.properties[property].read()
+                const response = await consumedTd.readProperty(property)
                     .then(async (res) => {
                         await res;
                         const endTime = process.hrtime(startTime);
                         return {
                             res,
                             s: endTime[0],
-                            ms: endTime[1] / 1000000
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
                         };
                     })
                     .catch(async (err) => {
                         await err;
                         const endTime = process.hrtime(startTime);
                         return {
+                            res: undefined,
                             error: err,
                             s: endTime[0],
-                            ms: endTime[1] / 1000000
+                            ms: endTime[1] / 1000000,
+                            size: 'n.A.'
                         };
                     });
-                if (response.res) response.size = sizeCalculator.getSize(response.res);
-                return await response;
+                if (response.res !== undefined && response.res !== null) {
+                    response.size = sizeCalculator.getSize(response.res);
+                }
+                return response;
             }
 
             // Writeable properties (have input)
-            if (!this.consumedTd.properties[property].readOnly) {
+            if (!this.consumedTd.getThingDescription().properties[property].readOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Write`,
                     interactionType: PossibleInteractionTypesEnum.PROP_WRITE,
                     interactionSelectBtn: {
-                        btnInputType: this.getCorrectInputType(this.consumedTd.properties[property]),
+                        btnInputType: this.getCorrectInputType(
+                            this.consumedTd.getThingDescription().properties[property]
+                        ),
                         btnKey: `property-${property}-write`,
                         btnGeneralStyle: 'btn-event-interaction',
                         btnSelectedStyle: 'btn-event-interaction-selected',
@@ -123,12 +140,12 @@ export default class TdParser {
             }
 
             async function getWriteResponseWithTiming(
-                consumedTd: any,
+                consumedTd: WoT.ConsumedThing | null,
                 val: any, sizeCalculator: SizeCalculator,
                 options?: any) {
                 if (!consumedTd) return { error: 'No consumed Thing available.' };
                 const startTime = process.hrtime();
-                const response = await consumedTd.properties[property].write(val, options)
+                const response = await consumedTd.writeProperty(property, val, options)
                     .then(async (res) => {
                         const endTime = process.hrtime(startTime);
                         return {
@@ -142,6 +159,7 @@ export default class TdParser {
                         await err;
                         const endTime = process.hrtime(startTime);
                         return {
+                            res: undefined,
                             error: err,
                             s: endTime[0],
                             ms: endTime[1] / 1000000,
@@ -154,21 +172,25 @@ export default class TdParser {
                         sizeCalculator.getSize(val) + sizeCalculator.getSize(options)
                         : sizeCalculator.getSize(val);
                 }
-                return await response;
+                return response;
             }
         }
     }
 
     private parseActions() {
         if (!this.consumedTd) return;
-        for (const action in this.consumedTd.actions) {
-            if (!this.consumedTd.actions.hasOwnProperty(action)) { continue; }
+        for (const action in this.consumedTd.getThingDescription().actions) {
+            if (!this.consumedTd.getThingDescription().actions.hasOwnProperty(action)) {
+                continue;
+            }
 
             this.parsedTd.actionInteractions.push({
                 interactionName: action,
                 interactionType: PossibleInteractionTypesEnum.ACTION,
                 interactionSelectBtn: {
-                    btnInputType: this.getCorrectInputTypeActions(this.consumedTd.actions[action]),
+                    btnInputType: this.getCorrectInputTypeActions(
+                        this.consumedTd.getThingDescription().actions[action]
+                    ),
                     btnKey: `action-${action}`,
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
@@ -178,10 +200,14 @@ export default class TdParser {
                 },
             });
 
-            async function getActionsWithTiming(consumedTd: any, sizeCalculator: SizeCalculator, input?: any) {
+            async function getActionsWithTiming(
+                consumedTd: WoT.ConsumedThing | null,
+                sizeCalculator: SizeCalculator,
+                input?: any
+            ) {
                 if (!consumedTd) return { error: 'No consumed Thing available.' };
                 const startTime = process.hrtime();
-                const response = await consumedTd.actions[action].invoke(input)
+                const response = await consumedTd.invokeAction(action, input)
                     .then(async (res) => {
                         await res;
                         const endTime = process.hrtime(startTime);
@@ -204,15 +230,17 @@ export default class TdParser {
                     });
                 // Measure size of input, if there is an input
                 if (input) response.size = `Input ${sizeCalculator.getSize(input)}`;
-                return await response;
+                return response;
             }
         }
     }
 
     private parseEvents() {
         if (!this.consumedTd) return;
-        for (const event in this.consumedTd.events) {
-            if (!this.consumedTd.events.hasOwnProperty(event)) { continue; }
+        for (const event in this.consumedTd.getThingDescription().events) {
+            if ( !this.consumedTd.getThingDescription().events.hasOwnProperty(event)) {
+                continue;
+            }
             const eventInteraction = {
                 interactionName: event,
                 interactionType: PossibleInteractionTypesEnum.EVENT_SUB,
@@ -220,12 +248,26 @@ export default class TdParser {
                     btnKey: `select-${event}`,
                     btnGeneralStyle: 'btn-event-interaction',
                     btnSelectedStyle: 'btn-event-interaction-selected',
-                    subscribe: () => {
-                        if (!this.consumedTd) return { error: 'No consumed Thing available.' };
-                        return this.consumedTd.events[event];
-                    },
-                    unsubscribe: () => {
-                        if (this.consumedTd) return this.consumedTd.events[event];
+                    interaction: () => {
+                        return {
+                            subscribe: async (cbFunc: (data: any) => void) => {
+                                if (!this.consumedTd) return { error: 'No consumed Thing available.' };
+                                const response = await (
+                                this.consumedTd.subscribeEvent(event,
+                                    async (res) => {
+                                        await res;
+                                        cbFunc(res);
+                                    })
+                                );
+                                return response;
+                            },
+                            unsubscribe: async () => {
+                                if (this.consumedTd) {
+                                    const response = await this.consumedTd.unsubscribeEvent(event);
+                                    return response;
+                                }
+                            }
+                        };
                     }
                 }
             };
@@ -234,7 +276,7 @@ export default class TdParser {
     }
 
     // Get possible input types from property for interactions
-    private getCorrectInputType(property: WoT.ThingProperty) {
+    private getCorrectInputType(property: any) {
         const propEnum = property.enum ? property.enum :
             (property.input ? (property.input.enum ? property.input.enum : null) : null);
         const propType = property.type ? property.type :
