@@ -244,7 +244,7 @@ export default Vue.extend({
 }
 
 /* === Styles for the dropdown box in the TD Editor Tab (Load Example TD) */
-.dropdown-custom-editor {
+.dropdown-custom-editor{
     left: 0px;
     width: max-content;
     max-width: 300px;
@@ -257,6 +257,14 @@ export default Vue.extend({
     min-width: 30px;
     margin-top: 45px;
     left: -220px;
+}
+
+.dropdown-custom-sidebar{
+    min-width: 50px;
+    width: 100px;
+    left: 0px;
+    z-index: 10;
+    margin-top: 30px;
 }
 
 .dropdown-custom-editor div:hover{

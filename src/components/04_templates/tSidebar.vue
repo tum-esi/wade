@@ -9,26 +9,15 @@
       :tabIconButton="getHeaderTab.tabIconButton"
       v-on:tab-clicked="homeClicked"
     />
-    <aTab
-      class="sidebar-header"
-      :tabId="'mageButton'"
-      :tabTitle="'MaGe'"
-      :tabStyle="'border-bottom'"
-      :tabButtonStyle="'btn-left tab-btn-small tab-btn-header'"
-      :tabIconButton="{iconBtnSrcPath: 'mage', iconBtnOnClick: 'mage'}"
-      v-on:tab-clicked="mageClicked"
+    <aDropdownButton
+      class="dropdown-plugin border-bottom"
+      btnStyle="dropdown-custom-sidebar"
+      btnKey="btn-plugin-clicked"
+      btnSrc="add_plugins"
+      :btnDropdownOptions="[ {title: 'MaGe', key: 'open-mage', icon: 'mage'} ]"
+      v-on:dropdown-clicked="dropDownReaction"
     />
-    <!-- sidebarMaGeTab: {
-            tabId: 'homeButton',
-            tabTitle: 'W-ADE',
-            tabStyle: 'border-bottom',
-            tabIconButton: {
-                iconBtnSrcPath: 'settings',
-                iconBtnOnClick: 'settings'
-            },
-            tabButtonStyle: 'btn-left tab-btn-small tab-btn-header',
-            tabLink: 'settings'
-        }, -->
+
     <div class="sidebar-content">
       <div class="sidebar-search">
         <!-- <aSearchbar class="searchbar" /> -->
@@ -58,6 +47,7 @@ import aTab from '@/components/01_atoms/aTab.vue';
 import aSearchbar from '@/components/01_atoms/aSearchbar.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import mSidebarElementGroup from '@/components/02_molecules/mSidebarElementGroup.vue';
+import { loggingError } from '../../util/helpers';
 
 export default Vue.extend({
   name: 'tSidebar',
@@ -78,15 +68,23 @@ export default Vue.extend({
     homeClicked() {
       this.$emit('home-clicked');
     },
-    mageClicked() {
-      this.$emit('mage-clicked');
-    },
     sidebarElementClicked(elementId: string, elementType: string) {
       this.$emit('sidebar-element-clicked', elementId, elementType);
     },
     openModuleAddElement(element: any) {
       this.$emit('open-module-element', element);
-    }
+    },
+    dropDownReaction(eventObject) {
+            if (eventObject.btnKey === 'btn-plugin-clicked') {
+              if (eventObject.btnValue === 'open-mage') {
+                this.$emit('mage-clicked');
+              } else {
+                loggingError(new Error('unknown plugin in dropdown'));
+              }
+            } else {
+                // event not relevant for this function
+            }
+        }
   }
 });
 </script>
@@ -131,6 +129,12 @@ export default Vue.extend({
 /* Add-dropdown btn */
 .dropdown-btn {
   width: 20%;
+}
+
+.dropdown-plugin {
+  width: 100%;
+  height: 30px;
+  border-bottom: 1px black solid;
 }
 
 /* Contains sidebar elements (tds, folders, mashups) */

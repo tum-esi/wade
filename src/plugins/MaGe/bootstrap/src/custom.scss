@@ -1,0 +1,20 @@
+// variable overrides
+$primary: #33b8a4;
+$font-family-base: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+// Bootstrap and its default variables
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+body {
+    background-color: #E6E6EA;  
+    /* 33b8a4 */
+}
+
+#title {
+    text-align: center;
+    /* font-family: 'Courier New', Courier, monospace; */
+}
+
+.td-select-checkbox {
+    width: 50px;
+}

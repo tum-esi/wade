@@ -13,7 +13,7 @@ export default new Router({
     {
       path: '/mage',
       name: 'mage',
-      component: () => import('@/components/04_templates/tMaGe.vue')
+      component: () => import('@/plugins/MaGe/pMaGe.vue')
     },
     {
       path: '/td/:id',

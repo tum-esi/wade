@@ -1,0 +1,28 @@
+{
+  "name": "wade-mage-plugin",
+  "version": "0.0.1",
+  "description": "MaGe as a Plugin for W-ADE",
+  "keywords": [
+    "WoT"
+  ],
+  "author": {
+    "name": "Hassib Belhaj"
+  },
+  "contributors": [
+    {
+      "name": "Adrian Kast"
+    }
+  ],
+  "license": "CC",
+  "dependencies": {
+    "brace": "^0.11.1",
+    "jquery": "~3.4.1",
+    "js-combinatorics": "0.5.4",
+    "jscode": "file:bootstrap",
+    "lodash": "4.17.15",
+    "plantuml-encoder": "1.4.0",
+    "popper.js": "^1.16.0",
+    "request": "~2.88.0",
+    "strip-indent": "3.0.0"
+  }
+}
