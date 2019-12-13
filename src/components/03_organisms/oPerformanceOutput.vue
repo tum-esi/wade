@@ -117,6 +117,7 @@ export default Vue.extend({
     border-radius: 3px;
     background: #B4BAB9;
     padding: 7px 7px 0 7px;
+    overflow: scroll;
 }
 
 .output-button-container {
