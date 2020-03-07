@@ -1,6 +1,7 @@
 import TdConsumer from './TdConsumer';
 import TdParser from './TdParser';
 import PerformancePrediction from './PerformancePrediction';
+import ConfidenceCalculator from './ConfidenceCalculator';
 import { PossibleInteractionTypesEnum, TdStateEnum, InteractionStateEnum, ProtocolEnum } from '@/util/enums';
 import { isDevelopment } from '@/util/helpers';
 import MessageHandler from './MessageHandler';
@@ -96,12 +97,19 @@ export async function resetAll() {
     // -> rewrite getParsedTd -> TdConsumer/ TdParser global & new methods 'reset', 'init', ..
 }
 
+export function calculateConf(results: any, settings: any) {
+    const confCalculator = new ConfidenceCalculator(results, settings);
+    const calculated = confCalculator.calculateAll();
+    console.log('WHY:', calculated);
+}
+
 export async function startPerformancePrediction(interactions: any, settings: WADE.PerformanceMeasurementSettings) {
 
     // Alien vs. Predictor
     const performancePredictor = new PerformancePrediction(
         interactions,
         settings.settingsMeasurementType,
+        settings.settingsConfidenceLevel,
         settings.settingsDelayType,
         settings.settingsDelayDuration,
         settings.settingsIterations,
@@ -109,9 +117,12 @@ export async function startPerformancePrediction(interactions: any, settings: WA
         settings.settingsNumMeasurements,
         settings.settingsNumClients);
 
-    // Return performance measurements
+    // Calculate confidence interval of performance measurements
     const performanceResult = await performancePredictor.getPerformance();
-    return await performanceResult;
+    console.log('Result', performanceResult);
+
+    // Return performance measurements enhanced with confidence interval calculations
+    return performanceResult;
 }
 
 export async function invokeInteractions(selectedInteractions) {

@@ -38,6 +38,16 @@ declare global {
       MASHUP = 'mashup'
     }
 
+    enum PossibleInteractionTypesEnum {
+      PROP_READ = 'property-read',
+      PROP_WRITE = 'property-write',
+      PROP_OBSERVE_READ = 'property-observe-read',
+      PROP_OBSERVE_WRITE = 'property-observe-write',
+      ACTION = 'action-invoke',
+      EVENT_SUB = 'event-subscribe',
+      EVENT_UNSUB = 'event-unsubscribe'
+    }
+
     interface MqttConfigInterface {
       broker: string;
       username: string | undefined;
@@ -180,8 +190,36 @@ declare global {
       tabIsActive?: boolean;
     }
 
+    interface PerformanceInteraction {
+      // Name of interaction, e.g. 'bool:Read'
+      name: string;
+      // Type of interaction (Read, Write, ...)
+      type: PossibleInteractionTypesEnum;
+      // Input set by user (if applicable)
+      input: any;
+      // Actual interaction that can be interacted on a Thing
+      interaction: any;
+    }
+
+    interface PerformanceInput {
+      // Size of input preferably in byte (see class SizeCalculator)
+      size: number | string;
+      // Input value: E.g. 'espresso', 22, true, ...
+      value: any;
+    }
+
+    interface PerformanceOutput {
+      // Size of output preferably in byte (see class SizeCalculator)
+      size: number | string;
+      // Output value: E.g. 'espresso', 22, true, ...
+      value: any;
+      // How often was this output received
+      amount: number;
+    }
+
     interface PerformanceResult {
       settingsMeasurementType: MeasurementTypeEnum;
+      settingsConfidenceLevel: number;
       settingsIterations: number;
       settingsDuration: number;
       settingsDelayType: DelayTypeEnum;
@@ -189,16 +227,17 @@ declare global {
       settingsNumMeasurements: number;
       settingsNumClients: number;
       name: string;
-      size: string;
-      type: any; // PossibleInteractionTypesEnu
+      input: PerformanceInput;
+      output: PerformanceOutput[];
+      type: any; // PossibleInteractionTypesEnum
       numClients: number;
       firstMeasured: number;
       delayFirst: number | boolean;
       delayBeforeEach: number | boolean;
-      realistic: { WCET: number, BCET: number, AET: number } | null;
-      possible: { WCET: number, BCET: number, AET: number } | null;
-      realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
-      possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
+      realistic: PerformanceResultDetailData | null;
+      possible: PerformanceResultDetailData | null;
+      realisticWithoutFirst: PerformanceResultDetailData | null;
+      possibleWithoutFirst: PerformanceResultDetailData | null;
       measuredExecutions: number[] | null;
       iterations?: number;
       duration?: number;
@@ -206,8 +245,44 @@ declare global {
       measurementNum: number; // Number of measurement rounds
     }
 
+    /**
+     * WCET: Worst Case Execution Time
+     * BCET: Best Case Execution Time
+     * AET: Average Execution Time
+     * all: All measurements uses for the calculation of the above
+     */
+    interface PerformanceResultDetailData {
+      WCET: number;
+      BCET: number;
+      AET: number;
+      all: number[];
+      confidenceResults: ConfidenceLevelResults | null;
+    }
+
+    /**
+     * The result object of the confidence level calculation
+     */
+    interface ConfidenceLevelResults {
+      confidenceFactor: number;
+      mean: number;
+      standardDeviation: number;
+      standardError: number;
+      errorMargin: number;
+      confidenceIntervalMin: number;
+      confidenceIntervalMax: number;
+      confidenceInterval: string;
+      precisionFactor: number;
+      precisionMinVal: number;
+      precisionMaxVal: number;
+      precisionRange: string;
+      resultsWithinRange: boolean | null;
+      resultsWithinRangeMin: boolean | null;
+      resultsWithinRangeMax: boolean | null;
+    }
+
     interface PerformanceMeasurementSettings {
       settingsMeasurementType: MeasurementTypeEnum;
+      settingsConfidenceLevel: number;
       settingsIterations?: number;
       settingsDuration?: number;
       settingsDelayType: DelayTypeEnum;

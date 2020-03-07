@@ -11,6 +11,7 @@
             :resultStatus="resultStatus"
             :resultData="resultData"
             @save-measurements="saveMeasurement"
+            @save-td="saveTD"
         />
     </div>
 </template>
@@ -22,6 +23,7 @@ import oPerformanceOptions from '@/components/03_organisms/oPerformanceOptions.v
 import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue';
 import { StatusEnum } from '@/util/enums';
 import { mapActions, mapGetters } from 'vuex';
+import { getCurrentDate } from '@/util/helpers';
 
 export default Vue.extend({
     name: 'tPerformance',
@@ -83,6 +85,14 @@ export default Vue.extend({
                 if (error) throw error;
                 const dataPath = storage.getDataPath();
                 console.log('Saved to: ', dataPath);
+            });
+        },
+        saveTD() {
+            const storage = require('electron-json-storage');
+            const td = require('../../../example-tds/annotade_td.json');
+            const name = `${getCurrentDate()}_annotated_td.json`;
+            storage.set(name, td, (error) => {
+                if (error) throw error;
             });
         }
     }

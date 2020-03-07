@@ -10,6 +10,7 @@
                 :name="element.name"
                 :settings="{
                     type: element.settingsMeasurementType,
+                    confidenceLevel: element.settingsConfidenceLevel,
                     iterations: element.settingsIteration,
                     duration: element.settingsDuration,
                     delayType: element.settingsDelayType,
@@ -18,7 +19,8 @@
                     numClients: element.settingsNumClients
                 }"
                 :results="{
-                    size: element.size,
+                    input: element.input,
+                    output: element.output,
                     firstMeasured: element.firstMeasured,
                     realistic: element.realistic,    
                     possible: element.possible,
@@ -33,7 +35,7 @@
         <div class="output-button-container">
             <aButtonBasic 
                 class="output-button"
-                :btnLabel="texts.btnSaveComputer"
+                :btnLabel="texts.btnSave"
                 :btnClass="'btn-normal'"
                 :btnOnClick="'save-measurements'"
                 :btnActive="measurementWasComputed"
@@ -45,7 +47,7 @@
                 :btnClass="'btn-normal'"
                 :btnOnClick="'save-measurements'"
                 :btnActive="measurementWasComputed"
-                @save-measurements="$emit('save-measurements', formattedData)"
+                @save-measurements="$emit('save-td', formattedData)"
             />
         </div>
     </div>

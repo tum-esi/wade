@@ -24,6 +24,56 @@
             <div class="results dropdown-container">
                 <label @click="showResults = !showResults">Show results</label>
                 <div v-if="showResults" class="result-elements">
+                    <!-- Realistic measurements: outliers have been removed (hopefully) -->
+                    <div @click="showRealistic = !showRealistic">
+                        <aOptionElement 
+                            class="option-element"
+                            v-if="!showRealistic && results.realistic"
+                            :firstElement="texts.outputResultRealistic"
+                            :icon="'arrow_right'"
+                        />
+                        <mComplexOptionElement
+                            class="option-element"                  
+                            v-if="results.realisticWithoutFirst && showRealistic"
+                            :title="texts.outputResultRealistic"
+                            :optionElementObj="getOptionElements(results.realisticWithoutFirst)"
+                        />
+                    </div>
+                    <!-- Possible measurements: all measurements are beeing considered-->
+                    <div @click="showPossible = !showPossible">
+                        <aOptionElement 
+                            class="option-element"
+                            v-if="!showPossible && results.possible"
+                            :firstElement="texts.outputResultPossible"
+                            :icon="'arrow_right'"
+                        />
+                        <mComplexOptionElement
+                            class="option-element"                  
+                            v-if="results.possibleWithoutFirst && showPossible"
+                            :title="texts.outputResultPossible"
+                            :optionElementObj="getOptionElements(results.possibleWithoutFirst)"
+                        />
+                    </div>
+                    <!-- Size of input send with request (if available)
+                    <aOptionElement 
+                        class="option-element"
+                        v-if="results.size"
+                        :firstElement="texts.outputResultSize"
+                        :secondElement="results.size"
+                    /> -->
+                    <!-- First measured timing -->
+                    <aOptionElement 
+                        class="option-element"
+                        v-if="results.firstMeasured"
+                        :firstElement="texts.outputResultFirstMeasured"
+                        :secondElement="results.firstMeasured"
+                    />
+                </div>
+            </div>
+            <!-- Presetted options - these are not changed by the measurement itself. They are just displayed and saved for overview purposes -->
+            <div class="presets dropdown-container">
+                <label @click="showPresets = !showPresets">Show settings</label>
+                <div v-if="showPresets" class="presets-elements">
                     <!-- Overall iterations (all) conducted -->
                     <aOptionElement 
                         class="option-element"
@@ -38,54 +88,6 @@
                         :firstElement="texts.outputResultoverallDuration"
                         :secondElement="results.overallDuration + ' ms'"
                     />
-                    <!-- Realistic measurements: outliers have been removed (hopefully) -->
-                    <aOptionElement 
-                        class="option-element"                  
-                        v-if="results.realistic"
-                        :firstElement="texts.outputResultRealistic"
-                        :secondElement="results.realistic"
-                    />
-                    <!-- Possible measurements: all measurements are beeing considered-->
-                    <aOptionElement 
-                        class="option-element"
-                        v-if="results.possible"
-                        :firstElement="texts.outputResultPossible"
-                        :secondElement="results.possible"
-                    />
-                    <!-- Realistic measurements without first timing measurement-->
-                    <aOptionElement 
-                        class="option-element"
-                        v-if="results.realisticWithoutFirst"
-                        :firstElement="texts.outputResultrealisticWithoutFirst"
-                        :secondElement="results.realisticWithoutFirst"
-                    />
-                    <!-- Possible measurements without first timing measurement-->
-                    <aOptionElement 
-                        class="option-element"
-                        v-if="results.possibleWithoutFirst"
-                        :firstElement="texts.outputResultpossibleWithoutFirst"
-                        :secondElement="results.possibleWithoutFirst"
-                    />
-                    <!-- Size of input send with request (if available) -->
-                    <aOptionElement 
-                        class="option-element"
-                        v-if="results.size"
-                        :firstElement="texts.outputResultSize"
-                        :secondElement="results.size"
-                    />
-                    <!-- First measured timing -->
-                    <aOptionElement 
-                        class="option-element"
-                        v-if="results.firstMeasured"
-                        :firstElement="texts.outputResultFirstMeasured"
-                        :secondElement="results.firstMeasured"
-                    />
-                </div>
-            </div>
-            <!-- Presetted options - these are not changed by the measurement itself. They are just displayed and saved for overview purposes -->
-            <div class="presets dropdown-container">
-                <label @click="showPresets = !showPresets">Show settings</label>
-                <div v-if="showPresets" class="presets-elements">
                     <!-- Type of measurement -->
                     <aOptionElement 
                         class="option-element"
@@ -120,6 +122,37 @@
                         :firstElement="texts.outputSettingDelayDuration"
                         :secondElement="settings.delayDuration"
                     />
+                    <!-- Input Size -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingsInputSize"
+                        :secondElement="results.input.size"
+                    />
+                    <!-- Input Value -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingsInputValue"
+                        :secondElement="results.input.value"
+                    />
+                    <!-- Output Size -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingsOutputSize"
+                        :secondElement="results.output[0].size"
+                    />
+                    <!-- Output Value -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingsOutputValue"
+                        :secondElement="results.output[0].value"
+                    />
+                    <!-- Output Value -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingsOutputAmount"
+                        :secondElement="results.output[0].amount"
+                    />
+
                     <!-- Number of measurements -->
                     <aOptionElement 
                         class="option-element"
@@ -132,6 +165,18 @@
                         :firstElement="texts.outputSettingClient"
                         :secondElement="settings.numClients"
                     />
+                    <!-- Confidence level -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingConfLevel"
+                        :secondElement="settings.confidenceLevel"
+                    />
+                    <!-- Confidence factor -->
+                    <aOptionElement 
+                        class="option-element"
+                        :firstElement="texts.outputSettingConfFactor"
+                        :secondElement="getConfLevel(settings.confidenceLevel)"
+                    />
                 </div>
 
             </div>
@@ -142,12 +187,15 @@
 <script lang="ts">
 import Vue from 'vue';
 import aOptionElement from '@/components/01_atoms/aOptionElement.vue';
+import mComplexOptionElement from '@/components/02_molecules/mComplexOptionElement.vue';
 import { DelayTypeEnum } from '@/util/enums';
+import { ConfLevel } from '@/util/helpers';
 
 export default Vue.extend({
     name: 'mPerformanceOutputElement',
     components: {
-        aOptionElement
+        aOptionElement,
+        mComplexOptionElement
     },
     props: {
         /**
@@ -165,6 +213,7 @@ export default Vue.extend({
        /**
         * Settings of performance prediction.
         * <{ type: WADE.MeasurementTypeEnum,
+        *   confidenceLevel: number,
         *   iterations?: number,
         *   duration?:number,
         *   delayType: WADE.DelayTypeEnum,
@@ -199,6 +248,10 @@ export default Vue.extend({
             showAllMeasurements: false,
             showPresets: false,
             showResults: false,
+            showRealistic: false,
+            showPossible: false,
+            showRealisticWOFirst: false,
+            showPossibleWOFirst: false,
             noDelay: DelayTypeEnum.NO_DELAY,
             arrowDownPath: require('@/assets/arrow_down.png'),
             arrowRightPath: require('@/assets/arrow_right.png'),
@@ -210,7 +263,25 @@ export default Vue.extend({
          */
         getIcon(path: string) {
            return require(`@/assets/${path}.png`);
+        },
+        getConfLevel(confidenceLevel: any) {
+            return ConfLevel.get(confidenceLevel);
+        },
+        /**
+         * Return formatted list for view of options
+         */
+        getOptionElements(obj) {
+            console.log('HERE', obj);
+            return [
+                { firstElement: 'WCET', secondElement: obj.WCET },
+                { firstElement: 'BCET', secondElement: obj.BCET },
+                { firstElement: 'AET', secondElement: obj.AET },
+                { firstElement: 'All', secondElement: obj.all },
+                { firstElement: 'CI Min', secondElement: obj.confidenceResults.confMin },
+                { firstElement: 'CI Max', secondElement: obj.confidenceResults.confMax },
+            ];
         }
+
     }
 });
 </script>

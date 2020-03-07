@@ -17,6 +17,8 @@ You need to have node installed.
 
 ## How to get started
 
+(To be able to easily work and develop functionalities in W-ADE, please read the architecture documentation first!)
+
 Step 1: Clone the repository to your local machine. 
 ```
 git clone 
@@ -43,7 +45,7 @@ If you want to add your changes to W-ADE, please fork the repository and create 
 
 
 ## Known Problems
-  - If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
+- If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
   ```
   cd wade 
   rm -r -f node_modules
