@@ -1,0 +1,175 @@
+{
+    "title": "virtual-test-thing-1",
+    "description": "node-wot servient for virtual test #1",
+    "@context": [
+        "https://www.w3.org/2019/wot/td/v1",
+        {
+            "iot": "http://example.org/iot"
+        },
+        {
+            "@language": "en"
+        }
+    ],
+    "properties": {
+        "readString": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/readString",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ],
+                    "htv:methodName": "GET"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/readString",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ]
+                }
+            ]
+        },
+        "readBoolean": {
+            "type": "boolean",
+            "readOnly": true,
+            "writeOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/readBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ],
+                    "htv:methodName": "GET"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/readBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ]
+                }
+            ]
+        },
+        "readInteger": {
+            "type": "integer",
+            "readOnly": true,
+            "writeOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/readInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ],
+                    "htv:methodName": "GET"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/readInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "readproperty"
+                    ]
+                }
+            ]
+        },
+        "writeString": {
+            "type": "string",
+            "writeOnly": true,
+            "readOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/writeString",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ],
+                    "htv:methodName": "PUT"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/writeString",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ]
+                }
+            ]
+        },
+        "writeBoolean": {
+            "type": "boolean",
+            "writeOnly": true,
+            "readOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/writeBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ],
+                    "htv:methodName": "PUT"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/writeBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ]
+                }
+            ]
+        },
+        "writeInteger": {
+            "type": "integer",
+            "writeOnly": true,
+            "readOnly": false,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-1/properties/writeInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ],
+                    "htv:methodName": "PUT"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-1/properties/writeInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "writeproperty"
+                    ]
+                }
+            ]
+        }
+    },
+    "@type": "Thing",
+    "security": [
+        "nosec_sc"
+    ],
+    "id": "urn:uuid:ee44f0df-5d6d-44e6-b995-395bbbd07700",
+    "forms": [
+        {
+            "href": "http://192.168.150.86:8080/virtual-test-thing-1/all/properties",
+            "contentType": "application/json",
+            "op": [
+                "readallproperties",
+                "readmultipleproperties",
+                "writeallproperties",
+                "writemultipleproperties"
+            ]
+        }
+    ],
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    }
+}

@@ -1,0 +1,114 @@
+<template>
+    <div class="performance-container"> 
+        <oSelection class="performance-child-container" :showButtons="'selection-btn-reset'"/>
+        <oPerformanceOptions 
+            class="performance-child-container"
+            :selectedInteractionNames="getSelectionNames" 
+            @start-measurement="startPerformancePrediction"
+        />
+        <oPerformanceOutput 
+            class="performance-child-container"
+            :resultStatus="resultStatus"
+            :resultData="resultData"
+            @save-measurements="saveMeasurement"
+            @save-td="saveTD"
+        />
+    </div>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+import oSelection from '@/components/03_organisms/oSelection.vue';
+import oPerformanceOptions from '@/components/03_organisms/oPerformanceOptions.vue';
+import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue';
+import { StatusEnum } from '@/util/enums';
+import { mapActions, mapGetters } from 'vuex';
+import { getCurrentDate } from '@/util/helpers';
+
+export default Vue.extend({
+    name: 'tPerformance',
+    components: {
+        oSelection,
+        oPerformanceOptions,
+        oPerformanceOutput
+    },
+    data() {
+        return {
+            resultData: undefined as any,
+            resultStatus: StatusEnum.NOT_STARTED
+        };
+    },
+    computed: {
+        ...mapGetters('TdStore', ['getSelections']),
+        // Returns name of selected interactions
+        getSelectionNames() {
+            const arrOfSelectionNames: any[] = [];
+            ((this as any).getSelections).forEach(element => {
+                arrOfSelectionNames.push(element.interactionName);
+            });
+            return arrOfSelectionNames;
+        }
+    },
+    methods: {
+        ...mapActions('TdStore', ['getPerformancePrediction']),
+        startPerformancePrediction(settings: WADE.PerformanceMeasurementSettings) {
+            // const {BrowserWindow} = require('electron');
+
+            // const win = BrowserWindow.getAllWindows()[0];
+            // const ses = win.webContents.session;
+
+            // ses.clearCache(() => {
+            // alert("Cache cleared!");
+            // });
+            this.resultStatus = StatusEnum.LOADING;
+            this.resultData = (this as any).getPerformancePrediction(settings)
+                .then((res) => {
+                    this.resultStatus = StatusEnum.COMPUTED;
+                    return res;
+                })
+                .catch((err) => {
+                    this.resultStatus = StatusEnum.ERROR;
+                    return err;
+                });
+        },
+        saveMeasurement(measurements) {
+            const storage = require('electron-json-storage');
+            for (let i = 0, l = measurements.length; i < l; i++) {
+                const key = `${(measurements[i].name).replace(/\s/g, '')}`
+                    + `_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`;
+                storage.set(key, measurements[i], (error) => {
+                    if (error) throw error;
+                });
+            }
+
+            storage.getAll( (error, data) => {
+                if (error) throw error;
+                const dataPath = storage.getDataPath();
+                console.log('Saved to: ', dataPath);
+            });
+        },
+        saveTD() {
+            const storage = require('electron-json-storage');
+            const td = require('../../../example-tds/annotade_td.json');
+            const name = `${getCurrentDate()}_annotated_td.json`;
+            storage.set(name, td, (error) => {
+                if (error) throw error;
+            });
+        }
+    }
+});
+</script>
+
+<style scoped>
+.performance-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+.performance-child-container {
+    width: 33.33%;
+    padding: 0px 7px 7px 7px;
+}
+
+</style>

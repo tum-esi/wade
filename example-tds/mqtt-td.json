@@ -1,0 +1,19 @@
+{
+    "name": "MQTT Counter",
+    "id": "urn:dev:wot:mqtt:counter",
+    "actions" : {
+        "resetCounter": {
+            "forms": [
+                {"href": "mqtt://test.mosquitto.org:1883/Test/actions/resetCounter",  "mqtt:qos":  0, "mqtt:retain" : false}
+            ]
+        }
+    }, 
+    "events": {
+        "temperature": {
+            "type": "integer",
+            "forms": [
+                {"href": "mqtt://test.mosquitto.org:1883/Test/events/event1",  "mqtt:qos":  0, "mqtt:retain" : false}
+            ]
+        } 
+    } 
+}

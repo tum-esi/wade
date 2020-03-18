@@ -1,0 +1,235 @@
+cache: 
+  paths:
+    - node_modules/
+
+stages:
+  - .pre
+  - fixes
+  - build
+  - .post
+
+
+# JOBS FOR LINUX
+# (should run for every Push on master branch)
+# >>>
+lin:install:
+  stage: .pre
+  script: npm install
+  tags: [linux]
+  only:
+    - master
+    - merge_requests
+    - tags
+
+lin:fix:crypto:
+  stage: fixes
+  script: npm install -f --no-save node-aead-crypto
+  tags: [linux]
+  needs: ['lin:install']
+  only:
+    - master
+    - merge_requests
+    - tags
+
+
+lin:build:
+  stage: build
+  before_script:
+    - "test -e ./dist_electron/ && rm -r -v ./dist_electron/ & echo removed dist || echo do nothing"
+  script: 
+    - npm run electron:build
+    - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
+  tags: [linux]
+  needs: ['lin:fix:crypto']
+  only:
+    - master
+    - merge_requests
+  except:
+    - tags
+
+lin:prod:
+  stage: build
+  before_script:
+    - "test -e ./dist_electron/ && rm -r -v ./dist_electron/ & echo removed dist || echo do nothing"
+  script: 
+    - npm run electron:build
+    - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
+  artifacts:
+    name: "WADE-Lin"
+    paths: 
+      - './dist_electron/*.AppImage'
+  tags: [linux]
+  needs: ['lin:fix:crypto']
+  only:
+    - tags
+
+# lin:prod:vt:
+#   stage: build
+#   before_script:
+#     - "test -e ./dist_electron/ && rm -r -v ./dist_electron/ & echo removed dist || echo do nothing"
+#     - "npm install -f virtual-thing"
+#   script: 
+#     - npm run electron:build
+#     - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
+#   after_script:
+#     - "npm uninstall virtual-thing"
+#   artifacts:
+#     name: "WADE-Lin-VT"
+#     paths: 
+#       - './dist_electron/*.AppImage'
+#   tags: [linux]
+#   needs: ['lin:fix:crypto']
+#   only:
+#     - tags
+
+lin:build:cleanup:
+  stage: .post
+  script: 
+    - npm uninstall node-aead-crypto
+    - rm -r ./node_modules/node-aead-crypto
+  when: always
+  tags: [linux]
+  needs: ['lin:build']
+  only:
+    - master
+    - merge_requests
+  except:
+    - tags
+
+lin:prod:cleanup:
+  stage: .post
+  script:
+    - npm uninstall node-aead-crypto
+    - rm -r ./node_modules/node-aead-crypto
+  when: always
+  tags: [linux]
+  needs: ['lin:prod']
+  only:
+    - tags
+# <<<
+
+
+# JOBS FOR WINDOWS
+# >>>
+win:install: 
+  stage: .pre
+  script: npm install
+  tags: [windows]
+  only:
+    - tags
+
+win:fix:crypto:
+  stage: fixes
+  script: npm install -f --no-save node-aead-crypto
+  tags: [windows]
+  needs: ['win:install']
+  only:
+    - tags
+
+win:fix:tdtools:
+  stage: fixes
+  script: npm install @node-wot/td-tools
+  tags: [windows]
+  needs: ['win:install']
+  only:
+    - tags
+
+win:build:
+  stage: build
+  before_script: 
+    - "if (Test-Path ./dist_electron/) {del -r ./dist_electron}"
+  script:
+    - npm run electron:build
+    - "if (Test-Path ./dist_electron/win-unpacked/w-ade.exe) {exit 0} else {exit 1}"
+  tags: [windows]
+  artifacts:
+    name: "WADE-Win"
+    paths: 
+      - './dist_electron/*.exe'
+  needs: ['win:fix:crypto']
+  only:
+    - tags
+
+win:cleanup:
+  stage: .post
+  script: 
+    - npm uninstall node-aead-crypto
+    - del -r ./node_modules/node-aead-crypto
+  when: always
+  tags: [windows]
+  needs: ['win:build']
+  only:
+    - tags
+# <<<
+
+
+# JOBS FOR MAC
+# !!! NOT TESTED YET !!!
+# >>>
+# mac:install:
+#   stage: .pre
+#   script: npm install
+#   tags: [mac]
+#   only:
+#     - tags
+#   allow_failure: true
+
+# mac:fix:crypto:
+#   stage: fixes
+#   script: npm install -f --no-save node-aead-crypto
+#   tags: [mac]
+#   needs: ['mac:install']
+#   only:
+#     - tags
+#   allow_failure: true
+
+# mac:build:
+#   stage: build
+#   before_script:
+#     - "test -e ./dist_electron/ && rm -r -v ./dist_electron/ & echo removed dist || echo do nothing"
+#   script: 
+#     - npm run electron:build
+#     - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
+#   artifacts:
+#     name: "WADE-Mac"
+#     paths: 
+#       - './dist_electron/*.AppImage'
+#   tags: [mac]
+#   needs: ['mac:fix:crypto']
+#   only:
+#     - tags
+#   allow_failure: true
+
+# mac:build:plugins:vt:
+#   stage: build
+#   before_script:
+#     - "test -e ./dist_electron/ && rm -r -v ./dist_electron/ & echo removed dist || echo do nothing"
+#     - "npm install -f virtual-thing"
+#   script: 
+#     - npm run electron:build
+#     - "test -e ./dist_electron/linux-unpacked && exit 0 || exit 1"
+#   after_script:
+#     - "npm uninstall virtual-thing"
+#   artifacts:
+#     name: "WADE-Mac-VT"
+#     paths: 
+#       - './dist_electron/*.AppImage'
+# #    expire_in: 1 month
+#   tags: [mac]
+#   needs: ['mac:fix:crypto']
+#   only:
+#     - tags
+#   allow_failure: true
+
+# mac:cleanup:
+#   stage: .post
+#   script: 
+#     - npm uninstall node-aead-crypto
+#     - rm -r ./node_modules/node-aead-crypto
+#   when: always
+#   tags: [mac]
+#   needs: ['mac:build']
+#   only:
+#     - tags
+#   allow_failure: true
+# <<<
