@@ -236,12 +236,11 @@ declare global {
       delayBeforeEach: number | boolean;
       realistic: PerformanceResultDetailData | null;
       possible: PerformanceResultDetailData | null;
-      realisticWithoutFirst: PerformanceResultDetailData | null;
-      possibleWithoutFirst: PerformanceResultDetailData | null;
       measuredExecutions: number[] | null;
       iterations?: number;
       duration?: number;
-      measuredDuration?: number; // Duration it actually took
+      overallDuration?: number; // Overall measured duration
+      overallIterations?: number; // Overall iteration executed
       measurementNum: number; // Number of measurement rounds
     }
 

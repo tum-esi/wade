@@ -1,22 +1,26 @@
 # W-ADE
+## **W**eb of Things **A**PI **D**evelopment **E**nvironment
+---
 
-Wade (short for **W**eb of Things **A**PI **D**evelopment **E**nvironment) is an API development environment for Web of Things that was designed for the W3C WoT building blocks. 
+Wade is an API development environment for Web of Things that was designed for the W3C WoT building blocks. 
 It is based on node-wot - the reference implementation of W3C's Scripting API. 
 It supports following protocols: HTTP/HTTPS, CoAP/CoAPS, MQTT.
 It is an Electron application.
 
 ## What can you do with W-ADE
+---
 - Test your Thing Description (TD)
 - Send request and interact with your Thing based on it's TD
 - Save and organize your Thing Descriptions
 - Check timing behaviour of your request
 - Spin up a virtual Thing (Virtual Thing is integrated)
 
-## Prerequisities
+## Prerequisites
+---
 You need to have node installed. 
 
 ## How to get started
-
+---
 (To be able to easily work and develop functionalities in W-ADE, please read the architecture documentation first!)
 
 Step 1: Clone the repository to your local machine. 

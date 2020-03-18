@@ -11,7 +11,7 @@
                 :settings="{
                     type: element.settingsMeasurementType,
                     confidenceLevel: element.settingsConfidenceLevel,
-                    iterations: element.settingsIteration,
+                    iterations: element.settingsIterations,
                     duration: element.settingsDuration,
                     delayType: element.settingsDelayType,
                     delayDuration: element.settingsDelayDuration,
@@ -24,10 +24,8 @@
                     firstMeasured: element.firstMeasured,
                     realistic: element.realistic,    
                     possible: element.possible,
-                    realisticWithoutFirst: element.realisticWithoutFirst,
-                    possibleWithoutFirst: element.possibleWithoutFirst,
-                    overallIteration: element.iterations,
-                    overallDuration: element.measuredDuration
+                    overallIteration: element.overallIterations,
+                    overallDuration: element.overallDuration
                 }"
                 :allMeasurements="element.measuredExecutions"
             />

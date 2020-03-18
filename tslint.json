@@ -20,6 +20,8 @@
     "align": [true, "parameters"],
     "arrow-parens": false,
     "no-bitwise": false,
-    "no-shadowed-variable": true
+    "no-shadowed-variable": true,
+    "max-classes-per-file": false,
+    "no-var-keyword": false
   }
 }

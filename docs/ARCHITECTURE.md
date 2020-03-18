@@ -1,8 +1,31 @@
 # W-ADE Software Architecture
 
 Here you find the detailed software architecture explained to better understand W-ADE's structure.
-First, the frontend architecture is explained, followed by the structure of the backend.
+First, the structure of the application logic is explained, followed by the frontend architecture.
 
+
+## Application Logic
+W-ADE is an Electron & Vue.js based desktop application.
+It is mainly written in TypeScript, a typed superset of JavaScript.
+
+The application structure is as following:   
+```
+    -assets  
+    -backend  
+    -components  
+    --01_atoms  
+    --02_molecules  
+    --03_organisms  
+    --04_templates  
+    -store  
+    --modules  
+    -util  
+    -App.vue  
+    -background.ts  
+    -main.ts  
+    -router.ts  
+    -shims-tsx.d.ts  
+ ````
 
 ## Fronted Architecture
 ---

@@ -34,9 +34,9 @@
                         />
                         <mComplexOptionElement
                             class="option-element"                  
-                            v-if="results.realisticWithoutFirst && showRealistic"
+                            v-if="results.realistic && showRealistic"
                             :title="texts.outputResultRealistic"
-                            :optionElementObj="getOptionElements(results.realisticWithoutFirst)"
+                            :optionElementObj="getOptionElements(results.realistic)"
                         />
                     </div>
                     <!-- Possible measurements: all measurements are beeing considered-->
@@ -49,9 +49,9 @@
                         />
                         <mComplexOptionElement
                             class="option-element"                  
-                            v-if="results.possibleWithoutFirst && showPossible"
+                            v-if="results.possible && showPossible"
                             :title="texts.outputResultPossible"
-                            :optionElementObj="getOptionElements(results.possibleWithoutFirst)"
+                            :optionElementObj="getOptionElements(results.possible)"
                         />
                     </div>
                     <!-- Size of input send with request (if available)
@@ -271,7 +271,6 @@ export default Vue.extend({
          * Return formatted list for view of options
          */
         getOptionElements(obj) {
-            console.log('HERE', obj);
             return [
                 { firstElement: 'WCET', secondElement: obj.WCET },
                 { firstElement: 'BCET', secondElement: obj.BCET },
