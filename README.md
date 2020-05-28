@@ -13,10 +13,10 @@ It is an Electron application.
 
 ---
 - Test your Thing Description (TD)
-- Send request and interact with your Thing based on it's TD
+- Send request and interact with your Thing based on its TD
 - Save and organize your Thing Descriptions
-- Check timing behaviour of your request
-- Spin up a virtual Thing (Virtual Thing is integrated)
+- Check timing behaviour of your requests to the Thing(s)
+- Spin up a virtual Thing based on a TD (Virtual Thing is integrated)
 
 ## Prerequisites
 
@@ -74,7 +74,7 @@ If you want to add your changes to W-ADE, please fork the repository and create 
   npm run electron:build
   ```
 
-- [Install node-aead-crypto to avoid failing dev build and build](https://gitlab.lrz.de/tum-ei-esi/wade/issues/22),
+- [Install node-aead-crypto to avoid failing dev build and build](https://github.com/tum-esi/wade/issues/9),
    because coap-binding seems to need it might be necessary (it isn't installed
    with current node version because it shouldn't be needed anymore):
 
@@ -85,7 +85,6 @@ If you want to add your changes to W-ADE, please fork the repository and create 
   After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
   comes with other disadvantages).
 
-- The *Virtual Thing* packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of virtual thing fails under windows and so would
-the installation of WADE if Virtual Thing was added to the packet.
+- The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so wouldthe installation of WADE if Shadow Thing was added to the package.json.
 
-- Vuex version 3.1.2 leads to build problems -> [Issue 55](https://gitlab.lrz.de/tum-ei-esi/wade/issues/55)
+- Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
