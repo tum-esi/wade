@@ -100,7 +100,6 @@ export async function resetAll() {
 export function calculateConf(results: any, settings: any) {
     const confCalculator = new ConfidenceCalculator(results, settings);
     const calculated = confCalculator.calculateAll();
-    console.log('WHY:', calculated);
 }
 
 export async function startPerformancePrediction(interactions: any, settings: WADE.PerformanceMeasurementSettings) {
@@ -119,7 +118,6 @@ export async function startPerformancePrediction(interactions: any, settings: WA
 
     // Calculate confidence interval of performance measurements
     const performanceResult = await performancePredictor.getPerformance();
-    console.log('Result', performanceResult);
 
     // Return performance measurements enhanced with confidence interval calculations
     return performanceResult;
