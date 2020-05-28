@@ -23,7 +23,7 @@ It is an Electron application.
 ---
 You need to have node installed. 
 
-## How to get started
+## How to install the application
 
 ---
 (To be able to easily work and develop functionalities in W-ADE, please read the architecture documentation first!)
@@ -49,7 +49,7 @@ npm run electron:build
 
 Step 4: Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
 
-## How to get started with development
+## How to get started with development / open in dev mode
 
 After cloning the repository and installing all node dependencies (see step 1 & 2) do not build the app (step 3) but run it in development mode instead. 
 This allows for hot-reloads and shows you all potential errors.
@@ -58,9 +58,11 @@ This allows for hot-reloads and shows you all potential errors.
 npm run electron:serve
 ```
 
+_(If you have problems performing this step or run into an error, check [Errors and known problems](#errors\ and\ known\ problems).)_
+
 If you want to add your changes to W-ADE, please fork the repository and create a pull request.
 
-## Known Problems
+## Errors and known problems
 
 - If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
 
