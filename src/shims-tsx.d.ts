@@ -13,6 +13,30 @@ declare global {
   }
 
   namespace WADE {
+
+// =============================================================================
+// ----------------------------------- Enums -----------------------------------
+// =============================================================================
+    enum ConfidenceLevel {
+      EIGHTY_PERCENT = 80,
+      EIGHTY_FIVE_PERCENT = 85,
+      NINETY_PERCENT = 90,
+      NINETY_FIVE_PERCENT = 95,
+      NINETY_NINE_PERCENT = 99,
+      NINETY_NINE_POINT_FIVE_PERCENT = 99.5,
+      NINETY_NINE_POINT_NINE_PERCENT = 99.9
+    }
+
+    enum ConfidenceFactor {
+      EIGHTY_PERCENT = 1.282,
+      EIGHTY_FIVE_PERCENT = 1.440,
+      NINETY_PERCENT = 1.645,
+      NINETY_FIVE_PERCENT = 1.960,
+      NINETY_NINE_PERCENT = 2.576,
+      NINETY_NINE_POINT_FIVE_PERCENT = 2.807,
+      NINETY_NINE_POINT_NINE_PERCENT = 3.291
+    }
+
     enum DelayTypeEnum {
       NO_DELAY = 'No Delay',
       BEFORE_EACH = 'Delay before each',
@@ -48,6 +72,65 @@ declare global {
       EVENT_UNSUB = 'event-unsubscribe'
     }
 
+// =============================================================================
+// ------------------ Interaction-Timing-Vocabulary interfaces -----------------
+// =============================================================================
+
+    interface InteractionTimingMeasurementContextElement {
+      repetitions: number;
+      duration: number;
+      measurement: {
+          type: WADE.MeasurementTypeEnum,
+          amount: number
+      };
+      delay: {
+          type: WADE.DelayTypeEnum,
+          duration: number | null
+      };
+      input?: {
+          size: string,
+          value: any
+      };
+      output?: Array<{size: string, value: any, amount: number}>;
+  }
+
+  interface InteractionTimingAET {
+      AET: number | undefined;
+      confidenceIntervalMin: number;
+      confidenceIntervalMax: number;
+  }
+
+  interface InteractionTimingConfidence {
+      level: WADE.ConfidenceLevel;
+      factor: WADE.ConfidenceFactor;
+      numMeasurments: {
+        realistic: number,
+        possible: number
+      };
+  }
+
+  interface InteractionTimingTimeBounds {
+      firstMeasured: number;
+      BCET: number | undefined;
+      WCET: number | undefined;
+      AET: InteractionTimingAET;
+  }
+
+
+  interface InteractionTimingStaticTiming {
+      measurementContext: Array<InteractionTimingMeasurementContextElement | string>;
+
+  }
+
+  interface InteractionTimingDynamicTiming {
+      type?: string; // only for properties to differentiate between read/write
+      measurementContext: InteractionTimingMeasurementContextElement | string;
+      possible: InteractionTimingTimeBounds;
+      realistic: InteractionTimingTimeBounds;
+      confidence: InteractionTimingConfidence;
+  }
+
+  // ===========================================================================
     interface MqttConfigInterface {
       broker: string;
       username: string | undefined;

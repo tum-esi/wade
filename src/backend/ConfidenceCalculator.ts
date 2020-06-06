@@ -21,7 +21,6 @@ export default class ConfidenceCalculator {
             this.data[i] = this.calculate(this.data[i]);
         }
 
-        console.log(' xxxxx In Conf!', this.data);
         // Return the timing measurements results, enhanced with the calculation of confidence interval + other info
         return this.data;
     }

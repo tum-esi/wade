@@ -24,6 +24,7 @@ import oPerformanceOutput from '@/components/03_organisms/oPerformanceOutput.vue
 import { StatusEnum } from '@/util/enums';
 import { mapActions, mapGetters } from 'vuex';
 import { getCurrentDate } from '@/util/helpers';
+import TdAnnotater from '@/backend/TdAnnotater';
 
 export default Vue.extend({
     name: 'tPerformance',
@@ -40,6 +41,7 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters('TdStore', ['getSelections']),
+        ...mapGetters('SidebarStore', ['getSavedTd']),
         // Returns name of selected interactions
         getSelectionNames() {
             const arrOfSelectionNames: any[] = [];
@@ -87,12 +89,21 @@ export default Vue.extend({
                 console.log('Saved to: ', dataPath);
             });
         },
-        saveTD() {
+
+        // Save annotated TD to electron storage
+        saveTD(measurements) {
+            if (this.resultStatus !== StatusEnum.COMPUTED) return;
             const storage = require('electron-json-storage');
-            const td = require('../../../example-tds/annotade_td.json');
-            const name = `${getCurrentDate()}_annotated_td.json`;
-            storage.set(name, td, (error) => {
+            const annotatedTD =
+                new TdAnnotater((this as any).getSavedTd((this as any).$route.params.id), measurements).getAnnotatedTD();
+            const name =
+                `${(this as any).$route.params.id}_annotated_${getCurrentDate()}.json`;
+            storage.set(name, annotatedTD, (error) => {
                 if (error) throw error;
+            });
+            storage.get(name, (error, data) => {
+                if (error) throw error;
+                console.log(`Annotated TD saved to: ${storage.getDataPath()}`);
             });
         }
     }

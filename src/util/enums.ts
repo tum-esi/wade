@@ -110,3 +110,11 @@ export enum StatusEnum {
   COMPUTED = 'computed',
   ERROR = 'error'
 }
+
+// For InteractionTiming vocabulary
+export enum TypeOfMeasurementContext {
+  DYNAMIC_PROPERTY_READ = 'dynamicTimingContext_property_read',
+  DYNAMIC_PROPERTY_WRITE = 'dynamicTimingContext_property_write',
+  DYNAMIC_ACTION = 'dynamicTimingContext_action',
+  NULL = 'null'
+}

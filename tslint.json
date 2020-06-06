@@ -22,6 +22,11 @@
     "no-bitwise": false,
     "no-shadowed-variable": true,
     "max-classes-per-file": false,
-    "no-var-keyword": false
+    "no-var-keyword": false,
+    "variable-name": false,
+    "class-name": false,
+    "max-line-length": false,
+    "radix": false,
+    "no-string-throw": false
   }
 }
