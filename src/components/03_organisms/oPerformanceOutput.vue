@@ -10,7 +10,8 @@
                 :name="element.name"
                 :settings="{
                     type: element.settingsMeasurementType,
-                    iterations: element.settingsIteration,
+                    confidenceLevel: element.settingsConfidenceLevel,
+                    iterations: element.settingsIterations,
                     duration: element.settingsDuration,
                     delayType: element.settingsDelayType,
                     delayDuration: element.settingsDelayDuration,
@@ -18,14 +19,13 @@
                     numClients: element.settingsNumClients
                 }"
                 :results="{
-                    size: element.size,
+                    input: element.input,
+                    output: element.output,
                     firstMeasured: element.firstMeasured,
                     realistic: element.realistic,    
                     possible: element.possible,
-                    realisticWithoutFirst: element.realisticWithoutFirst,
-                    possibleWithoutFirst: element.possibleWithoutFirst,
-                    overallIteration: element.iterations,
-                    overallDuration: element.measuredDuration
+                    overallIteration: element.overallIterations,
+                    overallDuration: element.overallDuration
                 }"
                 :allMeasurements="element.measuredExecutions"
             />
@@ -33,7 +33,7 @@
         <div class="output-button-container">
             <aButtonBasic 
                 class="output-button"
-                :btnLabel="texts.btnSaveComputer"
+                :btnLabel="texts.btnSave"
                 :btnClass="'btn-normal'"
                 :btnOnClick="'save-measurements'"
                 :btnActive="measurementWasComputed"
@@ -45,7 +45,7 @@
                 :btnClass="'btn-normal'"
                 :btnOnClick="'save-measurements'"
                 :btnActive="measurementWasComputed"
-                @save-measurements="$emit('save-measurements', formattedData)"
+                @save-measurements="$emit('save-td', formattedData)"
             />
         </div>
     </div>
@@ -117,6 +117,7 @@ export default Vue.extend({
     border-radius: 3px;
     background: #B4BAB9;
     padding: 7px 7px 0 7px;
+    overflow: scroll;
 }
 
 .output-button-container {

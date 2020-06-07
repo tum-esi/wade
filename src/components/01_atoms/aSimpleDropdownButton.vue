@@ -53,7 +53,7 @@ export default Vue.extend({
          * Type: Array<string>
          */
         dropdownOptions: {
-            type: Array,
+            // type: Array,
             required: true
         },
         /**

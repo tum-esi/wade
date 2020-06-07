@@ -76,6 +76,31 @@
                     :inputOptions="{ min: 1, max: 10 }"
                 />
             </aPerformanceOption>
+            <!-- Select confidence interval -->
+            <aPerformanceOption :optionLabel="texts.confidenceTitle">
+                <aSimpleDropdownButton 
+                    class="option-input"
+                    v-on:get-selected-input="selectedConfLevel=$event"
+                    :defaultOption="confLevelDefault"
+                    :dropdownOptions="confLevelOptions"
+                    :selectionAction="'get-selected-input'"
+                    :optionalIconPaths="{iconPathDropdownClosed: 'arrow_down', iconPathDropdownActive: 'arrow_right'}"
+                />
+            </aPerformanceOption>
+             <!-- Select Static Timing -->
+            <aPerformanceOption 
+                :optionLabel="texts.calculateStatic"
+                :class="{'disabled': typeOfDelay === getEnumType('NO_DELAY')}"
+            >
+                <aSimpleDropdownButton 
+                    class="option-input"
+                    v-on:get-selected-input="selectedStatic=$event"
+                    :defaultOption="staticDefault"
+                    :dropdownOptions="staticOptions"
+                    :selectionAction="'get-selected-input'"
+                    :optionalIconPaths="{iconPathDropdownClosed: 'arrow_down', iconPathDropdownActive: 'arrow_right'}"
+                />
+            </aPerformanceOption>
             <!-- Selected interactions -->
             <div class="selected-interaction">
                 <label>
@@ -107,6 +132,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { MeasurementTypeEnum, DelayTypeEnum } from '@/util/enums';
+import { confidenceLevel } from '@/util/helpers';
 import aSimpleDropdownButton from '@/components/01_atoms/aSimpleDropdownButton.vue';
 import aSimpleInputField from '@/components/01_atoms/aSimpleInputField.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
@@ -132,6 +158,50 @@ export default Vue.extend({
     data() {
         return {
             texts: this.$store.state.TextStore.performance.performanceOptions,
+            staticDefault: '',
+            selectedStatic: '',
+            staticOptions: [
+                {
+                    title: 'Calculate',
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: '',
+                    style: 'border-bottom full-width'
+                },
+            ],
+            selectedConfLevel: confidenceLevel.NINETY_NINE_PERCENT[0] as any,
+            confLevelDefault: confidenceLevel.NINETY_NINE_PERCENT[0],
+            confLevelOptions: [
+                {
+                    title: confidenceLevel.EIGHTY_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.EIGHTY_FIVE_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.NINETY_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.NINETY_FIVE_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.NINETY_NINE_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.NINETY_NINE_POINT_FIVE_PERCENT[0],
+                    style: 'border-bottom full-width'
+                },
+                {
+                    title: confidenceLevel.NINETY_NINE_POINT_NINE_PERCENT[0],
+                    style: 'full-width'
+                }
+            ],
             iterations: undefined as number | undefined,
             duration: undefined as number | undefined,
             measurementNum: 1 as number,
@@ -185,6 +255,7 @@ export default Vue.extend({
         startMeasurement() {
             const settings: WADE.PerformanceMeasurementSettings = {
                 settingsMeasurementType: this.measurementType,
+                settingsConfidenceLevel: this.selectedConfLevel,
                 settingsIterations: this.iterations,
                 settingsDuration: this.duration,
                 settingsDelayType: this.typeOfDelay,

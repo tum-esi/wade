@@ -13,6 +13,30 @@ declare global {
   }
 
   namespace WADE {
+
+// =============================================================================
+// ----------------------------------- Enums -----------------------------------
+// =============================================================================
+    enum ConfidenceLevel {
+      EIGHTY_PERCENT = 80,
+      EIGHTY_FIVE_PERCENT = 85,
+      NINETY_PERCENT = 90,
+      NINETY_FIVE_PERCENT = 95,
+      NINETY_NINE_PERCENT = 99,
+      NINETY_NINE_POINT_FIVE_PERCENT = 99.5,
+      NINETY_NINE_POINT_NINE_PERCENT = 99.9
+    }
+
+    enum ConfidenceFactor {
+      EIGHTY_PERCENT = 1.282,
+      EIGHTY_FIVE_PERCENT = 1.440,
+      NINETY_PERCENT = 1.645,
+      NINETY_FIVE_PERCENT = 1.960,
+      NINETY_NINE_PERCENT = 2.576,
+      NINETY_NINE_POINT_FIVE_PERCENT = 2.807,
+      NINETY_NINE_POINT_NINE_PERCENT = 3.291
+    }
+
     enum DelayTypeEnum {
       NO_DELAY = 'No Delay',
       BEFORE_EACH = 'Delay before each',
@@ -38,6 +62,75 @@ declare global {
       MASHUP = 'mashup'
     }
 
+    enum PossibleInteractionTypesEnum {
+      PROP_READ = 'property-read',
+      PROP_WRITE = 'property-write',
+      PROP_OBSERVE_READ = 'property-observe-read',
+      PROP_OBSERVE_WRITE = 'property-observe-write',
+      ACTION = 'action-invoke',
+      EVENT_SUB = 'event-subscribe',
+      EVENT_UNSUB = 'event-unsubscribe'
+    }
+
+// =============================================================================
+// ------------------ Interaction-Timing-Vocabulary interfaces -----------------
+// =============================================================================
+
+    interface InteractionTimingMeasurementContextElement {
+      repetitions: number;
+      duration: number;
+      measurement: {
+          type: WADE.MeasurementTypeEnum,
+          amount: number
+      };
+      delay: {
+          type: WADE.DelayTypeEnum,
+          duration: number | null
+      };
+      input?: {
+          size: string,
+          value: any
+      };
+      output?: Array<{size: string, value: any, amount: number}>;
+  }
+
+  interface InteractionTimingAET {
+      AET: number | undefined;
+      confidenceIntervalMin: number;
+      confidenceIntervalMax: number;
+  }
+
+  interface InteractionTimingConfidence {
+      level: WADE.ConfidenceLevel;
+      factor: WADE.ConfidenceFactor;
+      numMeasurments: {
+        realistic: number,
+        possible: number
+      };
+  }
+
+  interface InteractionTimingTimeBounds {
+      firstMeasured: number;
+      BCET: number | undefined;
+      WCET: number | undefined;
+      AET: InteractionTimingAET;
+  }
+
+
+  interface InteractionTimingStaticTiming {
+      measurementContext: Array<InteractionTimingMeasurementContextElement | string>;
+
+  }
+
+  interface InteractionTimingDynamicTiming {
+      type?: string; // only for properties to differentiate between read/write
+      measurementContext: InteractionTimingMeasurementContextElement | string;
+      possible: InteractionTimingTimeBounds;
+      realistic: InteractionTimingTimeBounds;
+      confidence: InteractionTimingConfidence;
+  }
+
+  // ===========================================================================
     interface MqttConfigInterface {
       broker: string;
       username: string | undefined;
@@ -180,8 +273,36 @@ declare global {
       tabIsActive?: boolean;
     }
 
+    interface PerformanceInteraction {
+      // Name of interaction, e.g. 'bool:Read'
+      name: string;
+      // Type of interaction (Read, Write, ...)
+      type: PossibleInteractionTypesEnum;
+      // Input set by user (if applicable)
+      input: any;
+      // Actual interaction that can be interacted on a Thing
+      interaction: any;
+    }
+
+    interface PerformanceInput {
+      // Size of input preferably in byte (see class SizeCalculator)
+      size: number | string;
+      // Input value: E.g. 'espresso', 22, true, ...
+      value: any;
+    }
+
+    interface PerformanceOutput {
+      // Size of output preferably in byte (see class SizeCalculator)
+      size: number | string;
+      // Output value: E.g. 'espresso', 22, true, ...
+      value: any;
+      // How often was this output received
+      amount: number;
+    }
+
     interface PerformanceResult {
       settingsMeasurementType: MeasurementTypeEnum;
+      settingsConfidenceLevel: number;
       settingsIterations: number;
       settingsDuration: number;
       settingsDelayType: DelayTypeEnum;
@@ -189,25 +310,61 @@ declare global {
       settingsNumMeasurements: number;
       settingsNumClients: number;
       name: string;
-      size: string;
-      type: any; // PossibleInteractionTypesEnu
+      input: PerformanceInput;
+      output: PerformanceOutput[];
+      type: any; // PossibleInteractionTypesEnum
       numClients: number;
       firstMeasured: number;
       delayFirst: number | boolean;
       delayBeforeEach: number | boolean;
-      realistic: { WCET: number, BCET: number, AET: number } | null;
-      possible: { WCET: number, BCET: number, AET: number } | null;
-      realisticWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
-      possibleWithoutFirst: { WCET: number, BCET: number, AET: number } | null;
+      realistic: PerformanceResultDetailData | null;
+      possible: PerformanceResultDetailData | null;
       measuredExecutions: number[] | null;
       iterations?: number;
       duration?: number;
-      measuredDuration?: number; // Duration it actually took
+      overallDuration?: number; // Overall measured duration
+      overallIterations?: number; // Overall iteration executed
       measurementNum: number; // Number of measurement rounds
+    }
+
+    /**
+     * WCET: Worst Case Execution Time
+     * BCET: Best Case Execution Time
+     * AET: Average Execution Time
+     * all: All measurements uses for the calculation of the above
+     */
+    interface PerformanceResultDetailData {
+      WCET: number;
+      BCET: number;
+      AET: number;
+      all: number[];
+      confidenceResults: ConfidenceLevelResults | null;
+    }
+
+    /**
+     * The result object of the confidence level calculation
+     */
+    interface ConfidenceLevelResults {
+      confidenceFactor: number;
+      mean: number;
+      standardDeviation: number;
+      standardError: number;
+      errorMargin: number;
+      confidenceIntervalMin: number;
+      confidenceIntervalMax: number;
+      confidenceInterval: string;
+      precisionFactor: number;
+      precisionMinVal: number;
+      precisionMaxVal: number;
+      precisionRange: string;
+      resultsWithinRange: boolean | null;
+      resultsWithinRangeMin: boolean | null;
+      resultsWithinRangeMax: boolean | null;
     }
 
     interface PerformanceMeasurementSettings {
       settingsMeasurementType: MeasurementTypeEnum;
+      settingsConfidenceLevel: number;
       settingsIterations?: number;
       settingsDuration?: number;
       settingsDelayType: DelayTypeEnum;

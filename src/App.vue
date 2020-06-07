@@ -182,6 +182,10 @@ export default Vue.extend({
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 
+::-webkit-scrollbar {
+    display: none;
+}
+
 html {
   width: 100%;
   height: 100%;
@@ -271,6 +275,10 @@ textarea:focus, input:focus{
 
 .grey {
   background-color: #939C9E;
+}
+
+.bg-grey {
+  background-color: #b4bab9;
 }
 
 .turqouise {

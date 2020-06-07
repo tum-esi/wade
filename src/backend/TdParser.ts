@@ -3,7 +3,6 @@
 import * as WoT from 'wot-typescript-definitions';
 import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
 import SizeCalculator from '@/backend/SizeCalculator';
-import { customThingDescription } from './wot-custom';
 
 export default class TdParser {
     private consumedTd: WoT.ConsumedThing | null;
@@ -34,9 +33,9 @@ export default class TdParser {
     private parseProperties() {
         if (!this.consumedTd) return;
 
-        for (const property in (this.consumedTd.getThingDescription() as customThingDescription).properties) {
+        for (const property in this.consumedTd.getThingDescription().properties) {
             if (
-                !(this.consumedTd.getThingDescription() as customThingDescription).properties.hasOwnProperty(property)
+                !this.consumedTd.getThingDescription().properties.hasOwnProperty(property)
             ) {
                  continue;
             }
@@ -49,7 +48,7 @@ export default class TdParser {
                     interactionType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
                     interactionSelectBtn: {
                         btnInputType: this.getCorrectInputType(
-                            (this.consumedTd.getThingDescription() as customThingDescription).properties[property]
+                            this.consumedTd.getThingDescription().properties[property]
                         ),
                         btnKey: `property-${property}-observe`,
                         btnGeneralStyle: 'btn-event-interaction',
@@ -72,7 +71,7 @@ export default class TdParser {
             }
 
             // Readable properties
-            if (!(this.consumedTd.getThingDescription() as customThingDescription).properties[property].writeOnly) {
+            if (!this.consumedTd.getThingDescription().properties[property].writeOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Read`,
                     interactionType: PossibleInteractionTypesEnum.PROP_READ,
@@ -122,13 +121,13 @@ export default class TdParser {
             }
 
             // Writeable properties (have input)
-            if (!(this.consumedTd.getThingDescription() as customThingDescription).properties[property].readOnly) {
+            if (!this.consumedTd.getThingDescription().properties[property].readOnly) {
                 this.parsedTd.propertyInteractions.push({
                     interactionName: `${property}: Write`,
                     interactionType: PossibleInteractionTypesEnum.PROP_WRITE,
                     interactionSelectBtn: {
                         btnInputType: this.getCorrectInputType(
-                            (this.consumedTd.getThingDescription() as customThingDescription).properties[property]
+                            this.consumedTd.getThingDescription().properties[property]
                         ),
                         btnKey: `property-${property}-write`,
                         btnGeneralStyle: 'btn-event-interaction',
@@ -180,8 +179,8 @@ export default class TdParser {
 
     private parseActions() {
         if (!this.consumedTd) return;
-        for (const action in (this.consumedTd.getThingDescription() as customThingDescription).actions) {
-            if (!(this.consumedTd.getThingDescription() as customThingDescription).actions.hasOwnProperty(action)) {
+        for (const action in this.consumedTd.getThingDescription().actions) {
+            if (!this.consumedTd.getThingDescription().actions.hasOwnProperty(action)) {
                 continue;
             }
 
@@ -190,7 +189,7 @@ export default class TdParser {
                 interactionType: PossibleInteractionTypesEnum.ACTION,
                 interactionSelectBtn: {
                     btnInputType: this.getCorrectInputTypeActions(
-                        (this.consumedTd.getThingDescription() as customThingDescription).actions[action]
+                        this.consumedTd.getThingDescription().actions[action]
                     ),
                     btnKey: `action-${action}`,
                     btnGeneralStyle: 'btn-event-interaction',
@@ -238,8 +237,8 @@ export default class TdParser {
 
     private parseEvents() {
         if (!this.consumedTd) return;
-        for (const event in (this.consumedTd.getThingDescription() as customThingDescription).events) {
-            if ( !(this.consumedTd.getThingDescription() as customThingDescription).events.hasOwnProperty(event)) {
+        for (const event in this.consumedTd.getThingDescription().events) {
+            if ( !this.consumedTd.getThingDescription().events.hasOwnProperty(event)) {
                 continue;
             }
             const eventInteraction = {

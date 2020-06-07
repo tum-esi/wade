@@ -1,0 +1,317 @@
+{
+    "title": "virtual-test-thing-2",
+    "description": "node-wot servient for virtual test #2 including delayed actions",
+    "@context": [
+        "https://www.w3.org/2019/wot/td/v1",
+        {
+            "iot": "http://example.org/iot"
+        },
+        {
+            "@language": "en"
+        }
+    ],
+    "actions": {
+        "noInputString": {
+            "output": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputString",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputString",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "noInputBoolean": {
+            "output": {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputBoolean",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "noInputInteger": {
+            "output": {
+                "type": "integer"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputInteger",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "noInputDelayString": {
+            "output": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputDelayString",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputDelayString",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "noInputDelayBoolean": {
+            "output": {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputDelayBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputDelayBoolean",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "noInputDelayInteger": {
+            "output": {
+                "type": "integer"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/noInputDelayInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/noInputDelayInteger",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputString": {
+            "input": {
+                "type": "string"
+            },
+            "output": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputString",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputString",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputBoolean": {
+            "input": {
+                "type": "boolean"
+            },
+            "output": {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputBoolean",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputInteger": {
+            "input": {
+                "type": "integer"
+            },
+            "output": {
+                "type": "integer"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputInteger",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputDelayString": {
+            "input": {
+                "type": "string"
+            },
+            "output": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputDelayString",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputDelayString",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputDelayBoolean": {
+            "input": {
+                "type": "boolean"
+            },
+            "output": {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputDelayBoolean",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputDelayBoolean",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        },
+        "inputDelayInteger": {
+            "input": {
+                "type": "integer"
+            },
+            "output": {
+                "type": "integer"
+            },
+            "forms": [
+                {
+                    "href": "http://192.168.150.86:8080/virtual-test-thing-2/actions/inputDelayInteger",
+                    "contentType": "application/json",
+                    "op": [
+                        "invokeaction"
+                    ],
+                    "htv:methodName": "POST"
+                },
+                {
+                    "href": "coap://192.168.150.86:5683/virtual-test-thing-2/actions/inputDelayInteger",
+                    "contentType": "application/json",
+                    "op": "invokeaction"
+                }
+            ],
+            "idempotent": false,
+            "safe": false
+        }
+    },
+    "@type": "Thing",
+    "security": [
+        "nosec_sc"
+    ],
+    "id": "urn:uuid:4694f427-ec53-4483-a142-ba9e1da4bc2f",
+    "forms": [
+        {
+            "href": "http://192.168.150.86:8080/virtual-test-thing-2/all/properties",
+            "contentType": "application/json",
+            "op": [
+                "readallproperties",
+                "readmultipleproperties"
+            ]
+        }
+    ],
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    }
+}
