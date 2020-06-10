@@ -44,7 +44,6 @@ export default Vue.extend({
 .tabbar-container {
   list-style-type: none;
   display: inline-block;
-  border-bottom: 1px solid #393B3A;
   width: 100%;
   height: 7%;
 }

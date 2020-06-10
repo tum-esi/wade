@@ -128,8 +128,8 @@ export default Vue.extend({
                 btnActive: false
             },
             showHelpBtn: {
-                btnLabelShow: 'Show Config Format Help',
-                btnLabelHide: 'Hide Config Format Help',
+                btnLabelShow: 'Show Help',
+                btnLabelHide: 'Hide Help',
                 btnClassShow: 'show-format',
                 btnClassHide: 'hide-format',
                 btnOnClick: 'show-help',
@@ -208,29 +208,27 @@ export default Vue.extend({
 .format-option label {
     font-size: 14px !important;
     padding-left: 7px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .config-container {
     height: 100%;
     width: 50%;
     display: flex;
-    padding: 0px 12px 10px 12px;
+    padding: 0px 7px 7px 7px;
 }
 
-.config-help-container, .show-config, .help-area {
+.config-help-container, .show-config {
     width: 100%;
-    height: 100%;
+    height: 92%;
 }
 
-.change-config-area {
+.help-area, .change-config-area, .help-area-text {
+    height: 100%; 
     width: 100%;
-    height: 100%;
 }
 
-.help-area-text {
-    width: 100%;
-    height: 90%;
-}
 .help-area-text textarea {
     width: 100%;
     height: 100%;
@@ -244,6 +242,8 @@ export default Vue.extend({
 .config-header {
     display: flex;
     justify-content: space-between;
+    height: 8%;
+    overflow: hidden;
 }
 
 .config-title {
@@ -265,7 +265,7 @@ export default Vue.extend({
 
 .config-area {
     width: 100%;
-    height: 79%;
+    height: 83%;
 }
 
 .config-area textarea{
@@ -294,7 +294,7 @@ export default Vue.extend({
 }
 
 .config-btns {
-    height: 7%;
+    height: 10%;
     padding-top: 7px;
     display: flex;
     justify-content: space-between;
