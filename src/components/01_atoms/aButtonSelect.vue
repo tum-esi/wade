@@ -4,11 +4,22 @@
     :class="getButtonSelectedStyle"
     class="btn-selection-container"
   >
-    <button v-if="btnLabel" class="select-btn-label" :class="btnGeneralStyle" >{{ btnLabel }}</button>
-    <button v-else-if="!btnLabel" class="select-btn-label" :class="btnGeneralStyle">{{ getBtnLabel }}</button>
+    <button 
+      v-if="btnLabel" 
+      class="select-btn-label" 
+      :class="btnGeneralStyle"
+    >
+      {{ btnLabel }}
+    </button>
+    <button 
+      v-else-if="!btnLabel" 
+      :class="getBtnStyle"
+    >
+      {{ getBtnLabel }}
+    </button>
 
     <div class="select-btn-container">
-      <img class="select-btn" @click.prevent="changeSelection" :src="currentSrc"/>
+      <img class="select-btn" @click.prevent="changeSelection" :src="!btnDisabled ? currentSrc : srcSelectionNotPossibele"/>
     </div>
 
   </div>
@@ -32,7 +43,8 @@ export default Vue.extend({
       btnSelected: false,
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
-      srcSelected: require('@/assets/checked_circle.png')
+      srcSelected: require('@/assets/checked_circle.png'),
+      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
     };
   },
   props: {
@@ -80,14 +92,25 @@ export default Vue.extend({
     btnOnClickValue: {
       type: String,
       required: false
+    },
+    /**
+     * Optional value, which indicates button enablement.
+     */
+    btnDisabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
+    getBtnStyle(): string {
+      return this.btnDisabled ? `select-btn-label ${this.btnGeneralStyle} disabled` : `select-btn-label ${this.btnGeneralStyle}`;
+    },
     getBtnLabel(): string {
       return this.btnSelected ? 'Selected' : 'Select';
     },
     getButtonSelectedStyle(): string {
-      return this.btnSelected ? 'btn-selection-container-selected' : '';
+      return this.btnSelected && !this.btnDisabled ? 'btn-selection-container-selected' : '';
     }
   },
   methods: {
@@ -96,9 +119,11 @@ export default Vue.extend({
       this.btnSelected ? this.$emit('select') : this.$emit('deselect');
     },
     changeSelection() {
+      if (!this.btnDisabled) {
         this.btnSelected = !this.btnSelected;
         this.currentSrc = this.btnSelected ? this.srcSelected : this.srcUnselected;
         this.onClick();
+      }
     }
   }
 });
