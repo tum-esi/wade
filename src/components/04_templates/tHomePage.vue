@@ -1,6 +1,7 @@
+<!-- Home/ start screen of the application. --> 
 <template>
-  <div class="home-container">
-    <label>Add a new Folder, Thing Description or Mashup by clicking on the button.</label>
+  <div :class="getSidebarActive ? 'home-container' : 'home-container full-screen'">
+    <label>Add a new Thing Description, mashup or folder by clicking on the button.</label>
 
     <aDropdownButton
       class="dropdown-btn"
@@ -26,7 +27,7 @@ export default Vue.extend({
       this.setActiveElement(null);
     },
     computed: {
-        ...mapGetters('SidebarStore', ['getAddNewButton']),
+        ...mapGetters('SidebarStore', ['getAddNewButton', 'getSidebarActive']),
     },
     methods: {
         ...mapActions('SidebarStore', ['setActiveElement']),
@@ -45,6 +46,12 @@ export default Vue.extend({
     flex-direction: column;
     justify-content: center;
 }
+
+.home-container label {
+  text-align: center;
+  padding: 20px 20px 40px 20px;
+}
+
 .dropdown-btn {
     width: 60px;
     height: 45px;
