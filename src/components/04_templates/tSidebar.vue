@@ -55,7 +55,7 @@ export default Vue.extend({
   data() {
     return {
       showCollapseBtn: false,
-      isSidebarVisible: false
+      isSidebarVisible: true
     };
   },
   computed: {

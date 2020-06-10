@@ -17,12 +17,11 @@ protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 900,
     autoHideMenuBar: true,
     webPreferences: { nodeIntegration: true}
   });
-  win.maximize();
   win.setMenu(null);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {

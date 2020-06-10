@@ -14,6 +14,7 @@
                     </div>
                 </div>
                 <aButtonBasic
+                    class="format-help-btn"
                     v-on:show-help="showHelpClicked"
                     :btnClass="showHelp ? showHelpBtn.btnClassHide : showHelpBtn.btnClassShow"
                     :btnLabel="showHelp  ? showHelpBtn.btnLabelHide : showHelpBtn.btnLabelShow"
@@ -244,6 +245,7 @@ export default Vue.extend({
     justify-content: space-between;
     height: 8%;
     overflow: hidden;
+    align-items: center;
 }
 
 .config-title {
@@ -252,6 +254,10 @@ export default Vue.extend({
     min-height: 50px;
     display: flex;
     align-items: center;
+}
+
+.format-help-btn {
+    min-width: 150px;
 }
 
 .config-status {
