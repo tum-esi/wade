@@ -1,6 +1,9 @@
 <template>
     <div class="performance-container"> 
-        <oSelection class="performance-child-container" :showButtons="'selection-btn-reset'"/>
+        <oSelection 
+            class="performance-child-container" :showButtons="'selection-btn-reset'"
+            v-on:selections-reseted="selectionResetted"
+        />
         <oPerformanceOptions 
             class="performance-child-container"
             :selectedInteractionNames="getSelectionNames" 
@@ -10,6 +13,7 @@
             class="performance-child-container"
             :resultStatus="resultStatus"
             :resultData="resultData"
+            :savedLocationInfo="savedLocationPath"
             @save-measurements="saveMeasurement"
             @save-td="saveTD"
         />
@@ -36,7 +40,8 @@ export default Vue.extend({
     data() {
         return {
             resultData: undefined as any,
-            resultStatus: StatusEnum.NOT_STARTED
+            resultStatus: StatusEnum.NOT_STARTED,
+            savedLocationPath: ''
         };
     },
     computed: {
@@ -54,6 +59,8 @@ export default Vue.extend({
     methods: {
         ...mapActions('TdStore', ['getPerformancePrediction']),
         startPerformancePrediction(settings: WADE.PerformanceMeasurementSettings) {
+            // Reset location path
+            this.savedLocationPath = '';
             // const {BrowserWindow} = require('electron');
 
             // const win = BrowserWindow.getAllWindows()[0];
@@ -73,6 +80,7 @@ export default Vue.extend({
                     return err;
                 });
         },
+        // Save performance measurements
         saveMeasurement(measurements) {
             const storage = require('electron-json-storage');
             for (let i = 0, l = measurements.length; i < l; i++) {
@@ -86,7 +94,7 @@ export default Vue.extend({
             storage.getAll( (error, data) => {
                 if (error) throw error;
                 const dataPath = storage.getDataPath();
-                console.log('Saved to: ', dataPath);
+                this.savedLocationPath = `Saved to: ${dataPath}`;
             });
         },
 
@@ -103,8 +111,16 @@ export default Vue.extend({
             });
             storage.get(name, (error, data) => {
                 if (error) throw error;
-                console.log(`Annotated TD saved to: ${storage.getDataPath()}`);
+                this.savedLocationPath = `Annotated TD saved to: ${storage.getDataPath()}`;
             });
+        },
+        selectionResetted() {
+            // Reset location path
+            this.savedLocationPath = '';
+
+            // Reset result status and clear output field
+            this.resultStatus = StatusEnum.NOT_STARTED;
+            this.resultData = new Promise((rej, res) => {rej([]); res([]); });
         }
     }
 });

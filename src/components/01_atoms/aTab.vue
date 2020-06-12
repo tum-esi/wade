@@ -1,17 +1,17 @@
 <template>
   <div class="tab-container" 
     :class="`${tabStyle} ${tabIsActive ? 'isActive' : ''}`"
-    v-on:click="$emit('tab-clicked', tabId)">
+    v-on:click.self="$emit('tab-clicked', tabId)">
 
       <aIconButton 
-        v-if="tabIconButton" 
+        v-if="tabIconButton && showBtn" 
         :class="tabButtonStyle" 
         :iconBtnSrcPath="tabIconButton.iconBtnSrcPath"
         :iconBtnOnClick="tabIconButton.iconBtnOnClick"
-        v-on:click="$emit('tab-btn-clicked', tabIconButton.iconBtnOnClick)"
+        v-on:icon-btn-clicked="$emit('tab-btn-clicked', tabIconButton.iconBtnOnClick)"
         />
       <aDropdownButton 
-        v-else-if="tabDropdownButton"
+        v-else-if="tabDropdownButton && showBtn"
         :class="tabButtonStyle" 
         :btnLabel="tabDropdownButton.btnLabel"
         :btnKey="tabDropdownButton.btnKey"
@@ -20,8 +20,8 @@
         />
       <label 
         v-if="tabTitle" 
-        class="tab-label" 
-        v-on:click="$emit('tab-label-clicked', tabId)">
+        :class="tabLabelStyle" 
+        v-on:click="$emit('tab-clicked', tabId)">
           {{ tabTitle }}
       </label>
   </div>
@@ -86,6 +86,14 @@ export default Vue.extend({
         required: false
     },
     /**
+     * When label needs specific styling.
+     */
+    tabLabelStyle: {
+      type: String,
+      required: false,
+      default: 'tab-label'
+    },
+    /**
      * If tab is router link.
      */
     tabLink: {
@@ -100,6 +108,15 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: false
+    },
+    /**
+     * Can be used e.g. to indicate if the icon or dropdown btn should be shown.
+     * (E.g. for hovering effects or when specific user rights are activated)
+     */
+    showBtn: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   }
 });
@@ -123,21 +140,31 @@ export default Vue.extend({
   order: 2;
 }
 
-.tab-btn-small {
+.tab-btn-20 {
   height: 100%;
-  width: 30%;
+  width: 20%;
 }
 
 .tab-btn-header {
-  padding: 15px 7px 15px 7px;
+  padding: 10px;
   background: none;
+  display: flex;
+  justify-content: center;
 }
 
 .tab-btn-header:hover {
   background: none;
 }
 
-.tab-label:hover {
+.tab-label-80 {
+  width: 80%;
+  border-right: solid 15px rgba(0, 0, 0, 0);
+  padding-left: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tab-label-80:hover {
   cursor: pointer;
 }
 

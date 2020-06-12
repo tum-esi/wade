@@ -7,7 +7,7 @@
   >
     <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }" :style="styleCss">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath" />
-      <label class="sidbar-element-label">{{ title }}</label>
+      <label class="sidebar-element-label">{{ title }}</label>
       <img
         :style="children && children.length > 0 ? '' : 'visibility: hidden;'"
         class="sidebar-element-icon-dropdown"
@@ -193,9 +193,10 @@ export default Vue.extend({
   filter: brightness(3);
 }
 
-.sidbar-element-label {
+.sidebar-element-label {
   width: 65%;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .sidebar-element-icon-dropdown,

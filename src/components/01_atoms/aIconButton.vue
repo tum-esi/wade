@@ -56,7 +56,7 @@ computed: {
 methods: {
   onClickAction() {
       if (this.iconBtnOnClick) {
-          this.$emit(this.iconBtnOnClick);
+        this.$emit('icon-btn-clicked', this.iconBtnOnClick);
       }
   }
 }
@@ -79,6 +79,11 @@ methods: {
 .btn-img-mashup-add {
   width: 100%;
   object-fit: contain;
+  padding: 5px 7px 5px 7px;
+}
+
+/* custom styling for header-tab toggle sidebar btn */
+.toggle-sidebar-btn {
   padding: 5px 7px 5px 7px;
 }
 </style>

@@ -29,6 +29,7 @@
                 }"
                 :allMeasurements="element.measuredExecutions"
             />
+            <label> {{ savedLocationInfo }} </label>
         </div>
         <div class="output-button-container">
             <aButtonBasic 
@@ -77,6 +78,14 @@ export default Vue.extend({
         resultData: {
             type: Promise,
             required: false
+        },
+        /**
+         * Path where annotated td or output is saved.
+         */
+        savedLocationInfo: {
+            type: String,
+            required: false,
+            default: ''
         }
     },
     data() {

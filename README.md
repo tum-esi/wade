@@ -9,6 +9,19 @@ It is based on node-wot - the reference implementation of W3C's Scripting API.
 It supports following protocols: HTTP/HTTPS, CoAP/CoAPS, MQTT.
 It is an Electron application.
 
+Please see the according paper **WADE: Timing Performance Benchmarking in Web of Things**.
+```
+@inproceedings{skks:2020,    
+	author          = {Verena Eileen Schlott, Ege Korkan, Sebastian Kaebisch, Sebastian Steinhorst},
+    title           = {W-ADE: Timing Performance Benchmarking in Web of Things},
+    booktitle       = {International Conference on Web Engineering (ICWE 2020)},
+    location        = {Helsinki, Finland},
+    year            = {in press},
+    month           = {June},
+    day             = {9-12},
+}
+```
+
 ## What can you do with W-ADE
 
 ---
@@ -51,6 +64,8 @@ Step 4: Navigate into the folder 'dist_electron' and install the application. Af
 
 ## How to get started with development / open in dev mode
 
+___
+
 After cloning the repository and installing all node dependencies (see step 1 & 2) do not build the app (step 3) but run it in development mode instead. 
 This allows for hot-reloads and shows you all potential errors.
 
@@ -63,6 +78,7 @@ _(If you have problems performing this step or run into an error, check [Errors 
 If you want to add your changes to W-ADE, please fork the repository and create a pull request.
 
 ## Errors and known problems
+---
 
 - If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
 
@@ -88,3 +104,10 @@ If you want to add your changes to W-ADE, please fork the repository and create 
 - The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so wouldthe installation of WADE if Shadow Thing was added to the package.json.
 
 - Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
+
+## Interaction Timing Vocabulary
+___
+
+To be able to add measured timing performance benchmarks to a Thing Description, a vocabulary set that is aligned with the current Thing Description was developed.   
+It is called **Interaction Timing Vocabulary**.   
+It's schema can be found in '/interaction-timing-vocabulary'.
