@@ -19,6 +19,8 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1200,
     height: 900,
+    minWidth: 800,
+    minHeight: 600,
     autoHideMenuBar: true,
     webPreferences: { nodeIntegration: true}
   });
