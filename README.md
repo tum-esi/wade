@@ -1,4 +1,14 @@
 # W-ADE
+## Table of Contents  
+[Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
+[What can you do with W-ADE](#what-can-you-do-with-w-ade)  
+[Prerequisites](#prerequisites)  
+[How to install the application](#how-to-install-the-application)  
+[How to get started with development / open in dev mode](#how-to-get-started-with-development-/-open-in-dev-mode)  
+[Errors and Known Problems](#errors-and-known-problems)
+[Interaction Timing Vocabulary](#interaction-timing-vocabulary)
+
+---
 ## **W**eb of Things **A**PI **D**evelopment **E**nvironment
 
 Wade is an API development environment for Web of Things that was designed for the [W3C WoT building blocks](https://w3c.github.io/wot-architecture/). 
