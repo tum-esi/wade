@@ -3,10 +3,11 @@
 [Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
 [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
 [Prerequisites](#prerequisites)  
-[How to install the application](#how-to-install-the-application)  
-[How to get started with development / open in dev mode](#how-to-get-started-with-development-/-open-in-dev-mode)  
+[How to Install the Application](#how-to-install-the-application)  
+[How to Get Started with Development / Open in Dev Mode](#how-to-get-started-with-development-/-open-in-dev-mode)  
 [Errors and Known Problems](#errors-and-known-problems)
-[Interaction Timing Vocabulary](#interaction-timing-vocabulary)
+[Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
+[Adding or Working on Issues](#adding-or-working-on-issues)
 
 ---
 ## **W**eb of Things **A**PI **D**evelopment **E**nvironment
@@ -116,3 +117,56 @@ If you want to add your changes to W-ADE, please fork the repository and create 
 To be able to add measured timing performance benchmarks to a Thing Description, a vocabulary set that is aligned with the current Thing Description was developed.   
 It is called **Interaction Timing Vocabulary**.   
 It's schema can be found in '/interaction-timing-vocabulary'.
+
+---
+## Adding or Working on Issues
+
+### Adding Issues
+When adding a new issue, please...
+1) Use the following **title style**:
+
+    ```
+    [<Topic>] <short description of issue>
+    ```
+    E.g.: [Sidebar] Improve UX of sidebar
+
+2) Add a **priority label** to indicate the importance of the issue.   
+
+    Existing priority labels are: 
+      - prio-low
+      - prio-mid
+      - prio-high.
+
+3) Add a label indicating the **type** of the issue.   
+
+    Existing type labels are: 
+    - Bug
+    - Enhancement (A new feature or functionality)
+    - Improvement (Improvement of existing features/ functionality)
+
+4) Add it to an **Overview-Ticket** (that fits best)  
+    Existing overview-tickets are: 
+    - [[Sidebar]](https://github.com/tum-esi/wade/issues/57)
+    - [[[Benchmarking / Timing Performance] Overview Ticket]](https://github.com/tum-esi/wade/issues/61)
+    - [[General]](https://github.com/tum-esi/wade/issues/56)
+    - [[UI]](https://github.com/tum-esi/wade/issues/54)
+    - [[Thing Description Interface]](https://github.com/tum-esi/wade/issues/52)
+    - [[Virtual Thing Plugin]](https://github.com/tum-esi/wade/issues/51)
+
+
+### Working on Issues
+
+When you want to work on an issue, please ... 
+
+1) Assign issue to yourself: So that multiple persons aren't working on the same issue.
+
+2) Create a new branch, and use the following naming convention:   
+    ```
+    <type-of-issue>-<topic>-<short-description>
+    ```
+    _kind-of-ticket_ refers to this:   
+    E.g. _bugfix-sidebar-click-error_ or _improvement-ui-better-zooming_
+
+3) Link the according issue in the pull request: When finishing the issue and when creating a pull-request to master, link the issue. The person who merges the pull-request to master can then close the issue.
+
+4) Closed issue also needs to be strike-throughed on the according overview-issue.
