@@ -226,6 +226,7 @@ export default Vue.extend({
 
 .button-label {
     font-size: 13px;
+    overflow: hidden;
 }
 
 /* Dropdown styling for MaGe mashup selection */

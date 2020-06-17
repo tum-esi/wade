@@ -1,8 +1,7 @@
 <template>
     <div class="editor-container"> 
         <div class="editor-title">
-            <label>Thing Description</label>
-            <label>{{this.id}}</label>
+            <label>Thing Description: {{this.id}}</label>
             <div class="editor-dropdown-container"> 
             <aDropdownButton
                 btnLabel="Load Example TD"
@@ -165,15 +164,19 @@ export default Vue.extend({
 .editor-title {
     position: relative;
     padding: 7px 0px 7px 2px;
-    max-height: 8%;
-    min-height: 50px;
+    height: 8%;
+    width: 100%;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .editor-title label {
     font-size: 14px;
     padding-right: 7px;
+    white-space: nowrap;
+    width: 50%;
+    overflow: hidden;
 }
 
 .editor-area {
@@ -199,8 +202,10 @@ export default Vue.extend({
 }
 
 .editor-dropdown-container{
-    right: 0px;
     display: inline-block;
+    height: 100%;
+    width: 50%;
+    white-space: nowrap;
 }
 
 .style-aDropdownButton {

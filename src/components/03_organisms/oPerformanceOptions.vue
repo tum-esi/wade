@@ -88,19 +88,20 @@
                 />
             </aPerformanceOption>
              <!-- Select Static Timing -->
-            <aPerformanceOption 
+          <aPerformanceOption 
                 :optionLabel="texts.calculateStatic"
-                :class="{'disabled': typeOfDelay === getEnumType('NO_DELAY')}"
+                :class="{'disabled': !isStaticTimingPossible}"
             >
-                <aSimpleDropdownButton 
-                    class="option-input"
-                    v-on:get-selected-input="selectedStatic=$event"
-                    :defaultOption="staticDefault"
-                    :dropdownOptions="staticOptions"
-                    :selectionAction="'get-selected-input'"
-                    :optionalIconPaths="{iconPathDropdownClosed: 'arrow_down', iconPathDropdownActive: 'arrow_right'}"
-                />
-            </aPerformanceOption>
+            <aButtonSelect 
+                class="option-input"
+                :btnKey="texts.calculateStatic"
+                :btnGeneralStyle="'btn-event-interaction'"
+                :btnSelectedStyle="'btn-event-interaction-selected'"
+                :btnDisabled="!isStaticTimingPossible"
+                v-on:select="staticTimingSelection('select')"
+                v-on:deselect="staticTimingSelection('deselect')"
+            />
+            </aPerformanceOption> 
             <!-- Selected interactions -->
             <div class="selected-interaction">
                 <label>
@@ -136,6 +137,7 @@ import { confidenceLevel } from '@/util/helpers';
 import aSimpleDropdownButton from '@/components/01_atoms/aSimpleDropdownButton.vue';
 import aSimpleInputField from '@/components/01_atoms/aSimpleInputField.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import aButtonSelect from '@/components/01_atoms/aButtonSelect.vue';
 import aPerformanceOption from '@/components/01_atoms/aPerformanceOption.vue';
 import aOptionElement from '@/components/01_atoms/aOptionElement.vue';
 import { mapGetters } from 'vuex';
@@ -146,6 +148,7 @@ export default Vue.extend({
         aSimpleDropdownButton,
         aSimpleInputField,
         aButtonBasic,
+        aButtonSelect,
         aPerformanceOption,
         aOptionElement
     },
@@ -157,6 +160,7 @@ export default Vue.extend({
     },
     data() {
         return {
+            isStaticTimingSelected: false,
             texts: this.$store.state.TextStore.performance.performanceOptions,
             staticDefault: '',
             selectedStatic: '',
@@ -244,6 +248,14 @@ export default Vue.extend({
             && ((this.iterations !== undefined && this.iterations > 0)
                 || (this.duration !== undefined && this.duration > 0))
             && ((this as any).getSelections.length > 0));
+        },
+        isStaticTimingPossible(): boolean {
+            const currentSelections = (this as any).getSelections;
+            // There needs to be exactly one action and one property
+            if (currentSelections.length === 2 && currentSelections.some(e => e.interactionType.toLowerCase().includes('property')) && currentSelections.some(e => e.interactionType.toLowerCase().includes('action'))) {
+                return true;
+            }
+            return false;
         }
     },
     methods: {
@@ -265,17 +277,9 @@ export default Vue.extend({
             };
 
             this.$emit('start-measurement', settings);
-
-            // this.$emit('start-measurement', {
-            //     measurementType: this.measurementType,
-            //     iterations: this.iterations,
-            //     duration: this.duration,
-            //     delayFirst: this.typeOfDelay === DelayTypeEnum.BEFORE_BEGIN
-            //         ? this.delayDuration || undefined : undefined,
-            //     delayBeforeEach: this.typeOfDelay === DelayTypeEnum.BEFORE_EACH
-            //         ? this.delayDuration || undefined : undefined,
-            //     measurementNum: this.measurementNum
-            // });
+        },
+        staticTimingSelection(selectionType) {
+            this.isStaticTimingSelected = selectionType === 'selected' ? true : false;
         }
     }
 });

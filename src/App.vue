@@ -186,14 +186,11 @@ export default Vue.extend({
     display: none;
 }
 
-html {
-  width: 100%;
-  height: 100%;
-}
-
-body {
-  width: 100%;
-  height: 100%;
+html, body {
+   width: 100%;
+   height: 100%;
+   margin: 0;
+   padding: 0;
 }
 
 textarea:focus, input:focus{
@@ -204,6 +201,10 @@ textarea:focus, input:focus{
 *:focus {
   outline: none;
   box-shadow: none;
+}
+
+.border-top {
+  border-top: 1px solid #393B3A;
 }
 
 .border-bottom {
@@ -285,6 +286,10 @@ textarea:focus, input:focus{
   background-color: #b5dfdd;
 }
 
+.font-bold {
+  font-weight: bold;
+}
+
 /* Styling for start page */
 #app {
   background: #B4BAB9;
@@ -293,13 +298,16 @@ textarea:focus, input:focus{
   height: 100%;
 }
 
-#sidebar {
-  width: 20%;
+#main-content {
+  width: 100%;
+  height: 100%;
 }
 
-#main-content {
-  width: 80%;
-  height: 100%;
+.full-screen {
+  left: 0;
+  top: 7%;
+  position: absolute;
+  width: 100%
 }
 
 </style>

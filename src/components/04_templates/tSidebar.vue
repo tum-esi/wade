@@ -1,13 +1,18 @@
 <template>
-  <div class="sidebar">
-    <aTab
+  <div 
+    :class="getSidebarStyle"
+    @mouseover="showCollapseBtn = true"
+    @mouseleave="showCollapseBtn = false"
+  >
+    <aTabHeader 
       class="sidebar-header"
-      :tabId="getHeaderTab.tabId"
-      :tabTitle="getHeaderTab.tabTitle"
-      :tabStyle="getHeaderTab.tabStyle"
-      :tabButtonStyle="getHeaderTab.tabButtonStyle"
-      :tabIconButton="getHeaderTab.tabIconButton"
+      :class="getHeaderStyle"
+      :isSidebarVisible="isSidebarVisible"
+      :showCollapseBtn="showCollapseBtn"
+      v-on:clicked="toggleSidebar"
       v-on:tab-clicked="homeClicked"
+      v-on:tab-label-clicked="homeClicked"
+      v-on:tab-btn-clicked="toggleSidebar"
     />
     <aDropdownButton
       class="dropdown-plugin border-bottom"
@@ -17,11 +22,10 @@
       :btnDropdownOptions="[ {title: 'MaGe', key: 'open-mage', icon: 'mage'} ]"
       v-on:dropdown-clicked="dropDownReaction"
     />
-
-    <div class="sidebar-content">
-      <div class="sidebar-search">
+    <div :class="isSidebarVisible ? 'sidebar-content' : 'sidebar-content invisible'">
+      <div class="add-element-container">
         <!-- <aSearchbar class="searchbar" /> -->
-        <label> Add Sidebar Element </label>
+        <label> Add Element </label>
         <aDropdownButton
           class="dropdown-btn"
           :btnKey="getAddNewButton.btnKey"
@@ -43,7 +47,7 @@
 <script lang='ts'>
 import Vue from 'vue';
 import { mapGetters, mapMutations } from 'vuex';
-import aTab from '@/components/01_atoms/aTab.vue';
+import aTabHeader from '@/components/01_atoms/aTabHeader.vue';
 import aSearchbar from '@/components/01_atoms/aSearchbar.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import mSidebarElementGroup from '@/components/02_molecules/mSidebarElementGroup.vue';
@@ -52,21 +56,41 @@ import { loggingError } from '../../util/helpers';
 export default Vue.extend({
   name: 'tSidebar',
   components: {
-    aTab,
+    aTabHeader,
     aSearchbar,
     aDropdownButton,
     mSidebarElementGroup
+  },
+  data() {
+    return {
+      showCollapseBtn: false,
+      isSidebarVisible: true
+    };
   },
   computed: {
     ...mapGetters('SidebarStore', [
       'getHeaderTab',
       'getAddNewButton',
-      'getSidebarElements'
-    ])
+      'getSidebarElements',
+      'getSidebarActive'
+    ]),
+    getSidebarStyle() {
+      console.log('route ', (this as any).$route.params.id);
+      return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? 'sidebar full-width' : (this as any).getSidebarActive ? 'sidebar sidebar-visible' : 'sidebar';
+    },
+    getHeaderStyle() {
+      return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? '' : (this as any).getSidebarActive ? '' : 'border-right';
+    }
   },
   methods: {
+    ...mapMutations('SidebarStore', ['setSidebarActiveStatus']),
     homeClicked() {
       this.$emit('home-clicked');
+    },
+    toggleSidebar() {
+      console.log('HEyho');
+      this.isSidebarVisible = !this.isSidebarVisible;
+      (this as any).setSidebarActiveStatus(this.isSidebarVisible);
     },
     sidebarElementClicked(elementId: string, elementType: string) {
       this.$emit('sidebar-element-clicked', elementId, elementType);
@@ -91,11 +115,16 @@ export default Vue.extend({
 
 <style scoped>
 .sidebar {
-  border-right: 1px solid #393b3a;
+  height: 100%;
+}
+
+.sidebar-visible {
+  border-right: 3px solid #393b3a;
 }
 
 .sidebar-header {
   height: 7%;
+  padding: 7px;
   background: #b5dfdd;
 }
 
@@ -104,21 +133,26 @@ export default Vue.extend({
 }
 
 .sidebar-content {
-  height: 100%;
+  height: 93%;
+  overflow: scroll;
 }
 
 /* Contains searchbar and add-dropdown-btn */
-.sidebar-search {
+.add-element-container {
   display: flex;
   justify-content: space-between;
   padding: 7px;
-  height: 6.5%;
+  height: 50px;
   border-bottom: 1px solid #393b3a;
   align-items: center;
 }
 
-.sidebar-search label {
+.add-element-container label {
   padding-left: 15px;
+  border-right: solid 15px rgba(0, 0, 0, 0);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 80%;
 }
 
 /* Searchbar Input field with icon */
@@ -126,22 +160,15 @@ export default Vue.extend({
   width: 77%;
 }
 
-/* Add-dropdown btn */
+/* "Add-dropdown" btn */
 .dropdown-btn {
   width: 20%;
 }
-
 .dropdown-plugin {
   width: 100%;
   height: 30px;
   background-color: #b5dfdd;
   border-bottom: 1px black solid;
-}
-
-/* Contains sidebar elements (tds, folders, mashups) */
-.sidebar-elements-container {
-  height: 86.5%;
-  overflow: scroll;
 }
 </style>
 
