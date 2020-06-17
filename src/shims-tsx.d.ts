@@ -1,4 +1,5 @@
 import Vue, { VNode } from 'vue';
+import { VtStatus } from './util/enums';
 
 
 declare global {
@@ -163,7 +164,33 @@ declare global {
       id: string;
       parentId: string;
     }
-
+    interface ChildlessElementInterface extends NewStoreElementInterface {
+      readonly hasChildren: false;
+    }
+    interface ParentElementInterface extends NewStoreElementInterface {
+      readonly hasChildren: true;
+      description: string;
+      children: (ChildlessElementInterface|ParentElementInterface)[];
+    }
+    interface TDElementInterface extends ChildlessElementInterface {
+      type: ElementTypeEnum.TD;
+      content: string;
+      config: object;
+      vconfig: object;
+      virtualthing: {
+        status: VtStatus
+        outMsg: [],
+        vt: undefined // not necessary, but used to remember that property is used
+      }
+    }
+    interface MashupElementInterface extends ParentElementInterface {
+      type: ElementTypeEnum.MASHUP;
+      children: (TDElementInterface | MashupElementInterface)[];
+    }
+    interface FolderElementInterface extends ParentElementInterface {
+      type: ElementTypeEnum.FOLDER;
+      children: (TDElementInterface | MashupElementInterface | FolderElementInterface)[];
+    }
     /**
      * The outcome fields of a basic formfield
      */
