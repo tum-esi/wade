@@ -3,6 +3,7 @@ import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingError } from '@/util/helpers';
 import { virtualConfigDefault } from '@/util/defaults';
+import { TD, Folder, Mashup } from '@/lib/classes';
 
 
 export default {
@@ -110,9 +111,12 @@ export default {
                         iconSrcPath: ElementTypeEnum.TD,
                         numOfParents: 0,
                     };
-                    commit('addElementToStore', {
-                        id: newElement.id,
-                        type: newElement.type,
+                    let tdInterface: WADE.TDElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        id: payload.id,
+                        hasChildren: false,
                         content: '',
                         config: state.configDefault,
                         vconfig: virtualConfigDefault,
@@ -121,7 +125,9 @@ export default {
                             outMsg: [],
                             vt: undefined // not necessary, but used to remember that property is used
                         }
-                    });
+                    }
+                    const newTD = new TD(tdInterface);
+                    commit('addElementToStore', newTD);
                     return newElement;
                 case ElementTypeEnum.FOLDER:
                     newElement = {
@@ -135,7 +141,17 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
+                    let folderInterface: WADE.FolderElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        description: payload.description || '',
+                        id: payload.id,
+                        hasChildren: true,
+                        children: []
+                    }
+                    let newFolder = new Folder(folderInterface);
+                    commit('addElementToStore', newFolder);
                     return newElement;
                 case ElementTypeEnum.MASHUP:
                     newElement = {
@@ -150,7 +166,17 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
+                    let mashupInterface: WADE.MashupElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        description: payload.description || '',
+                        id: payload.id,
+                        hasChildren: true,
+                        children: []
+                    }
+                    let newMashup = new Mashup(mashupInterface);
+                    commit('addElementToStore', newMashup);
                     return newElement;
                 default:
                     break;
