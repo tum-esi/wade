@@ -134,6 +134,7 @@ export default Vue.extend({
 .dropdown-plugin {
   width: 100%;
   height: 30px;
+  background-color: #b5dfdd;
   border-bottom: 1px black solid;
 }
 

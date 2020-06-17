@@ -228,6 +228,13 @@ export default Vue.extend({
     font-size: 13px;
 }
 
+/* Dropdown styling for MaGe mashup selection */
+.dropdown-container-mashup {
+    left: 0;
+    width: 100%;
+    margin-top: 6%;
+}
+
 /* btn style for sidebar dropdown options */
 .sidebar-element-icon-options {
   padding: 7px 0px 7px 0px;
