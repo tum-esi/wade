@@ -79,9 +79,10 @@ This allows for hot-reloads and shows you all potential errors.
 npm run electron:serve
 ```
 
-_(If you have problems performing this step or run into an error, check [Errors and known problems](#errors\ and\ known\ problems).)_
+_If you have problems performing this step or run into an error, check the [Errors and Known Problems](#errors-and-known-problems) section for help._
 
-If you want to add your changes to W-ADE, please fork the repository and create a pull request.
+If you want to add your changes to W-ADE, please fork the repository and create a pull request.  
+Also checkout the [Adding or Working on Issues](#adding-or-working-on-issues) section.
 
 ---
 ## Errors and Known Problems
