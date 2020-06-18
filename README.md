@@ -4,7 +4,7 @@
 [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
 [Prerequisites](#prerequisites)  
 [How to Install the Application](#how-to-install-the-application)  
-[How to Get Started with Development / Open in Dev Mode](#how-to-get-started-with-development-/-open-in-dev-mode)  
+[How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)  
 [Errors and Known Problems](#errors-and-known-problems)  
 [Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
 [Adding or Working on Issues](#adding-or-working-on-issues)
@@ -36,7 +36,7 @@ See the related paper **WADE: Timing Performance Benchmarking in Web of Things**
 - Send request and interact with your Thing based on its TD
 - Save and organize your Thing Descriptions
 - Retrieve timing performance benchmarks of your requests
-- Spin up a [Virtual Thing_ / _Shadow Thing](https://github.com/tum-esi/shadow-thing) based on your TD
+- Spin up a [Virtual Thing / Shadow Thing](https://github.com/tum-esi/shadow-thing) based on your TD
 
 ---
 ## Prerequisites
@@ -70,7 +70,7 @@ npm run electron:build
 Step 4: Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
 
 ---
-## How to get started with development / open in dev mode
+## How to get started with development
 
 After cloning the repository and installing all node dependencies (see step 1 & 2) do not build the app (step 3) but run it in development mode instead. 
 This allows for hot-reloads and shows you all potential errors.
