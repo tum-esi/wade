@@ -5,7 +5,7 @@
 [Prerequisites](#prerequisites)  
 [How to Install the Application](#how-to-install-the-application)  
 [How to Get Started with Development / Open in Dev Mode](#how-to-get-started-with-development-/-open-in-dev-mode)  
-[Errors and Known Problems](#errors-and-known-problems)
+[Errors and Known Problems](#errors-and-known-problems)  
 [Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
 [Adding or Working on Issues](#adding-or-working-on-issues)
 
