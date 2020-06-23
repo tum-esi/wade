@@ -1,20 +1,20 @@
 # W-ADE
 ## Table of Contents  
-[Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
-[What can you do with W-ADE](#what-can-you-do-with-w-ade)  
-[Prerequisites](#prerequisites)  
-[How to Install the Application](#how-to-install-the-application)  
-[How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)  
-[Errors and Known Problems](#errors-and-known-problems)  
-[Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
-[Adding or Working on Issues](#adding-or-working-on-issues)
+1. [Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
+2. [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
+3. [Prerequisites](#prerequisites)  
+4. [How to Install the Application](#how-to-install-the-application)  
+5. [How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)  
+6. [Errors and Known Problems](#errors-and-known-problems)  
+7. [Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
+8. [Adding or Working on Issues](#adding-or-working-on-issues)
 
 ---
 ## **W**eb of Things **A**PI **D**evelopment **E**nvironment
 
 Wade is an API development environment for Web of Things that was designed for the [W3C WoT building blocks](https://w3c.github.io/wot-architecture/). 
+It enables users to interact with IoT devices over various protocols. At the moment the following protocolls are supported: HTTP/HTTPS, CoAP/CoAPS, MQTT.  
 It is based on [node-wot](https://www.npmjs.com/org/node-wot), the reference implementation of [W3C's Scripting API](https://w3c.github.io/wot-scripting-api/). 
-It supports following protocols: HTTP/HTTPS, CoAP/CoAPS, MQTT.
 It is an Electron application.
 
 See the related paper **WADE: Timing Performance Benchmarking in Web of Things**.
@@ -32,53 +32,53 @@ See the related paper **WADE: Timing Performance Benchmarking in Web of Things**
 ---
 ## What can you do with W-ADE
 
-- Test your [Thing Description](https://w3c.github.io/wot-thing-description/) (TD)
-- Send request and interact with your Thing based on its TD
+- Send requests and interact with your IoT device based on its TD
+- Test and play around with your [Thing Description](https://w3c.github.io/wot-thing-description/) (TD)
 - Save and organize your Thing Descriptions
+- Get insights on the timing performance behaviour of interactions
 - Retrieve timing performance benchmarks of your requests
 - Spin up a [Virtual Thing / Shadow Thing](https://github.com/tum-esi/shadow-thing) based on your TD
 
 ---
 ## Prerequisites
 
-You need to have node installed. 
+You need to have [node.js](https://nodejs.org/en/) installed. 
 
 ---
 ## How to install the application
 
-(To be able to easily work and develop functionalities in W-ADE, please read the architecture documentation first!)
-
-Step 1: Clone the repository to your local machine.
+**Step 1:** Clone the repository to your local machine.
 
 ```
-git clone 
+git clone https://github.com/tum-esi/wade.git
 ```
 
-Step 2: Navigate into the main folder and install all dependencies.
+**Step 2:** Navigate into the main folder and install all dependencies.
 
 ```
 cd wade
 npm install 
 ```
 
-Step 3: Build the electron application.
+**Step 3:** Build the electron application. (_If you run into any errors, check here: [Errors and Known Problems](#errors-and-known-problems)_)
 
 ```
 npm run electron:build
 ```
 
-Step 4: Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
+**Step 4:** Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
 
 ---
 ## How to get started with development
 
-After cloning the repository and installing all node dependencies (see step 1 & 2) do not build the app (step 3) but run it in development mode instead. 
-This allows for hot-reloads and shows you all potential errors.
+(To be able to easily work and develop functionalities in W-ADE, please read the [architecture documentation](https://github.com/tum-esi/wade/blob/master/docs/ARCHITECTURE.md) first!)
+
+After cloning the repository and installing all node dependencies (see step 1 & 2 in [How to Install the Application](#how-to-install-the-application)) do **not** build the app (step 3) but run it in development mode instead:
 
 ```
 npm run electron:serve
 ```
-
+This allows for hot-reloads and shows you all potential errors.  
 _If you have problems performing this step or run into an error, check the [Errors and Known Problems](#errors-and-known-problems) section for help._
 
 If you want to add your changes to W-ADE, please fork the repository and create a pull request.  
@@ -108,7 +108,7 @@ Also checkout the [Adding or Working on Issues](#adding-or-working-on-issues) se
   After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
   comes with other disadvantages).
 
-- The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so wouldthe installation of WADE if Shadow Thing was added to the package.json.
+- The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the package.json.
 
 - Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
 
