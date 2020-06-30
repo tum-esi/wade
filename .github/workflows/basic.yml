@@ -30,5 +30,7 @@ jobs:
         check-latest: true
     - name: Install dependencies
       run: npm install
+    - name: Install node aead crypto
+      run: npm install node-aead-crypto
     - name: Build binaries
       run: npm run electron:build
