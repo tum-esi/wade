@@ -165,7 +165,7 @@ When you want to work on an issue, please ...
     ```
     <type-of-issue>-<topic>-<short-description>
     ```
-    _kind-of-ticket_ refers to this:   
+    _type-of-issue_ refers to this:   
     E.g. _bugfix-sidebar-click-error_ or _improvement-ui-better-zooming_
 
 3) Link the according issue in the pull request: When finishing the issue and when creating a pull-request to master, link the issue. The person who merges the pull-request to master can then close the issue.
