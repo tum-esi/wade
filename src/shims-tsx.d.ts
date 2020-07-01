@@ -170,7 +170,7 @@ declare global {
     interface ParentElementInterface extends NewStoreElementInterface {
       readonly hasChildren: true;
       description: string;
-      children: (ChildlessElementInterface|ParentElementInterface)[];
+      children: Array<ChildlessElementInterface|ParentElementInterface>;
     }
     interface TDElementInterface extends ChildlessElementInterface {
       type: ElementTypeEnum.TD;
@@ -181,15 +181,15 @@ declare global {
         status: VtStatus
         outMsg: [],
         vt: undefined // not necessary, but used to remember that property is used
-      }
+      };
     }
     interface MashupElementInterface extends ParentElementInterface {
       type: ElementTypeEnum.MASHUP;
-      children: (TDElementInterface | MashupElementInterface)[];
+      children: Array<TDElementInterface | MashupElementInterface>;
     }
     interface FolderElementInterface extends ParentElementInterface {
       type: ElementTypeEnum.FOLDER;
-      children: (TDElementInterface | MashupElementInterface | FolderElementInterface)[];
+      children: Array<TDElementInterface | MashupElementInterface | FolderElementInterface>;
     }
     /**
      * The outcome fields of a basic formfield
@@ -298,6 +298,7 @@ declare global {
       tabLink?: string;
       // If tab is active / should have indication to be active.
       tabIsActive?: boolean;
+      iconSrcPath?: string;
     }
 
     interface PerformanceInteraction {
@@ -399,5 +400,42 @@ declare global {
       settingsNumMeasurements: number;
       settingsNumClients?: number; // TODO: for later
     }
+  }
+
+  namespace MAGE {
+    // =============================================================================
+    // ----------------------------------- Enums -----------------------------------
+    // =============================================================================
+    enum templatesEnum {
+      EVENT = "use-event-template",
+      ACTION = "use-action-template",
+      SUBSCRIBTION = "#use-sub-template"
+    }
+    // =============================================================================
+    // --------------------------------- Interfaces --------------------------------
+    // =============================================================================
+    interface GenerationFormInterace  {
+      things: (WADE.TDElementInterface | WADE.MashupElementInterface)[],
+      min_inputs: number,
+      max_inputs: number,
+      min_outputs: number,
+      max_outputs: number,
+      max_things: number
+      templates: {
+        "use-event-template": boolean;
+        "use-action-template": boolean;
+        "use-sub-template": boolean;
+      },
+      "filters": {
+          "accepted_types": undefined,
+          "only_same_type": false,
+          "similarity_threshold": undefined,
+          "semantic_match": undefined
+      },
+      "generation": {
+          "generate_code": false,
+          "include_function_skeletons": false
+      }
+  }
   }
 }

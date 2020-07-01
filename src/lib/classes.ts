@@ -1,15 +1,15 @@
 import { ElementTypeEnum, VtStatus } from '@/util/enums';
 
 abstract class BasicElement implements WADE.NewStoreElementInterface {
-    public title: string
-    public id: string
-    public type: ElementTypeEnum
-    public parentId: string
+    public title: string;
+    public id: string;
+    public type: ElementTypeEnum;
+    public parentId: string;
     constructor(param: WADE.NewStoreElementInterface) {
         this.title = param.title;
         this.id = param.id;
         this.type = param.type;
-        this.parentId = "parent";
+        this.parentId = 'parent';
     }
 }
 
@@ -23,13 +23,13 @@ abstract class ChildlessElement extends BasicElement implements WADE.ChildlessEl
 
 abstract class ParentElement extends BasicElement implements WADE.ParentElementInterface {
     public readonly hasChildren: true;
-    public description: string
-    public children: (WADE.ChildlessElementInterface | WADE.ParentElementInterface)[]
+    public description: string;
+    public children: Array<WADE.ChildlessElementInterface | WADE.ParentElementInterface>;
     constructor(param: WADE.ParentElementInterface) {
         super(param);
         this.description = param.description;
         this.children = param.children;
-        this.hasChildren = true
+        this.hasChildren = true;
     }
 }
 
@@ -42,9 +42,10 @@ export class TD extends ChildlessElement implements WADE.TDElementInterface {
         status: VtStatus
         outMsg: [],
         vt: undefined // not necessary, but used to remember that property is used
-    }
-    constructor(param: WADE.TDElementInterface){
+    };
+    constructor(param: WADE.TDElementInterface) {
         super(param);
+        this.parentId = param.parentId;
         this.type = ElementTypeEnum.TD;
         this.content = param.content;
         this.config = param.config;
@@ -56,11 +57,12 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
     public type: ElementTypeEnum.MASHUP;
     public tds: TD[] ;
     public mashups: Mashup[] ;
-    public children: (Mashup | TD)[] ;
+    public children: Array<Mashup | TD> ;
     public systemDescription: string | undefined;
 
     constructor(param: WADE.MashupElementInterface) {
-        super(param)
+        super(param);
+        this.parentId = param.parentId;
         this.type = ElementTypeEnum.MASHUP;
         this.tds = [];
         this.mashups = [];
@@ -75,7 +77,7 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
                 child = new Mashup(childInterface);
                 this.mashups.push(child);
             }
-            this.children.push(child)
+            this.children.push(child);
         }
     }
 }
@@ -84,11 +86,12 @@ export class Folder extends ParentElement implements WADE.FolderElementInterface
     public tds: TD[] ;
     public mashups: Mashup[] ;
     public folders: Folder[];
-    public children: (Mashup | TD)[] ;
+    public children: Array<Mashup | TD | Folder> ;
     public systemDescription: string | undefined;
 
     constructor(param: WADE.FolderElementInterface) {
-        super(param)
+        super(param);
+        this.parentId = param.parentId;
         this.type = ElementTypeEnum.FOLDER;
         this.tds = [];
         this.mashups = [];
@@ -108,7 +111,7 @@ export class Folder extends ParentElement implements WADE.FolderElementInterface
                 child = new Folder(childInterface);
                 this.mashups.push(child);
             }
-            this.children.push(child)
+            this.children.push(child);
         }
     }
 }
