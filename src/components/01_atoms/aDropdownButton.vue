@@ -215,7 +215,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5px;
+    padding: 1%;
     border: none;
 }
 
@@ -248,7 +248,7 @@ export default Vue.extend({
 /* btn style for mashup options */
 .mashup-icon-style {
     width: 6%;
-    padding: 7px 3px 7px 7px;
+    padding: 1%;
 }
 
 /* === Styles for the dropdown box in the TD Editor Tab (Load Example TD) */
