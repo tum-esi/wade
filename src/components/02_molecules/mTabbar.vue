@@ -12,6 +12,7 @@
         :tabButtonStyle="tab.tabButtonStyle"
         :tabLink="tab.tabLink"
         :tabIsActive="tab.tabIsActive"
+        :iconSrcPath="tab.iconSrcPath"
         v-on:tab-clicked="$emit('tab-clicked', tab.tabId)"
       />
     </li>
