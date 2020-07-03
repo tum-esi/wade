@@ -5,7 +5,6 @@ import TdStore from './modules/td';
 import MashupStore from './modules/mashup';
 import ModalStore from './modules/modal';
 import TextStore from './modules/texts';
-import MageStore from './modules/mage';
 import { createPersistedState } from 'vuex-electron';
 
 Vue.use(Vuex);
@@ -17,7 +16,6 @@ export default new Vuex.Store({
     MashupStore,
     ModalStore,
     TextStore,
-    MageStore
   },
   state: {
 
