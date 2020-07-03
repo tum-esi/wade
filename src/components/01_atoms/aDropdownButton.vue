@@ -226,6 +226,7 @@ export default Vue.extend({
 
 .button-label {
     font-size: 13px;
+    overflow: hidden;
 }
 
 /* btn style for sidebar dropdown options */

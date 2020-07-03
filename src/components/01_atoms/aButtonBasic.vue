@@ -110,6 +110,7 @@ button:disabled {
   font-size: 14px;
   margin: 7px 0 7px 7px;
   padding: 7px;
+  white-space: nowrap;
 }
 
 .hide-format {

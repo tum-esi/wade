@@ -149,7 +149,9 @@ export default Vue.extend({
         // Remove all interactions from selected interacitons.
         resetAll() {
             this.$eventHub.$emit('selections-reseted');
+            this.$emit('selections-reseted');
             this.$eventHub.$emit('unsubscribe');
+            // Resets all selections in store
             (this as any).resetSelections();
         },
         invoke() {
@@ -194,6 +196,8 @@ export default Vue.extend({
 .selection-label-container{
     width: 100%;
     height: 20%;
+    display: flex;
+    align-items: center;
 }
 
 .selection-btn {
