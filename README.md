@@ -1,4 +1,7 @@
 # W-ADE
+
+![CI](https://github.com/tum-esi/wade/workflows/CI/badge.svg?branch=master)
+
 ## Table of Contents  
 1. [Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
 2. [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
@@ -17,6 +20,8 @@ It enables users to interact with IoT devices over various protocols. At the mom
 It is based on [node-wot](https://www.npmjs.com/org/node-wot), the reference implementation of [W3C's Scripting API](https://w3c.github.io/wot-scripting-api/). 
 It is an Electron application.
 
+
+
 See the related paper **WADE: Timing Performance Benchmarking in Web of Things**.
 ```
 @inproceedings{skks:2020,    
@@ -33,16 +38,19 @@ See the related paper **WADE: Timing Performance Benchmarking in Web of Things**
 ## What can you do with W-ADE
 
 - Send requests and interact with your IoT device based on its TD
+![alt text](docs/MainEditor.png "WADE TD Editor")
 - Test and play around with your [Thing Description](https://w3c.github.io/wot-thing-description/) (TD)
 - Save and organize your Thing Descriptions
 - Get insights on the timing performance behaviour of interactions
+![alt text](docs/Performance.png "WADE Timing Benchmarking")
 - Retrieve timing performance benchmarks of your requests
 - Spin up a [Virtual Thing / Shadow Thing](https://github.com/tum-esi/shadow-thing) based on your TD
+![alt text](docs/VT.png "WADE Thing Simulator")
 
 ---
 ## Prerequisites
 
-You need to have [node.js](https://nodejs.org/en/) installed. 
+You need to have [Node.js](https://nodejs.org/en/) installed. 
 
 ---
 ## How to install the application
