@@ -4,23 +4,23 @@ module.exports = {
   entry: "./index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "app.js",
+    filename: "app.js"
   },
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.ttf$/,
-        use: ["file-loader"],
-      },
-    ],
+        use: ["file-loader"]
+      }
+    ]
   },
   plugins: [
-    new MonacoEditorPlugin({
-      languages: ["json"],
-    }),
-  ],
+    new MonacoWebpackPlugin({
+      languages: ["json", "javascript", "typescript"]
+    })
+  ]
 };
