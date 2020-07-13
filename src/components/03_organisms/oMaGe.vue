@@ -1,137 +1,89 @@
 <template>
 <div class="flex-container-row">
     <div id="form-area" class="flex-container-row">
-        <!-- Defining Things to be either inputs or outputs-->
-        <div class="input-output-area round-top-left-corner round-bottom-left-corner shadow">
-            <div class="round-top-left-corner table-header flex-container-row shadow">
-                <label class="margin-right-auto">
-                    Inputs
-                </label>
-                <aDropdownButton
-                    class="add-icon"
-                    :class="'select-mashup-dropdown-btn'"
-                    :btnKey="'add-input'"
-                    :btnSrc="'add'"
-                    :btnDropdownOptions="getMashupChildrenForDropdown ? getMashupChildrenForDropdown : []" 
-                    v-on:dropdown-clicked="onAddElementSelected"
-                    />
-            </div>
-            <div class="table">
-                <div class="io-element flex-container-row" v-for="(id, name, index) in getInputsIds" :key="id">
-                    <label class="io-label margin-right-auto">{{id}}</label>
-                    <aIcon
-                    class="io-remove-icon"
-                    :specificStyle="'mage-minus-icon'"
-                    :iconSrcPath="'minus'"
-                    :mouseOverIconSrcPath="'minus_white'"
-                    :iconClickAction="'removeElement'"
-                    @icon-clicked="deleteFromIO(index, 'inputs')"
-                    />
-                </div> 
-            </div>
-        </div>
-        <div class="input-output-area shadow">
-            <div class="table-header flex-container-row shadow">
-                <label class="margin-right-auto">
-                    Outputs
-                </label>
-                <aDropdownButton
-                    class="add-icon"
-                    :class="'select-mashup-dropdown-btn'"
-                    :btnKey="'add-output'"
-                    :btnSrc="'add'"
-                    :btnDropdownOptions="getMashupChildrenForDropdown ? getMashupChildrenForDropdown : []"
-                    v-on:dropdown-clicked="onAddElementSelected"
-                />
-            </div>
-            <div class="table">
-                <div class="io-element flex-container-row" v-for="(id, name, index) in getOutputsIds" :key="id">
-                    <label class="io-label margin-right-auto">{{id}}</label>
-                    <aIcon
-                    class="io-remove-icon"
-                    :specificStyle="'mage-minus-icon'"
-                    :iconSrcPath="'minus'"
-                    :mouseOverIconSrcPath="'minus_white'"
-                    :iconClickAction="'removeElement'"
-                    @icon-clicked="deleteFromIO(index, 'outputs')"
-                    />
-                </div> 
-            </div>
-        </div>
-        <div class="input-output-area round-top-right-corner round-bottom-right-corner shadow">
-            <div class="table-header flex-container-row round-top-right-corner shadow">
-                <label class="margin-right-auto">
-                    Input/Output
-                </label>
-                <aDropdownButton
-                    class="add-icon"
-                    :class="'select-mashup-dropdown-btn'"
-                    :btnKey="'add-io'"
-                    :btnSrc="'add'"
-                    :btnDropdownOptions="getMashupChildrenForDropdown ? getMashupChildrenForDropdown : []"
-                    v-on:dropdown-clicked="onAddElementSelected"
-                />
-            </div>
-            <div class="table">
-                <div class="io-element flex-container-row" v-for="id in getIosIds" :key="id">
-                    <label class="io-label margin-right-auto">{{id}}</label>
-                    <aIcon
-                    class="io-remove-icon"
-                    :specificStyle="'mage-minus-icon'"
-                    :iconSrcPath="'minus'"
-                    :mouseOverIconSrcPath="'minus_white'"
-                    :iconClickAction="'removeElement'"
-                    @icon-clicked="deleteFromIO(index, 'ios')"
-                    />
-                </div> 
-            </div>
-        </div>
-        <!--Restricting number of interactions-->
+        <!--Selecting Elements for Mashup-->
+        <mTableMaGe id="mage-table" :table="table"/>
+        <!--Restricting number of interactions and Elements in Mashups-->
         <div id="interaction-restrictions-area">
-            <div class="restricton-option-area flex-container-row">
-                <div class="interaction-restrictions-header margin-right-auto">
+            <div class="restricton-option-area flex-container-row justify-content-even">
+                <div class="interaction-restrictions-header margin-right-auto align-items-center">
                     <label>Number of input interactions per mashup:</label>
                 </div>
-                <div class="flex-container-row align-content-center">
+                <div class="flex-container-row align-items-center">
                     <label>Min:</label>
-                    <input type="number" :min="1" v-model.number="minInputInteractions" @change="setMaxOutputInteractions">
+                    <input type="number" :min="1" v-model.number="minInputInteractions" @input="setMaxInputInteractions">
                 </div>
-                <div class="flex-container-row align-content-center">
+                <div class="flex-container-row align-items-center">
                     <label>Max:</label>
-                    <input 
-                    type="number" 
-                    :min="minInputInteractions" 
-                    v-model.number="maxOutputInteractions"
-                    @change="setMaxOutputInteractions"
+                    <input type="number" :min="minInputInteractions" v-model.number="maxInputInteractions"
+                    @input="setMaxInputInteractions"
                     >
                 </div>
             </div>
-            <div class="restricton-option-area flex-container-row">
-                <label class="interaction-restrictions-header margin-right-auto">Number of output interactions per mashup:</label>
-                <div>
+            <div class="restricton-option-area flex-container-row justify-content-even">
+                <div class="interaction-restrictions-header margin-right-auto align-items-center">
+                    <label>Number of output interactions per mashup:</label>
+                </div>
+                <div class="restrictions-input-area flex-container-row align-items-center">
+                    <label>Min:</label>
+                    <input type="number" :min="1" v-model.number="minOutputInteractions" @input="setMaxOutputInteractions">
+                </div>
+                <div class="flex-container-row align-items-center">
+                    <label>Max:</label>
+                    <input type="number" :min="minOutputInteractions" v-model.number="maxOutputInteractions"
+                    @input="setMaxOutputInteractions"
+                    >
+                </div>
+            </div>
+            <div class="restricton-option-area flex-container-row justify-content-even">
+                <div class="interaction-restrictions-header margin-right-auto align-items-center">
+                    <label>Number of Elements in the Mashup:</label>
+                </div>
+                <div class="restrictions-input-area flex-container-row align-items-center">
+                    <input type="checkbox" v-model="limitNumberOfElement">
+                    <label>Limit number of elements</label>
+                </div>
+                <div v-show="limitNumberOfElement" class="flex-container-row align-items-center">
+                    <label>Max number of Elements:</label>
+                    <input type="number" :min="2" :disabled="!limitNumberOfElement"  v-model.number="maxOutputInteractions"
+                    @input="setMaxOutputInteractions"
+                    >
                 </div>
             </div>
         </div>
-
+        <!--Selecting templates for Mashup Generation-->
+        <mTemplateSelectionArea id="template-selection-area"/>
+        <!--Filters and Constraints-->
+        <mFilterConstraintsAreaMaGe id="filters-area"/>
     </div>      
 </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import {mapState, mapGetters, mapActions, mapMutations } from 'vuex';
-import {ElementTypeEnum} from '@/util/enums';
+import { EventEmitter } from 'events';
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+import { ElementTypeEnum } from '@/util/enums';
+import { Mashup, TD } from '@/lib/classes';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
-import { EventEmitter } from 'events';
-import {Mashup, TD} from '@/lib/classes';
+import aListSimple from '@/components/01_atoms/aListSimple.vue';
+import mTableSimple from '@/components/02_molecules/mTableSimple.vue';
+import mTableMaGe from '@//components/02_molecules/mTableMaGe.vue';
+import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue'
+import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue'
 
 export default Vue.extend({
     components: {
         aDropdownButton,
         aIconButton,
-        aIcon
+        aIcon,
+        aListSimple,
+        mTableSimple,
+        mTableMaGe,
+        mTemplateSelectionArea,
+        mFilterConstraintsAreaMaGe
     },
 
     data() {
@@ -141,7 +93,10 @@ export default Vue.extend({
             childNeeded: {} as TD | Mashup,
             event: Object,
             minInputInteractions: 1,
-            maxOutputInteractions: 2
+            maxInputInteractions: 2,
+            minOutputInteractions: 1,
+            maxOutputInteractions: 2,
+            limitNumberOfElement: false
         };
     },
 
@@ -150,6 +105,33 @@ export default Vue.extend({
         ...mapGetters('SidebarStore', ['getSidebarElement']),
         ...mapGetters('MashupStore', ['getMashupChildren', 'getMashupChildrenForDropdown', 'isMashupSelected',
         'getInputsIds', 'getOutputsIds', 'getIosIds']),
+        inputList(): WADE.ListInterface {
+            let list: WADE.ListInterface = {
+                header: "Inputs",
+                items: (this as any).getInputsIds
+            }
+            return list;
+        },
+        outputList(): WADE.ListInterface {
+            let list: WADE.ListInterface = {
+                header: "Outputs",
+                items: (this as any).getOutputsIds
+            }
+            return list;
+        },
+        ioList(): WADE.ListInterface {
+            let list: WADE.ListInterface = {
+                header: "IOs",
+                items: (this as any).getIosIds
+            }
+            return list;
+        },
+        table(): WADE.TableInterface {
+            let table = {
+                columns: [this.inputList, this.outputList, this.ioList]
+            }
+            return table;
+        }
     },
 
     methods: {
@@ -185,73 +167,84 @@ export default Vue.extend({
                 default: return;
             }
         },
+        setMaxInputInteractions(): void {
+            this.maxInputInteractions  = this.minInputInteractions > this.maxInputInteractions ? this.minInputInteractions : this.maxInputInteractions;
+        },
         setMaxOutputInteractions(): void {
-            this.maxOutputInteractions  = this.minInputInteractions > this.maxOutputInteractions ? this.minInputInteractions : this.maxOutputInteractions;
+            this.maxOutputInteractions  = this.minOutputInteractions > this.maxOutputInteractions ? this.minOutputInteractions : this.maxOutputInteractions;
         }
     }
-});
+})
 </script>
 
 <style lang="less" scoped>
-    #mage-container{
-        align-content: flex-start;
-    }
 
-    #selection-container {
-        height: 100%;
-        width: 25%;
-        margin-right: 1%;
-    }
-
-    #select-mashup-container {
-        height: 8%;
+    #mage-table {
+        display: flex;
+        flex-flow: row nowrap;
         width: 100%;
-        background: #b5dfdd;
+        height: 33.33333333%;
+        margin-bottom: 1.5%;
     }
 
-    #child-restrictions-container{
+    #table {
+        display: flex;
+        flex-flow: row nowrap;
         width: 100%;
-        height: 100%;
-    }
-
-    #label-container {
-        width: 100%;
-        height: 20px;
-        margin-left: 10px;
+        height: 33.33333333%;
+        margin-bottom: 1%;
     }
 
     #form-area {
         width: 100%;
+        height: 100%;
         align-content: flex-start;
-        overflow: scroll;
+        overflow-y: auto;
+    }
+
+    #form-area::-webkit-scrollbar {
+        display: inline;
+    }
+
+    #form-area::-webkit-scrollbar-track {
+        background-color: #939C9E;
+        border-radius: 5pt;
+    }
+
+    #form-area::-webkit-scrollbar-thumb {
+        background-color: #b5dfdd;
+        border-radius: 5pt;
     }
 
     #interaction-restrictions-area {
         width: 100%;
         height: 20%;
-        margin-top: 5%;
+        margin-bottom: 1.5%;
     }
 
-    .align-content-center {
-        align-content: center;
+    #template-selection-area {
+        width: 100%;
+        height: 56%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        margin-bottom: 1.5%;
+    }
+
+    #filters-area {
+        width: 100%;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    .justify-content-even {
+        justify-content: space-between;
     }
 
     .shadow {
         box-shadow: 0 6px 3px rgba(0, 0, 0, 0.19);
-    }
-
-    .label {
-        width: 100%;
-        height: 100%;
-    }
-
-    .flex-container {
-        display: flex;
-    }
-
-    .flex-container-column {
-        display: flex;
-        flex-direction: column;
     }
 
     .flex-container-row {
@@ -259,84 +252,25 @@ export default Vue.extend({
         flex-flow: row wrap;
     }
 
-    .add-icon {
-        width: 20%;
-        height: 100%;
-    }
-
-    .full-width {
-        width: 100%;
-    }
-
-    .full-height {
-        height: 100%;
-    }
-
-    .margin-right-auto {
-        margin-right: auto;
-    }
-
-    .input-output-area {
-        width: 33.3333333%;
-        background-color: white;
-        height: 50%;
-    }
-
-    .table-header {
-        height: 16%;
-        width: 100%;
-        padding: 2%;
-        align-content: center;
-        align-items: center;
-        background-color: #b5dfdd;
-        font-size: 1.41vw;
-    }
-
-    .io-element {
-        height: 15%;
-        width: 100%;
-        padding: 4%;
-    }
-
-    .io-element:hover {
-        background: #939C9E;
-        box-shadow: 0 6px 3px rgba(0, 0, 0, 0.19);
-    }
-
-    .io-remove-icon {
-        height: 25%;
-        margin-right: 3%;
-        width: 10%;
-        align-self: center;
-    }
-
-    .io-label {
-        height: fit-content;
-        max-height: 100%;
-        align-self: center;
-    }
-
-    .table {
-        height: 84%;
-        width: 100%;
-        overflow: scroll;
-    }
-
     .restricton-option-area {
         width: 100%;
         height: 33.33333333%;
-        background-color: white;
         align-content: center;
         font-size: 12pt;
+        border: 0.5pt solid #393B3A;
         border-radius: 10px;
+        background-color: #b5dfdd;
+        padding-right: 3%;
     }
 
     .interaction-restrictions-header {
-        width: 45%;
+        width: 30%;
         height: 100%;
+        padding: 5pt;
+        display: flex;
         flex-flow: row wrap;
-        align-content: center;
-        background-color: #b5dfdd;
+        background-color: #939c9e;
+        border-right: 0.5pt solid #393B3A;
         border-top-left-radius: inherit;
         border-bottom-left-radius: inherit;
     }
