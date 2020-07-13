@@ -253,6 +253,22 @@ declare global {
       type?: AvailablePropertyDataTypesEnum;
       inputValue?: undefined | null | string | number; // TODO: get all available input
     }
+    /**
+     * A interface for a list
+     * @property header
+     * @property items
+     */
+    interface ListInterface {
+      header: string;
+      items: string[];
+    }
+    /**
+     * A interface for tables
+     * @property columns
+     */
+    interface TableInterface {
+      columns: ListInterface[];
+    }
 
     interface SidebarElement {
       // Title to be shown in the sidebar
