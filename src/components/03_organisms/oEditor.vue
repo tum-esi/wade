@@ -48,7 +48,6 @@ import { mapGetters, mapActions, mapMutations } from "vuex";
 import { TdStateEnum } from "@/util/enums";
 import { getFormattedJsonString, loggingError } from "@/util/helpers";
 import * as Api from "@/backend/Api";
-
 export default Vue.extend({
   name: "oEditor",
   components: {

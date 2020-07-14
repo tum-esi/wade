@@ -1,5 +1,5 @@
 <template>
-    <div class="statusbar-container border-bottom" :class="style">
+    <div class="statusbar-container" :class="style">
         <label>{{ statusMessage }}</label>
     </div>
 </template>
@@ -48,7 +48,6 @@ export default Vue.extend({
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border: 1px solid #393B3A;
-    border-bottom: none;
 }
 
 .statusbar-container label {
