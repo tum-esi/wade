@@ -13,7 +13,7 @@ import Vue from "vue";
 import MonacoEditor from "vue-monaco";
 
 export default Vue.extend({
-  name: "AppEditorCode",
+  name: "mCodeEditor",
   components: {
     MonacoEditor
   },
@@ -48,7 +48,8 @@ export default Vue.extend({
     };
   },
   watch: {
-    code(newVal) {
+    value(newVal) {
+      console.log(newVal);
       this.value = newVal;
     }
   }
