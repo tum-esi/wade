@@ -1,13 +1,14 @@
 <template>
-  <div class="form-field-baisic-container">
+  <div class="form-field-basic-container">
     <div class="form-field-basic-container">
       <label>{{form.title}}</label>
       <input
+        class="form-field-basic-input"
         :class="{ 'error-input' : hasError || hasDuplicateError}"
         :placeholder="form.placeholder"
         v-on:click="hasError=false, hasDuplicateError=false"
         v-model="input"
-      >
+      />
       <label v-if="hasError" class="error">{{ errorMessage }}</label>
       <label v-if="hasDuplicateError" class="error">{{ errorDuplicateMessage }}</label>
     </div>
@@ -15,18 +16,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 export default Vue.extend({
-    name: 'aFormfield',
-    props: {
-        form: {
-        type: Object as () => WADE.BasicFormFieldInterface,
-        required: true
-        }
-    },
+  name: "aFormfield",
+  props: {
+    form: {
+      type: Object as () => WADE.BasicFormFieldInterface,
+      required: true
+    }
+  },
   data() {
     return {
-      input: '',
+      input: "",
       hasError: false,
       hasDuplicateError: false,
       key: this.form.key
@@ -41,27 +42,27 @@ export default Vue.extend({
       ) {
         return this.form.rules.errorMessage;
       } else {
-        return '';
+        return "";
       }
     },
     errorDuplicateMessage(): string {
       if (this.form.rules && this.form.rules.errorMessageDuplicate) {
         return this.form.rules.errorMessageDuplicate;
       } else {
-        return '';
+        return "";
       }
     }
   },
   created() {
-    this.$eventHub.$on('check-has-error', this.checkError);
+    this.$eventHub.$on("check-has-error", this.checkError);
   },
   beforeDestroy() {
-    this.$eventHub.$off('check-has-error');
+    this.$eventHub.$off("check-has-error");
   },
   methods: {
     // Is called by parent component to check if all inputs are correct
     checkError() {
-      if (this.form.isRequired && this.input === '') {
+      if (this.form.isRequired && this.input === "") {
         this.hasError = true;
         return; // Return when there's already an error here
       } else {
@@ -71,8 +72,8 @@ export default Vue.extend({
       if (this.form.mustBeUnique) {
         // check store if unique id
         this.hasDuplicateError =
-          (this.input !== '')
-          && this.$store.getters['SidebarStore/doesIdAlreadyExist'](this.input);
+          this.input !== "" &&
+          this.$store.getters["SidebarStore/doesIdAlreadyExist"](this.input);
       }
     }
   }
@@ -99,8 +100,9 @@ export default Vue.extend({
   font-size: 14px;
 }
 
-.form-field-basic-container input:active, .form-field-basic-container input:focus {
-    box-shadow: 0 0 5px #b4bab9;
+.form-field-basic-container input:active,
+.form-field-basic-container input:focus {
+  box-shadow: 0 0 5px #b4bab9;
 }
 
 .error-input {

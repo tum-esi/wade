@@ -15,103 +15,112 @@
           ref="formElement"
         />
       </div>
-      <aFooterElement v-bind:buttons="footerButtons"/>
+      <aFooterElement v-bind:buttons="footerButtons" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import aHeaderElement from '@/components/01_atoms/aHeaderElement.vue';
-import aFormfield from '@/components/01_atoms/aFormfield.vue';
-import aFooterElement from '@/components/01_atoms/aFooterElement.vue';
+import Vue from "vue";
+import aHeaderElement from "@/components/01_atoms/aHeaderElement.vue";
+import aFormfield from "@/components/01_atoms/aFormfield.vue";
+import aFooterElement from "@/components/01_atoms/aFooterElement.vue";
 
 export default Vue.extend({
-    name: 'oModal',
-    components: {
-      aHeaderElement,
-      aFormfield,
-      aFooterElement
-    },
-    props: {
-      modalElement: {
-        type: Object as () => WADE.ModalAddElementInterface,
-        required: true
-      }
-    },
-    data() {
-      return {
-        src: require('@/assets/mashup.png'),
-        hasError: false,
-        newElement: {
-          type: '',
-          data: [{}],
-          parentId: ''
-        },
-        defaultSrc: '',
-        footerButtons: [
-          {
-            btnClass: 'btn-grey',
-            btnLabel: 'Cancel',
-            btnOnClick: 'cancel-btn-clicked'
-          },
-          {
-            btnClass: 'btn-pos',
-            btnLabel: 'Create',
-            btnOnClick: 'create-btn-clicked'
-          }
-        ]
-      };
-    },
-    created() {
-      this.$eventHub.$on('create-btn-clicked', this.create);
-      this.$eventHub.$on('cancel-btn-clicked', this.cancel);
-    },
-    beforeDestroy() {
-      this.$eventHub.$off('create-btn-clicked');
-      this.$eventHub.$off('cancel-btn-clicked');
-    },
-    methods: {
-      cancel() {
-        this.$emit('cancel');
-        // Delete input from form elements
-        (this as any).$refs.formElement.forEach((element: any) => {
-          element.input = '';
-        });
+  name: "oModal",
+  components: {
+    aHeaderElement,
+    aFormfield,
+    aFooterElement
+  },
+  props: {
+    modalElement: {
+      type: Object as () => WADE.ModalAddElementInterface,
+      required: true
+    }
+  },
+  data() {
+    return {
+      src: require("@/assets/mashup.png"),
+      hasError: false,
+      newElement: {
+        type: "",
+        data: [{}],
+        parentId: ""
       },
-      create() {
-        // Reset values for newElement
-        let hasError = false;
-        this.newElement.type = this.modalElement.type;
-        this.newElement.data = [];
-        this.newElement.parentId = this.modalElement.parentId || '';
-
-        // Check if formfields are correct
-        this.$eventHub.$emit('check-has-error');
-        const formElements: WADE.BasicFormFieldOutputInterface[] | any = this.$refs
-          .formElement;
-        formElements.forEach((element: WADE.BasicFormFieldOutputInterface) => {
-          if (element.hasError) {
-            // Cancel if one of the formFields has an error
-            hasError = true;
-          } else if (element.hasDuplicateError) {
-            hasError = true;
-          } else if (element.input) {
-            // Push form data to newElement and delete form input
-            const newDataElement = {
-              key: element.key,
-              value: element.input
-            };
-            this.newElement.data.push(newDataElement);
-            element.input = '';
-          }
-        });
-        // Create a new element
-        if (!hasError) {
-          this.$emit('create-element', this.newElement);
+      defaultSrc: "",
+      footerButtons: [
+        {
+          btnClass: "btn-grey",
+          btnLabel: "Cancel",
+          btnOnClick: "cancel-btn-clicked"
+        },
+        {
+          btnClass: "btn-pos",
+          btnLabel: "Create",
+          btnOnClick: "create-btn-clicked"
         }
+      ]
+    };
+  },
+  created() {
+    this.$eventHub.$on("create-btn-clicked", this.create);
+    this.$eventHub.$on("cancel-btn-clicked", this.cancel);
+  },
+  mounted() {
+    // Auto-focus First input field on open
+    const firstInputEl: HTMLElement = <HTMLElement>(
+      document.querySelectorAll(
+        ".middle-container-el .form-field-basic-input"
+      )[0]
+    );
+    firstInputEl.focus();
+  },
+  beforeDestroy() {
+    this.$eventHub.$off("create-btn-clicked");
+    this.$eventHub.$off("cancel-btn-clicked");
+  },
+  methods: {
+    cancel() {
+      this.$emit("cancel");
+      // Delete input from form elements
+      (this as any).$refs.formElement.forEach((element: any) => {
+        element.input = "";
+      });
+    },
+    create() {
+      // Reset values for newElement
+      let hasError = false;
+      this.newElement.type = this.modalElement.type;
+      this.newElement.data = [];
+      this.newElement.parentId = this.modalElement.parentId || "";
+
+      // Check if formfields are correct
+      this.$eventHub.$emit("check-has-error");
+      const formElements: WADE.BasicFormFieldOutputInterface[] | any = this
+        .$refs.formElement;
+      formElements.forEach((element: WADE.BasicFormFieldOutputInterface) => {
+        if (element.hasError) {
+          // Cancel if one of the formFields has an error
+          hasError = true;
+        } else if (element.hasDuplicateError) {
+          hasError = true;
+        } else if (element.input) {
+          // Push form data to newElement and delete form input
+          const newDataElement = {
+            key: element.key,
+            value: element.input
+          };
+          this.newElement.data.push(newDataElement);
+          element.input = "";
+        }
+      });
+      // Create a new element
+      if (!hasError) {
+        this.$emit("create-element", this.newElement);
       }
     }
+  }
 });
 </script>
 
