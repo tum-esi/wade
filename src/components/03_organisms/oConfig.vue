@@ -141,7 +141,8 @@ export default Vue.extend({
         },
         "nth-thing-id": {
             "token": "token"
-        }}
+        }
+    }
 }`
     };
   },
