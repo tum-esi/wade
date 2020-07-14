@@ -34,7 +34,7 @@ The application structure is as following:
 ---
 The architectural style of W-ADE's frontend is inspired by the _**Atom Design**_ design system by Brad Frost: http://atomicdesign.bradfrost.com/chapter-2/.  
 
-However, instead of being divided into 5 different types, W-ADE's GUI elements are only divided into 4 different modules:
+However, instead of being divided into 5 different types, W-ADE's GUI elements consist off only 4 different modules:
 1) Atoms
 2) Molecules
 3) Organisms
@@ -42,14 +42,13 @@ However, instead of being divided into 5 different types, W-ADE's GUI elements a
 
 ### Atoms
 
-Atoms comprise the most foundational building blocks of the user interface. 
-They include basic GUI elements like buttons (with different styles), form fields, inputs, labels and others.
-Every element that cannot be further broken down should be added to the atoms folder. 
+*Atoms* comprise the most foundational building blocks of the user interface. 
+They include basic GUI elements like buttons (with different styles), form fields, inputs, labels, etc.
+Every element that cannot be further broken down should be added to the *Atoms* folder. 
 
-If you want to build a plugin or work on the further development of W-ADE check out the atoms and see if elements you need for your interface already exist in here. 
+Most *Atom* components are dynamic. That means they can be used for building other components, as they can be dynamically be filled with different content.
+If you want to build plugins or work on the further development of W-ADE check out this folder to see if elements you need for your interface already exist in here. 
 Create a new atom if needed.
-
-Some of the styles used in atoms (and also in other elements) are stored in the App.vue file to make the available "*globally*".
 
 ### Molecules
 
@@ -59,7 +58,11 @@ In interfaces, molecules are relatively simple groups of UI elements functioning
 
 ### Templates
 
-GitLab Issues:
+Templates are non-dynamic components, which shouldn't be reused.
+They are components, filled with specific content, displaying full pages.
 
-- Num Clients performance testing (see PerformancePrediction.ts)
-- Overall error handling & displaying of errors
+
+### Remarks
+
+Some of the used styles are stored in the App.vue file to make them available "*globally*".
+

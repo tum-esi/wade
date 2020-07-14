@@ -1,5 +1,20 @@
 {
   "name": "w-ade",
+  "description": "W-ADE: Web of Things API Development Environment",
+  "author": "TUM-ESI <esi@ei.tum.de> (http://www.ei.tum.de/esi)",
+  "contributors": [
+    {
+      "name": "Verena Eileen Schlott",
+      "email": "schlott.verena.eileen@gmail.com"
+    },
+    {
+      "name": "Adrian Kast"
+    },
+    {
+      "name": "Ege Korkan",
+      "email": "ege.korkan@tum.de"
+    }
+  ],
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -21,7 +36,6 @@
     "coap": "^0.23.1",
     "core-js": "^2.6.5",
     "electron-json-storage": "^4.1.8",
-    "i": "^0.3.6",
     "monaco-editor-webpack-plugin": "^1.9.0",
     "npm": "^6.14.5",
     "vue": "^2.6.10",

@@ -1,17 +1,35 @@
 <template>
   <div class="td-page-container">
     <mTabbar :tabbarElements="getTdTabbar" v-on:tab-clicked="tabClicked" />
+
     <!-- Tab Config -->
-    <div v-if="currentTabId === 'config'" class="td-config">
+    <div
+      v-if="currentTabId === 'config'"
+      :class="getSidebarActive ? 'td-config border-top' : 'td-config full-screen border-top'"
+    >
       <oConfig class="td-config-child-el" />
       <!-- <oProtocolSelection class="td-config-child-el" /> -->
     </div>
-    <!-- Tab Performance -->
-    <div v-if="currentTabId === 'performance'" class="td-performance">
-      <tPerformance class="" />
+    <!-- Tab Virtual Thing -->
+    <div
+      v-if="currentTabId === 'virtual'"
+      :class="getSidebarActive ? 'td-virtual border-top' : 'td-virtual border-top full-screen'"
+    >
+      <oVirtual />
+      <oVirtualThing />
     </div>
-    <!-- Tab Editor & Selection & Results -->
-    <div v-if="currentTabId === 'editor'" class="td-editor">
+    <!-- Tab Performance -->
+    <div
+      v-if="currentTabId === 'performance'"
+      :class="getSidebarActive ? 'td-performance border-top' : 'td-performance border-top full-screen'"
+    >
+      <tPerformance />
+    </div>
+    <!-- Tab Editor & Selection & Results (default tab) -->
+    <div
+      v-if="currentTabId === 'editor'"
+      :class="getSidebarActive ? 'td-editor border-top' : 'td-editor border-top full-screen'"
+    >
       <aStatusbar class="td-page-statusbar" :statusMessage="statusMessage" />
       <!-- TODO no property statusMessage exists on aStatusbar! can be removed? -->
       <div class="td-main">
@@ -25,10 +43,7 @@
             v-on:cancel-btn-clicked="hideUrlBar"
           />
           <div :class="showUrlBar ? 'editor-showUrlBar' : 'editor-full'">
-            <oEditor
-              v-on:hide-url-bar="hideUrlBar"
-              v-on:open-config="tabClicked('config')"
-            />
+            <oEditor v-on:hide-url-bar="hideUrlBar" v-on:open-config="tabClicked('config')" />
           </div>
         </div>
         <div class="td-main-middle border-right">
@@ -38,10 +53,6 @@
           <oResults />
         </div>
       </div>
-    </div>
-    <div v-if="currentTabId === 'virtual'" class="td-virtual">
-      <oVirtual />
-      <oVirtualThing />
     </div>
   </div>
 </template>
@@ -132,6 +143,7 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters("TdStore", ["getTdTabbar"]),
+    ...mapGetters("SidebarStore", ["getSidebarActive"]),
     id() {
       return (this as any).$route.params.id;
     }

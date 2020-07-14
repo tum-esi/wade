@@ -9,15 +9,20 @@ export default {
     namespaced: true,
     state: {
         // ===== STATIC STORE STATE ===== //
-        sidebarHeaderTab: {
+        headerTab: {
             tabId: 'homeButton',
             tabTitle: 'W-ADE',
             tabStyle: 'border-bottom',
-            tabIconButton: {
-                iconBtnSrcPath: 'settings',
+            tabIconButtonHide: {
+                iconBtnSrcPath: 'arrow_double_left',
                 iconBtnOnClick: 'settings'
             },
-            tabButtonStyle: 'btn-left tab-btn-small tab-btn-header',
+            tabIconButtonShow: {
+                iconBtnSrcPath: 'arrow_double_left',
+                iconBtnOnClick: 'settings'
+            },
+            tabButtonStyle: 'tab-btn-right tab-btn-20 tab-btn-header',
+            tabLabelStyle: 'tab-label-80 font-bold',
             tabLink: 'settings'
         },
         sidebarAddNewButton: {
@@ -91,7 +96,8 @@ export default {
         folders: [],
         mashups: [],
         tds: [],
-        activeElementId: null
+        activeElementId: null,
+        isSidebarActive: true
     },
     actions: {
         async setActiveElement({ commit }, payload) {
@@ -389,6 +395,9 @@ export default {
         setActiveElement(state: any, payload: any) {
             state.activeElementId = payload;
         },
+        setSidebarActiveStatus(state: any, payload: boolean) {
+            state.isSidebarActive = payload;
+        },
         setVirtualThing(state: any, payload: {id: string, vt: any}) {
             let tdElement: { id: string, type: string, content: any, config: any , vconfig: any, virtualthing: any};
             let index: number;
@@ -409,7 +418,7 @@ export default {
          * whether the maximum array size of the output field is
          * reached
          *
-         * @param state given vuex state
+          *  @         param state given vuex state
          * @param payload id of the td, outMsg to add:
          *                              - content The message to display
          *                              - isError Is it an Error message?
@@ -519,6 +528,9 @@ export default {
         }
     },
     getters: {
+        getSidebarActive(state: any) {
+            return state.isSidebarActive;
+        },
         getDefaultConfig(state: any) {
             return JSON.stringify(state.configDefault);
         },
@@ -586,7 +598,7 @@ export default {
             };
         },
         getHeaderTab(state: any) {
-            return state.sidebarHeaderTab;
+            return state.headerTab;
         },
         getAddNewButton(state: any) {
             return state.sidebarAddNewButton;
@@ -605,7 +617,7 @@ export default {
         /**
          * Returns either a specific sidebar element when param has 'id'
          * or an array of sidebar elements, when param has 'type'
-         * @param state store state
+          *  @          param state store state
          */
         getSidebarElement(state: any) {
             return (elToFind) => {
