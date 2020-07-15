@@ -5,23 +5,11 @@
         <div class="config-title">
           <label>Configuration</label>
           <div class="format-option">
-            <input
-              type="radio"
-              name="format"
-              id="raw"
-              value="raw"
-              v-model="format"
-            />
+            <input type="radio" name="format" id="raw" value="raw" v-model="format" />
             <label for="raw">Raw</label>
           </div>
           <div class="format-option">
-            <input
-              type="radio"
-              name="format"
-              id="form-fields"
-              value="form-fields"
-              v-model="format"
-            />
+            <input type="radio" name="format" id="form-fields" value="form-fields" v-model="format" />
             <label for="form-fields">Form-Fields</label>
           </div>
         </div>
@@ -37,10 +25,7 @@
         />
       </div>
       <div v-if="!showHelp" class="show-config">
-        <aConfigStatusBar
-          class="config-status"
-          :statusMessage="configStatus"
-        ></aConfigStatusBar>
+        <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
         <div v-if="format === 'raw'" class="config-area">
           <mCodeEditor language="json" :code.sync="currentConfig"></mCodeEditor>
         </div>
@@ -123,41 +108,42 @@ export default Vue.extend({
         btnOnClick: "show-help"
       },
       helpAreaText: `
-        {
-            "http": {
-                "port": 80,
-                "proxy": {
-                    "href": "http://localhost:8080",
-                    "scheme": "basic",
-                    "token": "bearerToken",
-                    "username": "username",
-                    "password": "password",
-                },
-                "allowSelfSigned": true,
-            },
-            "coap": {
-                "port": 5683
-            },
-            "mqtt": {
-                "broker": "mqtt://test.mosquitto.org",
-                "username": "username",
-                "password": "password",
-                "clientId": "uniqueId"
-                "port": 1883
-            },
-            "credentials": {
-                "thing-id": {
-                    "username": "username",
-                    "password": "password"
-                },
-                "other-thing-id": {
-                    "identity": "identity",
-                    "psk": "psk"
-                },
-                "nth-thing-id": {
-                    "token": "token"
-                }}
-        }`
+{
+    "http": {
+        "port": 80,
+        "proxy": {
+            "href": "http://localhost:8080",
+            "scheme": "basic",
+            "token": "bearerToken",
+            "username": "username",
+            "password": "password",
+        },
+        "allowSelfSigned": true,
+    },
+    "coap": {
+        "port": 5683
+    },
+    "mqtt": {
+        "broker": "mqtt://test.mosquitto.org",
+        "username": "username",
+        "password": "password",
+        "clientId": "uniqueId"
+        "port": 1883
+    },
+    "credentials": {
+        "thing-id": {
+            "username": "username",
+            "password": "password"
+        },
+        "other-thing-id": {
+            "identity": "identity",
+            "psk": "psk"
+        },
+        "nth-thing-id": {
+            "token": "token"
+        }
+    }
+}`
     };
   },
   computed: {
