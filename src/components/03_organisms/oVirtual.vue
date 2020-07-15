@@ -185,7 +185,7 @@ export default Vue.extend({
 .show-vconfig,
 .help-area {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 50px);
 }
 
 .change-vconfig-area {
@@ -229,10 +229,14 @@ export default Vue.extend({
   padding-right: 7px;
 }
 
+.statusbar-container {
+  width: 100%;
+  height: 8%;
+}
+
 .vconfig-area {
   width: 100%;
-  height: 73%;
-  max-height: 800px;
+  height: 84%;
 }
 
 .vconfig-area textarea {
@@ -261,7 +265,7 @@ export default Vue.extend({
 }
 
 .vconfig-btns {
-  height: 10%;
+  height: 8%;
   padding-top: 7px;
   display: flex;
   justify-content: space-between;

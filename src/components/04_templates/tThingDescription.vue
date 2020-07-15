@@ -56,29 +56,33 @@
         </div>
       </div>
     </div>
+    <div v-if="currentTabId === 'virtual'" class="td-virtual">
+      <oVirtual />
+      <oVirtualThing />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { mapGetters, mapActions, mapMutations } from 'vuex';
-import aStatusbar from '@/components/01_atoms/aStatusbar.vue';
-import mTabbar from '@/components/02_molecules/mTabbar.vue';
-import mUrlBar from '@/components/02_molecules/mUrlBar.vue';
-import oConfig from '@/components/03_organisms/oConfig.vue';
-import oEditor from '@/components/03_organisms/oEditor.vue';
-import oVirtual from '@/components/03_organisms/oVirtual.vue';
-import oVirtualThing from '@/components/03_organisms/oVirtualThing.vue';
-import oSelection from '@/components/03_organisms/oSelection.vue';
-import oResults from '@/components/03_organisms/oResults.vue';
-import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
-import tPerformance from '@/components/04_templates/tPerformance.vue';
-import { Url } from 'url';
-import { TdStateEnum, TDTabsEnum } from '../../util/enums';
-import { ftruncate } from 'fs';
+import Vue from "vue";
+import { mapGetters, mapActions, mapMutations } from "vuex";
+import aStatusbar from "@/components/01_atoms/aStatusbar.vue";
+import mTabbar from "@/components/02_molecules/mTabbar.vue";
+import mUrlBar from "@/components/02_molecules/mUrlBar.vue";
+import oConfig from "@/components/03_organisms/oConfig.vue";
+import oEditor from "@/components/03_organisms/oEditor.vue";
+import oVirtual from "@/components/03_organisms/oVirtual.vue";
+import oVirtualThing from "@/components/03_organisms/oVirtualThing.vue";
+import oSelection from "@/components/03_organisms/oSelection.vue";
+import oResults from "@/components/03_organisms/oResults.vue";
+import oProtocolSelection from "@/components/03_organisms/oProtocolSelection.vue";
+import tPerformance from "@/components/04_templates/tPerformance.vue";
+import { Url } from "url";
+import { TdStateEnum, TDTabsEnum } from "../../util/enums";
+import { ftruncate } from "fs";
 
 export default Vue.extend({
-  name: 'tThingDescription',
+  name: "tThingDescription",
   components: {
     aStatusbar,
     oConfig,
@@ -94,22 +98,22 @@ export default Vue.extend({
   },
   created() {
     this.changeActiveTab();
-    this.$eventHub.$on('dropdown-clicked', this.tabClicked);
-    this.$store.commit('SidebarStore/setActiveElement', this.$route.params.id);
+    this.$eventHub.$on("dropdown-clicked", this.tabClicked);
+    this.$store.commit("SidebarStore/setActiveElement", this.$route.params.id);
   },
   beforeDestroy() {
-    this.$eventHub.$off('dropdown-clicked');
+    this.$eventHub.$off("dropdown-clicked");
   },
   data() {
     return {
-      tdId: '',
+      tdId: "",
       currentTabId: TDTabsEnum.EDITOR as TDTabsEnum | string,
-      statusMessage: '',
+      statusMessage: "",
       showUrlBar: false,
       fetchButton: {
-        btnLabel: 'Fetch Td',
-        btnClass: 'btn-url-bar',
-        btnOnClick: 'btn-clicked'
+        btnLabel: "Fetch Td",
+        btnClass: "btn-url-bar",
+        btnOnClick: "btn-clicked"
       },
       async fetchFunction(url: string) {
         // TODO: Error Handling connection time out
@@ -139,7 +143,7 @@ export default Vue.extend({
               errorMsg
             };
           });
-        (this as any).$eventHub.$emit('fetched-td', fetchedTd);
+        (this as any).$eventHub.$emit("fetched-td", fetchedTd);
       }
     };
   },
@@ -151,33 +155,36 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapMutations('TdStore', ['setActiveTab']),
+    ...mapMutations("TdStore", ["setActiveTab"]),
     hideUrlBar() {
       if (this.showUrlBar) this.showUrlBar = false;
     },
     tabClicked(args: any | TDTabsEnum) {
-      if (args.btnValue === 'td-url') {
+      if (args.btnValue === "td-url") {
         this.showUrlBar = true;
       }
-      if (typeof args === 'string') this.currentTabId = args;
+      if (typeof args === "string") this.currentTabId = args;
       // this.$router.push({
       //   name: 'config',
       //   params: { type: 'td', id: this.id, tab: 'config' }
       // });
     },
     changeActiveTab(): void {
-      (this as any).setActiveTab({tabbarKey: 'tdTabs', activeTab: this.currentTabId});
+      (this as any).setActiveTab({
+        tabbarKey: "tdTabs",
+        activeTab: this.currentTabId
+      });
     }
   },
   watch: {
     // Check if router id changed and change active sidebar element
-    '$route.params.id'(id) {
-      this.$store.commit('SidebarStore/setActiveElement', id);
+    "$route.params.id"(id) {
+      this.$store.commit("SidebarStore/setActiveElement", id);
       this.tdId = id;
       this.currentTabId = TDTabsEnum.EDITOR;
     },
     // Change active tab if tab id changed
-    'currentTabId'() {
+    currentTabId() {
       this.changeActiveTab();
     }
   }
@@ -201,7 +208,7 @@ export default Vue.extend({
 }
 
 .td-virtual {
-  height: 80%;
+  height: 100%;
   width: 100%;
   display: flex;
 }
