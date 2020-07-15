@@ -155,8 +155,6 @@ export async function invokeInteractions(selectedInteractions) {
       interactionType
     } = selectedInteractions[interaction];
 
-    console.log(selectedInteractions);
-
     switch (interactionType) {
       case PossibleInteractionTypesEnum.PROP_READ:
         if (interactionSelectBtn.interaction) {
@@ -165,15 +163,10 @@ export async function invokeInteractions(selectedInteractions) {
             interaction
           ].interactionSelectBtn.interaction();
 
-          resultProp = resultProp.error
-            ? { Error: resultProp.error }
-            : { [interactionName]: resultProp.res };
-
-          // Set property object for component
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp,
+            resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
             resultError: resultProp.error ? true : false,
             resultSize: resultProp.size
@@ -188,15 +181,10 @@ export async function invokeInteractions(selectedInteractions) {
             interaction
           ].interactionSelectBtn.interaction(interactionSelectBtn.input);
 
-          resultProp = resultProp.error
-            ? { Error: resultProp.error }
-            : { [interactionName]: resultProp.res };
-
-          // Set property object for component
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp,
+            resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultTime: `${resultProp.s}sec ${resultProp.ms}ms`,
             resultError: resultProp.error ? true : false,
             resultSize:
@@ -214,53 +202,35 @@ export async function invokeInteractions(selectedInteractions) {
             interaction
           ].interactionSelectBtn.interaction();
 
-          resultProp = resultProp.error
-            ? { Error: resultProp.error }
-            : { [interactionName]: resultProp.res };
-
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp,
+            resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultError: resultProp.error ? true : false
           });
         }
         break;
 
       case PossibleInteractionTypesEnum.EVENT_SUB:
+        // Subscribe to event
         if (interactionSelectBtn.interaction) {
           let resultEvent = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction();
 
-          console.log(resultEvent);
-
-          // TODO: resultEvent is simply object with callbakcs (errors will be handled with callbacks)
-
-          // OPTION 1) how it already was
-          resultEvent = resultEvent.error ? resultEvent.error : resultEvent;
-
-          // OPTION 2) not as object e.g. "lorem ipsum"
-          // resultEvent = resultEvent.error
-          //   ? { Error: resultEvent.error }
-          //   : { [interactionName]: resultEvent.res }; // TODO: udpate to resultEvent.res for consitency with properties/actions
-
-          // OPTION 3) as object { maintenance: "lorem ipsum" }?
-          // resultEvent = resultEvent.error
-          //   ? { Error: resultEvent.error }
-          //   : { res: resultEvent.res };
-
           resultEvents.push({
             resultType: PossibleInteractionTypesEnum.EVENT_SUB,
             resultTitle: interactionTitle,
-            resultValue: resultEvent,
+            resultValue: resultEvent = resultEvent.error
+              ? resultEvent.error
+              : resultEvent, // resultEvent is an object with callbacks
             resultError: resultEvent.error ? true : false
           });
         }
         break;
 
       case PossibleInteractionTypesEnum.EVENT_UNSUB:
-        // TODO: notify when unsubscribed
+        // TODO: Unsubscribe from event
         break;
 
       case PossibleInteractionTypesEnum.ACTION:
@@ -270,23 +240,12 @@ export async function invokeInteractions(selectedInteractions) {
             interaction
           ].interactionSelectBtn.interaction(interactionSelectBtn.input);
 
-          // TODO: DO WE NEED RESULT AS OBJECT FOR ACTIONS
-
-          // OPTION 1) as object e.g. { abort: "Success" }
-          resultAction = resultAction.error
-            ? { Error: resultAction.error }
-            : { [interactionName]: resultAction.res };
-
-          // OPTION 2) as object with "res" as key e.g. { res: "Success" }?
-          // resultAction = resultAction.error
-          //   ? { Error: resultAction.error }
-          //   : { res: resultAction.res };
-
-          // Set property object for component
           resultActions.push({
             resultType: PossibleInteractionTypesEnum.ACTION,
             resultTitle: interactionTitle,
-            resultValue: resultAction,
+            resultValue: resultAction.error
+              ? resultAction.error
+              : resultAction.res,
             resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
             resultError: resultAction.error ? true : false,
             resultSize: resultAction.size
