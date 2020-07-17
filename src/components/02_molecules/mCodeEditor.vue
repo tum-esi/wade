@@ -1,11 +1,5 @@
 <template>
-  <MonacoEditor
-    class="style-mCodeEditor"
-    theme="vs-dark"
-    :language="language"
-    v-model="value"
-    :options="options"
-  ></MonacoEditor>
+  <MonacoEditor class="style-mCodeEditor" theme="vs-dark" :language="language" v-model="value"></MonacoEditor>
 </template>
 
 <script lang="ts">
@@ -31,15 +25,6 @@ export default Vue.extend({
       type: String,
       required: false,
       default: ""
-    },
-    options: {
-      type: Object,
-      required: false,
-      default: () => {
-        return {
-          formatOnType: true
-        };
-      }
     }
   },
   data() {
