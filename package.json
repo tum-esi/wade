@@ -13,6 +13,10 @@
     {
       "name": "Ege Korkan",
       "email": "ege.korkan@tum.de"
+    },
+    {
+      "name": "Miguel Romero Karam",
+      "email": "miguel.romero@tum.de"
     }
   ],
   "version": "0.1.0",
@@ -24,7 +28,8 @@
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "ui": "vue ui"
   },
   "main": "background.js",
   "dependencies": {
@@ -36,13 +41,15 @@
     "coap": "^0.23.1",
     "core-js": "^2.6.5",
     "electron-json-storage": "^4.1.8",
+    "monaco-editor-webpack-plugin": "^1.9.0",
+    "npm": "^6.14.5",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0",
+    "vue-monaco": "^1.2.1",
     "vue-property-decorator": "^8.3.0",
     "vue-router": "^3.1.3",
     "vuex": "3.1.1",
     "vuex-electron": "^1.0.3",
-    "vuex-persistfile": "^0.1.4",
     "wot-typescript-definitions": "^0.7.1-SNAPSHOT.1"
   },
   "devDependencies": {
