@@ -1,7 +1,5 @@
 # W-ADE
 
-![CI](https://github.com/tum-esi/wade/workflows/CI/badge.svg?branch=master)
-
 ## Table of Contents  
 1. [Web of Things API Development Environment](**W**eb-of-Things-**A**PI–**D**evelopment–**E**nvironment)    
 2. [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
