@@ -55,6 +55,26 @@ export function retrieveProtocols(td: string): ProtocolEnum[] | null {
   if (tdJson.actions) addProtocols(tdJson.actions);
   if (tdJson.events) addProtocols(tdJson.events);
 
+  // checking the base for protocols
+
+  if (tdJson.base){
+    if (tdJson.base.indexOf("http") !== -1) {
+      protocols.push(ProtocolEnum.HTTP);
+    }
+    if (tdJson.base.indexOf("https") !== -1) {
+      protocols.push(ProtocolEnum.HTTPS);
+    }
+    if (tdJson.base.indexOf("mqtt") !== -1) {
+      protocols.push(ProtocolEnum.MQTT);
+    }
+    if (tdJson.base.indexOf("coap") !== -1) {
+      protocols.push(ProtocolEnum.COAP);
+    }
+    if (tdJson.base.indexOf("coaps") !== -1) {
+      protocols.push(ProtocolEnum.COAPS);
+    }
+  }
+
   return Array.from(new Set(protocols));
 }
 
