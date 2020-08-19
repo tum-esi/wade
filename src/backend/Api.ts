@@ -10,7 +10,7 @@ import * as stream from 'stream';
 import * as fs from 'fs';
 import * as path from 'path';
 
-let tdConsumer: any = null;
+let tdConsumer: null | TdConsumer  = null;
 
 export function retrieveProtocols(td: string): ProtocolEnum[] | null {
     const protocols = [] as ProtocolEnum[];
@@ -64,7 +64,12 @@ export function updateStatusMessage(
 
 // Return vue-parsed td, td state information and possible errors
 export async function consumeAndParseTd(td: string, config: object, protocols: ProtocolEnum[]) {
-    let consumedTd;
+    let consumedTd: {
+        tdJson: JSON | null,
+        tdConsumed: WoT.ConsumedThing | null,
+        tdState: TdStateEnum | null,
+        errorMsg: string | null
+    };
     // TODO: Check whenever a new TdConsumer is needed
     if (!tdConsumer) {
         tdConsumer = new TdConsumer(td, config, protocols);

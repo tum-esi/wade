@@ -57,6 +57,7 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
     public type: ElementTypeEnum.MASHUP;
     public tds: TD[] ;
     public mashups: Mashup[] ;
+    public content: string;
     public children: Array<Mashup | TD> ;
     public systemDescription: string | undefined;
 
@@ -64,6 +65,7 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
         super(param);
         this.parentId = param.parentId;
         this.type = ElementTypeEnum.MASHUP;
+        this.content = "";
         this.tds = [];
         this.mashups = [];
         this.children = [];
@@ -112,6 +114,61 @@ export class Folder extends ParentElement implements WADE.FolderElementInterface
                 this.mashups.push(child);
             }
             this.children.push(child);
+        }
+    }
+}
+/**
+ * Class
+ */
+export class GenerationForm implements MAGE.GenerationFormInterace {
+    public things: {
+        inputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
+        outputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
+    };
+    public minInputs: number;
+    public  maxInputs: number;
+    public  minOutputs: number;
+    public  maxOutputs: number;
+    public  maxThings: number | undefined;
+    public  templates: {
+        "use-event-template": boolean;
+        "use-action-template": boolean;
+        "use-sub-template": boolean;
+    };
+    public filters: {
+          acceptedTypes: string[],
+          onlySameType: boolean,
+          similarityThreshold: number,
+          semanticMatch: boolean
+    };
+    public generation: {
+          generateCode: boolean,
+          includeFunctionSkeletons: boolean
+    }
+    constructor() {
+        this.things = {
+            inputs: [],
+            outputs: [],
+        };
+        this.minInputs = 1,
+        this.maxInputs = 2,
+        this.minOutputs = 1,
+        this.maxOutputs = 2,
+        this.maxThings = undefined,
+        this.templates = {
+            "use-event-template": true,
+            "use-action-template": false,
+            "use-sub-template": true,
+        },
+        this.filters = {
+              acceptedTypes: ['string','integer','boolean','number'],
+              onlySameType: true,
+              similarityThreshold: 0,
+              semanticMatch: false
+        },
+        this.generation = {
+            generateCode: false,
+            includeFunctionSkeletons: false
         }
     }
 }

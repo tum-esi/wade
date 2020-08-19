@@ -11,11 +11,11 @@
                 </div>
                 <div class="flex-container-row align-items-center">
                     <label>Min:</label>
-                    <input type="number" :min="1" v-model.number="minInputInteractions" @input="setMaxInputInteractions">
+                    <input type="number" :min="1" v-model.number="generationForm.minInputs" @input="setMaxInputInteractions">
                 </div>
                 <div class="flex-container-row align-items-center">
                     <label>Max:</label>
-                    <input type="number" :min="minInputInteractions" v-model.number="maxInputInteractions"
+                    <input type="number" :min="generationForm.minInputs" v-model.number="generationForm.maxInputs"
                     @input="setMaxInputInteractions"
                     >
                 </div>
@@ -26,11 +26,11 @@
                 </div>
                 <div class="restrictions-input-area flex-container-row align-items-center">
                     <label>Min:</label>
-                    <input type="number" :min="1" v-model.number="minOutputInteractions" @input="setMaxOutputInteractions">
+                    <input type="number" :min="1" v-model.number="generationForm.minOutputs" @input="setMaxOutputInteractions">
                 </div>
                 <div class="flex-container-row align-items-center">
                     <label>Max:</label>
-                    <input type="number" :min="minOutputInteractions" v-model.number="maxOutputInteractions"
+                    <input type="number" :min="generationForm.minOutputs" v-model.number="generationForm.maxOutputs"
                     @input="setMaxOutputInteractions"
                     >
                 </div>
@@ -45,16 +45,22 @@
                 </div>
                 <div v-show="limitNumberOfElement" class="flex-container-row align-items-center">
                     <label>Max number of Elements:</label>
-                    <input type="number" :min="2" :disabled="!limitNumberOfElement"  v-model.number="maxOutputInteractions"
+                    <input type="number" :min="2" :max="100" :disabled="!limitNumberOfElement"  v-model.number="generationForm.maxThings"
                     @input="setMaxOutputInteractions"
                     >
                 </div>
             </div>
         </div>
         <!--Selecting templates for Mashup Generation-->
-        <mTemplateSelectionArea id="template-selection-area"/>
+        <mTemplateSelectionArea id="template-selection-area" v-model="generationForm.templates"/>
         <!--Filters and Constraints-->
-        <mFilterConstraintsAreaMaGe id="filters-area"/>
+        <mFilterConstraintsAreaMaGe id="filters-area" v-model="generationForm.filters"/>
+        <aButtonBasic
+        btnLabel="Generate Mashups"
+        btnClass="btn-grey"
+        btnOnClick="generate-mashups"
+        v-on:generate-mashups="generateMashups(generationForm)"
+        />
     </div>      
 </div>
 </template>
@@ -64,18 +70,22 @@ import Vue from 'vue';
 import { EventEmitter } from 'events';
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import { ElementTypeEnum } from '@/util/enums';
-import { Mashup, TD } from '@/lib/classes';
+import { Mashup, TD, GenerationForm } from '@/lib/classes';
+import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
-import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
+import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import mTableSimple from '@/components/02_molecules/mTableSimple.vue';
 import mTableMaGe from '@//components/02_molecules/mTableMaGe.vue';
 import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue'
 import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue'
+import { watch } from 'fs';
+import generateMashups from '@/backend/MaGe/generator';
 
 export default Vue.extend({
     components: {
+        aButtonBasic,
         aDropdownButton,
         aIconButton,
         aIcon,
@@ -88,15 +98,9 @@ export default Vue.extend({
 
     data() {
         return {
-            mashupData: {} as Mashup,
-            children: [] as Array<TD | Mashup>,
-            childNeeded: {} as TD | Mashup,
-            event: Object,
-            minInputInteractions: 1,
-            maxInputInteractions: 2,
-            minOutputInteractions: 1,
-            maxOutputInteractions: 2,
-            limitNumberOfElement: false
+            limitNumberOfElement: false,
+            generationForm: new GenerationForm(),
+            result: {}
         };
     },
 
@@ -133,10 +137,9 @@ export default Vue.extend({
             return table;
         }
     },
-
     methods: {
+        ...mapActions('MashupStore',['generateMashups']),
         onCurrentMashupSelected(event) {
-            this.event = event;
             if (event.btnValue === 'add-new-mashup') {
 
             } else {
@@ -145,35 +148,53 @@ export default Vue.extend({
             }
         },
         onAddElementSelected(event) {
-            this.event = event;
-            const children: Array<TD | Mashup> = this.$store.getters['MashupStore/getMashupChildren'];
-            this.children = children;
+            const children: (TD | Mashup)[] = this.$store.getters['MashupStore/getMashupChildren'];
             let childNeeded;
             for (const child of children) {
                 if (child.id === event.btnValue) childNeeded = child;
             }
             switch (event.btnKey) {
-                case 'add-input': this.$store.commit('MashupStore/addToInputs', childNeeded); break;
-                case 'add-output': this.$store.commit('MashupStore/addToOutputs', childNeeded); break;
-                case 'add-io': this.$store.commit('MashupStore/addToIos', childNeeded); break;
+                case 'add-input': 
+                    this.$store.commit('MashupStore/addToInputs', childNeeded); 
+                    this.generationForm.things.inputs.push(childNeeded);
+                    break;
+                case 'add-output':
+                    this.$store.commit('MashupStore/addToOutputs', childNeeded); 
+                    this.generationForm.things.outputs.push(childNeeded);
+                    break;
+                case 'add-io': 
+                    this.$store.commit('MashupStore/addToIos', childNeeded);
+                    this.generationForm.things.inputs.push(childNeeded);
+                    this.generationForm.things.outputs.push(childNeeded);
+                    break;
                 default: return;
             }
         },
         deleteFromIO(elementIndex: number, table: string) {
             switch(table) {
-                case 'inputs': this.$store.commit('MashupStore/removeFromInputs', elementIndex); break;
-                case 'outputs': this.$store.commit('MashupStore/removeFromOutputs', elementIndex); break;
-                case 'ios': this.$store.commit('MashupStore/removeFromIos', elementIndex); break;
+                case 'inputs': 
+                    this.$store.commit('MashupStore/removeFromInputs', elementIndex); 
+                    break;
+                case 'outputs': 
+                    this.$store.commit('MashupStore/removeFromOutputs', elementIndex); 
+                    break;
+                case 'ios': 
+                    this.$store.commit('MashupStore/removeFromIos', elementIndex); 
+                    break;
                 default: return;
             }
         },
         setMaxInputInteractions(): void {
-            this.maxInputInteractions  = this.minInputInteractions > this.maxInputInteractions ? this.minInputInteractions : this.maxInputInteractions;
+            this.generationForm.maxInputs = this.generationForm.minInputs > this.generationForm.maxInputs 
+            ? this.generationForm.minInputs 
+            : this.generationForm.maxInputs;
         },
         setMaxOutputInteractions(): void {
-            this.maxOutputInteractions  = this.minOutputInteractions > this.maxOutputInteractions ? this.minOutputInteractions : this.maxOutputInteractions;
+            this.generationForm.maxOutputs = this.generationForm.minOutputs > this.generationForm.maxOutputs 
+            ? this.generationForm.minOutputs 
+            : this.generationForm.maxOutputs;
         }
-    }
+    },
 })
 </script>
 

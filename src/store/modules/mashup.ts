@@ -1,4 +1,5 @@
 import { Mashup, TD } from '@/lib/classes';
+import generateMashups from "@/backend/MaGe/generator"
 
 export default {
     namespaced: true,
@@ -28,7 +29,8 @@ export default {
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
         ios:        null as Array<TD|Mashup> | null,
-        result: []
+        generationForm: null as MAGE.GenerationFormInterace | null,
+        result: null as Object | null
     },
     getters: {
         getMashupTabbar(state: any) {
@@ -71,6 +73,20 @@ export default {
         }
     },
     actions: {
+        async generateMashups({commit, state}, generationForm: MAGE.GenerationFormInterace) {
+            let inputs = state.inputs as (TD|Mashup)[];
+            let outputs = state.outputs as (TD|Mashup)[];
+            let ios = state.ios as (TD|Mashup)[];
+            generationForm.things.inputs = inputs;
+            generationForm.things.outputs = outputs;
+            for (let io of ios){
+                generationForm.things.inputs.push(io);
+                generationForm.things.outputs.push(io);
+            }
+            generateMashups(generationForm).then((result) =>{
+                commit('setResult', result);
+            })
+        }
     },
     mutations: {
         setCurrentMashup(state: any, mashup: Mashup) {
@@ -78,6 +94,12 @@ export default {
             (state.inputs as Array<TD|Mashup>) = [];
             (state.outputs as Array<TD|Mashup>) = [];
             (state.ios as Array<TD|Mashup>) = [];
+        },
+        setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace){
+            state.generationForm = generationForm;
+        },
+        setResult(state: any, result: object){
+            state.result = result;
         },
         addToInputs(state: any, ...elements: Array<TD|Mashup>) {
             const elementsFiltered = elements;

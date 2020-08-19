@@ -8,7 +8,7 @@
             </p>
         </div>
         <div id="selection-area">
-                <input type="checkbox" :value="isChecked" @input="$emit('input', $event.target.isChecked)">
+                <input type="checkbox" :checked="isChecked" @input="$emit('input', $event.target.checked)">
                 <label> Use this template </label>
         </div>
     </div>
@@ -66,6 +66,7 @@ export default Vue.extend({
         max-width: 100%;
         height: 50%;
         margin: 2% 5%;
+        flex-grow: 1;
     }
 
     #description-area {

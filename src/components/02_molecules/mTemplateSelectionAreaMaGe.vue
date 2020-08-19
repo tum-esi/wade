@@ -3,7 +3,8 @@
         <aTemplateSelectionMaGe
         :title="'Subscription-driven'"
         :imgSrc="'event-template'"
-
+        v-model="template['use-sub-template']"
+        @input="$emit('change', template)"
         class="template-selection"
         >
             <template v-slot:desription>
@@ -15,7 +16,8 @@
         <aTemplateSelectionMaGe
         :title="'Read-driven'"
         :imgSrc="'read-template'"
-
+        v-model="template['use-event-template']"
+        @input="$emit('change', template)"
         class="template-selection"
         >
             <template v-slot:desription>
@@ -27,7 +29,8 @@
         <aTemplateSelectionMaGe
         :title="'Action-driven'"
         :imgSrc="'action-template'"
-
+        v-model="template['use-action-template']"
+        @input="$emit('change', template)"
         class="template-selection"
         >
             <template v-slot:desription>
@@ -45,6 +48,20 @@ export default Vue.extend({
     name: 'mTemplateSelectionAreaMaGe',
     components: {
         aTemplateSelectionMaGe
+    },
+    model: {
+        prop: 'template',
+        event: 'change'
+    },
+    props: {
+        template: {
+            type: Object as () => {
+            "use-event-template": Boolean,
+            "use-action-template": Boolean,
+            "use-sub-template": Boolean,
+            },
+            required: true
+        }
     }
 })
 </script>

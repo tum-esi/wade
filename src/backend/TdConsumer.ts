@@ -37,8 +37,12 @@ export default class TdConsumer {
         this.config = config;
         this.protocols = protocols;
     }
-
-    public async getConsumedTd() {
+    public async getConsumedTd() : Promise<{
+        tdJson: JSON | null,
+        tdConsumed: WoT.ConsumedThing | null,
+        tdState: TdStateEnum | null,
+        errorMsg: string | null
+    }> {
         await this.parseTdJson(this.td);
 
         // if the td is in valid json format, consume it.

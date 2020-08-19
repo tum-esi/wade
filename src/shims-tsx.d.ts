@@ -185,6 +185,7 @@ declare global {
     }
     interface MashupElementInterface extends ParentElementInterface {
       type: ElementTypeEnum.MASHUP;
+      content: string | undefined;
       children: Array<TDElementInterface | MashupElementInterface>;
     }
     interface FolderElementInterface extends ParentElementInterface {
@@ -425,33 +426,62 @@ declare global {
     enum templatesEnum {
       EVENT = "use-event-template",
       ACTION = "use-action-template",
-      SUBSCRIBTION = "#use-sub-template"
+      SUBSCRIBTION = "use-sub-template"
     }
+
+    enum acceptedTypesEnum {
+      BOOLEAN = "boolean",
+      INTEGER = "integer",
+      NUMBER = "number",
+      ARRAY = "array",
+      OBJECT = "object"
+    }
+
     // =============================================================================
     // --------------------------------- Interfaces --------------------------------
     // =============================================================================
     interface GenerationFormInterace  {
-      things: (WADE.TDElementInterface | WADE.MashupElementInterface)[],
-      min_inputs: number,
-      max_inputs: number,
-      min_outputs: number,
-      max_outputs: number,
-      max_things: number
+      things: {
+        inputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
+        outputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
+      },
+      minInputs: number,
+      maxInputs: number,
+      minOutputs: number,
+      maxOutputs: number,
+      maxThings: number | undefined,
       templates: {
         "use-event-template": boolean;
         "use-action-template": boolean;
         "use-sub-template": boolean;
       },
-      "filters": {
-          "accepted_types": undefined,
-          "only_same_type": false,
-          "similarity_threshold": undefined,
-          "semantic_match": undefined
-      },
-      "generation": {
-          "generate_code": false,
-          "include_function_skeletons": false
+      filters: FiltersInterface,
+      generation: {
+          generateCode: boolean,
+          includeFunctionSkeletons: boolean
       }
-  }
+    }
+
+    interface FiltersInterface {
+        acceptedTypes: string[],
+        onlySameType: boolean,
+        similarityThreshold: number,
+        semanticMatch: boolean
+    }
+
+    interface InteractionInterface {
+      interactionType: string,
+      name: string,
+      object: object,
+      from: string,
+      to: string,
+      thingId: string
+      id: string,
+    }
+
+    interface InputInteractionInterface extends InteractionInterface{
+      interactionType: "event-subscribe" | "property-read" | "action-invoke",
+      matchingOutputCombinations?: MAGE.InteractionInterface[][],
+    }
   }
 }

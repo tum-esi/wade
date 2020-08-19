@@ -179,7 +179,8 @@ export default {
                         description: payload.description || '',
                         id: payload.id,
                         hasChildren: true,
-                        children: []
+                        children: [],
+                        content: ""
                     };
                     const newMashup = new Mashup(mashupInterface);
                     commit('addElementToStore', newMashup);
