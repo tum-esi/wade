@@ -2,7 +2,7 @@
 
 const stripIndent = require('strip-indent')
 
-module.exports.generate_code = function generate_code(mashup, tds) {
+module.exports.generateCode = function generateCode(mashup, tds) {
 
     // add tds to script
     let script = `            "use strict";
