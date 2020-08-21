@@ -24,6 +24,7 @@ export default {
         ],
         // ===== DYNAMIC STORE STATE ===== //
         isTabSelected: false,
+        resultReady: false,
         numberOfActiveTabs: 0,
         currentMashup: null as Mashup | null,
         inputs:     null as Array<TD|Mashup> | null,
@@ -68,6 +69,12 @@ export default {
             }
             return ids;
         },
+        getResult(state) {
+            return state.result;
+        },
+        isResultReady(state) {
+            return state.resultReady;
+        },
         isMashupSelected(state): boolean {
             return state.isMashupSelected;
         }
@@ -83,8 +90,10 @@ export default {
                 generationForm.things.inputs.push(io);
                 generationForm.things.outputs.push(io);
             }
+            commit('setResultReady',false);
             generateMashups(generationForm).then((result) =>{
                 commit('setResult', result);
+                commit('toggleResultReady');
             })
         }
     },
@@ -100,6 +109,9 @@ export default {
         },
         setResult(state: any, result: object){
             state.result = result;
+        },
+        setResultReady(state: any, ready: boolean){
+            state.resultReady = ready
         },
         addToInputs(state: any, ...elements: Array<TD|Mashup>) {
             const elementsFiltered = elements;
@@ -178,6 +190,9 @@ export default {
                     break;
                 }
             }
+        },
+        toggleResultReady(state) {
+            state.resultReady = !state.resultReady;
         },
         setTabActive(state: any, tabId: string) {
             for (const tab of state.mashupTabbar) {

@@ -56,10 +56,18 @@
         <!--Filters and Constraints-->
         <mFilterConstraintsAreaMaGe id="filters-area" v-model="generationForm.filters"/>
         <aButtonBasic
+        class="generate-button"
         btnLabel="Generate Mashups"
         btnClass="btn-grey"
         btnOnClick="generate-mashups"
         v-on:generate-mashups="generateMashups(generationForm)"
+        />
+        <mGalleryMermaid class="gallery" :txtArray="getResult.imagesMDs" :maxPossibleMashups="getResult.designSpaceSize" v-if="isResultReady"/>
+        <aButtonBasic
+        class="generate-button"
+        btnLabel="Generate Code for the currently viewed Mashup"
+        btnClass="btn-grey"
+        btnOnClick="generate-code"
         />
     </div>      
 </div>
@@ -76,10 +84,12 @@ import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
+import aViewerMermaid from '@/components/01_atoms/aViewerMermaid.vue';
+import mGalleryMermaid from '@/components/02_molecules/mGalleryMermaid.vue';
 import mTableSimple from '@/components/02_molecules/mTableSimple.vue';
 import mTableMaGe from '@//components/02_molecules/mTableMaGe.vue';
-import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue'
-import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue'
+import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue';
+import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue';
 import { watch } from 'fs';
 import generateMashups from '@/backend/MaGe/generator';
 
@@ -93,14 +103,21 @@ export default Vue.extend({
         mTableSimple,
         mTableMaGe,
         mTemplateSelectionArea,
-        mFilterConstraintsAreaMaGe
+        mFilterConstraintsAreaMaGe,
+        aViewerMermaid,
+        mGalleryMermaid
     },
 
     data() {
         return {
             limitNumberOfElement: false,
             generationForm: new GenerationForm(),
-            result: {}
+            test: [
+                "sequenceDiagram \n Bob->>John: Hello John, how are you? \n John-->>Bob: Great! \n",
+                "sequenceDiagram \n Alice->>John: Hello John, how are you? \n John-->>Alice: Great! \n",
+                "sequenceDiagram \n Fred->>John: Hello John, how are you? \n John-->>Fred: Great! \n",
+                "sequenceDiagram \n Carmen->>John: Hello John, how are you? \n John-->>Carmen: Great! \n",
+            ],
         };
     },
 
@@ -108,7 +125,7 @@ export default Vue.extend({
         ...mapState('MashupStore', ['currentMashup', 'inputs', 'outputs', 'ios']),
         ...mapGetters('SidebarStore', ['getSidebarElement']),
         ...mapGetters('MashupStore', ['getMashupChildren', 'getMashupChildrenForDropdown', 'isMashupSelected',
-        'getInputsIds', 'getOutputsIds', 'getIosIds']),
+        'getInputsIds', 'getOutputsIds', 'getIosIds','getResult','isResultReady']),
         inputList(): WADE.ListInterface {
             let list: WADE.ListInterface = {
                 header: "Inputs",
@@ -223,6 +240,11 @@ export default Vue.extend({
         overflow-y: auto;
     }
 
+    #form-area > * {
+        margin-left: 0.2%;
+        margin-right: 0.2%;
+    }
+
     #form-area::-webkit-scrollbar {
         display: inline;
     }
@@ -310,5 +332,17 @@ export default Vue.extend({
 
     .round-bottom-right-corner {
         border-bottom-right-radius: 10pt;
+    }
+
+    .generate-button {
+        width: 100%;
+        height: 5%;
+        margin: 1% 0.2%;
+        background-color: #b5dfdd;
+    }
+
+    .gallery {
+        width: 100%;
+        margin: 1%;
     }
 </style>

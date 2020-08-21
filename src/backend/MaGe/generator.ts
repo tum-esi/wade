@@ -8,6 +8,7 @@ import Crypto from "crypto";
 import * as Filters from "./filters";
 import * as Utils from "./utils";
 import { ThingDescription } from 'wot-typescript-definitions';
+import mermaid from 'mermaid';
 
 
 /** generate all the possible combinations of interactions for a given list of things and a given length */ 
@@ -214,7 +215,7 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
         allInputCombinations.push(...Combinatorics.bigCombination(inputs, i).toArray())
     }
     // filter input combinations that have more things than allowed
-    allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) get_number_of_things(inputs_c) <= form.maxThings});
+    if(form.maxThings) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) get_number_of_things(inputs_c) <= form.maxThings});
     allInputCombinations.forEach(inputs_c => {
         let availableOutputs: MAGE.InteractionInterface[][][] = []
         inputs_c.forEach(input => {if(input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations) }) 
@@ -242,61 +243,33 @@ function get_number_of_things(interactions: MAGE.InteractionInterface[]) {
  * 
  * @param {Array} interactions - Array of interaction (ie: a mashup)
  */
-function generate_UML(interactions) {
-    let uml = "@startuml\n"
+function generateMermaidSeqDiagram(interactions: MAGE.InteractionInterface[]) {
+    let seqDiagram = "sequenceDiagram\n"
     interactions.forEach( interaction => {
         // Determine interaction label and return path
-        if (interaction.interaction_type === "property-read")
-            uml += `"${interaction.from}" -> "${interaction.to}" : read: "${interaction.name}"\n`
-        else if (interaction.interaction_type === "property-write")
-            uml += `"${interaction.from}" -> "${interaction.to}" : write: "${interaction.name}"\n`
-        else if (interaction.interaction_type === "action-invoke")
-            uml += `"${interaction.from}" -> "${interaction.to}" : invoke: "${interaction.name}"\n`
-        else if (interaction.interaction_type === "event-subscribe")
-            uml += `"${interaction.from}" -> "${interaction.to}" : subscribe: "${interaction.name}"\n`
+        if (interaction.interactionType === "property-read")
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : read: "${interaction.name}"\n`
+        else if (interaction.interactionType === "property-write")
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : write: "${interaction.name}"\n`
+        else if (interaction.interactionType === "action-invoke")
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : invoke: "${interaction.name}"\n`
+        else if (interaction.interactionType === "event-subscribe")
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : subscribe: "${interaction.name}"\n`
         
         // determine return path
-        if (interaction.interaction_type === "property-read") {
-            uml += `activate "${interaction.to}"\n`
-            uml += `"${interaction.to}" --> "${interaction.from}" : response\n`
-            uml += `deactivate "${interaction.to}"\n`
-        } else if (interaction.interaction_type === "event") {
-            uml += `activate "${interaction.to}"\n`
-            uml += `"${interaction.to}" --> "${interaction.from}" : event-triggered\n`
-            uml += `deactivate "${interaction.to}"\n`
+        if (interaction.interactionType === "property-read") {
+            seqDiagram += `activate ${interaction.to}\n`
+            seqDiagram += `${interaction.to} -->> ${interaction.from} : response\n`
+            seqDiagram += `deactivate ${interaction.to}\n`
+        } else if (interaction.interactionType === "event-subscribe") {
+            seqDiagram += `activate ${interaction.to}\n`
+            seqDiagram += `${interaction.to} -->> ${interaction.from} : event-triggered\n`
+            seqDiagram += `deactivate ${interaction.to}\n`
         }
     })
-    uml += "@enduml"
-    return uml
+    seqDiagram += "\n"
+    return seqDiagram
 }
-
-/** if folder is given, save images in folder and return their names, if not, return PlantUML hash addresses. */
-// function generate_PNG(uml, plantuml_server="http://localhost:8080/plantuml/", folder) {
-//     let umlhash = Plantuml.encode(uml)
-
-//     if (folder) {
-//         let sha1hash = Crypto.createHash("sha1").update(umlhash).digest("hex")
-//         return new Promise((resolve, reject) => {
-//             Request(plantuml_server + "img/" + umlhash, (err, res, body) => {
-//                 if (err) {
-//                     console.log(err);
-//                 } else if (res.statusCode == 200) {
-//                     Fs.writeFile(folder + sha1hash + ".png", body, (err) => {
-//                         if (err) {console.error(err); reject()}
-//                         else resolve(sha1hash + ".png")
-//                     })
-//                 } else {
-//                     console.warn("PlantUML HTTP response code: " + res.statusCode)
-//                     reject()
-//                 }
-//             })
-//         })
-//     } else {
-//         return new Promise((resolve, reject) => {
-//             resolve(plantuml_server + "img/" + umlhash)
-//         })
-//     }
-// }
 
 /** calculate size of design space ( how many mashups would be possible without any rules or filters ) */
 function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
@@ -336,25 +309,23 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
 export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
     let interactionCombinations = await generateInteractionCombinations(generationForm);
     console.log(interactionCombinations);
-    let designSpaceSize = getDesignSpaceSize(generationForm)
+    let designSpaceSize = getDesignSpaceSize(generationForm);
 
-    let totalMashups =  interactionCombinations.length
-    console.log(`${totalMashups} mashups can be generated from given parameters. Design space size is: ${designSpaceSize}`)
+    let totalMashups =  interactionCombinations.length;
+    console.log(`${totalMashups} mashups can be generated from given parameters. Design space size is: ${designSpaceSize}`);
+
+    let imagesMDs: string[] = []
+    for (let combi of interactionCombinations) {
+       let uml = generateMermaidSeqDiagram(combi)
+       imagesMDs.push(uml);
+     }
 
     let results = {
         designSpaceSize: designSpaceSize,
         mashupsGenerated: totalMashups,
+        imagesMDs: imagesMDs,
+        mashups: interactionCombinations ,
     }
-
-    // create PNGs
-    // let images: any[] = []
-    // for (let combi of intraction_combinations) {
-    //     let uml = generate_UML(combi)
-    //     images.push( await generate_PNG(uml) )
-    // }
-
-    // results.images = images
-    // results.mashups = intraction_combinations 
 
     return results
 }
