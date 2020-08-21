@@ -78,7 +78,7 @@ export default {
         },
         tdResetSelectionsBtn: {
             btnClass: 'btn-reset',
-            btnLabel: 'Reset selections',
+            btnLabel: 'Reset Selections',
             btnOnClick: 'reset-selections'
         },
         tdResultsBtn: {
