@@ -32,11 +32,7 @@ export default {
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
         ios:        null as Array<TD|Mashup> | null,
-        propertyReads: null as {title: string, thingId: string, name: string, type: string}[] | null,
-        propertyWrites: null as {title: string, thingId: string, name: string, type: string}[] | null,
-        eventSubs: null as {title: string, thingId: string, name: string, type: string}[] | null,
-        actionInvokes: null as {title: string, thingId: string, name: string, type: string}[] | null,
-        forbiddenInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionInvokes: []},
+        allInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionInvokes: []},
         generationForm: null as MAGE.GenerationFormInterace | null,
         result: null as Object | null
     },
@@ -82,17 +78,20 @@ export default {
         getResult(state) {
             return state.result;
         },
+        getAllInteractions(state){
+            return state.allInteractions;
+        },
         getPropertyReads(state) {
-            return state.propertyReads;
+            return state.allInteractions.propertyReads;
         },
         getPropertyWrites(state) {
-            return state.propertyWrites;
+            return state.allInteractions.propertyWrites;
         },
         getEventSubs(state) {
-            return state.eventSubs;
+            return state.allInteractions.eventSubs;
         },
         getActionInvokes(state){
-            return state.actionInvokes;
+            return state.allInteractions.actionInvokes;
         },
         getForbiddenInteractions(state) {
             return state.forbiddenInteractions;
@@ -105,29 +104,32 @@ export default {
         },
     },
     actions: {
-        async generateMashups({commit, state}, generationForm: MAGE.GenerationFormInterace) {
-            let inputs = state.inputs as (TD|Mashup)[];
-            let outputs = state.outputs as (TD|Mashup)[];
-            let ios = state.ios as (TD|Mashup)[];
-            generationForm.things.inputs = inputs;
-            generationForm.things.outputs = outputs;
-            for (let io of ios){
-                generationForm.things.inputs.push(io);
-                generationForm.things.outputs.push(io);
-            }
-            let forbiddenInteractions: {title: string, thingId: string, name: string, type: string}[] = [];
-            for(let prop of state.forbiddenInteractions.propertyReads) forbiddenInteractions.push(prop);
-            for(let prop of state.forbiddenInteractions.propertyWrites) forbiddenInteractions.push(prop);
-            for(let event of state.forbiddenInteractions.eventSubs) forbiddenInteractions.push(event);
-            for(let action of state.forbiddenInteractions.actionInvokes) forbiddenInteractions.push(action);
+        async generateMashups({commit, state},
+            generationPayload: {
+                generationForm: MAGE.GenerationFormInterace, 
+            }) {
+                let inputs = state.inputs as (TD|Mashup)[];
+                let outputs = state.outputs as (TD|Mashup)[];
+                let ios = state.ios as (TD|Mashup)[];
+                generationPayload.generationForm.things.inputs = inputs;
+                generationPayload.generationForm.things.outputs = outputs;
+                for (let io of ios){
+                    generationPayload.generationForm.things.inputs.push(io);
+                    generationPayload.generationForm.things.outputs.push(io);
+                }
+                let forbiddenInteractions: MAGE.VueInteractionInterface[] = [];
+                for(let prop of state.forbiddenInteractions.propertyReads) forbiddenInteractions.push(prop);
+                for(let prop of state.forbiddenInteractions.propertyWrites) forbiddenInteractions.push(prop);
+                for(let event of state.forbiddenInteractions.eventSubs) forbiddenInteractions.push(event);
+                for(let action of state.forbiddenInteractions.actionInvokes) forbiddenInteractions.push(action);
 
-            generationForm.filters.forbiddenInteractions = forbiddenInteractions;
-            commit('setResultReady', false);
-            commit('setGenerationForm', generationForm);
-            generateMashups(generationForm).then((result) => {
-                commit('setResult', result);
-                commit('toggleResultReady');
-            });
+                generationPayload.generationForm.filters.forbiddenInteractions = forbiddenInteractions;
+                commit('setResultReady', false);
+                commit('setGenerationForm', generationPayload.generationForm);
+                generateMashups(generationPayload.generationForm).then((result) => {
+                    commit('setResult', result);
+                    commit('toggleResultReady');
+                });
         },
         async generateMashupCode({commit, state}, mashupNr: number) {
             let gen = {"mashup": state.result.mashups[mashupNr], "tds": {}};
@@ -159,11 +161,7 @@ export default {
             (state.inputs as Array<TD|Mashup>) = [];
             (state.outputs as Array<TD|Mashup>) = [];
             (state.ios as Array<TD|Mashup>) = [];
-            state.propertyReads = [];
-            state.propertyWrites = [];
-            state.eventSubs = [];
-            state.actionInvokes = [];
-            state.forbiddenInteractions = {
+            state.allInteractions = {
                 propertyReads: [],
                 propertyWrites: [],
                 eventSubs: [],
@@ -230,26 +228,56 @@ export default {
         categorizeTdInteractions(state: any, payload: {element: TD|Mashup, io: string}){
             let parsedTd = JSON.parse(payload.element.content);
                 for(let prop in parsedTd.properties){
-                    let readInteractionToPush = {title: payload.element.title, thingId: parsedTd.id, name: prop, type: "property-read"}; 
-                    let writeInteractionToPush = {title: payload.element.title, thingId: parsedTd.id, name: prop, type: "property-write"}; 
-                    if(payload.io == "input" && !parsedTd.properties[prop].writeOnly && !state.propertyReads.includes(readInteractionToPush)) 
-                        state.propertyReads.push(readInteractionToPush);
-                    else if(payload.io == "output" && !parsedTd.properties[prop].readOnly && !state.propertyWrites.includes(writeInteractionToPush))
-                        state.propertyWrites.push(writeInteractionToPush);
+                    let description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
+                    let readInteractionToPush: MAGE.VueInteractionInterface = {
+                        title: payload.element.title, 
+                        thingId: parsedTd.id, 
+                        name: prop, 
+                        description: description, 
+                        type: "property-read",
+                        restriction: "none" 
+                    }; 
+                    let writeInteractionToPush: MAGE.VueInteractionInterface= {
+                        title: payload.element.title, 
+                        thingId: parsedTd.id, 
+                        name: prop,
+                        description: description, 
+                        type: "property-write",
+                        restriction: "none"
+                    }; 
+                    if(payload.io == "input" && !parsedTd.properties[prop].writeOnly) 
+                        state.allInteractions.propertyReads.push(readInteractionToPush);
+                    else if(payload.io == "output" && !parsedTd.properties[prop].readOnly)
+                        state.allInteractions.propertyWrites.push(writeInteractionToPush);
                     else if(payload.io == "io"){
-                        if(!parsedTd.properties[prop].writeOnly && !state.propertyReads.includes(readInteractionToPush)) 
-                            state.propertyReads.push(readInteractionToPush);
-                        if(!parsedTd.properties[prop].readOnly && !state.propertyWrites.includes(writeInteractionToPush)) 
-                            state.propertyWrites.push(writeInteractionToPush);
+                        if(!parsedTd.properties[prop].writeOnly) 
+                            state.allInteractions.propertyReads.push(readInteractionToPush);
+                        if(!parsedTd.properties[prop].readOnly) 
+                            state.allInteractions.propertyWrites.push(writeInteractionToPush);
                     }
                 }
                 for(let event in parsedTd.events){
-                    let interactionToPush = {title: payload.element.title, thingId: parsedTd.id, name: event, type: "event-subscribe"};
-                    if(!state.eventSubs.includes(interactionToPush)) state.eventSubs.push(interactionToPush);
+                    let description = parsedTd.events[event].description ? parsedTd.events[event].description : null;
+                    let interactionToPush: MAGE.VueInteractionInterface = {
+                        title: payload.element.title, 
+                        thingId: parsedTd.id, name: event, 
+                        description: description, 
+                        type: "event-subscribe",
+                        restriction: "none"
+                    };
+                    state.allInteractions.eventSubs.push(interactionToPush);
                 }
                 for(let action in parsedTd.actions){
-                    let interactionToPush = {title: payload.element.title, thingId: parsedTd.id, name: action, type: "action-invoke"};
-                    if(!state.actionInvokes.includes(interactionToPush)) state.actionInvokes.push(interactionToPush);
+                    let description = parsedTd.actions[action].description ? parsedTd.actions[action].description : null;
+                    let interactionToPush: MAGE.VueInteractionInterface = {
+                        title: payload.element.title, 
+                        thingId: parsedTd.id, 
+                        name: action, 
+                        description: description, 
+                        type: "action-invoke",
+                        restriction: "none"
+                    };
+                    state.allInteractions.actionInvokes.push(interactionToPush);
                 }
         },
         addToForbiddenInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}){
@@ -271,6 +299,50 @@ export default {
                         state.forbiddenInteractions.actionInvokes.push(interaction);
                     return;
             }
+        },
+        addToMustHaveInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}){
+            switch(interaction.type) {
+                case "property-write": 
+                    if(!state.mustHaveInteractions.propertyWrites.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name)) 
+                        state.mustHaveInteractions.propertyWrites.push(interaction); 
+                    return;
+                case "property-read":
+                    if(!state.mustHaveInteractions.propertyReads.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
+                        state.mustHaveInteractions.propertyReads.push(interaction);
+                    return;
+                case "event-subscribe":
+                    if(!state.mustHaveInteractions.eventSubs.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
+                        state.mustHaveInteractions.eventSubs.push(interaction);
+                    return;
+                case "action-invoke":
+                    if(!state.mustHaveInteractions.actionInvokes.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
+                        state.mustHaveInteractions.actionInvokes.push(interaction);
+                    return;
+            }
+        },
+        setInteractionRestriction(state: any, payload: {interaction: MAGE.VueInteractionInterface, restriction: "none" | "forbidden" | "mustHave"}){
+            let index: number;
+            let interaction = payload.interaction;
+            let restriction = payload.restriction;
+            switch(interaction.type) {
+                case "property-read":
+                    index = (state.allInteractions.propertyReads as MAGE.VueInteractionInterface[]).findIndex(prop => prop.thingId === interaction.thingId &&
+                        prop.name === interaction.name);
+                    if(index !== -1) (state.allInteractions.propertyReads as MAGE.VueInteractionInterface[])[index].restriction = restriction;
+                case "property-write":
+                    index = (state.allInteractions.propertyWrites as MAGE.VueInteractionInterface[]).findIndex(prop => prop.thingId === interaction.thingId &&
+                        prop.name === interaction.name);
+                    if(index !== -1) (state.allInteractions.propertyWrites as MAGE.VueInteractionInterface[])[index].restriction = restriction;
+                case "event-subscribe":
+                    index = (state.allInteractions.eventSubs as MAGE.VueInteractionInterface[]).findIndex(event => event.thingId === interaction.thingId &&
+                        event.name === interaction.name);
+                    if(index !== -1) (state.allInteractions.eventSubs as MAGE.VueInteractionInterface[])[index].restriction = restriction;
+                case "action-invoke":
+                    index = (state.allInteractions.actionInvokes as MAGE.VueInteractionInterface[]).findIndex(action => action.thingId === interaction.thingId &&
+                        action.name === interaction.name);
+                    if(index !== -1) (state.allInteractions.actionInvokes as MAGE.VueInteractionInterface[])[index].restriction = restriction;
+            }
+            
         },
         removeFromInputs(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
@@ -305,31 +377,31 @@ export default {
         removeInteractions(state: any, element: TD|Mashup){
             let parsedTd = JSON.parse(element.content);
             let index = 0;
-            for(index = 0; index < state.propertyReads.length; index++) {
-                if(state.propertyReads[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.propertyReads[index]);
-                    state.propertyReads.splice(index,1); 
+            for(index = 0; index < state.allInteractions.propertyReads.length; index++) {
+                if(state.allInteractions.propertyReads[index].thingId === parsedTd.id) {
+                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.propertyReads[index]);
+                    state.allInteractions.propertyReads.splice(index,1); 
                     index--
                 };
             }
-            for(index = 0; index < state.propertyWrites.length; index++) {
-                if(state.propertyWrites[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.propertyWrites[index]);
-                    state.propertyWrites.splice(index,1); 
+            for(index = 0; index < state.allInteractions.propertyWrites.length; index++) {
+                if(state.allInteractions.propertyWrites[index].thingId === parsedTd.id) {
+                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.propertyWrites[index]);
+                    state.allInteractions.propertyWrites.splice(index,1); 
                     index--;
                 };
             }
-            for(index = 0; index < state.eventSubs.length; index++) {
-                if(state.eventSubs[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.eventSubs[index]);
-                    state.eventSubs.splice(index,1);
+            for(index = 0; index < state.allInteractions.eventSubs.length; index++) {
+                if(state.allInteractions.eventSubs[index].thingId === parsedTd.id) {
+                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.eventSubs[index]);
+                    state.allInteractions.eventSubs.splice(index,1);
                     index--;
                 };
             }
-            for(index = 0; index < state.actionInvokes.length; index++) {
-                if(state.actionInvokes[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.actionInvokes[index]);
-                    state.actionInvokes.splice(index,1);
+            for(index = 0; index < state.allInteractions.actionInvokes.length; index++) {
+                if(state.allInteractions.actionInvokes[index].thingId === parsedTd.id) {
+                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.actionInvokes[index]);
+                    state.allInteractions.actionInvokes.splice(index,1);
                     index--;
                 };
             }
@@ -352,6 +424,27 @@ export default {
                 case "action-invoke":
                     index = state.forbiddenInteractions.actionInvokes.findIndex(action => action.title === interaction.title && action.name === interaction.name);
                     state.forbiddenInteractions.actionInvokes.splice(index, 1);
+                    return;
+            }
+        },
+        removeFromMustHaveInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}) {
+            let index: number;
+            switch(interaction.type) {
+                case "property-write":
+                    index = state.mustHaveInteractions.propertyWrites.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
+                    state.mustHaveInteractions.propertyWrites.splice(index, 1);
+                    return;
+                case "property-read": 
+                    index = state.mustHaveInteractions.propertyReads.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
+                    state.mustHaveInteractions.propertyReads.splice(index, 1);
+                    return;
+                case "event-subscribe":
+                    index = state.mustHaveInteractions.eventSubs.findIndex(event => event.title === interaction.title && event.name === interaction.name);
+                    state.mustHaveInteractions.eventSubs.splice(index, 1);
+                    return;
+                case "action-invoke":
+                    index = state.mustHaveInteractions.actionInvokes.findIndex(action => action.title === interaction.title && action.name === interaction.name);
+                    state.mustHaveInteractions.actionInvokes.splice(index, 1);
                     return;
             }
         },

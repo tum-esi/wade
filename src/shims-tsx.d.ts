@@ -261,7 +261,8 @@ declare global {
      */
     interface ListInterface {
       header: string;
-      items: string[];
+      items: {label: string; payload?: any;}[];
+      
     }
     /**
      * A interface for tables
@@ -486,6 +487,15 @@ declare global {
     interface InputInteractionInterface extends InteractionInterface{
       interactionType: "event-subscribe" | "property-read" | "action-invoke",
       matchingOutputCombinations?: MAGE.InteractionInterface[][],
+    }
+
+    interface VueInteractionInterface {
+      title: string, 
+      thingId: string, 
+      name: string, 
+      description: string, 
+      type: "property-read" | "event-subscribe" | "property-write" | "action-invoke",
+      restriction: "none" | "forbidden" | "mustHave"
     }
   }
 }

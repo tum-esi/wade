@@ -62,8 +62,8 @@
                 </div>
             </div>
         </div>
-        <h4>Forbidden Interactions</h4>
-        <mInteractionSelectionMaGe :table="forbiddenInteractionsTable" :filters="filters"/>
+        <h4>Restrictions on individual Interactions</h4>
+        <mInteractionSelectionMaGe :table="InteractionsTable" :filters="filters"/>
     </div>
 </template>
 
@@ -88,38 +88,50 @@ export default Vue.extend({
         mInteractionSelectionMaGe
     },
     computed: {
-        ...mapGetters('MashupStore',['getForbiddenInteractions']),
-        forbiddenInteractionsTable() {
-            let forbiddenInteractions = (this as any).getForbiddenInteractions;
+        ...mapGetters('MashupStore',['getAllInteractions']),
+        InteractionsTable() {
+            let allInteractions = (this as any).getAllInteractions;
             let table: WADE.TableInterface = {columns: []};
             let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
             let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
             let listE: WADE.ListInterface = {header: "EventSubs", items: []};
             let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
-            for(let interactiontype in forbiddenInteractions) {
+            for(let interactiontype in allInteractions) {
                 switch(interactiontype) {
                     case "propertyWrites":
-                        let propertyWrites = forbiddenInteractions[interactiontype];
+                        let propertyWrites = allInteractions[interactiontype];
                         for(let prop of propertyWrites) {
-                            listW.items.push(`${prop.title}: ${prop.name}`);
+                            listW.items.push({
+                                label: `${prop.title}: ${prop.name}`,
+                                payload: prop
+                            });
                         }
                         break;
                     case "propertyReads":
-                        let propertyReads = forbiddenInteractions[interactiontype];
+                        let propertyReads = allInteractions[interactiontype];
                         for(let prop of propertyReads) {
-                            listR.items.push(`${prop.title}: ${prop.name}`);
+                            listR.items.push({
+                                label: `${prop.title}: ${prop.name}`,
+                                payload: prop
+                            });
                         }
                         break;
                     case "eventSubs":
-                        let eventSubs = forbiddenInteractions[interactiontype];
+                        let eventSubs = allInteractions[interactiontype];
                         for(let event of eventSubs) {
-                            listE.items.push(`${event.title}: ${event.name}`);
+                            listE.items.push({
+                                label: `${event.title}: ${event.name}`,
+                                payload: event
+                            });
                         }
                         break;
                     case "actionInvokes":
-                        let actionInvokes = forbiddenInteractions[interactiontype];
+                        let actionInvokes = allInteractions[interactiontype];
                         for(let action of actionInvokes) {
-                            listA.items.push(`${action.title}: ${action.name}`);
+                            listA.items.push({
+                                label: `${action.title}: ${action.name}`,
+                                payload: action
+                            });
                         }
                         break;
                 }

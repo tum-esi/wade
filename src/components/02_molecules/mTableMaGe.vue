@@ -15,8 +15,8 @@
             </div>
             </template>
             <template v-slot:rows>
-                <div class=" flex-container-row io-element" v-for="(id, rowIndex) in tableColumn.items" :key="rowIndex">
-                    <label class="io-label margin-right-auto">{{id}}</label>
+                <div class=" flex-container-row io-element" v-for="(item, rowIndex) in tableColumn.items" :key="rowIndex">
+                    <label class="io-label margin-right-auto">{{item.label}}</label>
                     <aIcon
                     class="io-remove-icon"
                     :specificStyle="'mage-minus-icon'"

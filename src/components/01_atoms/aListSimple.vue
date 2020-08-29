@@ -8,7 +8,7 @@
         <div class="rows grey">
             <slot name="rows">
                 <ul>
-                    <li v-for="(item, index) in list.items" :key="index"> {{item}} </li>
+                    <li v-for="(item, index) in list.items" :key="index"> {{item.label}} </li>
                 </ul>
             </slot>
         </div>

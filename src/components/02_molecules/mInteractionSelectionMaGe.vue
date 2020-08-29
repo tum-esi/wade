@@ -3,28 +3,40 @@
         <aListSimple class="column" v-for="(tableColumn, columnIndex) in this.table.columns" :key="columnIndex" :list="tableColumn">
             <template v-slot:header>
                 <div class="flex-container-row table-header">
-                <label class="margin-right-auto">{{tableColumn.header}}</label>
-                <aDropdownButton
-                    class="add-icon"
-                    :class="'select-mashup-dropdown-btn'"
-                    :btnKey="'add-to-'+getAddBtnKey(tableColumn.header)"
-                    :btnSrc="'add'"
-                    :btnDropdownOptions="getDropDownMenu(tableColumn.header) ? getDropDownMenu(tableColumn.header) : []"
-                    @dropdown-clicked="onAddInteractionSelected"
-                />
-            </div>
+                    <label class="margin-right-auto">{{tableColumn.header}}</label>
+                </div>
             </template>
             <template v-slot:rows>
-                <div class=" flex-container-row io-element" v-for="(id, rowIndex) in tableColumn.items" :key="rowIndex">
-                    <label class="io-label margin-right-auto">{{id}}</label>
-                    <aIcon
-                    class="io-remove-icon"
-                    :specificStyle="'mage-minus-icon'"
-                    :iconSrcPath="'minus'"
-                    :mouseOverIconSrcPath="'minus_white'"
-                    :iconClickAction="'removeInteraction'"
-                    @icon-clicked="deleteFromFrobiddenInteractions(id, columnIndex)"
-                    />
+                <div 
+                :title="item.payload.description ? item.payload.description : 'No description given'" 
+                class="element" 
+                v-for="(item, rowIndex) in tableColumn.items" :key="rowIndex">
+                    <label class="io-label margin-right-auto">{{item.label}}</label>
+                    <div>
+                        <input 
+                        type="radio" 
+                        :name="item.label" 
+                        :checked="item.payload.restriction=='none'"
+                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'none'})">
+                        <label>No restrictions</label> 
+                    </div>
+                    <div>
+                        <input 
+                        type="radio" 
+                        :name="item.label" 
+                        :checked="item.payload.restriction=='forbidden'"
+                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})">
+                        <label>Forbidden</label> 
+                    </div>
+                    <div>
+                        <input 
+                        type="radio" 
+                        :name="item.label" 
+                        :checked="item.payload.restriction=='mustHave'"
+                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'mustHave'})">
+                        <label>Must have</label> 
+                    </div>
+                    
                 </div>
             </template>
         </aListSimple>
@@ -102,7 +114,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        ...mapMutations('MashupStore',['addToForbiddenInteractions', 'removeFromForbiddenInteractions']),
+        ...mapMutations('MashupStore',['addToForbiddenInteractions', 'removeFromForbiddenInteractions','setInteractionRestriction']),
         getAddBtnKey(header: string){
             let headerlow = header.toLowerCase();
             switch(headerlow) {
@@ -191,8 +203,7 @@ export default Vue.extend({
     border-right: 0.5pt solid #393B3A !important;
 }
 
-.io-element {
-    height: 30pt;
+.element {
     width: 100%;
     border-bottom: 0.5pt solid #393B3A;
 }

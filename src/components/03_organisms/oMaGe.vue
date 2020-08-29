@@ -60,7 +60,7 @@
         btnLabel="Generate Mashups"
         btnClass="btn-grey"
         btnOnClick="generate-mashups"
-        @generate-mashups="generateMashups(generationForm)"
+        @generate-mashups="generateMashups({generationForm: generationForm})"
         />
         <mGalleryMermaid 
         class="gallery" 
@@ -128,23 +128,35 @@ export default Vue.extend({
         ...mapGetters('MashupStore', ['getMashupChildren', 'getMashupChildrenForDropdown', 'isMashupSelected',
         'getInputsIds', 'getOutputsIds', 'getIosIds','getResult','isResultReady']),
         inputList(): WADE.ListInterface {
+            let ids: {label: string}[] = [];
+            for(let item of (this as any).getInputsIds) {
+                ids.push({label: item});
+            }
             let list: WADE.ListInterface = {
                 header: "Inputs",
-                items: (this as any).getInputsIds
+                items: ids
             }
             return list;
         },
         outputList(): WADE.ListInterface {
+            let ids: {label: string}[] = [];
+            for(let item of (this as any).getOutputsIds) {
+                ids.push({label: item});
+            }
             let list: WADE.ListInterface = {
                 header: "Outputs",
-                items: (this as any).getOutputsIds
+                items: ids
             }
             return list;
         },
         ioList(): WADE.ListInterface {
+            let ids: {label: string}[] = [];
+            for(let item of (this as any).getIosIds) {
+                ids.push({label: item});
+            }
             let list: WADE.ListInterface = {
                 header: "IOs",
-                items: (this as any).getIosIds
+               items: ids
             }
             return list;
         },
