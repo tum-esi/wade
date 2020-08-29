@@ -119,7 +119,7 @@ export default Vue.extend({
 }
 
 .mashup-editor-half {
-    width: 60%;
+    width: 40%;
     height: 100%;
     padding: 1.5%;
 }
@@ -137,7 +137,7 @@ export default Vue.extend({
 }
 
 .mage-half {
-    width: 40%;
+    width: 60%;
     height: 100%;
     padding: 1.5% 1.5% 1.5% 0;
 }

@@ -44,7 +44,7 @@
             </div>
         </div>
         <div id="text-editor-area" v-if="getMashupTabbar[0].tabIsActive" :class="'text-editor-area-full'">
-           <textarea id="element-text-area" spellcheck="false" wrap="off" ></textarea>
+           <textarea id="element-text-area" spellcheck="false" wrap="off" :value="getMashupTd"></textarea>
         </div>
     </div>
 </template>
@@ -56,6 +56,7 @@ import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import mMashupElement from '@/components/02_molecules/mMashupElement.vue';
 import { ElementTypeEnum } from '../../util/enums';
+import mashup from '@/store/modules/mashup';
 
 export default Vue.extend({
     name: 'oMashupEditor',
@@ -84,7 +85,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters('MashupStore', ['getMashupTabbar']),
+        ...mapGetters('MashupStore', ['getMashupTabbar', 'getMashupTd']),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getDropdownOptions(): WADE.DropdownOptionInterface[] {
             this.dropdownOptions = [];

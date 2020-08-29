@@ -39,12 +39,17 @@ export default Vue.extend({
     },
     methods: {
         moveRight() {
-            if(this.txtArray && this.txtIndex >= this.txtArray.length-1) return;
-            this.txtIndex++;
+            this.txtIndex = (this.txtIndex + 1) % this.txtArray.length ;
+            this.$emit("current-mashup-nr", this.txtIndex);
         },
         moveLeft() {
-            if(this.txtArray && this.txtIndex <= 0) return;
-            this.txtIndex--;
+
+            if(this.txtArray && this.txtIndex <= 0) {
+                this.txtIndex = this.txtArray.length-1;
+            } else {
+                this.txtIndex--;
+            }
+            this.$emit("current-mashup-nr", this.txtIndex);
         }
     }
 })

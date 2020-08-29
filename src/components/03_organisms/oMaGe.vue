@@ -60,14 +60,21 @@
         btnLabel="Generate Mashups"
         btnClass="btn-grey"
         btnOnClick="generate-mashups"
-        v-on:generate-mashups="generateMashups(generationForm)"
+        @generate-mashups="generateMashups(generationForm)"
         />
-        <mGalleryMermaid class="gallery" :txtArray="getResult.imagesMDs" :maxPossibleMashups="getResult.designSpaceSize" v-if="isResultReady"/>
+        <mGalleryMermaid 
+        class="gallery" 
+        :txtArray="getResult.imagesMDs" 
+        :maxPossibleMashups="getResult.designSpaceSize" 
+        @current-mashup-nr="setCurrentViewedMashup"
+        v-if="isResultReady"/>
         <aButtonBasic
         class="generate-button"
         btnLabel="Generate Code for the currently viewed Mashup"
         btnClass="btn-grey"
         btnOnClick="generate-code"
+        @generate-code="generateCode"
+        v-if="isResultReady"
         />
     </div>      
 </div>
@@ -90,8 +97,7 @@ import mTableSimple from '@/components/02_molecules/mTableSimple.vue';
 import mTableMaGe from '@//components/02_molecules/mTableMaGe.vue';
 import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue';
 import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue';
-import { watch } from 'fs';
-import generateMashups from '@/backend/MaGe/generator';
+import generateMashups from '@/backend/MaGe/generator.ts';
 
 export default Vue.extend({
     components: {
@@ -111,13 +117,8 @@ export default Vue.extend({
     data() {
         return {
             limitNumberOfElement: false,
+            currentlyViewedMashup: 0,
             generationForm: new GenerationForm(),
-            test: [
-                "sequenceDiagram \n Bob->>John: Hello John, how are you? \n John-->>Bob: Great! \n",
-                "sequenceDiagram \n Alice->>John: Hello John, how are you? \n John-->>Alice: Great! \n",
-                "sequenceDiagram \n Fred->>John: Hello John, how are you? \n John-->>Fred: Great! \n",
-                "sequenceDiagram \n Carmen->>John: Hello John, how are you? \n John-->>Carmen: Great! \n",
-            ],
         };
     },
 
@@ -155,7 +156,7 @@ export default Vue.extend({
         }
     },
     methods: {
-        ...mapActions('MashupStore',['generateMashups']),
+        ...mapActions('MashupStore',['generateMashups',"generateMashupCode"]),
         onCurrentMashupSelected(event) {
             if (event.btnValue === 'add-new-mashup') {
 
@@ -210,6 +211,12 @@ export default Vue.extend({
             this.generationForm.maxOutputs = this.generationForm.minOutputs > this.generationForm.maxOutputs 
             ? this.generationForm.minOutputs 
             : this.generationForm.maxOutputs;
+        },
+        setCurrentViewedMashup(nr: number) {
+            this.currentlyViewedMashup = nr;
+        },
+        generateCode(){
+            this.$store.dispatch("MashupStore/generateMashupCode", this.currentlyViewedMashup);
         }
     },
 })
@@ -276,6 +283,7 @@ export default Vue.extend({
 
     #filters-area {
         width: 100%;
+        height: 75%;
     }
 
     .align-items-center {

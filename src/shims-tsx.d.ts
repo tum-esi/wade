@@ -464,9 +464,13 @@ declare global {
 
     interface FiltersInterface {
         acceptedTypes: string[],
+        acceptedInputInteractionTypes: string[],
+        acceptedOutputInteractionTypes: string[],
         onlySameType: boolean,
-        similarityThreshold: number,
-        semanticMatch: boolean
+        similarityThreshold: number | null,
+        semanticMatch: boolean,
+        mustHaveInteractions?: {title: string, thingId: string, name: string, type: string}[],
+        forbiddenInteractions?: {title: string, thingId: string, name: string, type: string}[],
     }
 
     interface InteractionInterface {

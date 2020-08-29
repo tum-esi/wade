@@ -137,8 +137,10 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     };
     public filters: {
           acceptedTypes: string[],
+          acceptedInputInteractionTypes: string[],
+          acceptedOutputInteractionTypes: string[],
           onlySameType: boolean,
-          similarityThreshold: number,
+          similarityThreshold: number | null,
           semanticMatch: boolean
     };
     public generation: {
@@ -162,8 +164,10 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
         },
         this.filters = {
               acceptedTypes: ['string','integer','boolean','number'],
+              acceptedInputInteractionTypes: ['property-read', 'event-subscibe', 'action-invoke'],
+              acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
               onlySameType: true,
-              similarityThreshold: 0,
+              similarityThreshold: null,
               semanticMatch: false
         },
         this.generation = {

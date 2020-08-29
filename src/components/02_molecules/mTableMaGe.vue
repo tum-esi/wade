@@ -32,11 +32,6 @@
 </template>
 
 <script lang="ts">
-/**
- * A simple table table component that is customizable using slots. 
- * To introduce a new table component, just copy this code and use the header and row slots provided in aListSimple component
- * For information on using slots, please refer to https://vuejs.org/v2/guide/components-slots.html
- */
 import Vue from 'vue'; 
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
@@ -44,7 +39,7 @@ import aIcon from '@/components/01_atoms/aIcon.vue';
 import { TD, Mashup } from '@/lib/classes';
 import { mapGetters } from 'vuex';
 export default Vue.extend({
-    name: 'mTableSimple',
+    name: 'mTableMaGe',
     components : {
         aListSimple,
         aDropdownButton,
