@@ -1,5 +1,5 @@
 <template>
-  <MonacoEditor class="style-mCodeEditor" theme="vs-dark" :language="language" v-model="value"></MonacoEditor>
+  <MonacoEditor class="style-mCodeEditor" theme="vs-dark" :language="language" :options="{automaticLayout: true}" v-model="value"></MonacoEditor>
 </template>
 
 <script lang="ts">
