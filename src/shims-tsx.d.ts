@@ -450,7 +450,7 @@ declare global {
       maxInputs: number,
       minOutputs: number,
       maxOutputs: number,
-      maxThings: number | undefined,
+      maxThings: number | null,
       templates: {
         "use-event-template": boolean;
         "use-action-template": boolean;
@@ -465,13 +465,14 @@ declare global {
 
     interface FiltersInterface {
         acceptedTypes: string[],
-        acceptedInputInteractionTypes: string[],
         acceptedOutputInteractionTypes: string[],
         onlySameType: boolean,
         similarityThreshold: number | null,
         semanticMatch: boolean,
-        mustHaveInteractions?: {title: string, thingId: string, name: string, type: string}[],
-        forbiddenInteractions?: {title: string, thingId: string, name: string, type: string}[],
+        mustHaveInteractions?: VueInteractionInterface[]
+        forbiddenInteractions?: VueInteractionInterface[],
+        mustHaveAnnotations?: string[];
+        forbiddenAnnotations?: string[];
     }
 
     interface InteractionInterface {
@@ -485,7 +486,7 @@ declare global {
     }
 
     interface InputInteractionInterface extends InteractionInterface{
-      interactionType: "event-subscribe" | "property-read" | "action-invoke",
+      interactionType: "event-subscribe" | "property-read" | "action-read",
       matchingOutputCombinations?: MAGE.InteractionInterface[][],
     }
 
@@ -494,8 +495,14 @@ declare global {
       thingId: string, 
       name: string, 
       description: string, 
-      type: "property-read" | "event-subscribe" | "property-write" | "action-invoke",
+      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke",
       restriction: "none" | "forbidden" | "mustHave"
+    }
+
+    interface VueAnnotationInterface {
+      annotation: string,
+      numberOfAccurance: number,
+      restriction: "none" | "forbidden" | "mustHave";
     }
   }
 }

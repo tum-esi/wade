@@ -39,8 +39,10 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
         actions.push(...interactions.actions);
         propertyWrites.push(...interactions.properties);
     });
-    // TODO: add possibility to only select actions or property writes
-    let outputs = [...propertyWrites, ...actions];
+
+    let outputs: MAGE.InteractionInterface[] = []
+    if(filters.acceptedOutputInteractionTypes.includes("property-write")) outputs.push(...propertyWrites);
+    if(filters.acceptedOutputInteractionTypes.includes("action-invoke")) outputs.push(...actions);
 
     // for each input, get matching outputs based on filters
     async function getMatchingOutputCombinations(input: MAGE.InputInteractionInterface) {
@@ -102,7 +104,11 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             if(filters.forbiddenInteractions) {
                 if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
                     inter.name === prop && inter.type === "property-read")) continue;
-            } 
+            }
+            // filter interactions with unwanted annotations
+            if(filters.forbiddenAnnotations) {
+                
+            }
             propertyReads.push({
                 interactionType: "property-read", 
                 name: prop,
@@ -145,7 +151,7 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
                 inter.name === action && inter.type === "action-invoke")) continue;
         }
         actionReads.push({
-            interactionType: "action-invoke",
+            interactionType: "action-read",
             name: action,
             object: thingDescription.actions[action],
             from: "Agent",
@@ -185,7 +191,7 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
     }
     for (let action in thingDescription.actions) {
         // filter based on accepted types
-        if (filters.acceptedTypes) {
+        if (filters) {
             if (!thingDescription.actions[action].input || !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) continue
         }
         // filter unwanted interactions
@@ -238,7 +244,7 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
         allInputCombinations.push(...Combinatorics.bigCombination(inputs, i).toArray());
     }
     // filter input combinations that have more things than allowed
-    if(form.maxThings) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) getNumberOfThings(inputs_c) <= form.maxThings});
+    if(form.maxThings && form.maxThings > 0) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) return getNumberOfThings(inputs_c) <= form.maxThings});
     allInputCombinations.forEach(inputs_c => {
         let availableOutputs: MAGE.InteractionInterface[][][] = [];
         inputs_c.forEach(input => {if(input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations);}) 
@@ -249,8 +255,23 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
         });
     })
     // filter final combinations that have more things than allowed
-    if (form.maxThings) interactionCombinations = interactionCombinations.filter(ios_c => {if(form.maxThings) getNumberOfThings(ios_c) <= form.maxThings});
+    if (form.maxThings && form.maxThings > 0) interactionCombinations = interactionCombinations.filter( mashup => {if(form.maxThings) return getNumberOfThings(mashup) <= form.maxThings});
+    if (form.filters.mustHaveInteractions && form.filters.mustHaveInteractions.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, form.filters.mustHaveInteractions)});
+    }
     return interactionCombinations;
+}
+
+function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHaveInteractions: MAGE.VueInteractionInterface[]): boolean {
+    let isIncluded: boolean = true;
+    for(let mustHaveInteraction of mustHaveInteractions) {
+        for(let [index, interaction] of mashup.entries()) {
+            if(interaction.thingId ===  mustHaveInteraction.thingId && interaction.name === mustHaveInteraction.name &&
+                interaction.interactionType === mustHaveInteraction.type) break;
+            if(index === mashup.length-1) isIncluded = false;
+        }
+    }
+    return isIncluded;
 }
 
 /** Returns the number of Things that participate in a given list on interactions */
@@ -271,23 +292,19 @@ function generateMermaidSeqDiagram(interactions: MAGE.InteractionInterface[]) {
     interactions.forEach( interaction => {
         // Determine interaction label and return path
         if (interaction.interactionType === "property-read")
-            seqDiagram += `${interaction.from} ->> ${interaction.to} : read: "${interaction.name}"\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : read: "${interaction.name}"\n`;
         else if (interaction.interactionType === "property-write")
             seqDiagram += `${interaction.from} ->> ${interaction.to} : write: "${interaction.name}"\n`;
-        else if (interaction.interactionType === "action-invoke")
+        else if (interaction.interactionType === "action-invoke" || interaction.interactionType === "action-read")
             seqDiagram += `${interaction.from} ->> ${interaction.to} : invoke: "${interaction.name}"\n`;
         else if (interaction.interactionType === "event-subscribe")
-            seqDiagram += `${interaction.from} ->> ${interaction.to} : subscribe: "${interaction.name}"\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribe: "${interaction.name}"\n`;
         
         // determine return path
         if (interaction.interactionType === "property-read") {
-            seqDiagram += `activate ${interaction.to}\n`;
-            seqDiagram += `${interaction.to} -->> ${interaction.from} : response\n`;
-            seqDiagram += `deactivate ${interaction.to}\n`;
+            seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
         } else if (interaction.interactionType === "event-subscribe") {
-            seqDiagram += `activate ${interaction.to}\n`;
-            seqDiagram += `${interaction.to} -->> ${interaction.from} : event-triggered\n`;
-            seqDiagram += `deactivate ${interaction.to}\n`;
+            seqDiagram += `${interaction.to} -->>- ${interaction.from} : event-triggered\n`;
         }
     });
     seqDiagram += "\n";
@@ -301,7 +318,7 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     let things = generationForm.things;
 
     let tdIds: string[] = [];
-    let uniqueTds:( WADE.TDElementInterface | WADE.MashupElementInterface)[] = [];
+    let uniqueTds:(WADE.TDElementInterface | WADE.MashupElementInterface)[] = [];
     things.inputs.concat(things.outputs).forEach(td => {
         if (!tdIds.includes(td.id)) {
             uniqueTds.push(td);

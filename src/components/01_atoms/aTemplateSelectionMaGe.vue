@@ -19,7 +19,7 @@ import Vue from 'vue'
 export default Vue.extend({
     name: 'aTemplateSelectionMaGe',
     model: {
-        prop: 'isChecked',
+        prop: 'is-checked',
         event: 'input'
     },
     props: {

@@ -1,0 +1,84 @@
+{
+    "@context": [
+        "https://www.w3.org/2019/wot/td/v1",
+        {"saref": "https://w3id.org/saref#"}
+    ],
+    "@type": "Thing",
+    "id": "de:tum:ei:esi:fp:coffee",
+    "title": "Virtual-Coffee-Machine",
+    "description": "A virtual coffee machine to learn the WoT TD standard",
+    "security": "nosec_sc",
+    "properties": {
+        "state": {
+            "@type": "saref:State",
+            "type": "string",
+            "readOnly": false,
+            "enum": ["Ready", "Brewing", "Error"],
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/properties/state"}]
+        },
+        "waterStatus": {
+            "@type": ["saref:MeteringFunction", "saref:Water"],
+            "type": "integer",
+            "readOnly": true,
+            "unit": "%",
+            "maximum": 100,
+            "minimum": 0,
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/properties/water"}]
+        },
+        "coffeeStatus": {
+            "@type": ["saref:MeteringFunction"],
+            "type": "integer",
+            "readOnly": true,
+            "unit": "%",
+            "maximum": 100,
+            "minimum": 0,
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/properties/coffee"}]
+        },
+        "binStatus": {
+            "@type": ["saref:MeteringFunction"],
+            "type": "integer",
+            "readOnly": true,
+            "unit": "%",
+            "maximum": 100,
+            "minimum": 0,
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/properties/bin"}]
+        }
+    },
+    "actions": {
+        "brew": {
+            "input": {
+                "type": "string",
+                "enum": ["latte-machiato", "espresso", "cappuccino"]
+            },
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/actions/brew"}]
+        },
+        "abort": {
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/actions/abort"}]
+        },
+        "shutdown": {
+            "@type": "saref:OffCommand",
+            "forms": [{"href": "http://localhost:8080/virtual-coffee-machine/actions/shutdown"}]
+        }
+    },
+    "events":{
+        "maintenance": {
+            "data": {"type": "string"},
+            "forms": [{
+                "href": "http://localhost:8080/virtual-coffee-machine/events/maintenance",
+                "subprotocol": "longpoll"
+            }]
+        },
+        "error": {
+            "data": {"type": "string"},
+            "forms": [{
+                "href": "http://localhost:8080/virtual-coffee-machine/events/error",
+                "subprotocol": "longpoll"
+            }]
+        }
+    },
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    }
+}

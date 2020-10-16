@@ -32,7 +32,8 @@ export default {
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
         ios:        null as Array<TD|Mashup> | null,
-        allInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionInvokes: []},
+        allInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
+        allAnnotations: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
         generationForm: null as MAGE.GenerationFormInterace | null,
         result: null as Object | null
     },
@@ -81,6 +82,9 @@ export default {
         getAllInteractions(state){
             return state.allInteractions;
         },
+        getAllAnnotations(state){
+            return state.allAnnotations;
+        },
         getPropertyReads(state) {
             return state.allInteractions.propertyReads;
         },
@@ -108,22 +112,38 @@ export default {
             generationPayload: {
                 generationForm: MAGE.GenerationFormInterace, 
             }) {
-                let inputs = state.inputs as (TD|Mashup)[];
-                let outputs = state.outputs as (TD|Mashup)[];
-                let ios = state.ios as (TD|Mashup)[];
+                let inputs: (TD|Mashup)[] = [];
+                let outputs: (TD|Mashup)[] = [];
+                inputs.push(...state.inputs);
+                outputs.push(...state.outputs);
+                
                 generationPayload.generationForm.things.inputs = inputs;
                 generationPayload.generationForm.things.outputs = outputs;
-                for (let io of ios){
+                for (let io of state.ios){
                     generationPayload.generationForm.things.inputs.push(io);
                     generationPayload.generationForm.things.outputs.push(io);
                 }
                 let forbiddenInteractions: MAGE.VueInteractionInterface[] = [];
-                for(let prop of state.forbiddenInteractions.propertyReads) forbiddenInteractions.push(prop);
-                for(let prop of state.forbiddenInteractions.propertyWrites) forbiddenInteractions.push(prop);
-                for(let event of state.forbiddenInteractions.eventSubs) forbiddenInteractions.push(event);
-                for(let action of state.forbiddenInteractions.actionInvokes) forbiddenInteractions.push(action);
+                let mustHaveInteractions: MAGE.VueInteractionInterface[] = [];
+                for(let interactionType in state.allInteractions) {
+                    for(let interaction of state.allInteractions[interactionType]) {
+                        switch (interaction.restriction) {
+                            case "forbidden":
+                                forbiddenInteractions.push(interaction);
+                                break;
+                            case "mustHave":
+                                mustHaveInteractions.push(interaction);
+                                break;
+                            case "none":
+                                continue;
+                            default:
+                                break;
+                        }
+                    }
+                }
 
                 generationPayload.generationForm.filters.forbiddenInteractions = forbiddenInteractions;
+                generationPayload.generationForm.filters.mustHaveInteractions = mustHaveInteractions;
                 commit('setResultReady', false);
                 commit('setGenerationForm', generationPayload.generationForm);
                 generateMashups(generationPayload.generationForm).then((result) => {
@@ -165,7 +185,15 @@ export default {
                 propertyReads: [],
                 propertyWrites: [],
                 eventSubs: [],
-                actionInvokes: []
+                actionInvokes: [],
+                actionReads: []
+            }
+            state.allAnnotations = {
+                propertyReads: [],
+                propertyWrites: [],
+                eventSubs: [],
+                actionInvokes: [],
+                actionReads: []
             }
         },
         setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace){
@@ -227,97 +255,210 @@ export default {
         },
         categorizeTdInteractions(state: any, payload: {element: TD|Mashup, io: string}){
             let parsedTd = JSON.parse(payload.element.content);
-                for(let prop in parsedTd.properties){
-                    let description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
-                    let readInteractionToPush: MAGE.VueInteractionInterface = {
-                        title: payload.element.title, 
-                        thingId: parsedTd.id, 
-                        name: prop, 
-                        description: description, 
-                        type: "property-read",
-                        restriction: "none" 
-                    }; 
-                    let writeInteractionToPush: MAGE.VueInteractionInterface= {
-                        title: payload.element.title, 
-                        thingId: parsedTd.id, 
-                        name: prop,
-                        description: description, 
-                        type: "property-write",
+            for(let prop in parsedTd.properties){
+                let description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
+                let annotations = parsedTd.properties[prop]["@type"] as string | string[] | undefined;
+                // put all annotations in string array
+                if(typeof annotations == "string") annotations = [annotations];
+                // construct VueAnnotation objects
+                let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                if(annotations) for(let annotation of annotations) {
+                    annotationsToPush.push({
+                        annotation: annotation,
+                        numberOfAccurance: 1,
                         restriction: "none"
-                    }; 
-                    if(payload.io == "input" && !parsedTd.properties[prop].writeOnly) 
-                        state.allInteractions.propertyReads.push(readInteractionToPush);
-                    else if(payload.io == "output" && !parsedTd.properties[prop].readOnly)
-                        state.allInteractions.propertyWrites.push(writeInteractionToPush);
-                    else if(payload.io == "io"){
-                        if(!parsedTd.properties[prop].writeOnly) 
-                            state.allInteractions.propertyReads.push(readInteractionToPush);
-                        if(!parsedTd.properties[prop].readOnly) 
-                            state.allInteractions.propertyWrites.push(writeInteractionToPush);
+                    });
+                }
+                // construct VueInteraction objects
+                let readInteractionToPush: MAGE.VueInteractionInterface = {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, 
+                    name: prop, 
+                    description: description, 
+                    type: "property-read",
+                    restriction: "none" 
+                }; 
+                let writeInteractionToPush: MAGE.VueInteractionInterface= {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, 
+                    name: prop,
+                    description: description, 
+                    type: "property-write",
+                    restriction: "none"
+                };
+                if(payload.io == "input" && !parsedTd.properties[prop].writeOnly) {
+                    // push interaction 
+                    state.allInteractions.propertyReads.push(readInteractionToPush);
+                    // push annotations if not already present
+                    for(let annotation of annotationsToPush) {
+                        let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.propertyReads[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.propertyReads.push(annotation);
+                        }
                     }
                 }
-                for(let event in parsedTd.events){
-                    let description = parsedTd.events[event].description ? parsedTd.events[event].description : null;
-                    let interactionToPush: MAGE.VueInteractionInterface = {
-                        title: payload.element.title, 
-                        thingId: parsedTd.id, name: event, 
-                        description: description, 
-                        type: "event-subscribe",
-                        restriction: "none"
-                    };
-                    state.allInteractions.eventSubs.push(interactionToPush);
+                else if(payload.io == "output" && !parsedTd.properties[prop].readOnly) {
+                    // push interaction 
+                    state.allInteractions.propertyWrites.push(writeInteractionToPush);
+                    // push annotations if not already present 
+                    for(let annotation of annotationsToPush) {
+                        let index = state.allAnnotations.propertyWrites.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.propertyWrites[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.propertyWrites.push(annotation);
+                        }
+                    }
                 }
-                for(let action in parsedTd.actions){
-                    let description = parsedTd.actions[action].description ? parsedTd.actions[action].description : null;
-                    let interactionToPush: MAGE.VueInteractionInterface = {
-                        title: payload.element.title, 
-                        thingId: parsedTd.id, 
-                        name: action, 
-                        description: description, 
-                        type: "action-invoke",
-                        restriction: "none"
-                    };
-                    state.allInteractions.actionInvokes.push(interactionToPush);
+                else if(payload.io == "io"){
+                    if(!parsedTd.properties[prop].writeOnly) {
+                        // push interaction 
+                        state.allInteractions.propertyReads.push(readInteractionToPush);
+                        // push annotations if not already present
+                        for(let annotation of annotationsToPush) {
+                            let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
+                            if(index !== -1) {
+                                state.allAnnotations.propertyReads[index].numberOfAccurance++;
+                            } else {
+                                state.allAnnotations.propertyReads.push(annotation);
+                            }
+                        }
+                    }
+                    if(!parsedTd.properties[prop].readOnly) {
+                        // push interaction 
+                        state.allInteractions.propertyWrites.push(writeInteractionToPush);
+                        // push annotations if not already present
+                        for(let annotation of annotationsToPush) {
+                            let index = state.allAnnotations.propertyWrites.findIndex(a => {return a.annotation === annotation.annotation});
+                            if(index !== -1) {
+                                state.allAnnotations.propertyWrites[index].numberOfAccurance++;
+                            } else {
+                                state.allAnnotations.propertyWrites.push(annotation);
+                            }
+                        }
+                    }
                 }
-        },
-        addToForbiddenInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}){
-            switch(interaction.type) {
-                case "property-write": 
-                    if(!state.forbiddenInteractions.propertyWrites.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name)) 
-                        state.forbiddenInteractions.propertyWrites.push(interaction); 
-                    return;
-                case "property-read":
-                    if(!state.forbiddenInteractions.propertyReads.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.forbiddenInteractions.propertyReads.push(interaction);
-                    return;
-                case "event-subscribe":
-                    if(!state.forbiddenInteractions.eventSubs.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.forbiddenInteractions.eventSubs.push(interaction);
-                    return;
-                case "action-invoke":
-                    if(!state.forbiddenInteractions.actionInvokes.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.forbiddenInteractions.actionInvokes.push(interaction);
-                    return;
             }
-        },
-        addToMustHaveInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}){
-            switch(interaction.type) {
-                case "property-write": 
-                    if(!state.mustHaveInteractions.propertyWrites.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name)) 
-                        state.mustHaveInteractions.propertyWrites.push(interaction); 
-                    return;
-                case "property-read":
-                    if(!state.mustHaveInteractions.propertyReads.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.mustHaveInteractions.propertyReads.push(interaction);
-                    return;
-                case "event-subscribe":
-                    if(!state.mustHaveInteractions.eventSubs.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.mustHaveInteractions.eventSubs.push(interaction);
-                    return;
-                case "action-invoke":
-                    if(!state.mustHaveInteractions.actionInvokes.some(inter => inter.thingId === interaction.thingId && inter.name === interaction.name))
-                        state.mustHaveInteractions.actionInvokes.push(interaction);
-                    return;
+            for(let event in parsedTd.events){
+                let description = parsedTd.events[event].description ? parsedTd.events[event].description : null;
+                let annotations = parsedTd.events[event]["@type"] as string | string[] | undefined;
+                // put all annotations in string array
+                if(typeof annotations == "string") annotations = [annotations];
+                // construct VueAnnotation objects
+                let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                if(annotations) for(let annotation of annotations) {
+                    annotationsToPush.push({
+                        annotation: annotation,
+                        numberOfAccurance: 1,
+                        restriction: "none"
+                    });
+                }
+                // construct VueInteraction objects
+                let interactionToPush: MAGE.VueInteractionInterface = {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, name: event, 
+                    description: description, 
+                    type: "event-subscribe",
+                    restriction: "none"
+                };
+                // push interaction 
+                state.allInteractions.eventSubs.push(interactionToPush);
+                // push annotations if not already present
+                for(let annotation of annotationsToPush) {
+                    let index = state.allAnnotations.eventSubs.findIndex(a => {return a.annotation === annotation.annotation});
+                    if(index !== -1) {
+                        state.allAnnotations.eventSubs[index].numberOfAccurance++;
+                    } else {
+                        state.allAnnotations.eventSubs.push(annotation);
+                    }
+                }
+            }
+            for(let action in parsedTd.actions){
+                let description = parsedTd.actions[action].description ? parsedTd.actions[action].description : null;
+                let annotations = parsedTd.actions[action]["@type"] as string | string[] | undefined;
+                // put all annotations in string array
+                if(typeof annotations == "string") annotations = [annotations];
+                // construct VueAnnotation objects
+                let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                if(annotations) for(let annotation of annotations) {
+                    annotationsToPush.push({
+                        annotation: annotation,
+                        numberOfAccurance: 1,
+                        restriction: "none"
+                    });
+                }
+                // construct VueInteraction objects
+                let actionInvokeToPush: MAGE.VueInteractionInterface = {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, 
+                    name: action, 
+                    description: description, 
+
+                    type: "action-invoke",
+                    restriction: "none"
+                };
+                let actionReadToPush: MAGE.VueInteractionInterface = {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, 
+                    name: action, 
+                    description: description, 
+                    type: "action-read",
+                    restriction: "none"
+                };
+                if(payload.io == "input") {
+                    // push interaction
+                    state.allInteractions.actionReads.push(actionReadToPush);
+                    // push annotations if not already present
+                    for(let annotation of annotationsToPush) {
+                        let index = state.allAnnotations.actionReads.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.actionReads[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.actionReads.push(annotation);
+                        }
+                    }
+                }
+                else if(payload.io == "output") {
+                    // push interaction
+                    state.allInteractions.actionInvokes.push(actionInvokeToPush);
+                    // push annotations if not already present
+                    for(let annotation of annotationsToPush) {
+                        let index = state.allAnnotations.actionInvokes.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.actionInvokes[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.actionInvokes.push(annotation);
+                        }
+                    }
+                }
+                else if(payload.io == "io"){
+                    // push interaction
+                    state.allInteractions.actionReads.push(actionReadToPush);
+                    // push interaction
+                    state.allInteractions.actionInvokes.push(actionInvokeToPush);
+                    // push annotations if not already present
+                    for(let annotation of annotationsToPush) {
+                        for(let annotation of annotationsToPush) {
+                            let index = state.allAnnotations.actionReads.findIndex(a => {return a.annotation === annotation.annotation});
+                            if(index !== -1) {
+                                state.allAnnotations.actionReads[index].numberOfAccurance++;
+                            } else {
+                                state.allAnnotations.actionReads.push(annotation);
+                            }
+                        }
+
+                        for(let annotation of annotationsToPush) {
+                            let index = state.allAnnotations.actionInvokes.findIndex(a => {return a.annotation === annotation.annotation});
+                            if(index !== -1) {
+                                state.allAnnotations.actionInvokes[index].numberOfAccurance++;
+                            } else {
+                                state.allAnnotations.actionInvokes.push(annotation);
+                            }
+                        }
+                    }
+                }
             }
         },
         setInteractionRestriction(state: any, payload: {interaction: MAGE.VueInteractionInterface, restriction: "none" | "forbidden" | "mustHave"}){
@@ -341,6 +482,10 @@ export default {
                     index = (state.allInteractions.actionInvokes as MAGE.VueInteractionInterface[]).findIndex(action => action.thingId === interaction.thingId &&
                         action.name === interaction.name);
                     if(index !== -1) (state.allInteractions.actionInvokes as MAGE.VueInteractionInterface[])[index].restriction = restriction;
+                case "action-read":
+                        index = (state.allInteractions.actionReads as MAGE.VueInteractionInterface[]).findIndex(action => action.thingId === interaction.thingId &&
+                            action.name === interaction.name);
+                        if(index !== -1) (state.allInteractions.actionReads as MAGE.VueInteractionInterface[])[index].restriction = restriction;
             }
             
         },
@@ -356,7 +501,7 @@ export default {
         },
         removeFromOutputs(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
-                (this as any).commit("MashupStore/removeInteractions", state.inputs[element]);
+                (this as any).commit("MashupStore/removeInteractions", state.outputs[element]);
                 (state.outputs as Array<TD|Mashup>).splice(element, 1);
             } else {
                 (this as any).commit("MashupStore/removeInteractions", element);
@@ -366,7 +511,7 @@ export default {
         },
         removeFromIos(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
-                (this as any).commit("MashupStore/removeInteractions", state.inputs[element]);
+                (this as any).commit("MashupStore/removeInteractions", state.ios[element]);
                 (state.ios as Array<TD|Mashup>).splice(element, 1);
             } else {
                 (this as any).commit("MashupStore/removeInteractions", element);
@@ -376,76 +521,65 @@ export default {
         },
         removeInteractions(state: any, element: TD|Mashup){
             let parsedTd = JSON.parse(element.content);
+            function removeAnnotations(
+                interaction: MAGE.VueInteractionInterface,
+                type: "properties" | "events" | "actions",
+                category: "propertyReads" | "propertyWrites" | "eventSubs" | "actionReads" | "actionInvokes") {
+                    let interactionName = interaction.name
+                    let annotations = parsedTd[type][interactionName]["@type"] as string | string[] | undefined;
+                    // put all annotations in string array
+                    if(typeof annotations == "string") annotations = [annotations];
+                    if(annotations) {
+                        for(let annotation of annotations) {
+                            let aIndex = state.allAnnotations[category].findIndex(a => {return a.annotation === annotation});
+                            if(aIndex !== -1) {
+                                state.allAnnotations[category][index].numberOfAccurance = --state.allAnnotations[category][index].numberOfAccurance;
+                                if(state.allAnnotations[category][index].numberOfAccurance === 0) state.allAnnotations[category].splice(index, 1);
+                            } 
+                            
+                        }
+                    }
+            }
             let index = 0;
             for(index = 0; index < state.allInteractions.propertyReads.length; index++) {
                 if(state.allInteractions.propertyReads[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.propertyReads[index]);
+                    let prop = state.allInteractions.propertyReads[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(prop, "properties", "propertyReads");
                     state.allInteractions.propertyReads.splice(index,1); 
                     index--
                 };
             }
             for(index = 0; index < state.allInteractions.propertyWrites.length; index++) {
                 if(state.allInteractions.propertyWrites[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.propertyWrites[index]);
+                    let prop = state.allInteractions.propertyWrites[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(prop, "properties", "propertyWrites");
                     state.allInteractions.propertyWrites.splice(index,1); 
                     index--;
                 };
             }
             for(index = 0; index < state.allInteractions.eventSubs.length; index++) {
                 if(state.allInteractions.eventSubs[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.eventSubs[index]);
+                    let event = state.allInteractions.eventSubs[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(event, "events", "eventSubs");
                     state.allInteractions.eventSubs.splice(index,1);
                     index--;
                 };
             }
             for(index = 0; index < state.allInteractions.actionInvokes.length; index++) {
                 if(state.allInteractions.actionInvokes[index].thingId === parsedTd.id) {
-                    (this as any).commit('MashupStore/removeFromForbiddenInteractions', state.allInteractions.actionInvokes[index]);
+                    let action = state.allInteractions.actionInvokes[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(action, "actions", "actionInvokes");
                     state.allInteractions.actionInvokes.splice(index,1);
                     index--;
                 };
             }
-        },
-        removeFromForbiddenInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}) {
-            let index: number;
-            switch(interaction.type) {
-                case "property-write":
-                    index = state.forbiddenInteractions.propertyWrites.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
-                    state.forbiddenInteractions.propertyWrites.splice(index, 1);
-                    return;
-                case "property-read": 
-                    index = state.forbiddenInteractions.propertyReads.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
-                    state.forbiddenInteractions.propertyReads.splice(index, 1);
-                    return;
-                case "event-subscribe":
-                    index = state.forbiddenInteractions.eventSubs.findIndex(event => event.title === interaction.title && event.name === interaction.name);
-                    state.forbiddenInteractions.eventSubs.splice(index, 1);
-                    return;
-                case "action-invoke":
-                    index = state.forbiddenInteractions.actionInvokes.findIndex(action => action.title === interaction.title && action.name === interaction.name);
-                    state.forbiddenInteractions.actionInvokes.splice(index, 1);
-                    return;
-            }
-        },
-        removeFromMustHaveInteractions(state: any, interaction: {title: string, thingId: string, name: string, type: string}) {
-            let index: number;
-            switch(interaction.type) {
-                case "property-write":
-                    index = state.mustHaveInteractions.propertyWrites.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
-                    state.mustHaveInteractions.propertyWrites.splice(index, 1);
-                    return;
-                case "property-read": 
-                    index = state.mustHaveInteractions.propertyReads.findIndex(prop => prop.title === interaction.title && prop.name === interaction.name);
-                    state.mustHaveInteractions.propertyReads.splice(index, 1);
-                    return;
-                case "event-subscribe":
-                    index = state.mustHaveInteractions.eventSubs.findIndex(event => event.title === interaction.title && event.name === interaction.name);
-                    state.mustHaveInteractions.eventSubs.splice(index, 1);
-                    return;
-                case "action-invoke":
-                    index = state.mustHaveInteractions.actionInvokes.findIndex(action => action.title === interaction.title && action.name === interaction.name);
-                    state.mustHaveInteractions.actionInvokes.splice(index, 1);
-                    return;
+            for(index = 0; index < state.allInteractions.actionReads.length; index++) {
+                if(state.allInteractions.actionReads[index].thingId === parsedTd.id) {
+                    let action = state.allInteractions.actionReads[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(action, "actions", "actionReads");
+                    state.allInteractions.actionReads.splice(index,1);
+                    index--;
+                };
             }
         },
         toggleTab(state: any, tabId: string) {

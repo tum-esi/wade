@@ -15,7 +15,7 @@
                     <div>
                         <input 
                         type="radio" 
-                        :name="item.label" 
+                        :name="`${item.label}-${tableColumn.header}`" 
                         :checked="item.payload.restriction=='none'"
                         @input="setInteractionRestriction({interaction: item.payload, restriction: 'none'})">
                         <label>No restrictions</label> 
@@ -23,7 +23,7 @@
                     <div>
                         <input 
                         type="radio" 
-                        :name="item.label" 
+                        :name="`${item.label}-${tableColumn.header}`"
                         :checked="item.payload.restriction=='forbidden'"
                         @input="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})">
                         <label>Forbidden</label> 
@@ -31,7 +31,7 @@
                     <div>
                         <input 
                         type="radio" 
-                        :name="item.label" 
+                        :name="`${item.label}-${tableColumn.header}`"
                         :checked="item.payload.restriction=='mustHave'"
                         @input="setInteractionRestriction({interaction: item.payload, restriction: 'mustHave'})">
                         <label>Must have</label> 
@@ -70,102 +70,8 @@ export default Vue.extend({
             required: true
         }
     },
-    computed: {
-        ...mapGetters('MashupStore',['getPropertyReads','getPropertyWrites','getEventSubs','getActionInvokes']),
-        propertyReadsDropdownMenu(){
-            let propertyReads = (this as any).getPropertyReads;
-            let dropdown: any[] = [];
-            for(let prop of propertyReads) {
-                let title = `${prop.title}: ${prop.name}`;
-                let key = `${prop.thingId}/${prop.title}/${prop.name}/${prop.type}`
-                dropdown.push({title: title, key: key});
-            }
-            return dropdown;
-        },
-        propertyWritesDropdownMenu(){
-            let propertyWrites = (this as any).getPropertyWrites;
-            let dropdown: any[] = [];
-            for(let prop of propertyWrites) {
-                let title = `${prop.title}: ${prop.name}`;
-                let key = `${prop.thingId}/${prop.title}/${prop.name}/${prop.type}`
-                dropdown.push({title: title, key: key});
-            }
-            return dropdown;
-        },
-        eventsDropdownMenu(){
-            let eventSubs = (this as any).getEventSubs;
-            let dropdown: any[] = [];
-            for(let event of eventSubs) {
-                let title = `${event.title}: ${event.name}`;
-                let key = `${event.thingId}/${event.title}/${event.name}/${event.type}`
-                dropdown.push({title: title, key: key});
-            }
-            return dropdown;
-        },
-        actionsDropdownMenu(){
-            let actionInvokes = (this as any).getActionInvokes;
-            let dropdown: any[] = [];
-            for(let action of actionInvokes) {
-                let title = `${action.title}: ${action.name}`;
-                let key = `${action.thingId}/${action.title}/${action.name}/${action.type}`
-                dropdown.push({title: title, key: key});
-            }
-            return dropdown;
-        },
-    },
     methods: {
-        ...mapMutations('MashupStore',['addToForbiddenInteractions', 'removeFromForbiddenInteractions','setInteractionRestriction']),
-        getAddBtnKey(header: string){
-            let headerlow = header.toLowerCase();
-            switch(headerlow) {
-                case "propertyreads": return "property-reads";
-                case "propertywrites": return "property-writes";
-                case "eventsubs": return "event-subs";
-                case "actioninvokes": return "action-invokes"
-            }
-        },
-        getDropDownMenu(header: string){
-            let headerlow = header.toLowerCase();
-            switch(headerlow) {
-                case "propertyreads": return this.propertyReadsDropdownMenu;
-                case "propertywrites": return this.propertyWritesDropdownMenu;
-                case "eventsubs": return this.eventsDropdownMenu;
-                case "actioninvokes": return this.actionsDropdownMenu;
-            }
-        },
-        deleteFromFrobiddenInteractions(id: string, columnIndex: number) {
-            let substr = id.replace(/\s+/g, '').split(':');
-            switch(columnIndex) {
-                case 0:
-                    let intr1 = {title: substr[0], name: substr[1], type: "property-read"};
-                    (this as any).removeFromForbiddenInteractions(intr1);
-                    break;
-                case 1:
-                    let intr2 = {title: substr[0], name: substr[1], type: "property-write"};
-                    (this as any).removeFromForbiddenInteractions(intr2);
-                    break;
-                case 2:
-                    let intr3 = {title: substr[0], name: substr[1], type: "event-subscribe"};
-                    (this as any).removeFromForbiddenInteractions(intr3);
-                    break;
-                case 3:
-                    let intr4 = {title: substr[0], name: substr[1], type: "action-invoke"};
-                    (this as any).removeFromForbiddenInteractions(intr4);
-                    break;
-                default: return;
-            }
-        },
-        onAddInteractionSelected(event) {
-            let filters = this.filters;
-            let substr = (event.btnValue as string).split("/");
-            let interaction = {
-                thingId: substr[0],
-                title: substr[1],
-                name: substr[2],
-                type: substr[3]
-            };
-            (this as any).addToForbiddenInteractions(interaction);
-        }
+        ...mapMutations('MashupStore',['setInteractionRestriction']),
     }
 });
 </script>

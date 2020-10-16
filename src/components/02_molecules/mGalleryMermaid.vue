@@ -1,13 +1,17 @@
 <template>
-    <div class="mermaid-gallery-container">
-        <aIconButton class="nav-button" iconBtnSrcPath="arrow_left" iconBtnOnClick="move-left" @icon-btn-clicked='moveLeft'/>
-        <div class="mermaid-view-container">
-            <label> {{txtArray.length}} mashups conform to the selected criteria from a total of {{maxPossibleMashups}} possible mashups</label>
-            <aViewerMermaid class="mermaid-view" :txt="txtArray[txtIndex]"/>
-            <label>Mashup {{txtIndex+1}}/{{txtArray.length}}</label>
+    <div>
+        <div v-if="txtArray.length <= 0">
+            No mashups could be generated according to the constraints and filters choosen!
         </div>
-        
-        <aIconButton class="nav-button" iconBtnSrcPath="arrow_right" iconBtnOnClick="move-right" @icon-btn-clicked='moveRight'/>
+        <div class="mermaid-gallery-container" v-else>
+            <aIconButton class="nav-button" iconBtnSrcPath="arrow_left" iconBtnOnClick="move-left" @icon-btn-clicked='moveLeft'/>
+            <div class="mermaid-view-container">
+                <label> {{txtArray.length}} mashups conform to the selected criteria from a total of {{maxPossibleMashups}} possible mashups</label>
+                <aViewerMermaid class="mermaid-view" :txt="txtArray[txtIndex]"/>
+                <label>Mashup {{txtIndex+1}}/{{txtArray.length}}</label>
+            </div>
+            <aIconButton class="nav-button" iconBtnSrcPath="arrow_right" iconBtnOnClick="move-right" @icon-btn-clicked='moveRight'/>
+        </div>
     </div>
 </template>
 

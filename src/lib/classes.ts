@@ -129,7 +129,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     public  maxInputs: number;
     public  minOutputs: number;
     public  maxOutputs: number;
-    public  maxThings: number | undefined;
+    public  maxThings: number | null;
     public  templates: {
         "use-event-template": boolean;
         "use-action-template": boolean;
@@ -137,7 +137,6 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     };
     public filters: {
           acceptedTypes: string[],
-          acceptedInputInteractionTypes: string[],
           acceptedOutputInteractionTypes: string[],
           onlySameType: boolean,
           similarityThreshold: number | null,
@@ -156,7 +155,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
         this.maxInputs = 2,
         this.minOutputs = 1,
         this.maxOutputs = 2,
-        this.maxThings = undefined,
+        this.maxThings = null,
         this.templates = {
             "use-event-template": true,
             "use-action-template": false,
@@ -164,9 +163,8 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
         },
         this.filters = {
               acceptedTypes: ['string','integer','boolean','number'],
-              acceptedInputInteractionTypes: ['property-read', 'event-subscibe', 'action-invoke'],
               acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
-              onlySameType: true,
+              onlySameType: false,
               similarityThreshold: null,
               semanticMatch: false
         },

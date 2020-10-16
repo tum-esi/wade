@@ -60,6 +60,19 @@
                     @input="$emit('change', onCheckBoxChecked('semanticMatch', $event.target.checked))">
                     <label>Only match interactions that have the same semantic ("@type") context.</label>
                 </div>
+                <h4>Output Interactions Restrictions</h4>
+                <div>
+                    <input type="checkbox"
+                    :checked="outputTypeIsChecked('action-invoke')"
+                    @input="$emit('change', onOutputTypeConstraintChanged('action-invoke', $event.target.checked))">
+                    <label>Allow Action Invokes</label>
+                </div>
+                <div>
+                    <input type="checkbox"
+                    :checked="outputTypeIsChecked('property-write')"
+                    @input="$emit('change', onOutputTypeConstraintChanged('property-write', $event.target.checked))">
+                    <label>Allow Property Writes</label>
+                </div>
             </div>
         </div>
         <h4>Restrictions on individual Interactions</h4>
@@ -95,6 +108,7 @@ export default Vue.extend({
             let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
             let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
             let listE: WADE.ListInterface = {header: "EventSubs", items: []};
+            let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
             let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
             for(let interactiontype in allInteractions) {
                 switch(interactiontype) {
@@ -134,23 +148,43 @@ export default Vue.extend({
                             });
                         }
                         break;
+                    case "actionReads":
+                        let actionReads = allInteractions[interactiontype];
+                        for(let action of actionReads) {
+                            listAR.items.push({
+                                label: `${action.title}: ${action.name}`,
+                                payload: action
+                            });
+                        }
+                        break;
                 }
             }
             table.columns.push(listR);
             table.columns.push(listW);
             table.columns.push(listE);
+            table.columns.push(listAR)
             table.columns.push(listA);
             return table;
         },
     },
     methods: {
-        typeIsChecked(type: MAGE.acceptedTypesEnum): boolean{
+        typeIsChecked(type: MAGE.acceptedTypesEnum): boolean {
             return this.filters.acceptedTypes.includes(type);
+        },
+        outputTypeIsChecked(type: "action-invoke" | "property-write"): boolean {
+            return this.filters.acceptedOutputInteractionTypes.includes(type);
         },
         onTypeConstraintChanged(type: MAGE.acceptedTypesEnum, checked: boolean): MAGE.FiltersInterface {
             let filters = this.filters;
-            if(checked) filters.acceptedTypes.push(type); 
-            else filters.acceptedTypes.splice(filters.acceptedTypes.indexOf(type), 1);
+            if      (checked && !filters.acceptedTypes.includes(type)) filters.acceptedTypes.push(type); 
+            else if (!checked && filters.acceptedTypes.includes(type)) filters.acceptedTypes.splice(filters.acceptedTypes.indexOf(type), 1);
+            
+            return filters;
+        },
+        onOutputTypeConstraintChanged(type: "action-invoke" | "property-write", checked: boolean): MAGE.FiltersInterface {
+            let filters = this.filters;
+            if      (checked && !filters.acceptedOutputInteractionTypes.includes(type)) filters.acceptedOutputInteractionTypes.push(type); 
+            else if (!checked && filters.acceptedOutputInteractionTypes.includes(type)) filters.acceptedOutputInteractionTypes.splice(filters.acceptedOutputInteractionTypes.indexOf(type), 1);
             
             return filters;
         },

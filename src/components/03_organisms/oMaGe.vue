@@ -40,14 +40,12 @@
                     <label>Number of Elements in the Mashup:</label>
                 </div>
                 <div class="restrictions-input-area flex-container-row align-items-center">
-                    <input type="checkbox" v-model="limitNumberOfElement">
+                    <input type="checkbox" v-model="limitNumberOfElement" @input="setMaxElementsFilter($event.target.checked)">
                     <label>Limit number of elements</label>
                 </div>
                 <div v-show="limitNumberOfElement" class="flex-container-row align-items-center">
                     <label>Max number of Elements:</label>
-                    <input type="number" :min="2" :max="100" :disabled="!limitNumberOfElement"  v-model.number="generationForm.maxThings"
-                    @input="setMaxOutputInteractions"
-                    >
+                    <input type="number" :min="2" :max="100" :disabled="!limitNumberOfElement"  v-model.number="generationForm.maxThings">
                 </div>
             </div>
         </div>
@@ -226,6 +224,12 @@ export default Vue.extend({
         },
         setCurrentViewedMashup(nr: number) {
             this.currentlyViewedMashup = nr;
+        },
+        setMaxElementsFilter(isChecked: boolean) {
+            if(isChecked) this.generationForm.maxThings = 2; else this.generationForm.maxThings = -1;
+        },
+        setMaxElements(maxThings: number) {
+            this.generationForm.maxThings = maxThings;
         },
         generateCode(){
             this.$store.dispatch("MashupStore/generateMashupCode", this.currentlyViewedMashup);
