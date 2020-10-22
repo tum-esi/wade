@@ -332,8 +332,13 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
     })
     // filter final combinations that have more things than allowed
     if (form.maxThings && form.maxThings > 0) interactionCombinations = interactionCombinations.filter( mashup => {if(form.maxThings) return getNumberOfThings(mashup) <= form.maxThings});
+    // filter based on must-have interactions
     if (form.filters.mustHaveInteractions && form.filters.mustHaveInteractions.length > 0) {
         interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, form.filters.mustHaveInteractions)});
+    }
+    //filter-based on must-have annotations
+    if(form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup, form.filters.mustHaveAnnotations)});
     }
     return interactionCombinations;
 }
@@ -348,6 +353,22 @@ function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHav
         }
     }
     return isIncluded;
+}
+
+function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
+    mustHaveAnnotations: MAGE.VueAnnotationInterface[]): boolean {
+        let isIncluded: boolean = true;
+        for(let mustHaveAnnotation of mustHaveAnnotations) {
+            for(let [index, interaction] of mashup.entries()) {
+                let interactionAnnotations = interaction.object["@type"];
+                if(typeof interactionAnnotations === "undefined") interactionAnnotations = [];
+                if(typeof interactionAnnotations === "string") interactionAnnotations = [interactionAnnotations];
+                if(interactionAnnotations.some(a => {return mustHaveAnnotation.annotation === a &&
+                    mustHaveAnnotation.type === interaction.interactionType })) break;
+                if(index === mashup.length-1) isIncluded = false;
+            }
+        }
+        return isIncluded;
 }
 
 /** Returns the number of Things that participate in a given list on interactions */
