@@ -94,11 +94,26 @@ export default {
         getEventSubs(state) {
             return state.allInteractions.eventSubs;
         },
+        getActionReads(state) {
+            return state.allInteractions.actionReads;
+        },
         getActionInvokes(state){
             return state.allInteractions.actionInvokes;
         },
-        getForbiddenInteractions(state) {
-            return state.forbiddenInteractions;
+        getPropertyReadAnnotations(state) {
+            return state.allAnnotations.propertyReads;
+        },
+        getPropertyWriteAnnotations(state) {
+            return state.allAnnotations.propertyWrites;
+        },
+        getEventSubAnnotations(state) {
+            return state.allAnnotations.eventSubs;
+        },
+        getActionReadAnnotations(state) {
+            return state.allAnnotations.actionReads;
+        },
+        getActionInvokeAnnotations(state){
+            return state.allAnnotations.actionInvokes;
         },
         isResultReady(state) {
             return state.resultReady;
@@ -141,9 +156,29 @@ export default {
                         }
                     }
                 }
+                let forbiddenAnnotations: MAGE.VueAnnotationInterface[] = [];
+                let mustHaveAnnotations: MAGE.VueAnnotationInterface[] = [];
+                for(let interactionType in state.allAnnotations) {
+                    for(let annotation of state.allAnnotations[interactionType]) {
+                        switch (annotation.restriction) {
+                            case "forbidden":
+                                forbiddenAnnotations.push(annotation);
+                                break;
+                            case "mustHave":
+                                mustHaveAnnotations.push(annotation);
+                                break;
+                            case "none":
+                                continue;
+                            default:
+                                break;
+                        }
+                    }
+                }
 
                 generationPayload.generationForm.filters.forbiddenInteractions = forbiddenInteractions;
                 generationPayload.generationForm.filters.mustHaveInteractions = mustHaveInteractions;
+                generationPayload.generationForm.filters.forbiddenAnnotations = forbiddenAnnotations;
+                generationPayload.generationForm.filters.mustHaveAnnotations = mustHaveAnnotations;
                 commit('setResultReady', false);
                 commit('setGenerationForm', generationPayload.generationForm);
                 generateMashups(generationPayload.generationForm).then((result) => {
@@ -261,10 +296,18 @@ export default {
                 // put all annotations in string array
                 if(typeof annotations == "string") annotations = [annotations];
                 // construct VueAnnotation objects
-                let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 if(annotations) for(let annotation of annotations) {
-                    annotationsToPush.push({
+                    readAnnotationsToPush.push({
                         annotation: annotation,
+                        type: 'property-read',
+                        numberOfAccurance: 1,
+                        restriction: "none"
+                    });
+                    writeAnnotationsToPush.push({
+                        annotation: annotation,
+                        type: 'property-write',
                         numberOfAccurance: 1,
                         restriction: "none"
                     });
@@ -290,7 +333,7 @@ export default {
                     // push interaction 
                     state.allInteractions.propertyReads.push(readInteractionToPush);
                     // push annotations if not already present
-                    for(let annotation of annotationsToPush) {
+                    for(let annotation of readAnnotationsToPush) {
                         let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
                         if(index !== -1) {
                             state.allAnnotations.propertyReads[index].numberOfAccurance++;
@@ -303,7 +346,7 @@ export default {
                     // push interaction 
                     state.allInteractions.propertyWrites.push(writeInteractionToPush);
                     // push annotations if not already present 
-                    for(let annotation of annotationsToPush) {
+                    for(let annotation of writeAnnotationsToPush) {
                         let index = state.allAnnotations.propertyWrites.findIndex(a => {return a.annotation === annotation.annotation});
                         if(index !== -1) {
                             state.allAnnotations.propertyWrites[index].numberOfAccurance++;
@@ -317,7 +360,7 @@ export default {
                         // push interaction 
                         state.allInteractions.propertyReads.push(readInteractionToPush);
                         // push annotations if not already present
-                        for(let annotation of annotationsToPush) {
+                        for(let annotation of readAnnotationsToPush) {
                             let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
                             if(index !== -1) {
                                 state.allAnnotations.propertyReads[index].numberOfAccurance++;
@@ -330,7 +373,7 @@ export default {
                         // push interaction 
                         state.allInteractions.propertyWrites.push(writeInteractionToPush);
                         // push annotations if not already present
-                        for(let annotation of annotationsToPush) {
+                        for(let annotation of writeAnnotationsToPush) {
                             let index = state.allAnnotations.propertyWrites.findIndex(a => {return a.annotation === annotation.annotation});
                             if(index !== -1) {
                                 state.allAnnotations.propertyWrites[index].numberOfAccurance++;
@@ -351,6 +394,7 @@ export default {
                 if(annotations) for(let annotation of annotations) {
                     annotationsToPush.push({
                         annotation: annotation,
+                        type: 'event-subscribe',
                         numberOfAccurance: 1,
                         restriction: "none"
                     });
@@ -381,10 +425,18 @@ export default {
                 // put all annotations in string array
                 if(typeof annotations == "string") annotations = [annotations];
                 // construct VueAnnotation objects
-                let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 if(annotations) for(let annotation of annotations) {
-                    annotationsToPush.push({
+                    readAnnotationsToPush.push({
                         annotation: annotation,
+                        type: 'action-read',
+                        numberOfAccurance: 1,
+                        restriction: "none"
+                    });
+                    writeAnnotationsToPush.push({
+                        annotation: annotation,
+                        type: 'action-invoke',
                         numberOfAccurance: 1,
                         restriction: "none"
                     });
@@ -411,7 +463,7 @@ export default {
                     // push interaction
                     state.allInteractions.actionReads.push(actionReadToPush);
                     // push annotations if not already present
-                    for(let annotation of annotationsToPush) {
+                    for(let annotation of readAnnotationsToPush) {
                         let index = state.allAnnotations.actionReads.findIndex(a => {return a.annotation === annotation.annotation});
                         if(index !== -1) {
                             state.allAnnotations.actionReads[index].numberOfAccurance++;
@@ -424,7 +476,7 @@ export default {
                     // push interaction
                     state.allInteractions.actionInvokes.push(actionInvokeToPush);
                     // push annotations if not already present
-                    for(let annotation of annotationsToPush) {
+                    for(let annotation of writeAnnotationsToPush) {
                         let index = state.allAnnotations.actionInvokes.findIndex(a => {return a.annotation === annotation.annotation});
                         if(index !== -1) {
                             state.allAnnotations.actionInvokes[index].numberOfAccurance++;
@@ -439,23 +491,21 @@ export default {
                     // push interaction
                     state.allInteractions.actionInvokes.push(actionInvokeToPush);
                     // push annotations if not already present
-                    for(let annotation of annotationsToPush) {
-                        for(let annotation of annotationsToPush) {
-                            let index = state.allAnnotations.actionReads.findIndex(a => {return a.annotation === annotation.annotation});
-                            if(index !== -1) {
-                                state.allAnnotations.actionReads[index].numberOfAccurance++;
-                            } else {
-                                state.allAnnotations.actionReads.push(annotation);
-                            }
+                    for(let annotation of readAnnotationsToPush) {
+                        let index = state.allAnnotations.actionReads.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.actionReads[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.actionReads.push(annotation);
                         }
+                    }
 
-                        for(let annotation of annotationsToPush) {
-                            let index = state.allAnnotations.actionInvokes.findIndex(a => {return a.annotation === annotation.annotation});
-                            if(index !== -1) {
-                                state.allAnnotations.actionInvokes[index].numberOfAccurance++;
-                            } else {
-                                state.allAnnotations.actionInvokes.push(annotation);
-                            }
+                    for(let annotation of writeAnnotationsToPush) {
+                        let index = state.allAnnotations.actionInvokes.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.actionInvokes[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.actionInvokes.push(annotation);
                         }
                     }
                 }
@@ -488,6 +538,28 @@ export default {
                         if(index !== -1) (state.allInteractions.actionReads as MAGE.VueInteractionInterface[])[index].restriction = restriction;
             }
             
+        },
+        setAnnotationRestriction(state: any, payload: {annotation: MAGE.VueAnnotationInterface, restriction: "none" | "forbidden" | "mustHave"}){
+            let index: number;
+            let annotation = payload.annotation;
+            let restriction = payload.restriction;
+            switch(annotation.type) {
+                case "property-read":
+                    index = (state.allAnnotations.propertyReads as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.propertyReads as MAGE.VueAnnotationInterface[])[index].restriction = restriction;
+                case "property-write":
+                    index = (state.allAnnotations.propertyWrites as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.propertyWrites as MAGE.VueAnnotationInterface[])[index].restriction = restriction;
+                case "event-subscribe":
+                    index = (state.allAnnotations.eventSubs as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.eventSubs as MAGE.VueAnnotationInterface[])[index].restriction = restriction;
+                case "action-invoke":
+                    index = (state.allAnnotations.actionInvokes as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.actionInvokes as MAGE.VueAnnotationInterface[])[index].restriction = restriction;
+                case "action-read":
+                    index = (state.allAnnotations.actionReads as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.actionReads as MAGE.VueAnnotationInterface[])[index].restriction = restriction;
+            }   
         },
         removeFromInputs(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
@@ -533,8 +605,8 @@ export default {
                         for(let annotation of annotations) {
                             let aIndex = state.allAnnotations[category].findIndex(a => {return a.annotation === annotation});
                             if(aIndex !== -1) {
-                                state.allAnnotations[category][index].numberOfAccurance = --state.allAnnotations[category][index].numberOfAccurance;
-                                if(state.allAnnotations[category][index].numberOfAccurance === 0) state.allAnnotations[category].splice(index, 1);
+                                state.allAnnotations[category][aIndex].numberOfAccurance = --state.allAnnotations[category][aIndex].numberOfAccurance;
+                                if(state.allAnnotations[category][aIndex].numberOfAccurance === 0) state.allAnnotations[category].splice(aIndex, 1);
                             } 
                             
                         }

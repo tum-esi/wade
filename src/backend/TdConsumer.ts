@@ -1,6 +1,6 @@
 import { Servient } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
-import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
+// import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
@@ -116,13 +116,13 @@ export default class TdConsumer {
             await this.servient.addClientFactory(new MqttClientFactory());
         }
 
-        if (this.protocols.indexOf('coap') !== -1) {
-            await this.servient.addClientFactory(new CoapClientFactory());
-        }
+        // if (this.protocols.indexOf('coap') !== -1) {
+        //     await this.servient.addClientFactory(new CoapClientFactory());
+        // }
 
-        if (this.protocols.indexOf('coaps') !== -1) {
-            await this.servient.addClientFactory(new CoapsClientFactory());
-        }
+        // if (this.protocols.indexOf('coaps') !== -1) {
+        //     await this.servient.addClientFactory(new CoapsClientFactory());
+        // }
 
         if (this.protocols.indexOf('http') !== -1) {
             await this.servient.addClientFactory(new HttpClientFactory({}));

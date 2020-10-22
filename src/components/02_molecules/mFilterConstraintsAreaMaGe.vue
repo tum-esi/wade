@@ -76,13 +76,16 @@
             </div>
         </div>
         <h4>Restrictions on individual Interactions</h4>
-        <mInteractionSelectionMaGe :table="InteractionsTable" :filters="filters"/>
+        <mInteractionSelectionMaGe :table="InteractionsTable"/>
+        <h4>Restrictions on Annotations</h4>
+        <mAnnotationSelectionMaGe :table="AnnotationsTable"/>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import mInteractionSelectionMaGe from '@/components/02_molecules/mInteractionSelectionMaGe.vue';
+import mAnnotationSelectionMaGe from '@/components/02_molecules/mAnnotationSelectionMaGe.vue';
 import { mapGetters } from 'vuex';
 import { watch } from 'fs';
 export default Vue.extend({
@@ -98,10 +101,11 @@ export default Vue.extend({
         }
     },
     components: {
-        mInteractionSelectionMaGe
+        mInteractionSelectionMaGe,
+        mAnnotationSelectionMaGe
     },
     computed: {
-        ...mapGetters('MashupStore',['getAllInteractions']),
+        ...mapGetters('MashupStore',['getAllInteractions','getAllAnnotations']),
         InteractionsTable() {
             let allInteractions = (this as any).getAllInteractions;
             let table: WADE.TableInterface = {columns: []};
@@ -166,6 +170,70 @@ export default Vue.extend({
             table.columns.push(listA);
             return table;
         },
+        AnnotationsTable() {
+            let allAnnotations = (this as any).getAllAnnotations;
+            let table: WADE.TableInterface = {columns: []};
+            let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
+            let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
+            let listE: WADE.ListInterface = {header: "EventSubs", items: []};
+            let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
+            let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
+            for(let annotationtype in allAnnotations) {
+                switch(annotationtype) {
+                    case "propertyWrites":
+                        let propertyWrites = allAnnotations[annotationtype];
+                        for(let annotation of propertyWrites) {
+                            listW.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "propertyReads":
+                        let propertyReads = allAnnotations[annotationtype];
+                        for(let annotation of propertyReads) {
+                            listR.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "eventSubs":
+                        let eventSubs = allAnnotations[annotationtype];
+                        for(let annotation of eventSubs) {
+                            listE.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "actionInvokes":
+                        let actionInvokes = allAnnotations[annotationtype];
+                        for(let annotation of actionInvokes) {
+                            listA.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "actionReads":
+                        let actionReads = allAnnotations[annotationtype];
+                        for(let annotation of actionReads) {
+                            listAR.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                }
+            }
+            table.columns.push(listR);
+            table.columns.push(listW);
+            table.columns.push(listE);
+            table.columns.push(listAR)
+            table.columns.push(listA);
+            return table;
+        },
     },
     methods: {
         typeIsChecked(type: MAGE.acceptedTypesEnum): boolean {
@@ -200,6 +268,7 @@ export default Vue.extend({
 <style lang="less" scoped>
 .filters-container {
     border: 0.5pt solid #393B3A;
+    height: fit-content;
     border-radius: 3pt;
 }
 

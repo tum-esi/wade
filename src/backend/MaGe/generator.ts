@@ -95,19 +95,31 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
     let propertyReads: MAGE.InputInteractionInterface[] = [];
     let actionReads: MAGE.InputInteractionInterface[] = [];
     for (let prop in thingDescription.properties) {
+
+        let propAnnotations = thingDescription.properties[prop]['@type'];
+        if(typeof propAnnotations === "undefined") propAnnotations = [];
+        if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
+
         if (!thingDescription.properties[prop].writeOnly) {
             // filter based on accepted types
             if (filters.acceptedTypes) {
                 if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) continue;
             }
+            // filter interactions with unwanted annotations
+            if(filters.forbiddenAnnotations) {
+                let forbiddenFound = false;
+                for(let annotation of propAnnotations) {
+                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-read")) {
+                        forbiddenFound = true;
+                        break;
+                    }
+                }
+                if(forbiddenFound) continue;
+            }
             // filter unwanted interactions
             if(filters.forbiddenInteractions) {
                 if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
                     inter.name === prop && inter.type === "property-read")) continue;
-            }
-            // filter interactions with unwanted annotations
-            if(filters.forbiddenAnnotations) {
-                
             }
             propertyReads.push({
                 interactionType: "property-read", 
@@ -121,9 +133,25 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
         }
     }
     for (let event in thingDescription.events) {
+
+        let eventAnnotations = thingDescription.events[event]['@type'];
+        if(typeof eventAnnotations === "undefined") eventAnnotations = [];
+        if(typeof eventAnnotations === "string") eventAnnotations = [eventAnnotations];
+
         // filter based on accepted types
         if (filters.acceptedTypes) {
             if (!thingDescription.events[event].data || !filters.acceptedTypes.includes(thingDescription.events[event].data.type)) continue;
+        }
+        // filter interactions with unwanted annotations
+        if(filters.forbiddenAnnotations) {
+            let forbiddenFound = false;
+            for(let annotation of eventAnnotations) {
+                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "event-subscribe")) {
+                    forbiddenFound = true;
+                    break;
+                }
+            }
+            if(forbiddenFound) continue;
         }
         // filter unwanted interactions
         if(filters.forbiddenInteractions) {
@@ -141,14 +169,30 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
         });
     }
     for (let action in thingDescription.actions) {
+
+        let actionAnnotations = thingDescription.actions[action]['@type'];
+        if(typeof actionAnnotations === "undefined") actionAnnotations = [];
+        if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
+
         if (!thingDescription.actions[action].output) continue
         if (filters.acceptedTypes) {
             if (!filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) continue
         }
+        // filter interactions with unwanted annotations
+        if(filters.forbiddenAnnotations) {
+            let forbiddenFound = false;
+            for(let annotation of actionAnnotations) {
+                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "action-read")) {
+                    forbiddenFound = true;
+                    break;
+                }
+            }
+            if(forbiddenFound) continue;
+        }
         // filter unwanted interactions
         if(filters.forbiddenInteractions) {
             if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                inter.name === action && inter.type === "action-invoke")) continue;
+                inter.name === action && inter.type === "action-read")) continue;
         }
         actionReads.push({
             interactionType: "action-read",
@@ -168,10 +212,26 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
     let actions: MAGE.InteractionInterface[] = [];
     let propertyWrites: MAGE.InteractionInterface[] = [];
     for (let prop in thingDescription.properties) {
+
+        let propAnnotations = thingDescription.properties[prop]['@type'];
+        if(typeof propAnnotations === "undefined") propAnnotations = [];
+        if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
+
         if (!thingDescription.properties[prop].readOnly) {
             // filter based on accepted types
             if (filters.acceptedTypes) {
                 if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) continue;
+            }
+            // filter interactions with unwanted annotations
+            if(filters.forbiddenAnnotations) {
+                let forbiddenFound = false;
+                for(let annotation of propAnnotations) {
+                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-write")) {
+                        forbiddenFound = true;
+                        break;
+                    }
+                }
+                if(forbiddenFound) continue;
             }
             // filter unwanted interactions
             if(filters.forbiddenInteractions) {
@@ -190,9 +250,25 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
         }
     }
     for (let action in thingDescription.actions) {
+
+        let actionAnnotations = thingDescription.actions[action]['@type'];
+        if(typeof actionAnnotations === "undefined") actionAnnotations = [];
+        if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
+
         // filter based on accepted types
         if (filters) {
             if (!thingDescription.actions[action].input || !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) continue
+        }
+        // filter interactions with unwanted annotations
+        if(filters.forbiddenAnnotations) {
+            let forbiddenFound = false;
+            for(let annotation of actionAnnotations) {
+                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "action-invoke")) {
+                    forbiddenFound = true;
+                    break;
+                }
+            }
+            if(forbiddenFound) continue;
         }
         // filter unwanted interactions
         if(filters.forbiddenInteractions) {

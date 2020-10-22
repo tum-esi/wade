@@ -471,8 +471,8 @@ declare global {
         semanticMatch: boolean,
         mustHaveInteractions?: VueInteractionInterface[]
         forbiddenInteractions?: VueInteractionInterface[],
-        mustHaveAnnotations?: string[];
-        forbiddenAnnotations?: string[];
+        mustHaveAnnotations?: VueAnnotationInterface[];
+        forbiddenAnnotations?: VueAnnotationInterface[];
     }
 
     interface InteractionInterface {
@@ -501,6 +501,7 @@ declare global {
 
     interface VueAnnotationInterface {
       annotation: string,
+      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke",
       numberOfAccurance: number,
       restriction: "none" | "forbidden" | "mustHave";
     }

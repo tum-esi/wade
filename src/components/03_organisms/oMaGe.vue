@@ -299,7 +299,7 @@ export default Vue.extend({
 
     #filters-area {
         width: 100%;
-        height: 75%;
+        height: 100%;
     }
 
     .align-items-center {

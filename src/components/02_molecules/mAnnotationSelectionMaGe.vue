@@ -7,8 +7,7 @@
                 </div>
             </template>
             <template v-slot:rows>
-                <div 
-                :title="item.payload.description ? item.payload.description : 'No description given'" 
+                <div
                 class="element" 
                 v-for="(item, rowIndex) in tableColumn.items" :key="rowIndex">
                     <label class="io-label margin-right-auto">{{item.label}}</label>
@@ -17,7 +16,7 @@
                         type="radio" 
                         :name="`${item.label}-${tableColumn.header}`" 
                         :checked="item.payload.restriction=='none'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'none'})">
+                        @input="setAnnotationRestriction({annotation: item.payload, restriction: 'none'})">
                         <label>No restrictions</label> 
                     </div>
                     <div>
@@ -25,7 +24,7 @@
                         type="radio" 
                         :name="`${item.label}-${tableColumn.header}`"
                         :checked="item.payload.restriction=='forbidden'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})">
+                        @input="setAnnotationRestriction({annotation: item.payload, restriction: 'forbidden'})">
                         <label>Forbidden</label> 
                     </div>
                     <div>
@@ -33,7 +32,7 @@
                         type="radio" 
                         :name="`${item.label}-${tableColumn.header}`"
                         :checked="item.payload.restriction=='mustHave'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'mustHave'})">
+                        @input="setAnnotationRestriction({annotation: item.payload, restriction: 'mustHave'})">
                         <label>Must have</label> 
                     </div>
                     
@@ -51,7 +50,7 @@ import aIcon from '@/components/01_atoms/aIcon.vue';
 import { TD, Mashup } from '@/lib/classes';
 import { mapGetters, mapMutations } from 'vuex';
 export default Vue.extend({
-    name: 'mInteractionSelectionMaGe',
+    name: 'mAnnotationSelectionMaGe',
     components : {
         aListSimple,
         aDropdownButton,
@@ -67,7 +66,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        ...mapMutations('MashupStore',['setInteractionRestriction']),
+        ...mapMutations('MashupStore',['setAnnotationRestriction']),
     }
 });
 </script>
