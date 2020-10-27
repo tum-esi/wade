@@ -72,19 +72,30 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     // Calculate all possible output combinations for each input combinations and put them together
     let interactionCombinations: MAGE.InteractionInterface[][] = [];
     
-    if (templates["use-sub-template"] && !templates["use-event-template"] && !templates["use-action-template"]) {
-        interactionCombinations.push(...getFinalCombinations(events, generationForm));
-    } else if (templates["use-event-template"] && !templates["use-sub-template"] && !templates["use-action-template"]) {
-        interactionCombinations.push(...getFinalCombinations(propertyReads, generationForm));
-    } else if (templates["use-event-template"] && templates["use-sub-template"] && !templates["use-action-template"]) {
-        interactionCombinations.push(...getFinalCombinations([...events, ...propertyReads], generationForm));
-    } else if (templates["use-event-template"] && templates["use-action-template"] && !templates["use-sub-template"]) {
-        interactionCombinations.push(...getFinalCombinations([...actionReads, ...propertyReads], generationForm));
-    } else if (templates["use-sub-template"] && !templates["use-action-template"] && !templates["use-event-template"]) {
-        interactionCombinations.push(...getFinalCombinations([...events, ...actionReads], generationForm));
-    } else if (templates["use-sub-template"] && templates["use-action-template"] && templates["use-event-template"]) {
-        interactionCombinations.push(...getFinalCombinations([...events, ...actionReads, ...propertyReads], generationForm));
+    let interactionsToCombine: MAGE.InputInteractionInterface[] = []
+    for(let template in templates) {
+        switch(template) {
+            case "use-event-template": if(templates[template]) interactionsToCombine.push(...events); break;
+            case "use-read-template": if(templates[template]) interactionsToCombine.push(...propertyReads); break;
+            case "use-action-template": if(templates[template]) interactionsToCombine.push(...actionReads); break;
+        }
     }
+
+    interactionCombinations.push(...getFinalCombinations(interactionsToCombine, generationForm));
+    
+    // if (templates["use-event-template"] && !templates["use-read-template"] && !templates["use-action-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations(events, generationForm));
+    // } else if (templates["use-read-template"] && !templates["use-sub-template"] && !templates["use-action-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations(propertyReads, generationForm));
+    // } else if (templates["use-event-template"] && templates["use-sub-template"] && !templates["use-action-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations([...events, ...propertyReads], generationForm));
+    // } else if (templates["use-event-template"] && templates["use-action-template"] && !templates["use-sub-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations([...actionReads, ...propertyReads], generationForm));
+    // } else if (templates["use-sub-template"] && !templates["use-action-template"] && !templates["use-event-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations([...events, ...actionReads], generationForm));
+    // } else if (templates["use-sub-template"] && templates["use-action-template"] && templates["use-event-template"]) {
+    //     interactionCombinations.push(...getFinalCombinations([...events, ...actionReads, ...propertyReads], generationForm));
+    // }
 
     return interactionCombinations;
 }
@@ -97,13 +108,13 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
     for (let prop in thingDescription.properties) {
 
         let propAnnotations = thingDescription.properties[prop]['@type'];
-        if(typeof propAnnotations === "undefined") propAnnotations = [];
+        if(!propAnnotations) propAnnotations = [];
         if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
 
         if (!thingDescription.properties[prop].writeOnly) {
-            // filter based on accepted types
-            if (filters.acceptedTypes) {
-                if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) continue;
+            if(!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
+                if(thingDescription.properties[prop].type) continue;
+                else if(!thingDescription.properties[prop].type && !filters.acceptedTypes.includes("null")) continue;
             }
             // filter interactions with unwanted annotations
             if(filters.forbiddenAnnotations) {
@@ -135,12 +146,14 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
     for (let event in thingDescription.events) {
 
         let eventAnnotations = thingDescription.events[event]['@type'];
-        if(typeof eventAnnotations === "undefined") eventAnnotations = [];
+        if(!eventAnnotations) eventAnnotations = [];
         if(typeof eventAnnotations === "string") eventAnnotations = [eventAnnotations];
 
         // filter based on accepted types
-        if (filters.acceptedTypes) {
-            if (!thingDescription.events[event].data || !filters.acceptedTypes.includes(thingDescription.events[event].data.type)) continue;
+        if(!thingDescription.events[event].data && !filters.acceptedTypes.includes("null")) continue;
+        else if (thingDescription.events[event].data && !filters.acceptedTypes.includes(thingDescription.events[event].data.type)) {
+            if(thingDescription.events[event].data.type) continue;
+            else if (!thingDescription.events[event].data.type && !filters.acceptedTypes.includes("null")) continue;
         }
         // filter interactions with unwanted annotations
         if(filters.forbiddenAnnotations) {
@@ -171,12 +184,13 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
     for (let action in thingDescription.actions) {
 
         let actionAnnotations = thingDescription.actions[action]['@type'];
-        if(typeof actionAnnotations === "undefined") actionAnnotations = [];
+        if(!actionAnnotations) actionAnnotations = [];
         if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
 
-        if (!thingDescription.actions[action].output) continue
-        if (filters.acceptedTypes) {
-            if (!filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) continue
+        if (!thingDescription.actions[action].output && !filters.acceptedTypes.includes("null")) continue
+        else if(thingDescription.actions[action].output && !filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) {
+            if(thingDescription.actions[action].output.type) continue;
+            else if(!thingDescription.actions[action].output.type && !filters.acceptedTypes.includes("null")) continue;
         }
         // filter interactions with unwanted annotations
         if(filters.forbiddenAnnotations) {
@@ -214,13 +228,14 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
     for (let prop in thingDescription.properties) {
 
         let propAnnotations = thingDescription.properties[prop]['@type'];
-        if(typeof propAnnotations === "undefined") propAnnotations = [];
+        if(!propAnnotations) propAnnotations = [];
         if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
 
         if (!thingDescription.properties[prop].readOnly) {
             // filter based on accepted types
-            if (filters.acceptedTypes) {
-                if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) continue;
+            if(!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
+                if(thingDescription.properties[prop].type) continue;
+                else if(!thingDescription.properties[prop].type && !filters.acceptedTypes.includes("null")) continue;
             }
             // filter interactions with unwanted annotations
             if(filters.forbiddenAnnotations) {
@@ -252,12 +267,16 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
     for (let action in thingDescription.actions) {
 
         let actionAnnotations = thingDescription.actions[action]['@type'];
-        if(typeof actionAnnotations === "undefined") actionAnnotations = [];
+        if(!actionAnnotations) actionAnnotations = [];
         if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
 
         // filter based on accepted types
-        if (filters) {
-            if (!thingDescription.actions[action].input || !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) continue
+        // if (!thingDescription.actions[action].input || !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) continue
+        
+        if (!thingDescription.actions[action].input && !filters.acceptedTypes.includes("null")) continue
+        else if(thingDescription.actions[action].input && !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) {
+            if(thingDescription.actions[action].input.type) continue;
+            else if(!thingDescription.actions[action].input.type && !filters.acceptedTypes.includes("null")) continue;
         }
         // filter interactions with unwanted annotations
         if(filters.forbiddenAnnotations) {
@@ -392,16 +411,20 @@ function generateMermaidSeqDiagram(interactions: MAGE.InteractionInterface[]) {
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : read: "${interaction.name}"\n`;
         else if (interaction.interactionType === "property-write")
             seqDiagram += `${interaction.from} ->> ${interaction.to} : write: "${interaction.name}"\n`;
-        else if (interaction.interactionType === "action-invoke" || interaction.interactionType === "action-read")
-            seqDiagram += `${interaction.from} ->> ${interaction.to} : invoke: "${interaction.name}"\n`;
+        else if (interaction.interactionType === "action-read")
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : invoke: "${interaction.name}"\n`;
         else if (interaction.interactionType === "event-subscribe")
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribe: "${interaction.name}"\n`;
+        else if(interaction.interactionType === "action-invoke")
+        seqDiagram += `${interaction.from} ->> ${interaction.to} : invoke: "${interaction.name}"\n`;
         
         // determine return path
         if (interaction.interactionType === "property-read") {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
         } else if (interaction.interactionType === "event-subscribe") {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : event-triggered\n`;
+        } else if (interaction.interactionType === "action-read") {
+            seqDiagram += `${interaction.to} -->>- ${interaction.from} : output\n`;
         }
     });
     seqDiagram += "\n";

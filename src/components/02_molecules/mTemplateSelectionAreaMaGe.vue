@@ -3,7 +3,7 @@
         <aTemplateSelectionMaGe
         :title="'Subscription-driven'"
         :imgSrc="'event-template'"
-        v-model="template['use-sub-template']"
+        v-model="template['use-event-template']"
         @input="$emit('change', template)"
         class="template-selection"
         >
@@ -16,7 +16,7 @@
         <aTemplateSelectionMaGe
         :title="'Read-driven'"
         :imgSrc="'read-template'"
-        v-model="template['use-event-template']"
+        v-model="template['use-read-template']"
         @input="$emit('change', template)"
         class="template-selection"
         >
@@ -58,7 +58,7 @@ export default Vue.extend({
             type: Object as () => {
             "use-event-template": Boolean,
             "use-action-template": Boolean,
-            "use-sub-template": Boolean,
+            "use-read-template": Boolean,
             },
             required: true
         }

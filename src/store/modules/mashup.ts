@@ -294,7 +294,8 @@ export default {
                 let description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
                 let annotations = parsedTd.properties[prop]["@type"] as string | string[] | undefined;
                 // put all annotations in string array
-                if(typeof annotations == "string") annotations = [annotations];
+                if(!annotations) annotations = []
+                if(typeof annotations === "string") annotations = [annotations];
                 // construct VueAnnotation objects
                 let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
@@ -312,12 +313,15 @@ export default {
                         restriction: "none"
                     });
                 }
+                let dataType = parsedTd.properties[prop].type ? parsedTd.properties[prop].type : "null";
                 // construct VueInteraction objects
                 let readInteractionToPush: MAGE.VueInteractionInterface = {
                     title: payload.element.title, 
                     thingId: parsedTd.id, 
                     name: prop, 
-                    description: description, 
+                    description: description,
+                    annotations: annotations,
+                    dataType: dataType,
                     type: "property-read",
                     restriction: "none" 
                 }; 
@@ -325,7 +329,9 @@ export default {
                     title: payload.element.title, 
                     thingId: parsedTd.id, 
                     name: prop,
-                    description: description, 
+                    description: description,
+                    annotations: annotations,
+                    dataType: dataType,
                     type: "property-write",
                     restriction: "none"
                 };
@@ -388,7 +394,8 @@ export default {
                 let description = parsedTd.events[event].description ? parsedTd.events[event].description : null;
                 let annotations = parsedTd.events[event]["@type"] as string | string[] | undefined;
                 // put all annotations in string array
-                if(typeof annotations == "string") annotations = [annotations];
+                if(!annotations) annotations = [];
+                if(typeof annotations === "string") annotations = [annotations];
                 // construct VueAnnotation objects
                 let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 if(annotations) for(let annotation of annotations) {
@@ -399,31 +406,39 @@ export default {
                         restriction: "none"
                     });
                 }
+                let dataType: any = "null";
+                if(parsedTd.events[event].data) dataType = parsedTd.events[event].data.type ? parsedTd.events[event].data.type : "null";
                 // construct VueInteraction objects
                 let interactionToPush: MAGE.VueInteractionInterface = {
                     title: payload.element.title, 
                     thingId: parsedTd.id, name: event, 
-                    description: description, 
+                    description: description,
+                    annotations: annotations,
+                    dataType: dataType,
                     type: "event-subscribe",
                     restriction: "none"
                 };
-                // push interaction 
-                state.allInteractions.eventSubs.push(interactionToPush);
-                // push annotations if not already present
-                for(let annotation of annotationsToPush) {
-                    let index = state.allAnnotations.eventSubs.findIndex(a => {return a.annotation === annotation.annotation});
-                    if(index !== -1) {
-                        state.allAnnotations.eventSubs[index].numberOfAccurance++;
-                    } else {
-                        state.allAnnotations.eventSubs.push(annotation);
+                
+                if(payload.io === "input") {
+                    // push interaction
+                    state.allInteractions.eventSubs.push(interactionToPush);
+                    // push annotations if not already present
+                    for(let annotation of annotationsToPush) {
+                        let index = state.allAnnotations.eventSubs.findIndex(a => {return a.annotation === annotation.annotation});
+                        if(index !== -1) {
+                            state.allAnnotations.eventSubs[index].numberOfAccurance++;
+                        } else {
+                            state.allAnnotations.eventSubs.push(annotation);
+                        }
                     }
-                }
+                }    
             }
             for(let action in parsedTd.actions){
                 let description = parsedTd.actions[action].description ? parsedTd.actions[action].description : null;
                 let annotations = parsedTd.actions[action]["@type"] as string | string[] | undefined;
                 // put all annotations in string array
-                if(typeof annotations == "string") annotations = [annotations];
+                if(!annotations) annotations = []
+                if(typeof annotations === "string") annotations = [annotations];
                 // construct VueAnnotation objects
                 let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
@@ -441,21 +456,28 @@ export default {
                         restriction: "none"
                     });
                 }
+                let dataTypeRead: any = "null";
+                let dataTypeInvoke: any = "null";
+                if(parsedTd.actions[action].output) dataTypeRead = parsedTd.actions[action].output.type ? parsedTd.actions[action].output.type : "null";
+                if(parsedTd.actions[action].input) dataTypeInvoke = parsedTd.actions[action].input.type ? parsedTd.actions[action].input.type : "null";
                 // construct VueInteraction objects
                 let actionInvokeToPush: MAGE.VueInteractionInterface = {
                     title: payload.element.title, 
                     thingId: parsedTd.id, 
                     name: action, 
                     description: description, 
-
+                    annotations: annotations,
+                    dataType: dataTypeInvoke,
                     type: "action-invoke",
                     restriction: "none"
                 };
                 let actionReadToPush: MAGE.VueInteractionInterface = {
-                    title: payload.element.title, 
-                    thingId: parsedTd.id, 
-                    name: action, 
-                    description: description, 
+                    title: payload.element.title,
+                    thingId: parsedTd.id,
+                    name: action,
+                    description: description,
+                    annotations: annotations,
+                    dataType: dataTypeRead,
                     type: "action-read",
                     restriction: "none"
                 };

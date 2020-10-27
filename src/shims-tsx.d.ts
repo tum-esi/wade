@@ -431,6 +431,7 @@ declare global {
     }
 
     enum acceptedTypesEnum {
+      VOID = "void",
       BOOLEAN = "boolean",
       INTEGER = "integer",
       NUMBER = "number",
@@ -454,7 +455,7 @@ declare global {
       templates: {
         "use-event-template": boolean;
         "use-action-template": boolean;
-        "use-sub-template": boolean;
+        "use-read-template": boolean;
       },
       filters: FiltersInterface,
       generation: {
@@ -485,7 +486,7 @@ declare global {
       id: string,
     }
 
-    interface InputInteractionInterface extends InteractionInterface{
+    interface InputInteractionInterface extends InteractionInterface {
       interactionType: "event-subscribe" | "property-read" | "action-read",
       matchingOutputCombinations?: MAGE.InteractionInterface[][],
     }
@@ -495,6 +496,8 @@ declare global {
       thingId: string, 
       name: string, 
       description: string, 
+      annotations: string[],
+      dataType: "null" | "string" | "integer" | "number" | "boolean" | "array" | "object",
       type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke",
       restriction: "none" | "forbidden" | "mustHave"
     }

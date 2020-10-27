@@ -1,6 +1,6 @@
 <template>
     <div id="table-container">
-        <aListSimple class="column" v-for="(tableColumn, columnIndex) in this.table.columns" :key="columnIndex" :list="tableColumn">
+        <aListSimple class="column" v-for="(tableColumn, columnIndex) in this.table.columns" :key="columnIndex" :list="tableColumn" v-show="showColumn(tableColumn)">
             <template v-slot:header>
                 <div class="flex-container-row table-header">
                     <label class="margin-right-auto">{{tableColumn.header}}</label>
@@ -10,6 +10,7 @@
                 <div 
                 :title="item.payload.description ? item.payload.description : 'No description given'" 
                 class="element" 
+                v-show="showInteraction(item.payload)"
                 v-for="(item, rowIndex) in tableColumn.items" :key="rowIndex">
                     <label class="io-label margin-right-auto">{{item.label}}</label>
                     <div>
@@ -65,9 +66,127 @@ export default Vue.extend({
             type: Object as () => WADE.TableInterface,
             required: true
         },
+        filters: {
+            type: Object as () => MAGE.FiltersInterface,
+            required: true
+        },
+        templates: {
+            type: Object as () => {
+            "use-event-template": Boolean,
+            "use-action-template": Boolean,
+            "use-read-template": Boolean,
+            },
+            required: true
+        }
+    },
+    data() {
+        return {
+            
+        }
+    },
+    computed: {
+        
     },
     methods: {
-        ...mapMutations('MashupStore',['setInteractionRestriction']),
+        ...mapMutations('MashupStore', ['setInteractionRestriction']),
+        ...mapGetters('MashupStore', ["getAllAnnotations"]),
+        showColumn(column: WADE.ListInterface): boolean {
+            let result: boolean = true;
+            if(column.items.length === 0) return false;
+            if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
+            if(column.header === "EventSubs" && this.templates["use-event-template"] === false) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
+            if(column.header === "ActionReads" && this.templates["use-action-template"] === false) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
+            if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
+            if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
+            
+            return true;
+        },
+        showInteraction(interaction: MAGE.VueInteractionInterface): boolean {
+                let allAnnotations = (this as any).getAllAnnotations();
+                let result: boolean = true;
+                if(!this.filters.acceptedTypes.includes(interaction.dataType)) {
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                    return false;
+                }
+                switch(interaction.type) {
+                    case "property-read":
+                        for(let annotation of interaction.annotations) {
+                            if(allAnnotations.propertyReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                                result = false;
+                                break;
+                            }
+                        }
+                        break;
+                    case "property-write": 
+                        for(let annotation of interaction.annotations) {
+                            if(allAnnotations.propertyWrites.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                                result = false;
+                                break;
+                            }
+                        }
+                        break;
+                    case "event-subscribe": 
+                        for(let annotation of interaction.annotations) {
+                            if(allAnnotations.eventSubs.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                                result = false;
+                                break;
+                            }
+                        }
+                        break;
+                    case "action-read": 
+                        for(let annotation of interaction.annotations) {
+                            if(allAnnotations.actionReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                                result = false;
+                                break;
+                            }
+                        }
+                        break;
+                    case "action-invoke": 
+                        for(let annotation of interaction.annotations) {
+                            if(allAnnotations.actionInvokes.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                                result = false;
+                                break;
+                            }
+                        }
+                        break;
+                }
+                return result;
+            }
     }
 });
 </script>
@@ -78,7 +197,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 30%;
+    height: 33.8%;
 }
 
 .add-icon {
@@ -94,15 +213,11 @@ export default Vue.extend({
 }
 
 .column:first-of-type {
-    border-top-left-radius: 3pt !important;
-    border-bottom-left-radius: 3pt !important;
-    border-left: 0.5pt solid #393B3A !important;
+    border-left: 0 !important;
 }
 
 .column:last-of-type {
-    border-top-right-radius: 3pt !important;
-    border-bottom-right-radius: 3pt !important;
-    border-right: 0.5pt solid #393B3A !important;
+    border-right: 0 !important;
 }
 
 .element {

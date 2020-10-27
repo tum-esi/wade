@@ -52,7 +52,7 @@
         <!--Selecting templates for Mashup Generation-->
         <mTemplateSelectionArea id="template-selection-area" v-model="generationForm.templates"/>
         <!--Filters and Constraints-->
-        <mFilterConstraintsAreaMaGe id="filters-area" v-model="generationForm.filters"/>
+        <mFilterConstraintsAreaMaGe id="filters-area" v-model="generationForm.filters" :templates="generationForm.templates"/>
         <aButtonBasic
         class="generate-button"
         btnLabel="Generate Mashups"
@@ -325,9 +325,18 @@ export default Vue.extend({
         align-content: center;
         font-size: 12pt;
         border: 0.5pt solid #393B3A;
-        border-radius: 10px;
         background-color: #b5dfdd;
         padding-right: 3%;
+    }
+
+    .restricton-option-area:first-of-type {
+          border-top-right-radius: 10px;
+          border-top-left-radius: 10px;
+    }
+
+    .restricton-option-area:last-of-type {
+          border-bottom-right-radius: 10px;
+          border-bottom-left-radius: 10px;
     }
 
     .interaction-restrictions-header {

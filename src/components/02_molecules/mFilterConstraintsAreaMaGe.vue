@@ -8,6 +8,12 @@
                 <h4>Allowed Types:</h4>
                 <div>
                     <input type="checkbox"  
+                    :checked="typeIsChecked('null')" 
+                    @input="$emit('change', onTypeConstraintChanged('null', $event.target.checked))"> 
+                    <label>Null</label>
+                </div>
+                <div>
+                    <input type="checkbox"  
                     :checked="typeIsChecked('string')" 
                     @input="$emit('change', onTypeConstraintChanged('string', $event.target.checked))"> 
                     <label>String</label>
@@ -75,10 +81,10 @@
                 </div>
             </div>
         </div>
-        <h4>Restrictions on individual Interactions</h4>
-        <mInteractionSelectionMaGe :table="InteractionsTable"/>
-        <h4>Restrictions on Annotations</h4>
-        <mAnnotationSelectionMaGe :table="AnnotationsTable"/>
+        <h4 v-if="showAnnotationsTable">Restrictions on Annotations</h4>
+        <mAnnotationSelectionMaGe v-if="showAnnotationsTable" :table="AnnotationsTable" :filters="filters" :templates="templates"/>
+        <h4 v-if="showInteractionsTable">Restrictions on individual Interactions</h4>
+        <mInteractionSelectionMaGe v-if="showInteractionsTable" :table="InteractionsTable" :filters="filters" :templates="templates"/>
     </div>
 </template>
 
@@ -98,6 +104,14 @@ export default Vue.extend({
         filters: {
             type: Object as () => MAGE.FiltersInterface,
             required: false
+        },
+        templates: {
+            type: Object as () => {
+            "use-event-template": Boolean,
+            "use-action-template": Boolean,
+            "use-sub-template": Boolean,
+            },
+            required: true
         }
     },
     components: {
@@ -234,6 +248,22 @@ export default Vue.extend({
             table.columns.push(listA);
             return table;
         },
+        showInteractionsTable(): boolean {
+            let allInteractions = (this as any).getAllInteractions;
+            let result: boolean = false;
+            for(let interactionType in allInteractions){
+                if(allInteractions[interactionType].length > 0) return true;
+            }
+            return result
+        },
+        showAnnotationsTable(): boolean {
+            let allAnnotations = (this as any).getAllAnnotations;
+            let result: boolean = false;
+            for(let interactionType in allAnnotations){
+                if(allAnnotations[interactionType].length > 0) return true;
+            }
+            return result
+        }
     },
     methods: {
         typeIsChecked(type: MAGE.acceptedTypesEnum): boolean {
@@ -270,6 +300,7 @@ export default Vue.extend({
     border: 0.5pt solid #393B3A;
     height: fit-content;
     border-radius: 3pt;
+    padding-right: 0.1pt;
 }
 
 .header {
@@ -286,6 +317,7 @@ export default Vue.extend({
     justify-content: space-between;
     background-color: #939C9E;
     padding: 5pt;
+    height: 22.5%;
 }
 
 

@@ -5,7 +5,7 @@
                 <label>{{list.header}}</label>
             </slot>
         </div>
-        <div class="rows grey">
+        <div class="rows">
             <slot name="rows">
                 <ul>
                     <li v-for="(item, index) in list.items" :key="index"> {{item.label}} </li>
@@ -54,6 +54,9 @@ export default Vue.extend({
         height: 85.5%;
         overflow: scroll;
         border-bottom-left-radius: inherit;
+        background-clip: padding-box;
+        background-color: #939c9e;
+        padding: 0.1pt;
     }
 
     .rows li {

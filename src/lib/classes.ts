@@ -133,7 +133,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     public  templates: {
         "use-event-template": boolean;
         "use-action-template": boolean;
-        "use-sub-template": boolean;
+        "use-read-template": boolean;
     };
     public filters: {
           acceptedTypes: string[],
@@ -159,10 +159,10 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
         this.templates = {
             "use-event-template": true,
             "use-action-template": false,
-            "use-sub-template": true,
+            "use-read-template": true,
         },
         this.filters = {
-              acceptedTypes: ['string','integer','boolean','number'],
+              acceptedTypes: ["null","string","integer","boolean","number"],
               acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
               onlySameType: false,
               similarityThreshold: null,

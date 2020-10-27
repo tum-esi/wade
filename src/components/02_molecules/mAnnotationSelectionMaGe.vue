@@ -1,6 +1,6 @@
 <template>
     <div id="table-container">
-        <aListSimple class="column" v-for="(tableColumn, columnIndex) in this.table.columns" :key="columnIndex" :list="tableColumn">
+        <aListSimple class="column" v-for="(tableColumn, columnIndex) in this.table.columns" :key="columnIndex" :list="tableColumn" v-show="showColumn(tableColumn)">
             <template v-slot:header>
                 <div class="flex-container-row table-header">
                     <label class="margin-right-auto">{{tableColumn.header}}</label>
@@ -64,9 +64,32 @@ export default Vue.extend({
             type: Object as () => WADE.TableInterface,
             required: true
         },
+        filters: {
+            type: Object as () => MAGE.FiltersInterface,
+            required: true
+        },
+        templates: {
+            type: Object as () => {
+            "use-event-template": Boolean,
+            "use-action-template": Boolean,
+            "use-sub-template": Boolean,
+            },
+            required: true
+        }
     },
     methods: {
         ...mapMutations('MashupStore',['setAnnotationRestriction']),
+        showColumn(column: WADE.ListInterface): boolean {
+            let result: boolean = true;
+            if(column.items.length === 0) return false;
+            if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) return false;
+            if(column.header === "EventSubs" && this.templates["use-event-template"] === false) return false;
+            if(column.header === "ActionReads" && this.templates["use-action-template"] === false) return false;
+            if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) return false;
+            if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) return false;
+            
+            return true;
+        }
     }
 });
 </script>
@@ -77,7 +100,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 30%;
+    height: 33.8%;
 }
 
 .add-icon {
@@ -93,15 +116,11 @@ export default Vue.extend({
 }
 
 .column:first-of-type {
-    border-top-left-radius: 3pt !important;
-    border-bottom-left-radius: 3pt !important;
-    border-left: 0.5pt solid #393B3A !important;
+    border-left: 0 !important;
 }
 
 .column:last-of-type {
-    border-top-right-radius: 3pt !important;
-    border-bottom-right-radius: 3pt !important;
-    border-right: 0.5pt solid #393B3A !important;
+    border-right: 0 !important;
 }
 
 .element {
