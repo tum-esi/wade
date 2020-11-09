@@ -55,7 +55,7 @@
       <div v-if="showHelp" class="config-help-container">
         <div class="help-area">
           <div class="help-area-text">
-            <mCodeEditor language="json" :code="helpAreaText"></mCodeEditor>
+            <aEditorMonaco language="json" :code="helpAreaText"/>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@ import { TdConfigEnum } from "@/util/enums";
 import { getFormattedJsonString } from "@/util/helpers";
 import aButtonBasic from "@/components/01_atoms/aButtonBasic.vue";
 import aConfigStatusBar from "@/components/01_atoms/aConfigStatusBar.vue";
-import mCodeEditor from "@/components/02_molecules/mCodeEditor.vue";
+import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue"
 import { setTimeout } from "timers";
 
 export default Vue.extend({
@@ -78,7 +78,7 @@ export default Vue.extend({
   components: {
     aButtonBasic,
     aConfigStatusBar,
-    mCodeEditor
+    aEditorMonaco
   },
   created() {
     this.config = getFormattedJsonString((this as any).getConfig(this.id));

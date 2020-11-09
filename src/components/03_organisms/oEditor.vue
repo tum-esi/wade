@@ -14,11 +14,7 @@
       </div>
     </div>
     <div class="editor-area">
-      <mCodeEditor
-        :language="currentTd ? 'json' : 'text'"
-        :placeholder.sync="getEditorPlaceholder"
-        :code.sync="currentTd"
-      ></mCodeEditor>
+      <aEditorMonaco v-model="currentTd" language="json"/>
     </div>
     <div class="config-btns">
       <aButtonBasic
@@ -43,7 +39,7 @@
 import Vue from "vue";
 import aButtonBasic from "@/components/01_atoms/aButtonBasic.vue";
 import aDropdownButton from "@/components/01_atoms/aDropdownButton.vue";
-import mCodeEditor from "@/components/02_molecules/mCodeEditor.vue";
+import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import { TdStateEnum } from "@/util/enums";
 import { getFormattedJsonString, loggingError } from "@/util/helpers";
@@ -53,7 +49,7 @@ export default Vue.extend({
   components: {
     aButtonBasic,
     aDropdownButton,
-    mCodeEditor
+    aEditorMonaco,
   },
   data() {
     return {

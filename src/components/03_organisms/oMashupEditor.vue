@@ -44,7 +44,7 @@
             </div>
         </div>
         <div id="text-editor-area" v-if="getMashupTabbar[0].tabIsActive" :class="'text-editor-area-full'">
-           <textarea id="element-text-area" spellcheck="false" wrap="off" :value="getMashupTd"></textarea>
+           <aEditorMonaco v-model="mashupTd" language="typescript"/>
         </div>
     </div>
 </template>
@@ -54,6 +54,7 @@ import Vue from 'vue';
 import { mapMutations, mapGetters } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
+import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
 import mMashupElement from '@/components/02_molecules/mMashupElement.vue';
 import { ElementTypeEnum } from '../../util/enums';
 import mashup from '@/store/modules/mashup';
@@ -63,6 +64,7 @@ export default Vue.extend({
     components: {
         aDropdownButton,
         aIconButton,
+        aEditorMonaco,
         mMashupElement
     },
     props: {
@@ -93,6 +95,14 @@ export default Vue.extend({
                 this.dropdownOptions.push({ title: td.id, key: td.id });
             }
             return this.dropdownOptions;
+        },
+        mashupTd: {
+            get(): string {
+                return (this as any).getMashupTd;
+            },
+            set(td: string) {
+                this.$store.commit("MashupStore/setMashupTd",td);
+            }
         }
     },
     methods: {
