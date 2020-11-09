@@ -12,32 +12,35 @@
                 class="element" 
                 v-show="showInteraction(item.payload)"
                 v-for="(item, rowIndex) in tableColumn.items" :key="rowIndex">
-                    <label class="io-label margin-right-auto">{{item.label}}</label>
-                    <div>
-                        <input 
-                        type="radio" 
-                        :name="`${item.label}-${tableColumn.header}`" 
-                        :checked="item.payload.restriction=='none'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'none'})">
-                        <label>No restrictions</label> 
+                    <div class="label-area">
+                        <label>{{item.label}}</label>
                     </div>
-                    <div>
-                        <input 
-                        type="radio" 
-                        :name="`${item.label}-${tableColumn.header}`"
-                        :checked="item.payload.restriction=='forbidden'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})">
-                        <label>Forbidden</label> 
+                    <div class="image-selector">
+                        <aIcon
+                        title="Mashup should not include interactions labelled with this annotation"
+                        class="selection-item-icon"
+                        :class="isCheckedClass(item.payload, 'forbidden')"
+                        iconSrcPath="forbidden-icon"
+                        iconClickAction="checked-changed"
+                        specificStyle="mage-icon"
+                        @icon-clicked="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})"/>
+                        <aIcon
+                        title="Mashup can include interactions labelled with this annotation"
+                        class="selection-item-icon"
+                        :class="isCheckedClass(item.payload, 'none')"
+                        iconSrcPath="include-icon"
+                        iconClickAction="checked-changed"
+                        specificStyle="mage-icon"
+                        @icon-clicked="setInteractionRestriction({interaction: item.payload, restriction: 'none'})"/>
+                        <aIcon
+                        title="Mashup should not include interactions labelled with this annotation"
+                        class="selection-item-icon"
+                        :class="isCheckedClass(item.payload, 'mustHave')"
+                        iconSrcPath="must-include-icon"
+                        iconClickAction="checked-changed"
+                        specificStyle="mage-icon"
+                        @icon-clicked="setInteractionRestriction({interaction: item.payload, restriction: 'mustHave'})"/>
                     </div>
-                    <div>
-                        <input 
-                        type="radio" 
-                        :name="`${item.label}-${tableColumn.header}`"
-                        :checked="item.payload.restriction=='mustHave'"
-                        @input="setInteractionRestriction({interaction: item.payload, restriction: 'mustHave'})">
-                        <label>Must have</label> 
-                    </div>
-                    
                 </div>
             </template>
         </aListSimple>
@@ -132,61 +135,65 @@ export default Vue.extend({
             return true;
         },
         showInteraction(interaction: MAGE.VueInteractionInterface): boolean {
-                let allAnnotations = (this as any).getAllAnnotations();
-                let result: boolean = true;
-                if(!this.filters.acceptedTypes.includes(interaction.dataType)) {
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                    return false;
-                }
-                switch(interaction.type) {
-                    case "property-read":
-                        for(let annotation of interaction.annotations) {
-                            if(allAnnotations.propertyReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                                result = false;
-                                break;
-                            }
-                        }
-                        break;
-                    case "property-write": 
-                        for(let annotation of interaction.annotations) {
-                            if(allAnnotations.propertyWrites.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                                result = false;
-                                break;
-                            }
-                        }
-                        break;
-                    case "event-subscribe": 
-                        for(let annotation of interaction.annotations) {
-                            if(allAnnotations.eventSubs.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                                result = false;
-                                break;
-                            }
-                        }
-                        break;
-                    case "action-read": 
-                        for(let annotation of interaction.annotations) {
-                            if(allAnnotations.actionReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                                result = false;
-                                break;
-                            }
-                        }
-                        break;
-                    case "action-invoke": 
-                        for(let annotation of interaction.annotations) {
-                            if(allAnnotations.actionInvokes.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
-                                result = false;
-                                break;
-                            }
-                        }
-                        break;
-                }
-                return result;
+            let allAnnotations = (this as any).getAllAnnotations();
+            let result: boolean = true;
+            if(!this.filters.acceptedTypes.includes(interaction.dataType)) {
+                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                return false;
             }
+            switch(interaction.type) {
+                case "property-read":
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.propertyReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+                case "property-write": 
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.propertyWrites.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+                case "event-subscribe": 
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.eventSubs.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+                case "action-read": 
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.actionReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+                case "action-invoke": 
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.actionInvokes.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+            }
+            return result;
+        },
+        isCheckedClass(interaction: MAGE.VueInteractionInterface, category: "none" | "forbidden" | "mustHave") {
+            if(interaction.restriction === category) return "checked-class"
+            return null;
+        }
     }
 });
 </script>
@@ -197,12 +204,16 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 33.8%;
+    height: 25%;
 }
 
 .add-icon {
     width: 20%;
     height: 100%;
+}
+
+.checked-class {
+    background-color: #b5dfdd;
 }
 
 .column {
@@ -222,7 +233,38 @@ export default Vue.extend({
 
 .element {
     width: 100%;
+    height: 19%;
+    padding-left: 2pt;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
     border-bottom: 0.5pt solid #393B3A;
+}
+
+.label-area {
+    height: 100%;
+    width: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.label-area label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.image-selector {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-flow: nowrap row;
+    justify-content: space-between;
+    align-items: center;
+}
+.image-selector input{
+    margin: 15%;
 }
 
 .io-element:hover {
@@ -260,5 +302,17 @@ export default Vue.extend({
     margin-right: auto;
 }
 
+.selection-item-icon {
+    max-height: 100%;
+    width: 35%;
+    padding: 2pt;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+}
+
+.selection-item-icon img {
+    padding: 0 !important;
+}
 
 </style>

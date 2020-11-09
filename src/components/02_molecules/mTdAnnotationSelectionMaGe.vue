@@ -22,7 +22,7 @@
                         iconSrcPath="forbidden-icon"
                         iconClickAction="checked-changed"
                         specificStyle="mage-icon"
-                        @icon-clicked="setAnnotationRestriction({annotation: item.payload, restriction: 'forbidden'})"/>
+                        @icon-clicked="setTdAnnotationRestriction({annotation: item.payload, restriction: 'forbidden'})"/>
                         <aIcon
                         title="Mashup can include interactions labelled with this annotation"
                         class="selection-item-icon"
@@ -30,7 +30,7 @@
                         iconSrcPath="include-icon"
                         iconClickAction="checked-changed"
                         specificStyle="mage-icon"
-                        @icon-clicked="setAnnotationRestriction({annotation: item.payload, restriction: 'none'})"/>
+                        @icon-clicked="setTdAnnotationRestriction({annotation: item.payload, restriction: 'none'})"/>
                         <aIcon
                         title="Mashup should not include interactions labelled with this annotation"
                         class="selection-item-icon"
@@ -38,7 +38,7 @@
                         iconSrcPath="must-include-icon"
                         iconClickAction="checked-changed"
                         specificStyle="mage-icon"
-                        @icon-clicked="setAnnotationRestriction({annotation: item.payload, restriction: 'mustHave'})"/>
+                        @icon-clicked="setTdAnnotationRestriction({annotation: item.payload, restriction: 'mustHave'})"/>
                     </div>
                 </div>
             </template>
@@ -54,7 +54,7 @@ import aIcon from '@/components/01_atoms/aIcon.vue';
 import { TD, Mashup } from '@/lib/classes';
 import { mapGetters, mapMutations } from 'vuex';
 export default Vue.extend({
-    name: 'mAnnotationSelectionMaGe',
+    name: 'mTdAnnotationSelectionMaGe',
     components : {
         aListSimple,
         aDropdownButton,
@@ -68,29 +68,18 @@ export default Vue.extend({
             type: Object as () => WADE.TableInterface,
             required: true
         },
-        filters: {
-            type: Object as () => MAGE.FiltersInterface,
-            required: true
-        },
-        templates: {
-            type: Object as () => {
-            "use-event-template": Boolean,
-            "use-action-template": Boolean,
-            "use-sub-template": Boolean,
-            },
-            required: true
-        }
+    },
+    computed: {
+        ...mapGetters('MashupStore',['getInputsIds','getOutputsIds','getIosIds']),
     },
     methods: {
-        ...mapMutations('MashupStore',['setAnnotationRestriction']),
+        ...mapMutations('MashupStore',['setTdAnnotationRestriction']),
         showColumn(column: WADE.ListInterface): boolean {
             let result: boolean = true;
             if(column.items.length === 0) return false;
-            if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) return false;
-            if(column.header === "EventSubs" && this.templates["use-event-template"] === false) return false;
-            if(column.header === "ActionReads" && this.templates["use-action-template"] === false) return false;
-            if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) return false;
-            if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) return false;
+            if(column.header === "Inputs" && (this as any).getInputsIds.length === 0) return false;
+            if(column.header === "Outputs" && (this as any).getOutputsIds.length === 0) return false;
+            if(column.header === "Ios" && (this as any).getIosIds.length === 0) return false;
             
             return true;
         },

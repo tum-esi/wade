@@ -23,21 +23,41 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     
     // get and categorize all input interactions
     things.inputs.forEach( thingDescription => {
+        let forbiddenAnnotationFound =  false
         if(!thingDescription.content) return;
         let parsedTd: ThingDescription = JSON.parse(thingDescription.content);
-        let interactions = getInputInteractions(parsedTd, filters);
-        events.push(...interactions.events);
-        propertyReads.push(...interactions.properties);
-        actionReads.push(...interactions.actions);
+        let types: string | string[] | undefined = parsedTd["@type"];
+        if(!types) types = [];
+        if(typeof types === "string") types = [types];
+        for(let type of types) {
+            if(filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type)) 
+            forbiddenAnnotationFound = true; break;
+        }
+        if(!forbiddenAnnotationFound) {
+            let interactions = getInputInteractions(parsedTd, filters);
+            events.push(...interactions.events);
+            propertyReads.push(...interactions.properties);
+            actionReads.push(...interactions.actions);
+        }
     })
 
     // get and categorize all output interactions
+    let forbiddenAnnotationFound =  false
     things.outputs.forEach( thingDescription => {
         if(!thingDescription.content) return;
         let parsedTd: ThingDescription = JSON.parse(thingDescription.content);
-        let interactions = getOutputInteractions(parsedTd, filters);
-        actions.push(...interactions.actions);
-        propertyWrites.push(...interactions.properties);
+        let types: string | string[] | undefined = parsedTd["@type"];
+        if(!types) types = [];
+        if(typeof types === "string") types = [types];
+        for(let type of types) {
+            if(filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type)) 
+            forbiddenAnnotationFound = true; break;
+        }
+        if(!forbiddenAnnotationFound) {
+            let interactions = getOutputInteractions(parsedTd, filters);
+            actions.push(...interactions.actions);
+            propertyWrites.push(...interactions.properties);
+        }
     });
 
     let outputs: MAGE.InteractionInterface[] = []
@@ -82,21 +102,6 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     }
 
     interactionCombinations.push(...getFinalCombinations(interactionsToCombine, generationForm));
-    
-    // if (templates["use-event-template"] && !templates["use-read-template"] && !templates["use-action-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations(events, generationForm));
-    // } else if (templates["use-read-template"] && !templates["use-sub-template"] && !templates["use-action-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations(propertyReads, generationForm));
-    // } else if (templates["use-event-template"] && templates["use-sub-template"] && !templates["use-action-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations([...events, ...propertyReads], generationForm));
-    // } else if (templates["use-event-template"] && templates["use-action-template"] && !templates["use-sub-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations([...actionReads, ...propertyReads], generationForm));
-    // } else if (templates["use-sub-template"] && !templates["use-action-template"] && !templates["use-event-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations([...events, ...actionReads], generationForm));
-    // } else if (templates["use-sub-template"] && templates["use-action-template"] && templates["use-event-template"]) {
-    //     interactionCombinations.push(...getFinalCombinations([...events, ...actionReads, ...propertyReads], generationForm));
-    // }
-
     return interactionCombinations;
 }
 
@@ -269,9 +274,6 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
         let actionAnnotations = thingDescription.actions[action]['@type'];
         if(!actionAnnotations) actionAnnotations = [];
         if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
-
-        // filter based on accepted types
-        // if (!thingDescription.actions[action].input || !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) continue
         
         if (!thingDescription.actions[action].input && !filters.acceptedTypes.includes("null")) continue
         else if(thingDescription.actions[action].input && !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) {
@@ -359,6 +361,10 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
     if(form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
         interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup, form.filters.mustHaveAnnotations)});
     }
+    //filter-based on must-have TD annotations
+    if(form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup, form.filters.mustHaveTdAnnotations, form)});
+    }
     return interactionCombinations;
 }
 
@@ -374,18 +380,56 @@ function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHav
     return isIncluded;
 }
 
+function mashupIncludesTdAnnotations(mashup: MAGE.InteractionInterface[],
+    mustHaveTdAnnotations: MAGE.VueAnnotationInterface[], form: MAGE.GenerationFormInterace): boolean {
+        let isIncluded: boolean = true;
+        for(let mustHaveTdAnnotation of mustHaveTdAnnotations) {
+            innerloop:for(let [index, interaction] of mashup.entries()) {
+                let resultTd: WADE.TDElementInterface | WADE.MashupElementInterface | undefined = undefined;
+                let parsedTd = null;
+                let types: string | string[] | undefined = undefined;
+                switch(interaction.interactionType) {
+                    case "property-read":
+                    case "action-read":
+                    case "event-subscribe":
+                        resultTd = form.things.inputs.find(td => {if(td.content) return JSON.parse(td.content).id === interaction.thingId});
+                        if(resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
+                        if(parsedTd) types = parsedTd["@type"];
+                        if(!types) types = [];
+                        if(typeof types === "string") types = [types];
+                        if(types.includes(mustHaveTdAnnotation.annotation)) break innerloop; 
+                        break;
+
+                    case "property-write":
+                    case "action-invoke":
+                        resultTd = form.things.outputs.find(td => {if(td.content) return JSON.parse(td.content).id === interaction.thingId});
+                        if(resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
+                        if(parsedTd) types = parsedTd["@type"];
+                        if(!types) types = [];
+                        if(typeof types === "string") types = [types];
+                        if(types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
+                        break;
+                }
+                if(index === mashup.length-1) isIncluded = false;
+            }
+            if(!isIncluded) return isIncluded;
+        }
+        return isIncluded;
+}
+
 function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
     mustHaveAnnotations: MAGE.VueAnnotationInterface[]): boolean {
         let isIncluded: boolean = true;
         for(let mustHaveAnnotation of mustHaveAnnotations) {
             for(let [index, interaction] of mashup.entries()) {
                 let interactionAnnotations = interaction.object["@type"];
-                if(typeof interactionAnnotations === "undefined") interactionAnnotations = [];
+                if(!interactionAnnotations) interactionAnnotations = [];
                 if(typeof interactionAnnotations === "string") interactionAnnotations = [interactionAnnotations];
                 if(interactionAnnotations.some(a => {return mustHaveAnnotation.annotation === a &&
                     mustHaveAnnotation.type === interaction.interactionType })) break;
                 if(index === mashup.length-1) isIncluded = false;
             }
+            if(!isIncluded) return isIncluded;
         }
         return isIncluded;
 }
@@ -468,7 +512,6 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
 /** Main function to generate mashups. Calls all other functions. */
 export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
     let interactionCombinations = await generateInteractionCombinations(generationForm);
-    console.log(interactionCombinations);
     let designSpaceSize = getDesignSpaceSize(generationForm);
 
     let totalMashups =  interactionCombinations.length;

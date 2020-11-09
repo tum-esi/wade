@@ -52,7 +52,11 @@
         <!--Selecting templates for Mashup Generation-->
         <mTemplateSelectionArea id="template-selection-area" v-model="generationForm.templates"/>
         <!--Filters and Constraints-->
-        <mFilterConstraintsAreaMaGe id="filters-area" v-model="generationForm.filters" :templates="generationForm.templates"/>
+        <mFilterConstraintsAreaMaGe 
+        id="filters-area" 
+        :class="filterAreaClass"
+        v-model="generationForm.filters"
+        :templates="generationForm.templates"/>
         <aButtonBasic
         class="generate-button"
         btnLabel="Generate Mashups"
@@ -163,6 +167,16 @@ export default Vue.extend({
                 columns: [this.inputList, this.outputList, this.ioList]
             }
             return table;
+        },
+        filterAreaClass() {
+            let number = 0;
+            console.log()
+            number += (this as any).getInputsIds.length;
+            number += (this as any).getOutputsIds.length;
+            number += (this as any).getIosIds.length;
+            
+            if(number === 0) return "filters-empty";
+            return "filters-full";
         }
     },
     methods: {
@@ -299,7 +313,14 @@ export default Vue.extend({
 
     #filters-area {
         width: 100%;
-        height: 100%;
+    }
+
+    .filters-empty {
+        height: fit-content;
+    }
+
+    .filters-full {
+        height: 140%;
     }
 
     .align-items-center {

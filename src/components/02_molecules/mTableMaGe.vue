@@ -60,9 +60,9 @@ export default Vue.extend({
     methods: {
         deleteFromIO(elementIndex: number, columnIndex: number) {
             switch(columnIndex) {
-                case 0: this.$store.commit('MashupStore/removeFromInputs', elementIndex); break;
-                case 1: this.$store.commit('MashupStore/removeFromOutputs', elementIndex); break;
-                case 2: this.$store.commit('MashupStore/removeFromIos', elementIndex); break;
+                case 0: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"input"}); break;
+                case 1: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"output"}); break;
+                case 2: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"io"}); break;
                 default: return;
             }
         },
@@ -74,9 +74,9 @@ export default Vue.extend({
                 if (child.id === event.btnValue) childNeeded = child;
             }
             switch (event.btnKey) {
-                case 'add-to-inputs': this.$store.commit('MashupStore/addToInputs', childNeeded); break;
-                case 'add-to-outputs': this.$store.commit('MashupStore/addToOutputs', childNeeded); break;
-                case 'add-to-ios': this.$store.commit('MashupStore/addToIos', childNeeded); break;
+                case 'add-to-inputs':   this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"input"}); break;
+                case 'add-to-outputs':  this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"output"}); break;
+                case 'add-to-ios':      this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"io"}); break;
                 default: return;
             }
         }

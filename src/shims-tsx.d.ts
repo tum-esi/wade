@@ -474,6 +474,8 @@ declare global {
         forbiddenInteractions?: VueInteractionInterface[],
         mustHaveAnnotations?: VueAnnotationInterface[];
         forbiddenAnnotations?: VueAnnotationInterface[];
+        mustHaveTdAnnotations?: VueAnnotationInterface[];
+        forbiddenTdAnnotations?: VueAnnotationInterface[];
     }
 
     interface InteractionInterface {
@@ -504,9 +506,15 @@ declare global {
 
     interface VueAnnotationInterface {
       annotation: string,
-      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke",
+      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" | "input" | "output" | "io",
       numberOfAccurance: number,
+      description: string | null,
       restriction: "none" | "forbidden" | "mustHave";
+    }
+
+    interface storedVocabInterface {
+      vocabUrl: string,
+      numberOfAccurances: number,
     }
   }
 }

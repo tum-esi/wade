@@ -7,43 +7,50 @@
             <div>
                 <h4>Allowed Types:</h4>
                 <div>
-                    <input type="checkbox"  
-                    :checked="typeIsChecked('null')" 
+                    <input type="checkbox"
+                    :checked="typeIsChecked('null')"
+                    :disabled="disableType('null')"
                     @input="$emit('change', onTypeConstraintChanged('null', $event.target.checked))"> 
                     <label>Null</label>
                 </div>
                 <div>
-                    <input type="checkbox"  
+                    <input type="checkbox"
+                    :disabled="disableType('string')" 
                     :checked="typeIsChecked('string')" 
                     @input="$emit('change', onTypeConstraintChanged('string', $event.target.checked))"> 
                     <label>String</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableType('integer')"
                     :checked="typeIsChecked('integer')" 
                     @input="$emit('change', onTypeConstraintChanged('integer', $event.target.checked))"> 
                     <label>Integer</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableType('number')"
                     :checked="typeIsChecked('number')" 
                     @input="$emit('change', onTypeConstraintChanged('number', $event.target.checked))">
                     <label>Number</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableType('boolean')"
                     :checked="typeIsChecked('boolean')" 
                     @input="$emit('input', onTypeConstraintChanged('boolean', $event.target.checked))">
                     <label>Boolean</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableType('array')"
                     :checked="typeIsChecked('array')" 
                     @input="$emit('change', onTypeConstraintChanged('array', $event.target.checked))">
                     <label>Array</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableType('object')"
                     :checked="typeIsChecked('object')"
                     @input="$emit('change', onTypeConstraintChanged('object', $event.target.checked))">
                     <label>Object</label>
@@ -69,19 +76,23 @@
                 <h4>Output Interactions Restrictions</h4>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableOutputType('action-invoke')"
                     :checked="outputTypeIsChecked('action-invoke')"
                     @input="$emit('change', onOutputTypeConstraintChanged('action-invoke', $event.target.checked))">
                     <label>Allow Action Invokes</label>
                 </div>
                 <div>
                     <input type="checkbox"
+                    :disabled="disableOutputType('property-write')"
                     :checked="outputTypeIsChecked('property-write')"
                     @input="$emit('change', onOutputTypeConstraintChanged('property-write', $event.target.checked))">
                     <label>Allow Property Writes</label>
                 </div>
             </div>
         </div>
-        <h4 v-if="showAnnotationsTable">Restrictions on Annotations</h4>
+        <h4 v-if="showTdAnnotationsTable">Restrictions on TD Annotations</h4>
+        <mTdAnnotationSelectionMaGe v-if="showTdAnnotationsTable" :table="TdAnnotationsTable"/>
+        <h4 v-if="showAnnotationsTable">Restrictions on Interaction Annotations</h4>
         <mAnnotationSelectionMaGe v-if="showAnnotationsTable" :table="AnnotationsTable" :filters="filters" :templates="templates"/>
         <h4 v-if="showInteractionsTable">Restrictions on individual Interactions</h4>
         <mInteractionSelectionMaGe v-if="showInteractionsTable" :table="InteractionsTable" :filters="filters" :templates="templates"/>
@@ -92,6 +103,7 @@
 import Vue from 'vue';
 import mInteractionSelectionMaGe from '@/components/02_molecules/mInteractionSelectionMaGe.vue';
 import mAnnotationSelectionMaGe from '@/components/02_molecules/mAnnotationSelectionMaGe.vue';
+import mTdAnnotationSelectionMaGe from '@/components/02_molecules/mTdAnnotationSelectionMaGe.vue';
 import { mapGetters } from 'vuex';
 import { watch } from 'fs';
 export default Vue.extend({
@@ -116,10 +128,11 @@ export default Vue.extend({
     },
     components: {
         mInteractionSelectionMaGe,
-        mAnnotationSelectionMaGe
+        mAnnotationSelectionMaGe,
+        mTdAnnotationSelectionMaGe
     },
     computed: {
-        ...mapGetters('MashupStore',['getAllInteractions','getAllAnnotations']),
+        ...mapGetters('MashupStore',['getAllInteractions','getAllAnnotations', 'getAllTdAnnotations']),
         InteractionsTable() {
             let allInteractions = (this as any).getAllInteractions;
             let table: WADE.TableInterface = {columns: []};
@@ -248,6 +261,48 @@ export default Vue.extend({
             table.columns.push(listA);
             return table;
         },
+        TdAnnotationsTable() {
+            let allTdAnnotations = (this as any).getAllTdAnnotations;
+            let table: WADE.TableInterface = {columns: []};
+            let listI: WADE.ListInterface = {header: "Inputs", items: []};
+            let listO: WADE.ListInterface = {header: "Outputs", items: []};
+            let listIo: WADE.ListInterface = {header: "Ios", items: []};
+            for(let annotationtype in allTdAnnotations) {
+                switch(annotationtype) {
+                    case "inputs":
+                        let inputs = allTdAnnotations[annotationtype];
+                        for(let annotation of inputs) {
+                            listI.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "outputs":
+                        let outputs = allTdAnnotations[annotationtype];
+                        for(let annotation of outputs) {
+                            listO.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                    case "ios":
+                        let ios = allTdAnnotations[annotationtype];
+                        for(let annotation of ios) {
+                            listIo.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
+                }
+            }
+            table.columns.push(listI);
+            table.columns.push(listO);
+            table.columns.push(listIo);
+            return table;
+        },
         showInteractionsTable(): boolean {
             let allInteractions = (this as any).getAllInteractions;
             let result: boolean = false;
@@ -263,11 +318,41 @@ export default Vue.extend({
                 if(allAnnotations[interactionType].length > 0) return true;
             }
             return result
+        },
+        showTdAnnotationsTable(): boolean {
+            let allTdAnnotations = (this as any).getAllTdAnnotations;
+            let result: boolean = false;
+            for(let interactionType in allTdAnnotations){
+                if(allTdAnnotations[interactionType].length > 0) return true;
+            }
+            return result
         }
     },
     methods: {
         typeIsChecked(type: MAGE.acceptedTypesEnum): boolean {
             return this.filters.acceptedTypes.includes(type);
+        },
+        disableType(type: MAGE.acceptedTypesEnum): boolean {
+            let interactions  = (this as any).getAllInteractions;
+            for(let interactionType in interactions) {
+                if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.dataType === type})) {
+                    if(!this.filters.acceptedTypes.includes(type)) this.filters.acceptedTypes.push(type); 
+                    return false;
+                } 
+            }
+            if(this.filters.acceptedTypes.includes(type)) this.filters.acceptedTypes.splice(this.filters.acceptedTypes.indexOf(type), 1);
+            return true
+        },
+        disableOutputType(type: "property-write" | "action-invoke"): boolean {
+            let interactions  = (this as any).getAllInteractions;
+            for(let interactionType in interactions) {
+                if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.type === type})) {
+                    if(!this.filters.acceptedOutputInteractionTypes.includes(type)) this.filters.acceptedOutputInteractionTypes.push(type); 
+                    return false;
+                } 
+            }
+            if(this.filters.acceptedOutputInteractionTypes.includes(type)) this.filters.acceptedOutputInteractionTypes.splice(this.filters.acceptedOutputInteractionTypes.indexOf(type), 1);
+            return true
         },
         outputTypeIsChecked(type: "action-invoke" | "property-write"): boolean {
             return this.filters.acceptedOutputInteractionTypes.includes(type);
@@ -303,6 +388,14 @@ export default Vue.extend({
     padding-right: 0.1pt;
 }
 
+.filters-container input{
+    margin-right: 2pt;
+}
+
+.filters-container h4{
+    margin-left: 2pt;
+}
+
 .header {
     display: flex;
     flex-flow: row nowrap;
@@ -317,7 +410,7 @@ export default Vue.extend({
     justify-content: space-between;
     background-color: #939C9E;
     padding: 5pt;
-    height: 22.5%;
+    height: 16%;
 }
 
 

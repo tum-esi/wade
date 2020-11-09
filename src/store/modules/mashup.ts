@@ -1,6 +1,8 @@
 import { Mashup, TD } from '@/lib/classes';
 import generateMashups from "@/backend/MaGe/generator";
 import generateCode from "@/backend/MaGe/codeGenerator";
+import * as N3 from "n3";
+import { fetchAndStoreVocab, vocabStore, parser } from "@/backend/MaGe/semantics";
 
 export default {
     namespaced: true,
@@ -34,8 +36,10 @@ export default {
         ios:        null as Array<TD|Mashup> | null,
         allInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
         allAnnotations: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
+        allTdAnnotations: {inputs: [], outputs: [], ios:[]},
+        storedVocabs: [] as MAGE.storedVocabInterface[],
         generationForm: null as MAGE.GenerationFormInterace | null,
-        result: null as Object | null
+        result: null as Object | null,
     },
     getters: {
         getMashupTd(state: any): string {
@@ -115,6 +119,18 @@ export default {
         getActionInvokeAnnotations(state){
             return state.allAnnotations.actionInvokes;
         },
+        getAllTdAnnotations(state) {
+            return state.allTdAnnotations;
+        },
+        getInputsTdAnnotations(state) {
+            return state.allTdAnnotations.inputs;
+        },
+        getOutputsTdAnnotations(state) {
+            return state.allTdAnnotations.outputs;
+        },
+        getIosTdAnnotations(state) {
+            return state.allTdAnnotations.ios;
+        },
         isResultReady(state) {
             return state.resultReady;
         },
@@ -127,6 +143,14 @@ export default {
             generationPayload: {
                 generationForm: MAGE.GenerationFormInterace, 
             }) {
+                for(let [index, vocab] of (state.storedVocabs as MAGE.storedVocabInterface[]).entries()) {
+                    if(vocab.numberOfAccurances === 0) {
+                        vocabStore.deleteGraph(new N3.NamedNode(vocab.vocabUrl));
+                        state.storedVocabs.splice(index,1);
+                        index--;
+                    }
+                }
+
                 let inputs: (TD|Mashup)[] = [];
                 let outputs: (TD|Mashup)[] = [];
                 inputs.push(...state.inputs);
@@ -174,11 +198,31 @@ export default {
                         }
                     }
                 }
+                let forbiddenTdAnnotations: MAGE.VueAnnotationInterface[] = [];
+                let mustHaveTdAnnotations: MAGE.VueAnnotationInterface[] = [];
+                for(let tdType in state.allTdAnnotations) {
+                    for(let annotation of state.allTdAnnotations[tdType]) {
+                        switch (annotation.restriction) {
+                            case "forbidden":
+                                forbiddenTdAnnotations.push(annotation);
+                                break;
+                            case "mustHave":
+                                mustHaveTdAnnotations.push(annotation);
+                                break;
+                            case "none":
+                                continue;
+                            default:
+                                break;
+                        }
+                    }
+                }
 
                 generationPayload.generationForm.filters.forbiddenInteractions = forbiddenInteractions;
                 generationPayload.generationForm.filters.mustHaveInteractions = mustHaveInteractions;
                 generationPayload.generationForm.filters.forbiddenAnnotations = forbiddenAnnotations;
                 generationPayload.generationForm.filters.mustHaveAnnotations = mustHaveAnnotations;
+                generationPayload.generationForm.filters.forbiddenTdAnnotations = forbiddenTdAnnotations;
+                generationPayload.generationForm.filters.mustHaveTdAnnotations = mustHaveTdAnnotations;
                 commit('setResultReady', false);
                 commit('setGenerationForm', generationPayload.generationForm);
                 generateMashups(generationPayload.generationForm).then((result) => {
@@ -205,6 +249,42 @@ export default {
             commit("setTabActive", "editor");
 
 
+        },
+        async addTdToIo({dispatch, commit, state}: any, payload: {element: TD|Mashup, io:"input"|"output"|"io"}){
+            await dispatch("addTdVocab", {element: payload.element});
+            commit("addTdAnnotations", payload);
+            switch(payload.io) {
+                case "input": commit("addToInputs", payload.element); break;
+                case "output": commit("addToOutputs", payload.element); break;
+                case "io": commit("addToIos", payload.element); break;
+            }
+        },
+        async addTdVocab({state}: any, payload: {element: TD|Mashup}) {
+            let td = payload.element.content;
+            let parsedTd = JSON.parse(td);
+            let uris = parsedTd["@context"] as string | Array<any>
+            if(typeof uris === "string") return;
+            for(let vocabObject of uris) {
+                if(typeof vocabObject === "string") continue;
+                for(let vocab in vocabObject) {
+                    if(vocab === "@language") continue;
+                    let uri = vocabObject[vocab] as string
+                    let index = (state.storedVocabs as MAGE.storedVocabInterface[]).findIndex(v => {return v.vocabUrl === uri});
+                    if(index !== -1) state.storedVocabs[index].numberOfAccurances++
+                    else {
+                        (state.storedVocabs as MAGE.storedVocabInterface[]).push({vocabUrl: uri, numberOfAccurances: 1});
+                        await fetchAndStoreVocab(uri);
+                    }
+                }
+            }    
+        },
+        removeTdFromIo({dispatch, commit, state}: any, payload: {element: number, io:"input"|"output"|"io"}) {
+            commit("removeTdAnnotations", payload);
+            switch(payload.io) {
+                case "input": commit("removeFromInputs", payload.element); break;
+                case "output": commit("removeFromOutputs", payload.element); break;
+                case "io": commit("removeFromIos", payload.element); break;
+            }
         }
     },
     mutations: {
@@ -222,14 +302,22 @@ export default {
                 eventSubs: [],
                 actionInvokes: [],
                 actionReads: []
-            }
+            };
             state.allAnnotations = {
                 propertyReads: [],
                 propertyWrites: [],
                 eventSubs: [],
                 actionInvokes: [],
                 actionReads: []
-            }
+            };
+            state.allTdAnnotations = {
+                propertyReads: [],
+                propertyWrites: [],
+                eventSubs: [],
+                actionInvokes: [],
+                actionReads: []
+            };
+            state.allTdAnnotations = {inputs: [], outputs: [], ios:[]};
         },
         setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace){
             state.generationForm = generationForm;
@@ -290,6 +378,26 @@ export default {
         },
         categorizeTdInteractions(state: any, payload: {element: TD|Mashup, io: string}){
             let parsedTd = JSON.parse(payload.element.content);
+
+            function getAnnotationDescription(annotation: string): string | null {
+                let parts = annotation.split(":");
+                for(let vocabObj of parsedTd["@context"]) {
+                    if(typeof vocabObj === "string") continue;
+                    for(let vocab in vocabObj) {
+                        if(vocab === parts[0]) {
+                            let uri = vocabObj[vocab];
+                            let tmp = vocabStore.getObjects(
+                                new N3.NamedNode(`${uri}${parts[1]}`),
+                                new N3.NamedNode("http://www.w3.org/2000/01/rdf-schema#comment"),
+                                new N3.NamedNode(uri));
+                            if(tmp.length > 0) return tmp[0].id;
+                            return null;
+                        }
+                    }
+                }
+                return null;
+            }
+
             for(let prop in parsedTd.properties){
                 let description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
                 let annotations = parsedTd.properties[prop]["@type"] as string | string[] | undefined;
@@ -299,17 +407,22 @@ export default {
                 // construct VueAnnotation objects
                 let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
-                if(annotations) for(let annotation of annotations) {
+                for(let annotation of annotations) {
+                    let comment: string | null = null;
+                    comment = getAnnotationDescription(annotation);
+
                     readAnnotationsToPush.push({
                         annotation: annotation,
                         type: 'property-read',
                         numberOfAccurance: 1,
+                        description: comment,
                         restriction: "none"
                     });
                     writeAnnotationsToPush.push({
                         annotation: annotation,
                         type: 'property-write',
                         numberOfAccurance: 1,
+                        description: comment,
                         restriction: "none"
                     });
                 }
@@ -398,11 +511,15 @@ export default {
                 if(typeof annotations === "string") annotations = [annotations];
                 // construct VueAnnotation objects
                 let annotationsToPush: MAGE.VueAnnotationInterface[] = [];
-                if(annotations) for(let annotation of annotations) {
+                for(let annotation of annotations) {
+                    let comment: string | null = null;
+                    comment = getAnnotationDescription(annotation);
+
                     annotationsToPush.push({
                         annotation: annotation,
                         type: 'event-subscribe',
                         numberOfAccurance: 1,
+                        description: comment,
                         restriction: "none"
                     });
                 }
@@ -443,16 +560,21 @@ export default {
                 let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 if(annotations) for(let annotation of annotations) {
+                    let comment: string | null = null;
+                    comment = getAnnotationDescription(annotation);
+
                     readAnnotationsToPush.push({
                         annotation: annotation,
                         type: 'action-read',
                         numberOfAccurance: 1,
+                        description: comment,
                         restriction: "none"
                     });
                     writeAnnotationsToPush.push({
                         annotation: annotation,
                         type: 'action-invoke',
                         numberOfAccurance: 1,
+                        description: comment,
                         restriction: "none"
                     });
                 }
@@ -533,6 +655,62 @@ export default {
                 }
             }
         },
+        addTdAnnotations(state: any, payload: {element: TD|Mashup, io: "input" | "output" | "io"}) {
+            let td = payload.element.content;
+            let parsedTd = JSON.parse(td);
+            let annotations: string | string[] | undefined = parsedTd["@type"];
+            if(!annotations) return;
+            if(typeof annotations === "string") annotations = [annotations];
+
+            function getAnnotationObjects(annotations: string[]): MAGE.VueAnnotationInterface[] {
+                let description: string | null = null;
+                let resultAnnotation: MAGE.VueAnnotationInterface[] = [];
+
+                for(let annotation of annotations) {
+                    let annotationsArray: MAGE.VueAnnotationInterface[] = state.allTdAnnotations[`${payload.io}s`];
+                    let annotationIndex = annotationsArray.findIndex( a => {return a.annotation === annotation});
+                    //If a VueAnnotation Object is already there, just increment number of accurances
+                    if(annotationIndex !== -1) annotationsArray[annotationIndex].numberOfAccurance++;
+                    else {
+                    //Make a new VueAnnotation Object
+                    //Search for description first
+                        let annotationParts = annotation.split(":");
+                        // make sure annotation is based on a vocab
+                        if(annotationParts.length > 1) {
+                            // get all contexts in TD
+                            let tdContexts = parsedTd["@context"];
+                            // make sure context is an array
+                            if(typeof tdContexts === "object") {
+                                for(let context of tdContexts) {
+                                    // skip string context
+                                    if(typeof context === "string") continue;
+                                    // get vocab uri
+                                    let vocabUri = context[annotationParts[0]];
+                                    // search store for comment
+                                    let tmp = vocabStore.getObjects(
+                                        new N3.NamedNode(`${vocabUri}${annotationParts[1]}`),
+                                        new N3.NamedNode("http://www.w3.org/2000/01/rdf-schema#comment"),
+                                        new N3.NamedNode(vocabUri))[0];
+                                    if(tmp) description = tmp.value;
+                                }
+                            }
+                        }
+                        //make new object with the found description
+                        let annotationToPush: MAGE.VueAnnotationInterface = {
+                            annotation: annotation,
+                            numberOfAccurance: 1,
+                            description: description,
+                            restriction: "none",
+                            type: payload.io
+                        }
+                        //push to results
+                        resultAnnotation.push(annotationToPush);
+                    }
+                }
+                return resultAnnotation;
+            }
+            state.allTdAnnotations[`${payload.io}s`].push(...getAnnotationObjects(annotations));
+        },
         setInteractionRestriction(state: any, payload: {interaction: MAGE.VueInteractionInterface, restriction: "none" | "forbidden" | "mustHave"}){
             let index: number;
             let interaction = payload.interaction;
@@ -583,12 +761,22 @@ export default {
                     if(index !== -1) (state.allAnnotations.actionReads as MAGE.VueAnnotationInterface[])[index].restriction = restriction;  break;
             }   
         },
+        setTdAnnotationRestriction(state: any, payload: {annotation: MAGE.VueAnnotationInterface, restriction: "none" | "forbidden" | "mustHave"}){
+            let index: number;
+            let annotation = payload.annotation;
+            let restriction = payload.restriction;
+            let annotationArray: MAGE.VueAnnotationInterface[] = state.allTdAnnotations[`${annotation.type}s`]
+            index = annotationArray.findIndex(a => a.annotation === annotation.annotation);
+            if(index !== -1) state.allTdAnnotations[`${annotation.type}s`][index].restriction = restriction;
+        },
         removeFromInputs(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
                 (this as any).commit("MashupStore/removeInteractions", state.inputs[element]);
+                (this as any).commit("MashupStore/removeVocabs", {element: state.inputs[element]});
                 (state.inputs as Array<TD|Mashup>).splice(element, 1);
             } else {
                 (this as any).commit("MashupStore/removeInteractions", element);
+                (this as any).commit("MashupStore/removeVocabs", {element: element});
                 const indexToDelete = (state.inputs as Array<TD|Mashup>).indexOf(element);
                 (state.inputs as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
@@ -596,9 +784,11 @@ export default {
         removeFromOutputs(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
                 (this as any).commit("MashupStore/removeInteractions", state.outputs[element]);
+                (this as any).commit("MashupStore/removeVocabs", {element: state.outputs[element]});
                 (state.outputs as Array<TD|Mashup>).splice(element, 1);
             } else {
                 (this as any).commit("MashupStore/removeInteractions", element);
+                (this as any).commit("MashupStore/removeVocabs", {element: element});
                 const indexToDelete = (state.outputs as Array<TD|Mashup>).indexOf(element);
                 (state.outputs as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
@@ -606,9 +796,11 @@ export default {
         removeFromIos(state: any, element: TD|Mashup|number) {
             if(typeof element === 'number') {
                 (this as any).commit("MashupStore/removeInteractions", state.ios[element]);
+                (this as any).commit("MashupStore/removeVocabs", {element: state.ios[element]});
                 (state.ios as Array<TD|Mashup>).splice(element, 1);
             } else {
                 (this as any).commit("MashupStore/removeInteractions", element);
+                (this as any).commit("MashupStore/removeVocabs", {element: element});
                 const indexToDelete = (state.ios as Array<TD|Mashup>).indexOf(element);
                 (state.ios as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
@@ -622,7 +814,7 @@ export default {
                     let interactionName = interaction.name
                     let annotations = parsedTd[type][interactionName]["@type"] as string | string[] | undefined;
                     // put all annotations in string array
-                    if(typeof annotations == "string") annotations = [annotations];
+                    if(typeof annotations === "string") annotations = [annotations];
                     if(annotations) {
                         for(let annotation of annotations) {
                             let aIndex = state.allAnnotations[category].findIndex(a => {return a.annotation === annotation});
@@ -636,7 +828,8 @@ export default {
             }
             let index = 0;
             for(index = 0; index < state.allInteractions.propertyReads.length; index++) {
-                if(state.allInteractions.propertyReads[index].thingId === parsedTd.id) {
+                if(state.allInteractions.propertyReads[index].thingId === parsedTd.id && 
+                    state.allInteractions.propertyReads[index].title === element.title) {
                     let prop = state.allInteractions.propertyReads[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(prop, "properties", "propertyReads");
                     state.allInteractions.propertyReads.splice(index,1); 
@@ -644,7 +837,8 @@ export default {
                 };
             }
             for(index = 0; index < state.allInteractions.propertyWrites.length; index++) {
-                if(state.allInteractions.propertyWrites[index].thingId === parsedTd.id) {
+                if(state.allInteractions.propertyWrites[index].thingId === parsedTd.id && 
+                    state.allInteractions.propertyWrites[index].title === element.title) {
                     let prop = state.allInteractions.propertyWrites[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(prop, "properties", "propertyWrites");
                     state.allInteractions.propertyWrites.splice(index,1); 
@@ -652,7 +846,8 @@ export default {
                 };
             }
             for(index = 0; index < state.allInteractions.eventSubs.length; index++) {
-                if(state.allInteractions.eventSubs[index].thingId === parsedTd.id) {
+                if(state.allInteractions.eventSubs[index].thingId === parsedTd.id && 
+                    state.allInteractions.eventSubs[index].title === element.title) {
                     let event = state.allInteractions.eventSubs[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(event, "events", "eventSubs");
                     state.allInteractions.eventSubs.splice(index,1);
@@ -660,7 +855,8 @@ export default {
                 };
             }
             for(index = 0; index < state.allInteractions.actionInvokes.length; index++) {
-                if(state.allInteractions.actionInvokes[index].thingId === parsedTd.id) {
+                if(state.allInteractions.actionInvokes[index].thingId === parsedTd.id && 
+                    state.allInteractions.actionInvokes[index].title === element.title) {
                     let action = state.allInteractions.actionInvokes[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(action, "actions", "actionInvokes");
                     state.allInteractions.actionInvokes.splice(index,1);
@@ -668,12 +864,40 @@ export default {
                 };
             }
             for(index = 0; index < state.allInteractions.actionReads.length; index++) {
-                if(state.allInteractions.actionReads[index].thingId === parsedTd.id) {
+                if(state.allInteractions.actionReads[index].thingId === parsedTd.id && 
+                    state.allInteractions.actionReads[index].title === element.title) {
                     let action = state.allInteractions.actionReads[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(action, "actions", "actionReads");
                     state.allInteractions.actionReads.splice(index,1);
                     index--;
                 };
+            }
+        },
+        removeVocabs(state: any, payload: {element: TD|Mashup}) {
+            let td = payload.element.content;
+            let parsedTd = JSON.parse(td);
+            let uris = parsedTd["@context"] as string | Array<any>
+            if(typeof uris === "string") return;
+            for(let vocabObject of uris) {
+                if(typeof vocabObject === "string") continue;
+                for(let vocab in vocabObject) {
+                    let uri = vocabObject[vocab] as string
+                    let index = (state.storedVocabs as MAGE.storedVocabInterface[]).findIndex(v => {return v.vocabUrl === uri});
+                    if(index !== -1 && state.storedVocabs[index].numberOfAccurances > 0) state.storedVocabs[index].numberOfAccurances--;
+                }
+            }
+        },
+        removeTdAnnotations(state: any, payload: {element: number, io: "input" | "output" | "io"}){
+            let tdObject: TD | Mashup = state[`${payload.io}s`][payload.element];
+            let td = tdObject.content;
+            let parsedTd = JSON.parse(td);
+            let tdAnnotations: string | string[] | undefined = parsedTd["@type"];
+            if(!tdAnnotations) return;
+            if(typeof tdAnnotations === "string") tdAnnotations = [tdAnnotations];
+            for(let annotation of tdAnnotations) {
+                let annotationsArray: MAGE.VueAnnotationInterface[] = state.allTdAnnotations[`${payload.io}s`]
+                let annotationIndex = annotationsArray.findIndex(a => {return a.annotation === annotation});
+                if(annotationIndex !== -1) annotationsArray.splice(annotationIndex,1);
             }
         },
         toggleTab(state: any, tabId: string) {
