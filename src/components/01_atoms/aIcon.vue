@@ -54,8 +54,11 @@ export default Vue.extend({
     },
     computed: {
         getImg(): any {
-            let req = this.mouseover ? require(`@/assets/${this.mouseOverIconSrcPath}.png`) :
-             require(`@/assets/${this.iconSrcPath}.png`);
+            let req = require(`@/assets/${this.iconSrcPath}.png`)
+            if(this.mouseOverIconSrcPath) {
+                req = this.mouseover ? require(`@/assets/${this.mouseOverIconSrcPath}.png`) : 
+                require(`@/assets/${this.iconSrcPath}.png`);
+            }
             return req
         }
     },
@@ -79,6 +82,7 @@ export default Vue.extend({
 
 .icon-container img {
     max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
     padding: 5px 7px 5px 7px;
 }
@@ -87,6 +91,11 @@ export default Vue.extend({
     padding: 0 !important;
     height: 100% !important; 
     width: 100% !important;
+    object-fit: fill;
+}
+
+.mage-icon {
+    padding: 0 !important;
     object-fit: fill;
 }
 </style>

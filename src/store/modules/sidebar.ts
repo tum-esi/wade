@@ -487,7 +487,7 @@ export default {
          * whether the maximum array size of the output field is
          * reached
          *
-          *  @         param state given vuex state
+         *  @         param state given vuex state
          * @param payload id of the td, outMsg to add:
          *                              - content The message to display
          *                              - isError Is it an Error message?
@@ -686,7 +686,7 @@ export default {
         /**
          * Returns either a specific sidebar element when param has 'id'
          * or an array of sidebar elements, when param has 'type'
-          *  @          param state store state
+         *  @          param state store state
          */
         getSidebarElement(state: any) {
             return (elToFind) => {

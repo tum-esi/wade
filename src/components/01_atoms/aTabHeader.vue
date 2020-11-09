@@ -177,7 +177,7 @@ export default Vue.extend({
 
 /* Will only be applied for tabbar-tabs */
 .tab-container-in-tabbar:hover {
-  background: #939c9e;;
+  background: #939c9e;
 }
 
 .tab-button-container {
