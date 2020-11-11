@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="txtArray.length <= 0">
+        <div v-if="!txtArray || txtArray.length <= 0">
             No mashups could be generated according to the constraints and filters choosen!
         </div>
         <div class="mermaid-gallery-container" v-else>
@@ -29,7 +29,7 @@ export default Vue.extend({
     props: {
         txtArray: {
             type: Array,
-            required: true
+            required: false
         },
         maxPossibleMashups: {
             type: Number,

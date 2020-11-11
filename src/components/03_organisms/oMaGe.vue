@@ -62,21 +62,22 @@
         btnLabel="Generate Mashups"
         btnClass="btn-grey"
         btnOnClick="generate-mashups"
-        @generate-mashups="generateMashups({generationForm: generationForm})"
+        @generate-mashups="onGenerateMashupClick()"
         />
-        <mGalleryMermaid 
+        <mGalleryMermaid
+        id="mermaid-all"
         class="gallery" 
-        :txtArray="getResult.imagesMDs" 
-        :maxPossibleMashups="getResult.designSpaceSize" 
+        :txtArray="getResult ? getResult.imagesMDs : []" 
+        :maxPossibleMashups="getResult ? getResult.designSpaceSize : 0" 
         @current-mashup-nr="setCurrentViewedMashup"
-        v-if="isResultReady"/>
+        v-show="isResultReady"/>
         <aButtonBasic
         class="generate-button"
         btnLabel="Generate Code for the currently viewed Mashup"
         btnClass="btn-grey"
         btnOnClick="generate-code"
         @generate-code="generateCode"
-        v-if="isResultReady"
+        v-show="isResultReady"
         />
     </div>      
 </div>
@@ -121,6 +122,7 @@ export default Vue.extend({
             limitNumberOfElement: false,
             currentlyViewedMashup: 0,
             generationForm: new GenerationForm(),
+            mermaidDiv: document.getElementById("mermaid-all")
         };
     },
 
@@ -245,158 +247,174 @@ export default Vue.extend({
         setMaxElements(maxThings: number) {
             this.generationForm.maxThings = maxThings;
         },
+        onGenerateMashupClick() {
+            this.$store.dispatch("MashupStore/generateMashups", {generationForm: this.generationForm}).then(() => {
+                this.mermaidDiv = document.getElementById("mermaid-all");
+                setTimeout(()=> {
+                    if(this.mermaidDiv) this.mermaidDiv.scrollIntoView({
+                        behavior: "smooth"
+                    });
+                },3)
+                
+            })
+        },
         generateCode(){
             this.$store.dispatch("MashupStore/generateMashupCode", this.currentlyViewedMashup);
         }
     },
+    mounted() {
+        this.$nextTick(() => {
+            this.mermaidDiv = document.getElementById("mermaid-all");
+        });
+    }
 })
 </script>
 
 <style lang="less" scoped>
 
-    #mage-table {
-        display: flex;
-        flex-flow: row nowrap;
-        width: 100%;
-        height: 33.33333333%;
-        margin-bottom: 1.5%;
-    }
+#mage-table {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    height: 33.33333333%;
+    margin-bottom: 1.5%;
+}
 
-    #table {
-        display: flex;
-        flex-flow: row nowrap;
-        width: 100%;
-        height: 33.33333333%;
-        margin-bottom: 1%;
-    }
+#table {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    height: 33.33333333%;
+    margin-bottom: 1%;
+}
 
-    #form-area {
-        width: 100%;
-        height: 100%;
-        align-content: flex-start;
-        overflow-y: auto;
-    }
+#form-area {
+    width: 100%;
+    height: 100%;
+    align-content: flex-start;
+    overflow-y: auto;
+}
 
-    #form-area > * {
-        margin-left: 0.2%;
-        margin-right: 0.2%;
-    }
+#form-area > * {
+    margin-left: 0.2%;
+    margin-right: 0.2%;
+}
 
-    #form-area::-webkit-scrollbar {
-        display: inline;
-    }
+#form-area::-webkit-scrollbar {
+    display: inline;
+}
 
-    #form-area::-webkit-scrollbar-track {
-        background-color: #939C9E;
-        border-radius: 5pt;
-    }
+#form-area::-webkit-scrollbar-track {
+    background-color: #939C9E;
+    border-radius: 5pt;
+}
 
-    #form-area::-webkit-scrollbar-thumb {
-        background-color: #b5dfdd;
-        border-radius: 5pt;
-    }
+#form-area::-webkit-scrollbar-thumb {
+    background-color: #b5dfdd;
+    border-radius: 5pt;
+}
 
-    #interaction-restrictions-area {
-        width: 100%;
-        height: 20%;
-        margin-bottom: 1.5%;
-    }
+#interaction-restrictions-area {
+    width: 100%;
+    height: 20%;
+    margin-bottom: 1.5%;
+}
 
-    #template-selection-area {
-        width: 100%;
-        height: 56%;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        margin-bottom: 1.5%;
-    }
+#template-selection-area {
+    width: 100%;
+    height: 56%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    margin-bottom: 1.5%;
+}
 
-    #filters-area {
-        width: 100%;
-    }
+#filters-area {
+    width: 100%;
+}
 
-    .filters-empty {
-        height: fit-content;
-    }
+.filters-empty {
+    height: fit-content;
+}
 
-    .filters-full {
-        height: 140%;
-    }
+.filters-full {
+    height: 140%;
+}
 
-    .align-items-center {
-        align-items: center;
-    }
+.align-items-center {
+    align-items: center;
+}
 
-    .justify-content-even {
-        justify-content: space-between;
-    }
+.justify-content-even {
+    justify-content: space-between;
+}
 
-    .shadow {
-        box-shadow: 0 6px 3px rgba(0, 0, 0, 0.19);
-    }
+.shadow {
+    box-shadow: 0 6px 3px rgba(0, 0, 0, 0.19);
+}
 
-    .flex-container-row {
-        display: flex;
-        flex-flow: row wrap;
-    }
+.flex-container-row {
+    display: flex;
+    flex-flow: row wrap;
+}
 
-    .restricton-option-area {
-        width: 100%;
-        height: 33.33333333%;
-        align-content: center;
-        font-size: 12pt;
-        border: 0.5pt solid #393B3A;
-        background-color: #b5dfdd;
-        padding-right: 3%;
-    }
+.restricton-option-area {
+    width: 100%;
+    height: 33.33333333%;
+    align-content: center;
+    font-size: 12pt;
+    border: 0.5pt solid #393B3A;
+    background-color: #b5dfdd;
+    padding-right: 3%;
+}
 
-    .restricton-option-area:first-of-type {
-          border-top-right-radius: 10px;
-          border-top-left-radius: 10px;
-    }
+.restricton-option-area:first-of-type {
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+}
 
-    .restricton-option-area:last-of-type {
-          border-bottom-right-radius: 10px;
-          border-bottom-left-radius: 10px;
-    }
+.restricton-option-area:last-of-type {
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+}
 
-    .interaction-restrictions-header {
-        width: 30%;
-        height: 100%;
-        padding: 5pt;
-        display: flex;
-        flex-flow: row wrap;
-        background-color: #939c9e;
-        border-right: 0.5pt solid #393B3A;
-        border-top-left-radius: inherit;
-        border-bottom-left-radius: inherit;
-    }
+.interaction-restrictions-header {
+    width: 30%;
+    height: 100%;
+    padding: 5pt;
+    display: flex;
+    flex-flow: row wrap;
+    background-color: #939c9e;
+    border-right: 0.5pt solid #393B3A;
+    border-top-left-radius: inherit;
+    border-bottom-left-radius: inherit;
+}
 
-    .round-top-left-corner {
-        border-top-left-radius: 10pt;
-    }
+.round-top-left-corner {
+    border-top-left-radius: 10pt;
+}
 
-    .round-top-right-corner {
-        border-top-right-radius: 10pt;
-    }
+.round-top-right-corner {
+    border-top-right-radius: 10pt;
+}
 
-    .round-bottom-left-corner {
-        border-bottom-left-radius: 10pt;
-    }
+.round-bottom-left-corner {
+    border-bottom-left-radius: 10pt;
+}
 
-    .round-bottom-right-corner {
-        border-bottom-right-radius: 10pt;
-    }
+.round-bottom-right-corner {
+    border-bottom-right-radius: 10pt;
+}
 
-    .generate-button {
-        width: 100%;
-        height: 5%;
-        margin: 1% 0.2%;
-        background-color: #b5dfdd;
-    }
+.generate-button {
+    width: 100%;
+    height: 5%;
+    margin: 1% 0.2%;
+    background-color: #b5dfdd;
+}
 
-    .gallery {
-        width: 100%;
-        margin: 1%;
-    }
+.gallery {
+    width: 100%;
+    margin: 1%;
+}
 </style>

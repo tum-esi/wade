@@ -318,6 +318,8 @@ export default {
                 actionReads: []
             };
             state.allTdAnnotations = {inputs: [], outputs: [], ios:[]};
+            state.result = null;
+            state.resultReady = false;
         },
         setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace){
             state.generationForm = generationForm;
