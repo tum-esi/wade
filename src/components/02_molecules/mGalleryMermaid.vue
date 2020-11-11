@@ -43,17 +43,28 @@ export default Vue.extend({
     },
     methods: {
         moveRight() {
+            let mermaidDiv = document.getElementById("mermaid-all");
             this.txtIndex = (this.txtIndex + 1) % this.txtArray.length ;
             this.$emit("current-mashup-nr", this.txtIndex);
+            setTimeout(()=> {
+                if(mermaidDiv) mermaidDiv.scrollIntoView({
+                    behavior: "smooth"
+                });
+            },3)
         },
         moveLeft() {
-
+            let mermaidDiv = document.getElementById("mermaid-all");
             if(this.txtArray && this.txtIndex <= 0) {
                 this.txtIndex = this.txtArray.length-1;
             } else {
                 this.txtIndex--;
             }
             this.$emit("current-mashup-nr", this.txtIndex);
+            setTimeout(()=> {
+                if(mermaidDiv) mermaidDiv.scrollIntoView({
+                    behavior: "smooth"
+                });
+            },3)
         }
     }
 })
