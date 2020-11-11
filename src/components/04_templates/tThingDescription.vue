@@ -54,10 +54,6 @@
         </div>
       </div>
     </div>
-    <div v-if="currentTabId === 'virtual'" class="td-virtual">
-      <oVirtual />
-      <oVirtualThing />
-    </div>
   </div>
 </template>
 
