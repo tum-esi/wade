@@ -447,31 +447,124 @@ function getNumberOfThings(interactions: MAGE.InteractionInterface[]) {
  * 
  * @param {Array} interactions - Array of interaction (ie: a mashup)
  */
-function generateMermaidSeqDiagram(interactions: MAGE.InteractionInterface[]) {
+function generateMermaidSeqDiagram(mashupObject: {interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
     let seqDiagram = "sequenceDiagram\n";
+    let interactions = mashupObject.interactions;
+    let inputsDone = 0;
+    let outputsDone = 0;
     interactions.forEach( interaction => {
         // Determine interaction label and return path
-        if (interaction.interactionType === "property-read")
-            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : read: "${interaction.name}"\n`;
-        else if (interaction.interactionType === "property-write")
-            seqDiagram += `${interaction.from} ->> ${interaction.to} : write: "${interaction.name}"\n`;
-        else if (interaction.interactionType === "action-read")
-            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : invoke: "${interaction.name}"\n`;
-        else if (interaction.interactionType === "event-subscribe")
-            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribe: "${interaction.name}"\n`;
-        else if(interaction.interactionType === "action-invoke")
-        seqDiagram += `${interaction.from} ->> ${interaction.to} : invoke: "${interaction.name}"\n`;
+        if (interaction.interactionType === "property-read") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : readProperty: "${interaction.name}"\n`;
+            inputsDone++;
+        } 
+        else if (interaction.interactionType === "action-read") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : invokeAction: "${interaction.name}"\n`;
+            inputsDone++;
+        }
+        else if (interaction.interactionType === "event-subscribe") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribeEvent: "${interaction.name}"\n`;
+            inputsDone++;          
+        }
+        else if (interaction.interactionType === "property-write") {
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : writeProperty: "${interaction.name}"\n`;
+            outputsDone++;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        }    
+        else if(interaction.interactionType === "action-invoke") {
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->> ${interaction.to} : invokeAction: "${interaction.name}"\n`;
+            outputsDone++;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        }
+        
         
         // determine return path
         if (interaction.interactionType === "property-read") {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
         } else if (interaction.interactionType === "event-subscribe") {
-            seqDiagram += `${interaction.to} -->>- ${interaction.from} : event-triggered\n`;
+            seqDiagram += `${interaction.to} -->> ${interaction.from} : confirmation\n`;
+            seqDiagram += `${interaction.to} ->>- ${interaction.from} : data-pushed\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
         } else if (interaction.interactionType === "action-read") {
-            seqDiagram += `${interaction.to} -->>- ${interaction.from} : output\n`;
+            seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
         }
     });
     seqDiagram += "\n";
+    return seqDiagram
+}
+
+function generatePlantUmlSeqDiagram(mashupObject: {interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
+    let seqDiagram = "@startuml\ngroup strict\n";
+    let interactions = mashupObject.interactions;
+    let inputsDone = 0;
+    let outputsDone = 0;
+    interactions.forEach( interaction => {
+        // Determine interaction label and return path
+        if (interaction.interactionType === "property-read") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : readProperty: "${interaction.name}"\n`;
+            seqDiagram += `activate "${interaction.to}"\n`;
+            inputsDone++;
+        } 
+        else if (interaction.interactionType === "action-read") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : invokeAction: "${interaction.name}"\n`;
+            seqDiagram += `activate "${interaction.to}"\n`;
+            inputsDone++;
+        }
+        else if (interaction.interactionType === "event-subscribe") {
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : subscribeEvent: "${interaction.name}"\n`;
+            seqDiagram += `activate "${interaction.to}"\n`;
+            inputsDone++;          
+        }
+        else if (interaction.interactionType === "property-write") {
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : writeProperty: "${interaction.name}"\n`;
+            outputsDone++;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        }    
+        else if(interaction.interactionType === "action-invoke") {
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == 0) seqDiagram += `par\n`;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : invokeAction: "${interaction.name}"\n`;
+            outputsDone++;
+            if(mashupObject.numberOfOutputInteractions > 1 && outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        }
+        
+        
+        // determine return path
+        if (interaction.interactionType === "property-read") {
+            seqDiagram += `"${interaction.to}" --> "${interaction.from}" : response\n`;
+            seqDiagram += `deactivate "${interaction.to}"\n`
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === "event-subscribe") {
+            seqDiagram += `"${interaction.to}" --> "${interaction.from}" : confirmation\n`;
+            seqDiagram += `"${interaction.to}" -> "${interaction.from}" : data-pushed\n`;
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === "action-read") {
+            seqDiagram += `"${interaction.to}" --> "${interaction.from}" : response\n`;
+            seqDiagram += `deactivate "${interaction.to}"\n`
+            if(mashupObject.numberOfInputInteractions > 1 && inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        }
+    });
+    seqDiagram += "end\n@enduml\n";
     return seqDiagram
 }
 
@@ -518,15 +611,37 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
     console.log(`${totalMashups} mashups can be generated from given parameters. Design space size is: ${designSpaceSize}`);
 
     let imagesMDs: string[] = [];
+    let plantUmls: string[] = [];
     for (let combi of interactionCombinations) {
-       let uml = generateMermaidSeqDiagram(combi);
-       imagesMDs.push(uml);
+        let numberOfInputInteractions = 0;
+        let numberOfOutputInteractions = 0;
+        for(let interaction of combi) {
+            switch(interaction.interactionType) {
+                case "property-read":
+                case "event-subscribe":
+                case "action-read":
+                    numberOfInputInteractions++; break;
+                case "property-write":
+                case "action-invoke":
+                    numberOfOutputInteractions++; break;
+            }
+        }
+        let combiObject = {
+            interactions: combi,
+            numberOfInputInteractions: numberOfInputInteractions,
+            numberOfOutputInteractions: numberOfOutputInteractions
+        }
+        let mermaidUml = generateMermaidSeqDiagram(combiObject);
+        imagesMDs.push(mermaidUml);
+        let plantUml = generatePlantUmlSeqDiagram(combiObject);
+        plantUmls.push(plantUml);
      }
 
     let results = {
         designSpaceSize: designSpaceSize,
         mashupsGenerated: totalMashups,
         imagesMDs: imagesMDs,
+        plantUmls: plantUmls,
         mashups: interactionCombinations ,
     };
 
