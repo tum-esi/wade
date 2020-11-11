@@ -85,6 +85,7 @@ export default Vue.extend({
     methods: {
         onTabClicked(event) {
             this.$store.commit('MashupStore/toggleTab', event);
+            this.$eventHub.$emit('tab-clicked');
         }
     },
     created() {

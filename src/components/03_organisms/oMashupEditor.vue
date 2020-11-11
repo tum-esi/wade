@@ -83,7 +83,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            dropdownOptions: [] as any[]
+            dropdownOptions: [] as any[],
         };
     },
     computed: {

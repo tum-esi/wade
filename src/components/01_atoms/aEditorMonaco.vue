@@ -21,11 +21,12 @@ export default Vue.extend({
         language: {
             type: String,
             required: true
-        }
+        },
     },
     data() {
         return {
-            monacoEditor: {} as Monaco.editor.IStandaloneCodeEditor
+            monacoEditor: {} as Monaco.editor.IStandaloneCodeEditor,
+            modelContentListener: {} as Monaco.IDisposable,
         }
     },
     mounted() {
@@ -33,19 +34,30 @@ export default Vue.extend({
             let container = document.getElementById("monaco-editor"); 
             if(container) this.monacoEditor = Monaco.editor.create(container, {
                 language: this.language,
-                value: this.code
+                value: this.code,
+                scrollBeyondLastLine: false,
+                fontSize: 15,
+                tabSize: 4
             });
-            let newEditor = this.monacoEditor;
-            window.onresize = function() {
-                newEditor.layout();
+            window.onresize = () => {
+                this.monacoEditor.layout();
             }
-            newEditor.onDidChangeModelContent((e) => this.$emit("change", newEditor.getValue()));
-            newEditor.onDidChangeCursorPosition((e) => console.log(e.reason));
+            this.$eventHub.$on("tab-clicked", () => {setTimeout(() => {this.monacoEditor.layout()}, 3)});
+            this.modelContentListener = this.monacoEditor.onDidChangeModelContent((e) => this.$emit("change", this.monacoEditor.getValue()));
         })
+    },
+    beforeDestroy() {
+        this.$eventHub.$off("tab-clicked");
+        this.modelContentListener.dispose();
+        this.monacoEditor.dispose();
     },
     watch: {
         code: function(newCode: string, oldCode: string) {
             if(this.monacoEditor.getValue() !== newCode) this.monacoEditor.setValue(newCode);
+        },
+        language: function(newLanguage: string, oldLanguage: string) {
+            let model = this.monacoEditor.getModel();
+            if(model) Monaco.editor.setModelLanguage(model, newLanguage);
         }
     }
 })

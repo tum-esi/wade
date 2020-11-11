@@ -27,7 +27,7 @@
       <div v-if="!showHelp" class="show-config">
         <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
         <div v-if="format === 'raw'" class="config-area">
-          <mCodeEditor language="json" :code.sync="currentConfig"></mCodeEditor>
+          <aEditorMonaco language="json" :code="currentConfig"/>
         </div>
         <div v-else class="config-area">
           <div class="config-area-form-container">
@@ -70,7 +70,7 @@ import { TdConfigEnum } from "@/util/enums";
 import { getFormattedJsonString } from "@/util/helpers";
 import aButtonBasic from "@/components/01_atoms/aButtonBasic.vue";
 import aConfigStatusBar from "@/components/01_atoms/aConfigStatusBar.vue";
-import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue"
+import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue";
 import { setTimeout } from "timers";
 
 export default Vue.extend({
