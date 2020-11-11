@@ -468,6 +468,7 @@ declare global {
         acceptedTypes: string[],
         acceptedOutputInteractionTypes: string[],
         onlySameType: boolean,
+        onlySimilarNames: boolean,
         similarityThreshold: number | null,
         semanticMatch: boolean,
         mustHaveInteractions?: VueInteractionInterface[]

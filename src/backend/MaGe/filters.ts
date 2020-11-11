@@ -1,6 +1,6 @@
 import Req from 'request'
 
-function getFromSchema(el: MAGE.InteractionInterface, prop: string) {
+function getFromSchema(el: MAGE.InteractionInterface, prop: string): string | string[] | object {
     let elObj = (el.object as any);
     let value;
     if (el.interactionType === "property-write" ||
@@ -8,7 +8,7 @@ function getFromSchema(el: MAGE.InteractionInterface, prop: string) {
         value = el.object[prop]
     } else if (el.interactionType === "event-subscribe" && elObj.data) {
         value = elObj.data[prop]
-    } else if (el.interactionType === "action-invoke" && elObj.input) {
+    } else if (el.interactionType === "action-read" && elObj.input) {
         value = elObj.input[prop]
     } else if (el.interactionType === "action-invoke" && elObj.output) {
         value = elObj.output[prop]
@@ -41,7 +41,7 @@ export function sameType(...elements: MAGE.InteractionInterface[]) {
     return same
 }
 
-export function similar(element1, element2, threshold: number) {
+export function similar(element1: MAGE.InteractionInterface, element2: MAGE.InteractionInterface, threshold: number) {
     return new Promise((resolve, reject) => {
         Req(
             `http://127.0.0.1:5000/word2vec/similarity?w1=${element1.name}&w2==${element2.name}`, 

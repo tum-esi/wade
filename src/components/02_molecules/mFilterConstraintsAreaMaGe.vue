@@ -65,7 +65,15 @@
                     <label>Only match interactions that have similar types</label>
                 </div>
                 <div>
-                    <input type="checkbox"> <label>Only match interactions that have similar names</label>
+                    <input type="checkbox"
+                    :checked="filters.onlySimilarNames"
+                    @input="$emit('change', onCheckBoxChecked('onlySimilarNames',$event.target.checked))">
+                    <label>Only match interactions that have similar names</label>
+                </div>
+                <div v-show="filters.onlySimilarNames && filters.similarityThreshold">
+                    <label class="margin-right-2pt">Similarity Threshold:</label>
+                    <input type="range" min="0" max="1" step="0.01" v-model="filters.similarityThreshold">
+                    <input class="fit-content" type="number" min="0" max="1" step="0.01" v-model="filters.similarityThreshold">
                 </div>
                 <div>
                     <input type="checkbox"
@@ -374,6 +382,10 @@ export default Vue.extend({
         onCheckBoxChecked(prop: string, checked: boolean): MAGE.FiltersInterface {
             let filters = this.filters;
             filters[prop] = checked;
+            if(prop === "onlySimilarNames") {
+                if(checked) filters.similarityThreshold = 0.5;
+                else filters.similarityThreshold = null;
+            }
             return filters;
         }
     },
@@ -413,5 +425,12 @@ export default Vue.extend({
     height: 16%;
 }
 
+.fit-content {
+    width: 35pt;
+}
+
+.margin-right-2pt {
+    margin-right: 2pt;
+}
 
 </style>

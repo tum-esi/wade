@@ -139,6 +139,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
           acceptedTypes: string[],
           acceptedOutputInteractionTypes: string[],
           onlySameType: boolean,
+          onlySimilarNames: boolean,
           similarityThreshold: number | null,
           semanticMatch: boolean
     };
@@ -165,6 +166,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
               acceptedTypes: ["null","string","integer","boolean","number"],
               acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
               onlySameType: false,
+              onlySimilarNames: false,
               similarityThreshold: null,
               semanticMatch: false
         },
