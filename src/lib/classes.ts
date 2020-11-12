@@ -121,6 +121,7 @@ export class Folder extends ParentElement implements WADE.FolderElementInterface
  * Class
  */
 export class GenerationForm implements MAGE.GenerationFormInterace {
+    public mashupName: string;
     public things: {
         inputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
         outputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
@@ -148,6 +149,7 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
           includeFunctionSkeletons: boolean
     }
     constructor() {
+        this.mashupName="";
         this.things = {
             inputs: [],
             outputs: [],

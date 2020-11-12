@@ -44,14 +44,14 @@
             </div>
         </div>
         <div id="text-editor-area" v-if="getMashupTabbar[0].tabIsActive" :class="'text-editor-area-full'">
-           <aEditorMonaco v-model="mashupTd" language="typescript"/>
+           <aEditorMonaco v-model="mashupTd" :language="editorLanguage"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapMutations, mapGetters } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
@@ -87,6 +87,7 @@ export default Vue.extend({
         };
     },
     computed: {
+        ...mapState('MashupStore', ['editorLanguage']),
         ...mapGetters('MashupStore', ['getMashupTabbar', 'getMashupTd']),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getDropdownOptions(): WADE.DropdownOptionInterface[] {

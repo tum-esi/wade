@@ -41,6 +41,7 @@
     "core-js": "^2.6.5",
     "cors-anywhere": "^0.4.3",
     "electron-json-storage": "^4.1.8",
+    "js-beautify": "^1.13.0",
     "js-combinatorics": "^0.6.1",
     "mermaid": "^8.7.0",
     "monaco-editor": "^0.21.2",
@@ -57,6 +58,7 @@
     "wot-typescript-definitions": "^0.7.1-SNAPSHOT.1"
   },
   "devDependencies": {
+    "@types/js-beautify": "^1.13.1",
     "@types/js-combinatorics": "^0.5.32",
     "@types/mermaid": "^8.2.1",
     "@types/n3": "^1.4.4",

@@ -1,3 +1,7 @@
+import parseSeqD from "@/backend/SD/parseSeqD"
+import generateSD from "@/backend/SD/generateSD"
+// import generateTS from "@/backend/SD/codeGen"
+import checkSeqD from "@/backend/SD/validateSeqD"
 import { Mashup, TD } from '@/lib/classes';
 import generateMashups from "@/backend/MaGe/generator";
 import generateCode from "@/backend/MaGe/codeGenerator";
@@ -39,7 +43,9 @@ export default {
         allTdAnnotations: {inputs: [], outputs: [], ios:[]},
         storedVocabs: [] as MAGE.storedVocabInterface[],
         generationForm: null as MAGE.GenerationFormInterace | null,
-        result: null as Object | null,
+        result: null as MAGE.MashupGenerationResult | null,
+        systemDescription: null as string | null,
+        editorLanguage: "json",
     },
     getters: {
         getMashupTd(state: any): string {
@@ -216,7 +222,7 @@ export default {
                         }
                     }
                 }
-
+                generationPayload.generationForm.mashupName = (state.currentMashup as Mashup).title;
                 generationPayload.generationForm.filters.forbiddenInteractions = forbiddenInteractions;
                 generationPayload.generationForm.filters.mustHaveInteractions = mustHaveInteractions;
                 generationPayload.generationForm.filters.forbiddenAnnotations = forbiddenAnnotations;
@@ -229,6 +235,50 @@ export default {
                     commit('setResult', result);
                     commit('toggleResultReady');
                 });
+        },
+        async generateSystemDescription({state, commit}, mashupNr: number) {
+            let mashupGenerationResult =  state.result as MAGE.MashupGenerationResult;
+            let sdGenInput: {"mashup-uml": string, tds: string} = {"mashup-uml": mashupGenerationResult.plantUmls[mashupNr], "tds": "["};
+            // get all relevant TDs for the selected mashup
+            let idsUsed: string[] = [];
+            let outputs = state.generationForm.things.outputs as WADE.TDElementInterface[];
+            let inputs = state.generationForm.things.inputs as WADE.TDElementInterface[];
+            mashupGenerationResult.mashups[mashupNr].forEach(element => {
+                if (!idsUsed.includes(element.thingId)) idsUsed.push(element.thingId);
+            });
+            outputs.concat(inputs).forEach(td => {
+                let parsedTd = JSON.parse((td as WADE.TDElementInterface).content);
+                if (idsUsed.includes(parsedTd.id)) sdGenInput.tds += td.content;
+                sdGenInput.tds += ",";
+            });
+            sdGenInput.tds = sdGenInput.tds.slice(0,-1);
+            sdGenInput.tds += "]";
+
+
+            checkSeqD(sdGenInput["mashup-uml"])
+            .then((ok) => {
+                console.log(ok);
+                let mashupLogic: SDSQ.mashupLogic;
+                let outSD: string
+                try {
+                    mashupLogic = parseSeqD(sdGenInput["mashup-uml"])
+                } catch (error) {
+                    throw new Error("parseSeqD problem!: " + error);
+                }
+
+                try {
+                    outSD = generateSD(mashupLogic, sdGenInput.tds)
+                } catch (error) {
+                    throw new Error(" generateSD problem!: " + error);
+                }
+                commit("setMashupTd", outSD);
+                commit("setTabActive", "editor");
+                state.editorLanguage = "json";
+                
+            })
+            .catch((notOk) => {
+                throw new Error("!!! invalid Sequence Diagram notation" + notOk);
+            });
         },
         async generateMashupCode({commit, state}, mashupNr: number) {
             let gen = {"mashup": state.result.mashups[mashupNr], "tds": {}};
@@ -247,7 +297,7 @@ export default {
             let mashupTd = generateCode(gen.mashup, Object.values(gen.tds));
             commit("setMashupTd", mashupTd);
             commit("setTabActive", "editor");
-
+            state.editorLanguage = "typescript";
 
         },
         async addTdToIo({dispatch, commit, state}: any, payload: {element: TD|Mashup, io:"input"|"output"|"io"}){

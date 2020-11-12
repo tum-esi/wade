@@ -79,6 +79,14 @@
         @generate-code="generateCode"
         v-show="isResultReady"
         />
+        <aButtonBasic
+        class="generate-button"
+        btnLabel="Generate System Description for the currently viewed Mashup"
+        btnClass="btn-grey"
+        btnOnClick="generate-sd"
+        @generate-sd="generateSD"
+        v-show="isResultReady"
+        />
     </div>      
 </div>
 </template>
@@ -260,6 +268,9 @@ export default Vue.extend({
         },
         generateCode(){
             this.$store.dispatch("MashupStore/generateMashupCode", this.currentlyViewedMashup);
+        },
+        generateSD(){
+            this.$store.dispatch("MashupStore/generateSystemDescription", this.currentlyViewedMashup);
         }
     },
     mounted() {
