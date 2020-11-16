@@ -112,7 +112,7 @@ import Vue from 'vue';
 import mInteractionSelectionMaGe from '@/components/02_molecules/mInteractionSelectionMaGe.vue';
 import mAnnotationSelectionMaGe from '@/components/02_molecules/mAnnotationSelectionMaGe.vue';
 import mTdAnnotationSelectionMaGe from '@/components/02_molecules/mTdAnnotationSelectionMaGe.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import { watch } from 'fs';
 export default Vue.extend({
     name: 'mFilterConstraintsAreaMaGe',
@@ -140,9 +140,9 @@ export default Vue.extend({
         mTdAnnotationSelectionMaGe
     },
     computed: {
-        ...mapGetters('MashupStore',['getAllInteractions','getAllAnnotations', 'getAllTdAnnotations']),
+        ...mapState('MashupStore',["allInteractions", "allAnnotations", "allTdAnnotations"]),
         InteractionsTable() {
-            let allInteractions = (this as any).getAllInteractions;
+            let allInteractions = (this as any).allInteractions;
             let table: WADE.TableInterface = {columns: []};
             let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
             let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
@@ -206,7 +206,7 @@ export default Vue.extend({
             return table;
         },
         AnnotationsTable() {
-            let allAnnotations = (this as any).getAllAnnotations;
+            let allAnnotations = (this as any).allAnnotations;
             let table: WADE.TableInterface = {columns: []};
             let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
             let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
@@ -270,7 +270,7 @@ export default Vue.extend({
             return table;
         },
         TdAnnotationsTable() {
-            let allTdAnnotations = (this as any).getAllTdAnnotations;
+            let allTdAnnotations = (this as any).allTdAnnotations;
             let table: WADE.TableInterface = {columns: []};
             let listI: WADE.ListInterface = {header: "Inputs", items: []};
             let listO: WADE.ListInterface = {header: "Outputs", items: []};
@@ -312,7 +312,7 @@ export default Vue.extend({
             return table;
         },
         showInteractionsTable(): boolean {
-            let allInteractions = (this as any).getAllInteractions;
+            let allInteractions = (this as any).allInteractions;
             let result: boolean = false;
             for(let interactionType in allInteractions){
                 if(allInteractions[interactionType].length > 0) return true;
@@ -320,7 +320,7 @@ export default Vue.extend({
             return result
         },
         showAnnotationsTable(): boolean {
-            let allAnnotations = (this as any).getAllAnnotations;
+            let allAnnotations = (this as any).allAnnotations;
             let result: boolean = false;
             for(let interactionType in allAnnotations){
                 if(allAnnotations[interactionType].length > 0) return true;
@@ -328,7 +328,7 @@ export default Vue.extend({
             return result
         },
         showTdAnnotationsTable(): boolean {
-            let allTdAnnotations = (this as any).getAllTdAnnotations;
+            let allTdAnnotations = (this as any).allTdAnnotations;
             let result: boolean = false;
             for(let interactionType in allTdAnnotations){
                 if(allTdAnnotations[interactionType].length > 0) return true;
@@ -341,7 +341,7 @@ export default Vue.extend({
             return this.filters.acceptedTypes.includes(type);
         },
         disableType(type: MAGE.acceptedTypesEnum): boolean {
-            let interactions  = (this as any).getAllInteractions;
+            let interactions  = (this as any).allInteractions;
             for(let interactionType in interactions) {
                 if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.dataType === type})) {
                     if(!this.filters.acceptedTypes.includes(type)) this.filters.acceptedTypes.push(type); 
@@ -352,7 +352,7 @@ export default Vue.extend({
             return true
         },
         disableOutputType(type: "property-write" | "action-invoke"): boolean {
-            let interactions  = (this as any).getAllInteractions;
+            let interactions  = (this as any).allInteractions;
             for(let interactionType in interactions) {
                 if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.type === type})) {
                     if(!this.filters.acceptedOutputInteractionTypes.includes(type)) this.filters.acceptedOutputInteractionTypes.push(type); 

@@ -52,8 +52,8 @@ import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
-import { TD, Mashup } from '@/lib/classes';
-import { mapGetters, mapMutations } from 'vuex';
+import { TD, Mashup } from '@/backend/Td';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 export default Vue.extend({
     name: 'mInteractionSelectionMaGe',
     components : {
@@ -91,8 +91,8 @@ export default Vue.extend({
         
     },
     methods: {
+        ...mapState('MashupStore', ["allAnnotations"]),
         ...mapMutations('MashupStore', ['setInteractionRestriction']),
-        ...mapGetters('MashupStore', ["getAllAnnotations"]),
         showColumn(column: WADE.ListInterface): boolean {
             let result: boolean = true;
             if(column.items.length === 0) return false;
@@ -135,7 +135,7 @@ export default Vue.extend({
             return true;
         },
         showInteraction(interaction: MAGE.VueInteractionInterface): boolean {
-            let allAnnotations = (this as any).getAllAnnotations();
+            let allAnnotations = (this as any).allAnnotations();
             let result: boolean = true;
             if(!this.filters.acceptedTypes.includes(interaction.dataType)) {
                 (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});

@@ -185,7 +185,8 @@ declare global {
     }
     interface MashupElementInterface extends ParentElementInterface {
       type: ElementTypeEnum.MASHUP;
-      content: string | undefined;
+      systemDescription: string | undefined;
+      mashupCode: string | undefined;
       children: Array<TDElementInterface | MashupElementInterface>;
     }
     interface FolderElementInterface extends ParentElementInterface {
@@ -445,8 +446,8 @@ declare global {
     interface GenerationFormInterace  {
       mashupName: string;
       things: {
-        inputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
-        outputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
+        inputs: WADE.TDElementInterface[]
+        outputs: WADE.TDElementInterface[]
       },
       minInputs: number,
       maxInputs: number,
@@ -468,6 +469,7 @@ declare global {
     interface FiltersInterface {
         acceptedTypes: string[],
         acceptedOutputInteractionTypes: string[],
+        allowMixedTemplates: boolean,
         onlySameType: boolean,
         onlySimilarNames: boolean,
         similarityThreshold: number | null,

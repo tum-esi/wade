@@ -67,25 +67,25 @@
         <mGalleryMermaid
         id="mermaid-all"
         class="gallery" 
-        :txtArray="getResult ? getResult.imagesMDs : []" 
-        :maxPossibleMashups="getResult ? getResult.designSpaceSize : 0" 
+        :txtArray="result ? result.imagesMDs : []" 
+        :maxPossibleMashups="result ? result.designSpaceSize : 0" 
         @current-mashup-nr="setCurrentViewedMashup"
-        v-show="isResultReady"/>
-        <aButtonBasic
-        class="generate-button"
-        btnLabel="Generate Code for the currently viewed Mashup"
-        btnClass="btn-grey"
-        btnOnClick="generate-code"
-        @generate-code="generateCode"
-        v-show="isResultReady"
-        />
+        v-show="resultReady"/>
         <aButtonBasic
         class="generate-button"
         btnLabel="Generate System Description for the currently viewed Mashup"
         btnClass="btn-grey"
         btnOnClick="generate-sd"
         @generate-sd="generateSD"
-        v-show="isResultReady"
+        v-show="resultReady"
+        />
+        <aButtonBasic
+        class="generate-button"
+        btnLabel="Generate Code for the currently viewed Mashup"
+        btnClass="btn-grey"
+        btnOnClick="generate-code"
+        @generate-code="generateCode"
+        v-show="resultReady"
         />
     </div>      
 </div>
@@ -96,7 +96,8 @@ import Vue from 'vue';
 import { EventEmitter } from 'events';
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import { ElementTypeEnum } from '@/util/enums';
-import { Mashup, TD, GenerationForm } from '@/lib/classes';
+import { Mashup, TD } from '@/backend/Td';
+import { GenerationForm } from '@/backend/MaGe/generator';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
@@ -135,10 +136,9 @@ export default Vue.extend({
     },
 
     computed: {
-        ...mapState('MashupStore', ['currentMashup', 'inputs', 'outputs', 'ios']),
+        ...mapState('MashupStore', ['currentMashup', 'result', 'resultReady']),
         ...mapGetters('SidebarStore', ['getSidebarElement']),
-        ...mapGetters('MashupStore', ['getMashupChildren', 'getMashupChildrenForDropdown', 'isMashupSelected',
-        'getInputsIds', 'getOutputsIds', 'getIosIds','getResult','isResultReady']),
+        ...mapGetters('MashupStore', ['getMashupChildrenForDropdown', 'getInputsIds', 'getOutputsIds', 'getIosIds']),
         inputList(): WADE.ListInterface {
             let ids: {label: string}[] = [];
             for(let item of (this as any).getInputsIds) {

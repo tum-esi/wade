@@ -57,15 +57,16 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
     public type: ElementTypeEnum.MASHUP;
     public tds: TD[] ;
     public mashups: Mashup[] ;
-    public content: string;
     public children: Array<Mashup | TD> ;
-    public systemDescription: string | undefined;
+    public systemDescription: string;
+    public mashupCode: string;
 
     constructor(param: WADE.MashupElementInterface) {
         super(param);
         this.parentId = param.parentId;
         this.type = ElementTypeEnum.MASHUP;
-        this.content = "";
+        this.systemDescription = "";
+        this.mashupCode = "";
         this.tds = [];
         this.mashups = [];
         this.children = [];
@@ -114,67 +115,6 @@ export class Folder extends ParentElement implements WADE.FolderElementInterface
                 this.mashups.push(child);
             }
             this.children.push(child);
-        }
-    }
-}
-/**
- * Class
- */
-export class GenerationForm implements MAGE.GenerationFormInterace {
-    public mashupName: string;
-    public things: {
-        inputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
-        outputs: (WADE.TDElementInterface | WADE.MashupElementInterface)[]
-    };
-    public minInputs: number;
-    public  maxInputs: number;
-    public  minOutputs: number;
-    public  maxOutputs: number;
-    public  maxThings: number | null;
-    public  templates: {
-        "use-event-template": boolean;
-        "use-action-template": boolean;
-        "use-read-template": boolean;
-    };
-    public filters: {
-          acceptedTypes: string[],
-          acceptedOutputInteractionTypes: string[],
-          onlySameType: boolean,
-          onlySimilarNames: boolean,
-          similarityThreshold: number | null,
-          semanticMatch: boolean
-    };
-    public generation: {
-          generateCode: boolean,
-          includeFunctionSkeletons: boolean
-    }
-    constructor() {
-        this.mashupName="";
-        this.things = {
-            inputs: [],
-            outputs: [],
-        };
-        this.minInputs = 1,
-        this.maxInputs = 2,
-        this.minOutputs = 1,
-        this.maxOutputs = 2,
-        this.maxThings = null,
-        this.templates = {
-            "use-event-template": true,
-            "use-action-template": false,
-            "use-read-template": true,
-        },
-        this.filters = {
-              acceptedTypes: ["null","string","integer","boolean","number"],
-              acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
-              onlySameType: false,
-              onlySimilarNames: false,
-              similarityThreshold: null,
-              semanticMatch: false
-        },
-        this.generation = {
-            generateCode: false,
-            includeFunctionSkeletons: false
         }
     }
 }

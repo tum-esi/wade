@@ -1,4 +1,4 @@
-import { typeToOp, sdToTd } from "./util"
+import { typeToOp, sdToTd, interactionType } from "./util"
 import beautify from 'js-beautify';
 
 // import fs = require( "fs" )
@@ -384,7 +384,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             let dataPC = 0
             const pre = "// -- interaction sequence --"
             const hasDataPush = inEl.receiveIntrcts.some(
-                rec => (rec.type === SDSQ.interactionType.observe || rec.type === SDSQ.interactionType.subscribe)
+                rec => (rec.type === SDSQ.interactionType.observeProperty || rec.type === SDSQ.interactionType.subscribeEvent)
             )
             if (hasDataPush) {
                 customDataPush[customDataPushCount] = {}
@@ -394,7 +394,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                 const varname = "autoGenWrite" + customCount++
                 const inname = "autoWriteInput" + customCount++
                 let inpost
-                const fIntr = (snd.type === SDSQ.interactionType.write) ? "writeProperty" : "invokeAction"
+                const fIntr = (snd.type === SDSQ.interactionType.writeProperty) ? "writeProperty" : "invokeAction"
                 if (snd.get || snd.defaultInput !== undefined) {
                     inpost = (snd.get && snd.defaultInput !== undefined) ?
                             `${composeVarName(snd.get)} ?? ${genDefaultString(snd.defaultInput)}` :
@@ -410,7 +410,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             inEl.receiveIntrcts.forEach( rec => {
 
                 let varname
-                const fIntr = typeToOp[SDSQ.interactionType[rec.type]]
+                const fIntr = typeToOp[interactionType[rec.type]]
                 let proto = ""
                 let hvar = ""
                 if (rec.set) {
@@ -420,10 +420,10 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                     hvar = varname
                 }
 
-                if (rec.type === SDSQ.interactionType.read || rec.type === SDSQ.interactionType.invoke) {
+                if (rec.type === interactionType.readProperty || rec.type === interactionType.invokeAction) {
                     proto += `${rec.set ? "" : "let"} ${varname} = this.consumed_things["${rec.to}"].` + fIntr + `("${rec.name}")`
                     waits.push(`${varname} = await ${varname}`)
-                } else if (rec.type === SDSQ.interactionType.subscribe || rec.type === SDSQ.interactionType.observe) {
+                } else if (rec.type === interactionType.subscribeEvent || rec.type === interactionType.observeProperty) {
                     if (rec.set) {hvar = "autoGenReceive" + customCount++}
                     customDataPush[customDataPushCount][dataPC] = false
 

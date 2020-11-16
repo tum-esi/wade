@@ -2,11 +2,11 @@ import parseSeqD from "@/backend/SD/parseSeqD"
 import generateSD from "@/backend/SD/generateSD"
 // import generateTS from "@/backend/SD/codeGen"
 import checkSeqD from "@/backend/SD/validateSeqD"
-import { Mashup, TD } from '@/lib/classes';
+import { Mashup, TD } from '@/backend/Td';
 import generateMashups from "@/backend/MaGe/generator";
 import generateCode from "@/backend/MaGe/codeGenerator";
 import * as N3 from "n3";
-import { fetchAndStoreVocab, vocabStore, parser } from "@/backend/MaGe/semantics";
+import { fetchAndStoreVocab, vocabStore } from "@/backend/MaGe/semantics";
 
 export default {
     namespaced: true,
@@ -32,8 +32,9 @@ export default {
         // ===== DYNAMIC STORE STATE ===== //
         isTabSelected: false,
         resultReady: false,
+        showCode: false,
+        showSd: true,
         numberOfActiveTabs: 0,
-        mashupTd: "",
         currentMashup: null as Mashup | null,
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
@@ -44,15 +45,14 @@ export default {
         storedVocabs: [] as MAGE.storedVocabInterface[],
         generationForm: null as MAGE.GenerationFormInterace | null,
         result: null as MAGE.MashupGenerationResult | null,
-        systemDescription: null as string | null,
         editorLanguage: "json",
     },
     getters: {
-        getMashupTd(state: any): string {
-            return state.mashupTd;
+        getMashupCode(state) : string {
+            return (state.currentMashup as Mashup).mashupCode;
         },
-        getMashupTabbar(state: any) {
-            return state.mashupTabbar;
+        getMashupSd(state) : string {
+            return (state.currentMashup as Mashup).systemDescription;
         },
         getMashupChildren(state): Array<TD | Mashup> {
             return (state.currentMashup as Mashup).children;
@@ -86,15 +86,6 @@ export default {
             }
             return ids;
         },
-        getResult(state) {
-            return state.result;
-        },
-        getAllInteractions(state){
-            return state.allInteractions;
-        },
-        getAllAnnotations(state){
-            return state.allAnnotations;
-        },
         getPropertyReads(state) {
             return state.allInteractions.propertyReads;
         },
@@ -125,9 +116,6 @@ export default {
         getActionInvokeAnnotations(state){
             return state.allAnnotations.actionInvokes;
         },
-        getAllTdAnnotations(state) {
-            return state.allTdAnnotations;
-        },
         getInputsTdAnnotations(state) {
             return state.allTdAnnotations.inputs;
         },
@@ -136,12 +124,6 @@ export default {
         },
         getIosTdAnnotations(state) {
             return state.allTdAnnotations.ios;
-        },
-        isResultReady(state) {
-            return state.resultReady;
-        },
-        isMashupSelected(state): boolean {
-            return state.isMashupSelected;
         },
     },
     actions: {
@@ -157,8 +139,8 @@ export default {
                     }
                 }
 
-                let inputs: (TD|Mashup)[] = [];
-                let outputs: (TD|Mashup)[] = [];
+                let inputs: TD[] = [];
+                let outputs: TD[] = [];
                 inputs.push(...state.inputs);
                 outputs.push(...state.outputs);
                 
@@ -263,21 +245,24 @@ export default {
                 try {
                     mashupLogic = parseSeqD(sdGenInput["mashup-uml"])
                 } catch (error) {
-                    throw new Error("parseSeqD problem!: " + error);
+                    console.error("parseSeqD problem!: " + error);
+                    return;
                 }
 
                 try {
                     outSD = generateSD(mashupLogic, sdGenInput.tds)
                 } catch (error) {
-                    throw new Error(" generateSD problem!: " + error);
+                    console.error("generateSD problem!: " + error);
+                    return;
                 }
-                commit("setMashupTd", outSD);
                 commit("setTabActive", "editor");
+                commit("setMashupSd", outSD);
                 state.editorLanguage = "json";
+                state.showSd = true; state.showCode = false;
                 
             })
             .catch((notOk) => {
-                throw new Error("!!! invalid Sequence Diagram notation" + notOk);
+                console.error("Invalid Sequence Diagram notation:" + notOk);
             });
         },
         async generateMashupCode({commit, state}, mashupNr: number) {
@@ -294,10 +279,12 @@ export default {
                 let parsedTd = JSON.parse((td as WADE.TDElementInterface).content);
                 if (idsUsed.includes(parsedTd.id)) gen.tds[td.id] = td.content;
             });
-            let mashupTd = generateCode(gen.mashup, Object.values(gen.tds));
-            commit("setMashupTd", mashupTd);
+            let mashupCode = generateCode(gen.mashup, Object.values(gen.tds));
+            
             commit("setTabActive", "editor");
+            commit("setMashupCode", mashupCode);
             state.editorLanguage = "typescript";
+            state.showSd = false; state.showCode = true;
 
         },
         async addTdToIo({dispatch, commit, state}: any, payload: {element: TD|Mashup, io:"input"|"output"|"io"}){
@@ -309,7 +296,7 @@ export default {
                 case "io": commit("addToIos", payload.element); break;
             }
         },
-        async addTdVocab({state}: any, payload: {element: TD|Mashup}) {
+        async addTdVocab({state}: any, payload: {element: TD}) {
             let td = payload.element.content;
             let parsedTd = JSON.parse(td);
             let uris = parsedTd["@context"] as string | Array<any>
@@ -338,8 +325,11 @@ export default {
         }
     },
     mutations: {
-        setMashupTd(state: any, mashupTd: string) {
-            state.mashupTd = mashupTd;
+        setMashupSd(state: any, mashupSd: string) {
+            (state.currentMashup as Mashup).systemDescription = mashupSd;
+        },
+        setMashupCode(state: any, code: string) {
+            (state.currentMashup as Mashup).mashupCode = code;
         },
         setCurrentMashup(state: any, mashup: Mashup) {
             (state.currentMashup as Mashup) = mashup;
@@ -370,6 +360,8 @@ export default {
             state.allTdAnnotations = {inputs: [], outputs: [], ios:[]};
             state.result = null;
             state.resultReady = false;
+            state.showCode = false;
+            state.showSd = true;
         },
         setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace){
             state.generationForm = generationForm;
@@ -428,7 +420,7 @@ export default {
                 (this as any).commit("MashupStore/categorizeTdInteractions", {element: element, io:"io"});
             }
         },
-        categorizeTdInteractions(state: any, payload: {element: TD|Mashup, io: string}){
+        categorizeTdInteractions(state: any, payload: {element: TD, io: string}){
             let parsedTd = JSON.parse(payload.element.content);
 
             function getAnnotationDescription(annotation: string): string | null {
@@ -707,7 +699,7 @@ export default {
                 }
             }
         },
-        addTdAnnotations(state: any, payload: {element: TD|Mashup, io: "input" | "output" | "io"}) {
+        addTdAnnotations(state: any, payload: {element: TD, io: "input" | "output" | "io"}) {
             let td = payload.element.content;
             let parsedTd = JSON.parse(td);
             let annotations: string | string[] | undefined = parsedTd["@type"];
@@ -857,7 +849,7 @@ export default {
                 (state.ios as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
         },
-        removeInteractions(state: any, element: TD|Mashup){
+        removeInteractions(state: any, element: TD){
             let parsedTd = JSON.parse(element.content);
             function removeAnnotations(
                 interaction: MAGE.VueInteractionInterface,
@@ -925,7 +917,7 @@ export default {
                 };
             }
         },
-        removeVocabs(state: any, payload: {element: TD|Mashup}) {
+        removeVocabs(state: any, payload: {element: TD}) {
             let td = payload.element.content;
             let parsedTd = JSON.parse(td);
             let uris = parsedTd["@context"] as string | Array<any>
@@ -940,7 +932,7 @@ export default {
             }
         },
         removeTdAnnotations(state: any, payload: {element: number, io: "input" | "output" | "io"}){
-            let tdObject: TD | Mashup = state[`${payload.io}s`][payload.element];
+            let tdObject: TD = state[`${payload.io}s`][payload.element];
             let td = tdObject.content;
             let parsedTd = JSON.parse(td);
             let tdAnnotations: string | string[] | undefined = parsedTd["@type"];

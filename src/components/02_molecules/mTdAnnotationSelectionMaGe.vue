@@ -51,7 +51,7 @@ import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
-import { TD, Mashup } from '@/lib/classes';
+import { TD, Mashup } from '@/backend/Td';
 import { mapGetters, mapMutations } from 'vuex';
 export default Vue.extend({
     name: 'mTdAnnotationSelectionMaGe',

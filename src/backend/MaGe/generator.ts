@@ -577,7 +577,7 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     let things = generationForm.things;
 
     let tdIds: string[] = [];
-    let uniqueTds:(WADE.TDElementInterface | WADE.MashupElementInterface)[] = [];
+    let uniqueTds: WADE.TDElementInterface[] = [];
     things.inputs.concat(things.outputs).forEach(td => {
         if (!tdIds.includes(td.id)) {
             uniqueTds.push(td);
@@ -651,3 +651,67 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
     return results;
 }
 
+/**
+ * Class
+ */
+export class GenerationForm implements MAGE.GenerationFormInterace {
+    public mashupName: string;
+    public things: {
+        inputs: WADE.TDElementInterface[]
+        outputs: WADE.TDElementInterface[]
+    };
+    public minInputs: number;
+    public  maxInputs: number;
+    public  minOutputs: number;
+    public  maxOutputs: number;
+    public  maxThings: number | null;
+    public  templates: {
+        "use-event-template": boolean;
+        "use-action-template": boolean;
+        "use-read-template": boolean;
+    };
+    public filters: {
+          acceptedTypes: string[],
+          allowMixedTemplates: boolean,
+          acceptedOutputInteractionTypes: string[],
+          onlySameType: boolean,
+          onlySimilarNames: boolean,
+          similarityThreshold: number | null,
+          semanticMatch: boolean
+    };
+    public generation: {
+          generateCode: boolean,
+          includeFunctionSkeletons: boolean
+    }
+    constructor() {
+        this.mashupName="";
+        this.things = {
+            inputs: [],
+            outputs: [],
+        };
+        this.minInputs = 1,
+        this.maxInputs = 2,
+        this.minOutputs = 1,
+        this.maxOutputs = 2,
+        this.maxThings = null,
+        this.templates = {
+            "use-event-template": true,
+            "use-action-template": false,
+            "use-read-template": true,
+        },
+        this.filters = {
+            acceptedTypes: ["null","string","integer","boolean","number"],
+            acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
+            onlySameType: false,
+            onlySimilarNames: false,
+            similarityThreshold: null,
+            semanticMatch: false,
+            allowMixedTemplates: false,
+        
+        },
+        this.generation = {
+            generateCode: false,
+            includeFunctionSkeletons: false
+        }
+    }
+}

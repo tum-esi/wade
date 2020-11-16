@@ -178,7 +178,6 @@ function fillSd(
         tds.forEach(td => {
           const noSpaceTitle = td.title.replace(/ /g, "");
           if (noSpaceTitle === interact.to) {
-            // if (interact.type in interactionType) {
               if(Object.values(interactionType).includes(interact.type)) {
               let firstForm: boolean
               const nextOp: string = interactionType[interact.type].toLowerCase();
@@ -195,7 +194,21 @@ function fillSd(
               // determine which form to choose
               let formCandidates: SDSQ.tdForms[] = td[ttDIntr][interact.name].forms.filter(
                 candidate => {
-                  if (typeof candidate.op === "string") {
+                  if (!candidate.op) {
+                    switch(ttDIntr) {
+                      case "properties":
+                        if(nextOp === "readproperty" || nextOp === "writeproperty") return true;
+                        break;
+                      case "actions":
+                        if(nextOp === "invokeaction") return true;
+                        break;
+                      case "events":
+                        if(nextOp === "subscribeevent") return true;
+                        break;
+                    }
+                    return false;
+                  }
+                  else if (typeof candidate.op === "string") {
                     return (candidate.op === nextOp);
                   } else {
                     return candidate.op.some(opEl => opEl === nextOp);

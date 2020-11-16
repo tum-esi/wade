@@ -2,7 +2,7 @@
     <div class="mashup-container">
         <mTabbar 
         class="border-bottom" 
-        :tabbarElements="getMashupTabbar"
+        :tabbarElements="mashupTabbar"
         v-on:tab-clicked="onTabClicked"
         />
         <div  class="mashup-info border-bottom">
@@ -17,7 +17,7 @@
                 :availableElements="availableElements"
             />
             <o-ma-ge
-                v-if="getMashupTabbar[1].tabIsActive"
+                v-if="mashupTabbar[1].tabIsActive"
                 :class="getMaGeClass"
             />
         </div>
@@ -31,7 +31,7 @@ import { ElementTypeEnum } from '../../util/enums';
 import mTabbar from '@/components/02_molecules/mTabbar.vue';
 import oMashupEditor from '@/components/03_organisms/oMashupEditor.vue';
 import oMaGe from '@/components/03_organisms/oMaGe.vue';
-import { Mashup } from '../../lib/classes';
+import { Mashup } from '@/backend/Td';
 
 export default Vue.extend({
     name: 'tMashup',
@@ -49,8 +49,7 @@ export default Vue.extend({
       };
     },
     computed: {
-        ...mapState('MashupStore', ['currentMashup','numberOfActiveTabs']),
-        ...mapGetters('MashupStore', ['getMashupTabbar']),
+        ...mapState('MashupStore', ['currentMashup','numberOfActiveTabs', "mashupTabbar"]),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getTitle(): string {
             if (this.mashup) return this.mashup.title;
@@ -62,21 +61,21 @@ export default Vue.extend({
         getMashupEditorClass(): string {
             if ((this as any).numberOfActiveTabs === 0) {
                 return 'mashup-editor-full';
-            } else if ((this as any).numberOfActiveTabs === 1 && (this as any).getMashupTabbar[0].tabIsActive) {
+            } else if ((this as any).numberOfActiveTabs === 1 && (this as any).mashupTabbar[0].tabIsActive) {
                 return 'mashup-editor-full'
-            } else if ((this as any).numberOfActiveTabs === 1 && !(this as any).getMashupTabbar[0].tabIsActive) {
+            } else if ((this as any).numberOfActiveTabs === 1 && !(this as any).mashupTabbar[0].tabIsActive) {
                 return 'mashup-editor-minimized'
-            } else if ((this as any).numberOfActiveTabs === 2 && (this as any).getMashupTabbar[0].tabIsActive ) {
+            } else if ((this as any).numberOfActiveTabs === 2 && (this as any).mashupTabbar[0].tabIsActive ) {
                 return 'mashup-editor-half';
-            } else if ((this as any).numberOfActiveTabs === 2 && !(this as any).getMashupTabbar[0].tabIsActive ) {
+            } else if ((this as any).numberOfActiveTabs === 2 && !(this as any).mashupTabbar[0].tabIsActive ) {
                  return 'mashup-editor-minimized';
             }
             return '';
         },
         getMaGeClass(): string {
-            if ((this as any).numberOfActiveTabs === 1 && (this as any).getMashupTabbar[1].tabIsActive) {
+            if ((this as any).numberOfActiveTabs === 1 && (this as any).mashupTabbar[1].tabIsActive) {
                 return 'mage-full'
-            } else if ((this as any).numberOfActiveTabs === 2 && (this as any).getMashupTabbar[1].tabIsActive ) {
+            } else if ((this as any).numberOfActiveTabs === 2 && (this as any).mashupTabbar[1].tabIsActive ) {
                 return 'mage-half';
             }
             return '';

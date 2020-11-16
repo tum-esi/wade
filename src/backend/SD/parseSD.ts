@@ -1,4 +1,7 @@
 // ------------ Program -------------
+
+import { interactionDir, interactionType } from './util'
+
 /**
  * parses an SD to an tree-like representation
  * @param SD input System Description
@@ -216,14 +219,14 @@ function RecPathToIntrct(inRec: SDSQ.pathInteractReceive[]) {
 
         if (inEl.set) { set = parseVarRef(inEl.set) }
 
-        if (inEl.op === "subscribe-event") {
-            type = SDSQ.interactionType.subscribe
-        } else if (inEl.op === "invoke-action") {
-            type = SDSQ.interactionType.invoke
-        } else if (inEl.op === "observe-property") {
-            type = SDSQ.interactionType.observe
-        } else if (inEl.op === "read-property") {
-            type = SDSQ.interactionType.read
+        if (inEl.op === "subscribeevent") {
+            type = interactionType.subscribeEvent;
+        } else if (inEl.op === "invokeaction") {
+            type = interactionType.invokeAction;
+        } else if (inEl.op === "observeproperty") {
+            type = interactionType.observeProperty;
+        } else if (inEl.op === "readproperty") {
+            type = SDSQ.interactionType.readProperty;
         } else {throw new Error("wrong receive op " + inEl.op)}
         intrctProto.push({direction, type, to, name, set})
     })
@@ -237,7 +240,7 @@ function RecPathToIntrct(inRec: SDSQ.pathInteractReceive[]) {
 function SendPathToIntrct(inSend: SDSQ.pathInteractSend[]) {
     const intrctProto: SDSQ.interactionSend[] = []
     inSend.forEach( inEl => {
-        const direction = SDSQ.interactionDir.send
+        const direction = interactionDir.send;
         let type; let get; let defaultInput
 
         // get interaction target (->Thing) by ref and without leading "#"
@@ -248,10 +251,10 @@ function SendPathToIntrct(inSend: SDSQ.pathInteractSend[]) {
         if (inEl.get) {get = parseVarRef(inEl.get)}
         if (inEl.defaultInput !== undefined) {defaultInput = inEl.defaultInput}
 
-        if (inEl.op === "invoke-action") {
-            type = SDSQ.interactionType.invoke
-        } else if (inEl.op === "write-property") {
-            type = SDSQ.interactionType.write
+        if (inEl.op === "invokeaction") {
+            type = interactionType.invokeAction;
+        } else if (inEl.op === "writeproperty") {
+            type = interactionType.writeProperty;
         } else {throw new Error("wrong send op " + inEl.op)}
         intrctProto.push({direction, type, to, name, get, defaultInput})
     })

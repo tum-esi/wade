@@ -1,6 +1,6 @@
 <template>
     <div class="flex-box-row" >
-        <div :id="getMashupTabbar[0].tabIsActive ? 'elements-area-full' : 'elements-area-minimized'">
+        <div :id="mashupTabbar[0].tabIsActive ? 'elements-area-full' : 'elements-area-minimized'">
             <div v-if="mashupChildren.length <= 0">
                 <label>
                     You have not added any Thing Descriptions to this Mashup. 
@@ -43,8 +43,8 @@
                 />
             </div>
         </div>
-        <div id="text-editor-area" v-if="getMashupTabbar[0].tabIsActive" :class="'text-editor-area-full'">
-           <aEditorMonaco v-model="mashupTd" :language="editorLanguage"/>
+        <div id="text-editor-area" v-if="mashupTabbar[0].tabIsActive" :class="'text-editor-area-full'">
+           <aEditorMonaco v-model="editorText" :language="editorLanguage"/>
         </div>
     </div>
 </template>
@@ -58,6 +58,7 @@ import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
 import mMashupElement from '@/components/02_molecules/mMashupElement.vue';
 import { ElementTypeEnum } from '../../util/enums';
 import mashup from '@/store/modules/mashup';
+import { editor } from 'monaco-editor';
 
 export default Vue.extend({
     name: 'oMashupEditor',
@@ -87,8 +88,8 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapState('MashupStore', ['editorLanguage']),
-        ...mapGetters('MashupStore', ['getMashupTabbar', 'getMashupTd']),
+        ...mapState('MashupStore', ['editorLanguage', "mashupTabbar", "showSd", "showCode"]),
+        ...mapGetters('MashupStore', ['getMashupSd', 'getMashupCode']),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getDropdownOptions(): WADE.DropdownOptionInterface[] {
             this.dropdownOptions = [];
@@ -97,13 +98,35 @@ export default Vue.extend({
             }
             return this.dropdownOptions;
         },
-        mashupTd: {
+        mashupSd: {
             get(): string {
-                return (this as any).getMashupTd;
+                return (this as any).getMashupSd;
             },
-            set(td: string) {
-                this.$store.commit("MashupStore/setMashupTd",td);
+            set(sd: string) {
+                this.$store.commit("MashupStore/setMashupSd", sd);
             }
+        },
+        mashupCode: {
+            get(): string {
+                return (this as any).getMashupCode;
+            },
+            set(code: string) {
+                this.$store.commit("MashupStore/setMashupCode", code);
+            }
+        },
+        editorText: {
+            get(): string {
+                let text = (this as any).showSd ? (this as any).mashupSd : (this as any).mashupCode;
+                return text;
+            },
+            set(text: string) {
+                if((this as any).showSd) {
+                    this.$store.commit("MashupStore/setMashupSd", text);
+                } else {
+                    this.$store.commit("MashupStore/setMashupCode", text);
+                }
+            }
+            
         }
     },
     methods: {

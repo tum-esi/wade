@@ -3,7 +3,7 @@ import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingError } from '@/util/helpers';
 import { virtualConfigDefault } from '@/util/defaults';
-import { TD, Folder, Mashup } from '@/lib/classes';
+import { TD, Folder, Mashup } from '@/backend/Td';
 
 
 export default {
@@ -180,7 +180,8 @@ export default {
                         id: payload.id,
                         hasChildren: true,
                         children: [],
-                        content: ""
+                        systemDescription: "",
+                        mashupCode: "",
                     };
                     const newMashup = new Mashup(mashupInterface);
                     commit('addElementToStore', newMashup);
@@ -302,6 +303,17 @@ export default {
                     break;
                 }
             }
+        },
+        async deleteElementAndChildren({state, commit, dispatch}, payload: {id: string, type: string}) {
+            const elementList: any[] = state[`${payload.type}s`];
+            let elementToDelete: TD | Mashup | Folder | undefined;
+            elementToDelete = elementList.find(element => element.id === payload.id);
+            if(elementToDelete && elementToDelete.hasChildren) {
+                for(let child of elementToDelete.children) {
+                    await dispatch("deleteElementAndChildren", {id: child.id, type: child.type});
+                }
+            }
+            state.commit("deleteElementFromStore", payload);
         }
     },
     mutations: {
@@ -392,7 +404,7 @@ export default {
         // Delete td/ mashup/ folder from tds/ mashups/ folders
         deleteElementFromStore(state: any, payload: {id: string, type: string}) {
             const elementList = state[`${payload.type}s`];
-            let elementToDelete;
+            let elementToDelete: TD | Mashup | Folder | undefined;
             for (const element of elementList as (TD[] | Mashup[] | Folder[])) {
                 if (element.id === payload.id) {
                     elementToDelete = element;
@@ -400,25 +412,23 @@ export default {
                     break;
                 }
             }
-            if (elementToDelete.parentId !== 'parent') {
-                let index = 0;
+            if (elementToDelete && elementToDelete.parentId !== 'parent') {
                 let finished = false;
                 for (const mashup of state.mashups as Mashup[]) {
                     if (mashup.id === elementToDelete.parentId) {
-                        mashup.children.splice(mashup.children.indexOf(elementToDelete as (TD | Mashup)), 1);
+                        const index = mashup.children.findIndex(child => {if(elementToDelete) return child.id === elementToDelete.id});
+                        if(index !== -1) mashup.children.splice(index, 1);
                         finished = true;
                         break;
                     }
-                    index++;
                 }
-                index = 0;
                 if (!finished) for (const folder of state.folders as Folder[]) {
                     if (folder.id === elementToDelete.parentId) {
-                        folder.children.splice(folder.children.indexOf(elementToDelete as (TD | Mashup | Folder)), 1);
+                        const index = folder.children.findIndex(child => {if(elementToDelete) return child.id === elementToDelete.id});
+                        if(index !== -1) folder.children.splice(index, 1);
                         finished = true;
                         break;
                     }
-                    index++;
                 }
             }
         },
