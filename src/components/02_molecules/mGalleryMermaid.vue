@@ -36,7 +36,7 @@ export default Vue.extend({
             required: true
         }
     },
-    data: function(){
+    data(){
         return {
             txtIndex: 0,
         }
@@ -65,6 +65,11 @@ export default Vue.extend({
                     behavior: "smooth"
                 });
             },3)
+        }
+    },
+    watch: {
+        txtArray() {
+            if(this.txtArray) this.txtIndex = 0;
         }
     }
 })
