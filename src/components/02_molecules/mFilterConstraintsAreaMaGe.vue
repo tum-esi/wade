@@ -38,7 +38,7 @@
                     <input type="checkbox"
                     :disabled="disableType('boolean')"
                     :checked="typeIsChecked('boolean')" 
-                    @input="$emit('input', onTypeConstraintChanged('boolean', $event.target.checked))">
+                    @input="$emit('change', onTypeConstraintChanged('boolean', $event.target.checked))">
                     <label>Boolean</label>
                 </div>
                 <div>
@@ -57,6 +57,28 @@
                 </div>
             </div>
             <div>
+                <h4>Input Interactions Restrictions</h4>
+                <div>
+                    <input type="checkbox"
+                    :disabled="disableInputRestriction('allowMixedTemplates')"
+                    v-model="filters.allowMixedTemplates">
+                    <label>Allow Mixed Templates</label>
+                </div>
+                <h4>Output Interactions Restrictions</h4>
+                <div>
+                    <input type="checkbox"
+                    :disabled="disableOutputType('action-invoke')"
+                    :checked="outputTypeIsChecked('action-invoke')"
+                    @input="$emit('change', onOutputTypeConstraintChanged('action-invoke', $event.target.checked))">
+                    <label>Allow Action Invokes</label>
+                </div>
+                <div>
+                    <input type="checkbox"
+                    :disabled="disableOutputType('property-write')"
+                    :checked="outputTypeIsChecked('property-write')"
+                    @input="$emit('change', onOutputTypeConstraintChanged('property-write', $event.target.checked))">
+                    <label>Allow Property Writes</label>
+                </div>
                 <h4>Interaction Matching Criteria</h4>
                 <div>
                     <input type="checkbox"
@@ -81,21 +103,6 @@
                     @input="$emit('change', onCheckBoxChecked('semanticMatch', $event.target.checked))">
                     <label>Only match interactions that have the same semantic ("@type") context.</label>
                 </div>
-                <h4>Output Interactions Restrictions</h4>
-                <div>
-                    <input type="checkbox"
-                    :disabled="disableOutputType('action-invoke')"
-                    :checked="outputTypeIsChecked('action-invoke')"
-                    @input="$emit('change', onOutputTypeConstraintChanged('action-invoke', $event.target.checked))">
-                    <label>Allow Action Invokes</label>
-                </div>
-                <div>
-                    <input type="checkbox"
-                    :disabled="disableOutputType('property-write')"
-                    :checked="outputTypeIsChecked('property-write')"
-                    @input="$emit('change', onOutputTypeConstraintChanged('property-write', $event.target.checked))">
-                    <label>Allow Property Writes</label>
-                </div>
             </div>
         </div>
         <h4 v-if="showTdAnnotationsTable">Restrictions on TD Annotations</h4>
@@ -113,7 +120,6 @@ import mInteractionSelectionMaGe from '@/components/02_molecules/mInteractionSel
 import mAnnotationSelectionMaGe from '@/components/02_molecules/mAnnotationSelectionMaGe.vue';
 import mTdAnnotationSelectionMaGe from '@/components/02_molecules/mTdAnnotationSelectionMaGe.vue';
 import { mapGetters, mapState } from 'vuex';
-import { watch } from 'fs';
 export default Vue.extend({
     name: 'mFilterConstraintsAreaMaGe',
     model: {
@@ -123,7 +129,8 @@ export default Vue.extend({
     props: {
         filters: {
             type: Object as () => MAGE.FiltersInterface,
-            required: false
+            required: false,
+            
         },
         templates: {
             type: Object as () => {
@@ -139,6 +146,24 @@ export default Vue.extend({
         mAnnotationSelectionMaGe,
         mTdAnnotationSelectionMaGe
     },
+    data() {
+        return {
+            typeWasDisabled: {
+                "null": true,
+                "integer": true,
+                "number": true,
+                "string": true,
+                "boolean": true,
+                "array": true,
+                "object": true
+            },
+            outputTypeWasDisabled: {
+                "property-write": true,
+                "action-invoke": true
+            },
+
+        }
+    },
     computed: {
         ...mapState('MashupStore',["allInteractions", "allAnnotations", "allTdAnnotations"]),
         InteractionsTable() {
@@ -149,6 +174,7 @@ export default Vue.extend({
             let listE: WADE.ListInterface = {header: "EventSubs", items: []};
             let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
             let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
+            let listO: WADE.ListInterface = {header: "PropertyObservations", items: []}
             for(let interactiontype in allInteractions) {
                 switch(interactiontype) {
                     case "propertyWrites":
@@ -196,12 +222,22 @@ export default Vue.extend({
                             });
                         }
                         break;
+                    case "propertyObservations":
+                        let propertyObservations = allInteractions[interactiontype];
+                        for(let observation of propertyObservations) {
+                            listO.items.push({
+                                label: `${observation.title}: ${observation.name}`,
+                                payload: observation
+                            });
+                        }
+                        break;
                 }
             }
             table.columns.push(listR);
-            table.columns.push(listW);
+            table.columns.push(listO);
             table.columns.push(listE);
             table.columns.push(listAR)
+            table.columns.push(listW);
             table.columns.push(listA);
             return table;
         },
@@ -213,6 +249,7 @@ export default Vue.extend({
             let listE: WADE.ListInterface = {header: "EventSubs", items: []};
             let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
             let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
+            let listO: WADE.ListInterface = {header: "PropertyObservations", items: []}
             for(let annotationtype in allAnnotations) {
                 switch(annotationtype) {
                     case "propertyWrites":
@@ -260,12 +297,22 @@ export default Vue.extend({
                             });
                         }
                         break;
+                     case "propertyObservations":
+                        let propertyObservations = allAnnotations[annotationtype];
+                        for(let annotation of propertyObservations) {
+                            listO.items.push({
+                                label: `${annotation.annotation}`,
+                                payload: annotation
+                            });
+                        }
+                        break;
                 }
             }
             table.columns.push(listR);
-            table.columns.push(listW);
+            table.columns.push(listO);
             table.columns.push(listE);
             table.columns.push(listAR)
+            table.columns.push(listW);
             table.columns.push(listA);
             return table;
         },
@@ -342,24 +389,49 @@ export default Vue.extend({
         },
         disableType(type: MAGE.acceptedTypesEnum): boolean {
             let interactions  = (this as any).allInteractions;
+            let filters = this.filters;
             for(let interactionType in interactions) {
                 if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.dataType === type})) {
-                    if(!this.filters.acceptedTypes.includes(type)) this.filters.acceptedTypes.push(type); 
+                    if(!filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === true) {
+                        filters.acceptedTypes.push(type);
+                        this.typeWasDisabled[type] = false;
+                        this.$emit("change",filters);
+                    } 
                     return false;
                 } 
             }
-            if(this.filters.acceptedTypes.includes(type)) this.filters.acceptedTypes.splice(this.filters.acceptedTypes.indexOf(type), 1);
-            return true
+            if(filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === false) {
+                filters.acceptedTypes.splice(filters.acceptedTypes.indexOf(type), 1);
+                this.typeWasDisabled[type] = true;
+                this.$emit("change", filters);
+            } 
+            return true;
+        },
+        disableInputRestriction(type: "allowMixedTemplates"): boolean {
+            switch(type) {
+               case "allowMixedTemplates":
+                   return false;
+                   break;
+            }
         },
         disableOutputType(type: "property-write" | "action-invoke"): boolean {
             let interactions  = (this as any).allInteractions;
+            let filters = this.filters;
             for(let interactionType in interactions) {
                 if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.type === type})) {
-                    if(!this.filters.acceptedOutputInteractionTypes.includes(type)) this.filters.acceptedOutputInteractionTypes.push(type); 
+                    if(!filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === true) {
+                        filters.acceptedOutputInteractionTypes.push(type);
+                        this.outputTypeWasDisabled[type] = false;
+                        this.$emit("change", filters);
+                    } 
                     return false;
                 } 
             }
-            if(this.filters.acceptedOutputInteractionTypes.includes(type)) this.filters.acceptedOutputInteractionTypes.splice(this.filters.acceptedOutputInteractionTypes.indexOf(type), 1);
+            if(filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === false) {
+                filters.acceptedOutputInteractionTypes.splice(filters.acceptedOutputInteractionTypes.indexOf(type), 1);
+                this.outputTypeWasDisabled[type] = true;
+                this.$emit("change", filters);
+            } 
             return true
         },
         outputTypeIsChecked(type: "action-invoke" | "property-write"): boolean {
@@ -422,7 +494,7 @@ export default Vue.extend({
     justify-content: space-between;
     background-color: #939C9E;
     padding: 5pt;
-    height: 16%;
+    height: 18%;
 }
 
 .fit-content {

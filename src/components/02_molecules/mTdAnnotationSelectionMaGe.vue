@@ -16,7 +16,7 @@
                     </div>
                     <div class="image-selector">
                         <aIcon
-                        title="Mashup should not include interactions labelled with this annotation"
+                        title="Mashup should not include TDs labelled with this annotation"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'forbidden')"
                         iconSrcPath="forbidden-icon"
@@ -24,7 +24,7 @@
                         specificStyle="mage-icon"
                         @icon-clicked="setTdAnnotationRestriction({annotation: item.payload, restriction: 'forbidden'})"/>
                         <aIcon
-                        title="Mashup can include interactions labelled with this annotation"
+                        title="Mashup can include TDs labelled with this annotation"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'none')"
                         iconSrcPath="include-icon"
@@ -32,7 +32,7 @@
                         specificStyle="mage-icon"
                         @icon-clicked="setTdAnnotationRestriction({annotation: item.payload, restriction: 'none'})"/>
                         <aIcon
-                        title="Mashup should not include interactions labelled with this annotation"
+                        title="Mashup must include TDs labelled with this annotation"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'mustHave')"
                         iconSrcPath="must-include-icon"
@@ -97,7 +97,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 25%;
+    height: 24.25%;
 }
 
 .add-icon {

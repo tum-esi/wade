@@ -39,8 +39,8 @@ export default {
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
         ios:        null as Array<TD|Mashup> | null,
-        allInteractions: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
-        allAnnotations: {propertyReads: [], propertyWrites: [], eventSubs:[], actionReads:[], actionInvokes: []},
+        allInteractions: {propertyReads: [], propertyWrites: [], propertyObservations: [], eventSubs:[], actionReads:[], actionInvokes: []},
+        allAnnotations: {propertyReads: [], propertyWrites: [], propertyObservations: [], eventSubs:[], actionReads:[], actionInvokes: []},
         allTdAnnotations: {inputs: [], outputs: [], ios:[]},
         storedVocabs: [] as MAGE.storedVocabInterface[],
         generationForm: null as MAGE.GenerationFormInterace | null,
@@ -339,6 +339,7 @@ export default {
             state.allInteractions = {
                 propertyReads: [],
                 propertyWrites: [],
+                propertyObservations: [],
                 eventSubs: [],
                 actionInvokes: [],
                 actionReads: []
@@ -346,18 +347,13 @@ export default {
             state.allAnnotations = {
                 propertyReads: [],
                 propertyWrites: [],
-                eventSubs: [],
-                actionInvokes: [],
-                actionReads: []
-            };
-            state.allTdAnnotations = {
-                propertyReads: [],
-                propertyWrites: [],
+                propertyObservations: [],
                 eventSubs: [],
                 actionInvokes: [],
                 actionReads: []
             };
             state.allTdAnnotations = {inputs: [], outputs: [], ios:[]};
+            state.storedVocabs = [];
             state.result = null;
             state.resultReady = false;
             state.showCode = false;
@@ -482,7 +478,7 @@ export default {
                     type: "property-read",
                     restriction: "none" 
                 }; 
-                let writeInteractionToPush: MAGE.VueInteractionInterface= {
+                let writeInteractionToPush: MAGE.VueInteractionInterface = {
                     title: payload.element.title, 
                     thingId: parsedTd.id, 
                     name: prop,
@@ -492,9 +488,20 @@ export default {
                     type: "property-write",
                     restriction: "none"
                 };
+                let observeInteractionToPush: MAGE.VueInteractionInterface = {
+                    title: payload.element.title, 
+                    thingId: parsedTd.id, 
+                    name: prop,
+                    description: description,
+                    annotations: annotations,
+                    dataType: dataType,
+                    type: "property-observe",
+                    restriction: "none"
+                }
                 if(payload.io == "input" && !parsedTd.properties[prop].writeOnly) {
                     // push interaction 
                     state.allInteractions.propertyReads.push(readInteractionToPush);
+                    if(parsedTd.properties[prop].observable) state.allInteractions.propertyObservations.push(observeInteractionToPush);
                     // push annotations if not already present
                     for(let annotation of readAnnotationsToPush) {
                         let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
@@ -502,6 +509,16 @@ export default {
                             state.allAnnotations.propertyReads[index].numberOfAccurance++;
                         } else {
                             state.allAnnotations.propertyReads.push(annotation);
+                        }
+                    }
+                    if(parsedTd.properties[prop].observable) {
+                        for(let annotation of readAnnotationsToPush) {
+                            let index = state.allAnnotations.propertyObservations.findIndex(a => {return a.annotation === annotation.annotation});
+                            if(index !== -1) {
+                                state.allAnnotations.propertyObservations[index].numberOfAccurance++;
+                            } else {
+                                state.allAnnotations.propertyObservations.push(annotation);
+                            }
                         }
                     }
                 }
@@ -522,6 +539,7 @@ export default {
                     if(!parsedTd.properties[prop].writeOnly) {
                         // push interaction 
                         state.allInteractions.propertyReads.push(readInteractionToPush);
+                        if(parsedTd.properties[prop].observable) state.allInteractions.propertyObservations.push(observeInteractionToPush);
                         // push annotations if not already present
                         for(let annotation of readAnnotationsToPush) {
                             let index = state.allAnnotations.propertyReads.findIndex(a => {return a.annotation === annotation.annotation});
@@ -529,6 +547,16 @@ export default {
                                 state.allAnnotations.propertyReads[index].numberOfAccurance++;
                             } else {
                                 state.allAnnotations.propertyReads.push(annotation);
+                            }
+                        }
+                        if(parsedTd.properties[prop].observable) {
+                            for(let annotation of readAnnotationsToPush) {
+                                let index = state.allAnnotations.propertyObservations.findIndex(a => {return a.annotation === annotation.annotation});
+                                if(index !== -1) {
+                                    state.allAnnotations.propertyObservations[index].numberOfAccurance++;
+                                } else {
+                                    state.allAnnotations.propertyObservations.push(annotation);
+                                }
                             }
                         }
                     }
@@ -580,7 +608,7 @@ export default {
                     restriction: "none"
                 };
                 
-                if(payload.io === "input") {
+                if(payload.io === "input" ||  payload.io === "io") {
                     // push interaction
                     state.allInteractions.eventSubs.push(interactionToPush);
                     // push annotations if not already present
@@ -780,6 +808,10 @@ export default {
                         index = (state.allInteractions.actionReads as MAGE.VueInteractionInterface[]).findIndex(action => action.thingId === interaction.thingId &&
                             action.name === interaction.name);
                         if(index !== -1) (state.allInteractions.actionReads as MAGE.VueInteractionInterface[])[index].restriction = restriction; break;
+                case "property-observe":
+                    index = (state.allInteractions.propertyObservations as MAGE.VueInteractionInterface[]).findIndex(action => action.thingId === interaction.thingId &&
+                        action.name === interaction.name);
+                    if(index !== -1) (state.allInteractions.propertyObservations as MAGE.VueInteractionInterface[])[index].restriction = restriction; break;
             }
             
         },
@@ -803,6 +835,9 @@ export default {
                 case "action-read":
                     index = (state.allAnnotations.actionReads as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
                     if(index !== -1) (state.allAnnotations.actionReads as MAGE.VueAnnotationInterface[])[index].restriction = restriction;  break;
+                case "property-observe":
+                    index = (state.allAnnotations.propertyObservations as MAGE.VueAnnotationInterface[]).findIndex(a => a.annotation === annotation.annotation);
+                    if(index !== -1) (state.allAnnotations.propertyObservations as MAGE.VueAnnotationInterface[])[index].restriction = restriction;  break;
             }   
         },
         setTdAnnotationRestriction(state: any, payload: {annotation: MAGE.VueAnnotationInterface, restriction: "none" | "forbidden" | "mustHave"}){
@@ -854,7 +889,7 @@ export default {
             function removeAnnotations(
                 interaction: MAGE.VueInteractionInterface,
                 type: "properties" | "events" | "actions",
-                category: "propertyReads" | "propertyWrites" | "eventSubs" | "actionReads" | "actionInvokes") {
+                category: "propertyReads" | "propertyWrites" | "eventSubs" | "actionReads" | "actionInvokes" | "propertyObservations") {
                     let interactionName = interaction.name
                     let annotations = parsedTd[type][interactionName]["@type"] as string | string[] | undefined;
                     // put all annotations in string array
@@ -913,6 +948,15 @@ export default {
                     let action = state.allInteractions.actionReads[index] as MAGE.VueInteractionInterface;
                     removeAnnotations(action, "actions", "actionReads");
                     state.allInteractions.actionReads.splice(index,1);
+                    index--;
+                };
+            }
+            for(index = 0; index < state.allInteractions.propertyObservations.length; index++) {
+                if(state.allInteractions.propertyObservations[index].thingId === parsedTd.id && 
+                    state.allInteractions.propertyObservations[index].title === element.title) {
+                    let action = state.allInteractions.propertyObservations[index] as MAGE.VueInteractionInterface;
+                    removeAnnotations(action, "properties", "propertyObservations");
+                    state.allInteractions.propertyObservations.splice(index,1);
                     index--;
                 };
             }

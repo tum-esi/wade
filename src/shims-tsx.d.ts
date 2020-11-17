@@ -493,7 +493,7 @@ declare global {
     }
 
     interface InputInteractionInterface extends InteractionInterface {
-      interactionType: "event-subscribe" | "property-read" | "action-read",
+      interactionType: "event-subscribe" | "property-read" | "action-read" | "property-observe",
       matchingOutputCombinations?: MAGE.InteractionInterface[][],
     }
 
@@ -504,13 +504,13 @@ declare global {
       description: string, 
       annotations: string[],
       dataType: "null" | "string" | "integer" | "number" | "boolean" | "array" | "object",
-      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke",
+      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" | "property-observe",
       restriction: "none" | "forbidden" | "mustHave"
     }
 
     interface VueAnnotationInterface {
       annotation: string,
-      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" | "input" | "output" | "io",
+      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" |  "property-observe" | "input" | "output" | "io",
       numberOfAccurance: number,
       description: string | null,
       restriction: "none" | "forbidden" | "mustHave";

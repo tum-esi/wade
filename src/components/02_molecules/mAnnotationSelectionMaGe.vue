@@ -32,7 +32,7 @@
                         specificStyle="mage-icon"
                         @icon-clicked="setAnnotationRestriction({annotation: item.payload, restriction: 'none'})"/>
                         <aIcon
-                        title="Mashup should not include interactions labelled with this annotation"
+                        title="Mashup must include interactions labelled with this annotation"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'mustHave')"
                         iconSrcPath="must-include-icon"
@@ -88,6 +88,7 @@ export default Vue.extend({
             if(column.items.length === 0) return false;
             if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) return false;
             if(column.header === "EventSubs" && this.templates["use-event-template"] === false) return false;
+            if(column.header === "PropertyObservations" && this.templates["use-event-template"] === false) return false;
             if(column.header === "ActionReads" && this.templates["use-action-template"] === false) return false;
             if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) return false;
             if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) return false;
@@ -108,7 +109,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 25%;
+    height: 24.25%;
 }
 
 .add-icon {

@@ -14,11 +14,12 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     let filters = generationForm.filters;
     let templates = generationForm.templates;
 
-    let events:         MAGE.InputInteractionInterface[] = []
-    let propertyReads:  MAGE.InputInteractionInterface[] = []
-    let actionReads:    MAGE.InputInteractionInterface[] = []
-    let propertyWrites: MAGE.InteractionInterface[] = []
-    let actions:        MAGE.InteractionInterface[] = []
+    let events:         MAGE.InputInteractionInterface[] = [];
+    let propertyReads:  MAGE.InputInteractionInterface[] = [];
+    let propertyObservations: MAGE.InputInteractionInterface[] = [];
+    let actionReads:    MAGE.InputInteractionInterface[] = [];
+    let propertyWrites: MAGE.InteractionInterface[] = [];
+    let actions:        MAGE.InteractionInterface[] = [];
     
     // get and categorize all input interactions
     things.inputs.forEach( thingDescription => {
@@ -37,6 +38,7 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
             events.push(...interactions.events);
             propertyReads.push(...interactions.properties);
             actionReads.push(...interactions.actions);
+            propertyObservations.push(...interactions.observations);
         }
     })
 
@@ -83,10 +85,14 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     for (let input of actionReads) {
         input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
     }
+    for (let input of propertyObservations) {
+        input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
+    }
     // remove inputs without matching outputs
     events = events.filter(event => event.matchingOutputCombinations && event.matchingOutputCombinations.length > 0);
     propertyReads = propertyReads.filter(property => property.matchingOutputCombinations && property.matchingOutputCombinations.length > 0);
     actionReads = actionReads.filter(action => action.matchingOutputCombinations && action.matchingOutputCombinations.length > 0);
+    propertyObservations = propertyObservations.filter(observation => observation.matchingOutputCombinations && observation.matchingOutputCombinations.length > 0);
 
     // Calculate all possible output combinations for each input combinations and put them together
     let interactionCombinations: MAGE.InteractionInterface[][] = [];
@@ -94,7 +100,12 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     let interactionsToCombine: MAGE.InputInteractionInterface[] = []
     for(let template in templates) {
         switch(template) {
-            case "use-event-template": if(templates[template]) interactionsToCombine.push(...events); break;
+            case "use-event-template":
+                if(templates[template]) {
+                    interactionsToCombine.push(...events);
+                    interactionsToCombine.push(...propertyObservations);
+                }
+                break;
             case "use-read-template": if(templates[template]) interactionsToCombine.push(...propertyReads); break;
             case "use-action-template": if(templates[template]) interactionsToCombine.push(...actionReads); break;
         }
@@ -108,13 +119,17 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
 function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.FiltersInterface) {
     let events: MAGE.InputInteractionInterface[] = [];
     let propertyReads: MAGE.InputInteractionInterface[] = [];
+    let propertyObservations: MAGE.InputInteractionInterface[] = [];
     let actionReads: MAGE.InputInteractionInterface[] = [];
     for (let prop in thingDescription.properties) {
+        let dontAddRead = false;
+        let dontAddObserve = false;
 
         let propAnnotations = thingDescription.properties[prop]['@type'];
         if(!propAnnotations) propAnnotations = [];
         if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
 
+        // filter based on unwanted types
         if (!thingDescription.properties[prop].writeOnly) {
             if(!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
                 if(thingDescription.properties[prop].type) continue;
@@ -122,22 +137,41 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             }
             // filter interactions with unwanted annotations
             if(filters.forbiddenAnnotations) {
-                let forbiddenFound = false;
+                let forbiddenReadFound = false;
+                let forbiddenObserveFound = false;
                 for(let annotation of propAnnotations) {
                     if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-read")) {
-                        forbiddenFound = true;
+                        forbiddenReadFound = true;
                         break;
                     }
                 }
-                if(forbiddenFound) continue;
+                for(let annotation of propAnnotations) {
+                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-observe")) {
+                        forbiddenObserveFound = true;
+                        break;
+                    }
+                }
+                if(forbiddenReadFound) dontAddRead = true;
+                if(forbiddenObserveFound) dontAddObserve = true;
             }
             // filter unwanted interactions
             if(filters.forbiddenInteractions) {
                 if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                    inter.name === prop && inter.type === "property-read")) continue;
+                    inter.name === prop && inter.type === "property-read")) dontAddRead = true;
+                if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
+                        inter.name === prop && inter.type === "property-observe")) dontAddObserve = true;
             }
-            propertyReads.push({
+            if(!dontAddRead) propertyReads.push({
                 interactionType: "property-read", 
+                name: prop,
+                object: thingDescription.properties[prop],
+                from: "Agent",
+                to: thingDescription.title,
+                thingId: thingDescription.id,
+                id: ""
+            });
+            if(thingDescription.properties[prop].observable && !dontAddObserve) propertyObservations.push({
+                interactionType: "property-observe", 
                 name: prop,
                 object: thingDescription.properties[prop],
                 from: "Agent",
@@ -222,7 +256,7 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             id: ""
         });
     }
-    return { "events": events, "properties": propertyReads, "actions": actionReads };
+    return { "events": events, "properties": propertyReads, "actions": actionReads, "observations": propertyObservations };
 }
 
 /** parse a TD to return all interactions that can serve as an output */
@@ -341,6 +375,9 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
     }
     // filter input combinations that have more things than allowed
     if(form.maxThings && form.maxThings > 0) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) return getNumberOfThings(inputs_c) <= form.maxThings});
+    // filtering of mixed template inputs
+    if(!form.filters.allowMixedTemplates)  allInputCombinations = allInputCombinations.filter(inputs_c => {return isMixedInputTemplate(inputs_c)});
+
     allInputCombinations.forEach(inputs_c => {
         let availableOutputs: MAGE.InteractionInterface[][][] = [];
         inputs_c.forEach(input => {if(input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations);}) 
@@ -433,6 +470,16 @@ function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
         return isIncluded;
 }
 
+function isMixedInputTemplate(inputs: MAGE.InputInteractionInterface[]): boolean {
+    let template: string = "";
+    for(let [index, input] of inputs.entries()) {
+        if(index === 0) {template = input.interactionType; continue;}
+        if(input.interactionType !== template) return false;
+        if(index === inputs.length - 1) return true;
+    }
+    return true;
+}
+
 /** Returns the number of Things that participate in a given list on interactions */
 function getNumberOfThings(interactions: MAGE.InteractionInterface[]) {
     let thingIds: string[] = [];
@@ -471,6 +518,12 @@ function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactio
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribeEvent: "${interaction.name}"\n`;
             inputsDone++;          
         }
+        else if (interaction.interactionType === "property-observe") {
+            if(inputsDone == 0) seqDiagram += `par\n`;
+            if(inputsDone > 0) seqDiagram += `and\n`;
+            seqDiagram += `${interaction.from} ->>+ ${interaction.to} : observeProperty: "${interaction.name}"\n`;
+            inputsDone++;          
+        }
         else if (interaction.interactionType === "property-write") {
             if(outputsDone == 0) seqDiagram += `par\n`;
             if(outputsDone > 0) seqDiagram += `and\n`;
@@ -491,7 +544,7 @@ function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactio
         if (interaction.interactionType === "property-read") {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
             if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "event-subscribe") {
+        } else if (interaction.interactionType === "event-subscribe" || interaction.interactionType === "property-observe") {
             seqDiagram += `${interaction.to} -->> ${interaction.from} : confirmation\n`;
             seqDiagram += `${interaction.to} ->>- ${interaction.from} : data-pushed\n`;
             if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
@@ -534,6 +587,13 @@ function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interacti
             seqDiagram += `activate "${interaction.to}"\n`;
             inputsDone++;          
         }
+        else if (interaction.interactionType === "property-observe") {
+            if(inputsDone == 0) seqDiagram += `par\n`;
+            if(inputsDone > 0) seqDiagram += `else\n`;
+            seqDiagram += `"${interaction.from}" -> "${interaction.to}" : observeProperty: "${interaction.name}"\n`;
+            seqDiagram += `activate "${interaction.to}"\n`;
+            inputsDone++;          
+        }
         else if (interaction.interactionType === "property-write") {
             if(outputsDone == 0) seqDiagram += `par\n`;
             if(outputsDone > 0) seqDiagram += `else\n`;
@@ -555,7 +615,7 @@ function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interacti
             seqDiagram += `"${interaction.to}" --> "${interaction.from}" : response\n`;
             seqDiagram += `deactivate "${interaction.to}"\n`
             if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "event-subscribe") {
+        } else if (interaction.interactionType === "event-subscribe" || interaction.interactionType === "property-observe") {
             seqDiagram += `"${interaction.to}" --> "${interaction.from}" : confirmation\n`;
             seqDiagram += `"${interaction.to}" ->> "${interaction.from}" : data-pushed\n`;
             if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
@@ -622,6 +682,7 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
                 case "property-read":
                 case "event-subscribe":
                 case "action-read":
+                case "property-observe":
                     numberOfInputInteractions++; break;
                 case "property-write":
                 case "action-invoke":
@@ -700,8 +761,8 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
             "use-read-template": true,
         },
         this.filters = {
-            acceptedTypes: ["null","string","integer","boolean","number"],
-            acceptedOutputInteractionTypes: ['property-write', 'action-invoke'],
+            acceptedTypes: [],
+            acceptedOutputInteractionTypes: [],
             onlySameType: false,
             onlySimilarNames: false,
             similarityThreshold: null,

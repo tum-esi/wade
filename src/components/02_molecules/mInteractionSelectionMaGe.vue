@@ -17,7 +17,7 @@
                     </div>
                     <div class="image-selector">
                         <aIcon
-                        title="Mashup should not include interactions labelled with this annotation"
+                        title="Mashup must not include this interaction"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'forbidden')"
                         iconSrcPath="forbidden-icon"
@@ -25,7 +25,7 @@
                         specificStyle="mage-icon"
                         @icon-clicked="setInteractionRestriction({interaction: item.payload, restriction: 'forbidden'})"/>
                         <aIcon
-                        title="Mashup can include interactions labelled with this annotation"
+                        title="Mashup can include this interaction"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'none')"
                         iconSrcPath="include-icon"
@@ -33,7 +33,7 @@
                         specificStyle="mage-icon"
                         @icon-clicked="setInteractionRestriction({interaction: item.payload, restriction: 'none'})"/>
                         <aIcon
-                        title="Mashup should not include interactions labelled with this annotation"
+                        title="Mashup must include this interaction"
                         class="selection-item-icon"
                         :class="isCheckedClass(item.payload, 'mustHave')"
                         iconSrcPath="must-include-icon"
@@ -110,6 +110,13 @@ export default Vue.extend({
                 }
                 return false;
             }
+            if(column.header === "PropertyObservations" && this.templates["use-event-template"] === false) {
+                for(let item of column.items) {
+                    let interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                }
+                return false;
+            }
             if(column.header === "ActionReads" && this.templates["use-action-template"] === false) {
                 for(let item of column.items) {
                     let interaction  = item.payload as MAGE.VueInteractionInterface;
@@ -169,6 +176,15 @@ export default Vue.extend({
                         }
                     }
                     break;
+                case "property-observe": 
+                    for(let annotation of interaction.annotations) {
+                        if(allAnnotations.propertyObservations.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
+                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
                 case "action-read": 
                     for(let annotation of interaction.annotations) {
                         if(allAnnotations.actionReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
@@ -204,7 +220,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 25%;
+    height: 24.25%;
 }
 
 .add-icon {
