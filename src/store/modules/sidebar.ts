@@ -313,7 +313,7 @@ export default {
                     await dispatch("deleteElementAndChildren", {id: child.id, type: child.type});
                 }
             }
-            state.commit("deleteElementFromStore", payload);
+            commit("deleteElementFromStore", payload);
         }
     },
     mutations: {
