@@ -2,6 +2,7 @@ import * as N3 from 'n3';
 const { DataFactory } = N3;
 const { namedNode, literal, defaultGraph, quad } = DataFactory;
 import { RdfXmlParser } from "rdfxml-streaming-parser";
+import { JsonLdParser } from "jsonld-streaming-parser";
 
 export const parser = new N3.Parser();
 export let vocabStore = new N3.Store();
@@ -14,7 +15,7 @@ export async function fetchAndStoreVocab(url:string): Promise<boolean> {
     let requestInit : RequestInit = {
         method: "GET",
         headers: {
-            "Accept": "text/turtle, text/rdf+xml;0.9, text/xml;0.9, application/rdf+xml;0.9",
+            "Accept": "text/turtle, application/rdf+xml;0.9, application/ld+json;0.9",
             "Origin": "localhost"
         }
     }
@@ -30,6 +31,9 @@ export async function fetchAndStoreVocab(url:string): Promise<boolean> {
         let rdfxmlParser = new RdfXmlParser({
             dataFactory: DataFactory,
         });
+        let jsonLdParser = new JsonLdParser({
+            dataFactory: DataFactory,
+        });
         let text = await response.text();
         if(!contentTypeString) {
             if(text.search("xml") !== -1) {
@@ -43,6 +47,16 @@ export async function fetchAndStoreVocab(url:string): Promise<boolean> {
             rdfxmlParser.write(text);
             rdfxmlParser.end();
             }
+        } else if(contentTypeString && (contentTypeString.search("json") !== -1)) {
+            jsonLdParser
+                .on('data', (quad) => {
+                    quad.graph = namedNode(url);
+                    vocabStore.addQuad(quad);
+                })
+                .on('error', console.error)
+                .on('end', () => console.log('All JSON-LD triples were parsed!'));
+            rdfxmlParser.write(text);
+            rdfxmlParser.end();
         } else if(contentTypeString && (contentTypeString.search("xml") !== -1)) {
             rdfxmlParser
                 .on('data', (quad) => {
@@ -50,7 +64,7 @@ export async function fetchAndStoreVocab(url:string): Promise<boolean> {
                     vocabStore.addQuad(quad);
                 })
                 .on('error', console.error)
-                .on('end', () => console.log('All triples were parsed!'));
+                .on('end', () => console.log('All RDF/XML triples were parsed!'));
             rdfxmlParser.write(text);
             rdfxmlParser.end();
         } else if(contentTypeString && (contentTypeString.search("turtle") !== -1)) {
