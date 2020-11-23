@@ -10,8 +10,7 @@ import beautify from 'js-beautify';
 /**
  * Generates the content for a mashup.ts file that contains the
  * Mashup application logic represented by the System Description
- * and the content for a index.js file that handles the WoT-Scripting-API
- * integration.
+ * and the content for a index.js file that handles the WoT-Scripting-API integration.
  * To execute the generated code one needs to have node.js and npm installed,
  * install the required npm-packages e.g. `@node-wot/core`
  * and can then start the Mashup by running `node filename_index.js`
