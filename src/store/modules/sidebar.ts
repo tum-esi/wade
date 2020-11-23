@@ -309,7 +309,8 @@ export default {
             let elementToDelete: TD | Mashup | Folder | undefined;
             elementToDelete = elementList.find(element => element.id === payload.id);
             if(elementToDelete && elementToDelete.hasChildren) {
-                for(let child of elementToDelete.children) {
+                while(elementToDelete.children.length > 0) {
+                    let child = elementToDelete.children[0];
                     await dispatch("deleteElementAndChildren", {id: child.id, type: child.type});
                 }
             }
