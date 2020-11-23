@@ -650,6 +650,9 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
         if(!element.content) return;
         parsedTd = JSON.parse(element.content);
         if (parsedTd.properties) n += Object.keys(parsedTd.properties).length;
+        for(let prop in parsedTd.properties) {
+            if(parsedTd.properties[prop].observable) n++;
+        }
         if (parsedTd.actions) n += Object.keys(parsedTd.actions).length;
         if (parsedTd.events) n += Object.keys(parsedTd.events).length;
     })
