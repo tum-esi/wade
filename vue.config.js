@@ -1,3 +1,5 @@
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 module.exports = {
   pluginOptions: {
     electronBuilder: {
@@ -7,4 +9,11 @@ module.exports = {
       },
     },
   },
+  configureWebpack: {
+    plugins: [
+      new MonacoWebpackPlugin({
+        languages: ['typescript', 'javascript', 'json']
+      })
+    ]
+  }
 };
