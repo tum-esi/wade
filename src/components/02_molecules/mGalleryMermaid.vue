@@ -7,6 +7,7 @@
             <aIconButton class="nav-button" iconBtnSrcPath="arrow_left" iconBtnOnClick="move-left" @icon-btn-clicked='moveLeft'/>
             <div class="mermaid-view-container">
                 <label> {{txtArray.length}} mashups conform to the selected criteria from a total of {{maxPossibleMashups}} possible mashups</label>
+                <label> {{timeText}}</label>
                 <aViewerMermaid class="mermaid-view" :txt="txtArray[txtIndex]"/>
                 <label>Mashup {{txtIndex+1}}/{{txtArray.length}}</label>
             </div>
@@ -17,6 +18,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapGetters } from 'vuex';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aViewerMermaid from '@/components/01_atoms/aViewerMermaid.vue';
 import { watch } from 'fs';
@@ -39,6 +41,14 @@ export default Vue.extend({
     data(){
         return {
             txtIndex: 0,
+        }
+    },
+    computed: {
+        ...mapGetters('MashupStore',["getGenerationExecutionTime"]),
+        timeText(): string {
+            let generationExecutionTime = (this as any).getGenerationExecutionTime;
+            let result = `${generationExecutionTime.executionTime.toFixed(2)} ${generationExecutionTime.stringUnit}`;
+            return result;
         }
     },
     methods: {

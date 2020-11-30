@@ -1,6 +1,6 @@
 "use strict";
 
-export default function generateCode(mashup, tds): string {
+export default function generateCode(mashup, tds: string[]): string {
     // add tds to script
     let script =
 `"use strict";

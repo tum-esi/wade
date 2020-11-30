@@ -267,7 +267,7 @@ export default Vue.extend({
             })
         },
         generateCode(){
-            this.$store.dispatch("MashupStore/generateMashupCode", this.currentlyViewedMashup);
+            this.$store.dispatch("MashupStore/generateMashupCode");
         },
         generateSD(){
             this.$store.dispatch("MashupStore/generateSystemDescription", this.currentlyViewedMashup);

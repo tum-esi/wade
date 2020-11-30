@@ -7,6 +7,7 @@ import Crypto from "crypto";
 import * as Filters from "./filters";
 import * as Utils from "./utils";
 import { ThingDescription } from 'wot-typescript-definitions';
+import { hrtime } from 'process';
 
 /** generate all the possible combinations of interactions for a given list of things and a given length */ 
 async function generateInteractionCombinations(generationForm: MAGE.GenerationFormInterace) {
@@ -377,6 +378,21 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
     if(form.maxThings && form.maxThings > 0) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) return getNumberOfThings(inputs_c) <= form.maxThings});
     // filtering of mixed template inputs
     if(!form.filters.allowMixedTemplates)  allInputCombinations = allInputCombinations.filter(inputs_c => {return isMixedInputTemplate(inputs_c)});
+    // filter input based on must-have interactions
+    if (form.filters.mustHaveInteractions && form.filters.mustHaveInteractions.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, 
+            form.filters.mustHaveInteractions.filter(i => i.type === "property-read" || i.type === "property-observe" || i.type === "event-subscribe" || i.type === "action-read"))});
+    }
+    //filter input based on must-have annotations
+    if(form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup,
+            form.filters.mustHaveAnnotations.filter(a => a.type === "property-read" || a.type === "property-observe" || a.type === "event-subscribe" || a.type === "action-read"))});
+    }
+    //filter input based on must-have TD annotations
+    if(form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup,
+            form.filters.mustHaveTdAnnotations.filter(a => a.type === "input" || a.type === "io"), form)});
+    }
 
     allInputCombinations.forEach(inputs_c => {
         let availableOutputs: MAGE.InteractionInterface[][][] = [];
@@ -669,6 +685,7 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
 
 /** Main function to generate mashups. Calls all other functions. */
 export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
+    let start = hrtime.bigint();
     let interactionCombinations = await generateInteractionCombinations(generationForm);
     let designSpaceSize = getDesignSpaceSize(generationForm);
 
@@ -703,15 +720,16 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
         let plantUml = generatePlantUmlSeqDiagram(combiObject);
         plantUmls.push(plantUml);
      }
-
+    let end = hrtime.bigint();
     let results = {
         designSpaceSize: designSpaceSize,
         mashupsGenerated: totalMashups,
         imagesMDs: imagesMDs,
         plantUmls: plantUmls,
-        mashups: interactionCombinations ,
+        mashups: interactionCombinations,
+        executionTime: end - start
     };
-
+    
     return results;
 }
 

@@ -5,6 +5,7 @@ import checkSeqD from "@/backend/SD/validateSeqD"
 import { Mashup, TD } from '@/backend/Td';
 import generateMashups from "@/backend/MaGe/generator";
 import generateCode from "@/backend/MaGe/codeGenerator";
+import codeGenerator from "@/backend/SD/codeGen";
 import * as N3 from "n3";
 import { fetchAndStoreVocab, vocabStore } from "@/backend/MaGe/semantics";
 
@@ -45,6 +46,7 @@ export default {
         storedVocabs: [] as MAGE.storedVocabInterface[],
         generationForm: null as MAGE.GenerationFormInterace | null,
         result: null as MAGE.MashupGenerationResult | null,
+        mashupLogic: null as Object | null,
         editorLanguage: "json",
     },
     getters: {
@@ -125,6 +127,126 @@ export default {
         getIosTdAnnotations(state) {
             return state.allTdAnnotations.ios;
         },
+        getGenerationExecutionTime(state) {
+            let executionTime: bigint | number = state.result.executionTime;
+            let numberOfConversions = 0;
+            // Convert to micro-seconds
+            if(executionTime > 1000) {
+                // Convert to number if possible
+                if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                    executionTime = Number(executionTime);
+                    executionTime = executionTime/1000;
+                } else if (typeof executionTime === "bigint") {
+                    executionTime = executionTime/1000n;
+                } 
+                numberOfConversions++;
+                // Convert to milli-seconds
+                if(executionTime > 1000) {
+                    // Convert to number if possible
+                    if(typeof executionTime === "number") {
+                        executionTime = executionTime/1000;
+                    // Convert to number if possible
+                    } else if (typeof executionTime === "bigint") {
+                        if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                            executionTime = Number(executionTime);
+                            executionTime = executionTime/1000;
+                        } else if (typeof executionTime === "bigint") {
+                            executionTime = executionTime/1000n;
+                        } 
+                    }
+                    numberOfConversions++;
+                    // Convert to seconds
+                    if(executionTime > 1000) {
+                        if(typeof executionTime === "number") {
+                            executionTime = executionTime/1000;
+                        // Convert to number if possible
+                        } else if (typeof executionTime === "bigint") {
+                            if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                                executionTime = Number(executionTime);
+                                executionTime = executionTime/1000;
+                            } else if (typeof executionTime === "bigint") {
+                                executionTime = executionTime/1000n;
+                            } 
+                        }
+                        numberOfConversions++;
+                        // Convert to minutes
+                        if(executionTime > 60) {
+                            if(typeof executionTime === "number") {
+                                executionTime = executionTime/60;
+                            // Convert to number if possible
+                            } else if (typeof executionTime === "bigint") {
+                                if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                                    executionTime = Number(executionTime);
+                                    executionTime = executionTime/60;
+                                } else if (typeof executionTime === "bigint") {
+                                    executionTime = executionTime/60n;
+                                } 
+                            }
+                            numberOfConversions++;
+                            // Convert to hours 
+                            if(executionTime > 60) {
+                                if(typeof executionTime === "number") {
+                                    executionTime = executionTime/60;
+                                // Convert to number if possible
+                                } else if (typeof executionTime === "bigint") {
+                                    if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                                        executionTime = Number(executionTime);
+                                        executionTime = executionTime/60;
+                                    } else if (typeof executionTime === "bigint") {
+                                        executionTime = executionTime/60n;
+                                    } 
+                                }
+                                numberOfConversions++;
+                                // Convert to days
+                                if(executionTime > 24) {
+                                    if(typeof executionTime === "number") {
+                                        executionTime = executionTime/24;
+                                    // Convert to number if possible
+                                    } else if (typeof executionTime === "bigint") {
+                                        if(executionTime <= Number.MAX_SAFE_INTEGER) {
+                                            executionTime = Number(executionTime);
+                                            executionTime = executionTime/24;
+                                        } else if (typeof executionTime === "bigint") {
+                                            executionTime = executionTime/24n;
+                                        } 
+                                    }
+                                    numberOfConversions++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            let stringUnit: string = "";
+            switch(numberOfConversions) {
+                case 0:
+                    stringUnit = "ns";
+                    break;
+                case 1:
+                    stringUnit = "µs";
+                    break;
+                case 2:
+                    stringUnit = "ms";
+                    break;
+                case 3:
+                    stringUnit = "s";
+                    break;
+                case 4:
+                    stringUnit = "min";
+                    break;
+                case 5:
+                    stringUnit = "h";
+                    break;
+                case 6:
+                    stringUnit = "d";
+                    break;
+                case 7:
+                    stringUnit = "a";
+                    break;
+            }
+
+            return {executionTime, stringUnit};
+        }
     },
     actions: {
         async generateMashups({commit, state},
@@ -244,6 +366,7 @@ export default {
                 let outSD: string
                 try {
                     mashupLogic = parseSeqD(sdGenInput["mashup-uml"])
+                    state.mashupLogic = mashupLogic;
                 } catch (error) {
                     console.error("parseSeqD problem!: " + error);
                     return;
@@ -265,22 +388,23 @@ export default {
                 console.error("Invalid Sequence Diagram notation:" + notOk);
             });
         },
-        async generateMashupCode({commit, state}, mashupNr: number) {
-            let gen = {"mashup": state.result.mashups[mashupNr], "tds": {}};
+        async generateMashupCode({getters, commit, state}) {
+            const sd = getters.getMashupSd;
+            let mashupCodeParts = codeGenerator(JSON.parse(sd), state.mashupLogic);
+            let mashupCode = 
+`/**************************************************
+Base
+**************************************************/
+`;
+            mashupCode += mashupCodeParts.base;
+            mashupCode += 
+`
 
-            // get all relevant TDs for the selected mashup
-            let idsUsed: string[] = []
-            let outputs = state.generationForm.things.outputs;
-            let inputs = state.generationForm.things.inputs;
-            gen.mashup.forEach(element => {
-                if (!idsUsed.includes(element.thingId)) idsUsed.push(element.thingId);
-            });
-            outputs.concat(inputs).forEach(td => {
-                let parsedTd = JSON.parse((td as WADE.TDElementInterface).content);
-                if (idsUsed.includes(parsedTd.id)) gen.tds[td.id] = td.content;
-            });
-            let mashupCode = generateCode(gen.mashup, Object.values(gen.tds));
-            
+/**************************************************
+Code
+**************************************************/
+`;
+            mashupCode += mashupCodeParts.code;
             commit("setTabActive", "editor");
             commit("setMashupCode", mashupCode);
             state.editorLanguage = "typescript";
