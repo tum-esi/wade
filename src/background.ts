@@ -1,10 +1,12 @@
 'use strict';
 
+declare const __static: string;
 import { app, protocol, BrowserWindow } from 'electron';
 import {
   createProtocol,
 } from 'vue-cli-plugin-electron-builder/lib';
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import path from 'path';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -22,7 +24,8 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: true}
+    webPreferences: { nodeIntegration: true},
+    icon: path.join(__static, 'icon.png')
   });
   // win.setMenu(null);
 

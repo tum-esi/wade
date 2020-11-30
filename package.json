@@ -17,6 +17,10 @@
     {
       "name": "Miguel Romero Karam",
       "email": "miguel.romero@tum.de"
+    },
+    {
+      "name": "Fady Salama",
+      "email": "fady.salama@tum.de"
     }
   ],
   "version": "0.1.0",
@@ -29,12 +33,14 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
+    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "ui": "vue ui"
   },
   "main": "background.js",
   "dependencies": {
     "@node-wot/binding-http": "^0.7.1",
     "@node-wot/binding-mqtt": "^0.7.1",
+    "@node-wot/binding-coap": "^0.7.1",
     "@node-wot/binding-websockets": "^0.7.1",
     "@node-wot/core": "^0.7.1",
     "coap": "^0.23.1",
@@ -59,6 +65,7 @@
     "wot-typescript-definitions": "^0.7.1-SNAPSHOT.1"
   },
   "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.0",
     "@types/js-beautify": "^1.13.1",
     "@types/js-combinatorics": "^0.5.32",
     "@types/mermaid": "^8.2.1",
@@ -69,6 +76,7 @@
     "@vue/cli-service": "^3.12.1",
     "electron": "^9.1.0",
     "electron-devtools-installer": "^3.1.1",
+    "electron-icon-builder": "^1.0.2",
     "less": "^3.10.3",
     "less-loader": "^4.1.0",
     "tslint": "^5.20.1",
