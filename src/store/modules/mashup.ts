@@ -1,10 +1,8 @@
 import parseSeqD from "@/backend/SD/parseSeqD"
 import generateSD from "@/backend/SD/generateSD"
-// import generateTS from "@/backend/SD/codeGen"
 import checkSeqD from "@/backend/SD/validateSeqD"
 import { Mashup, TD } from '@/backend/Td';
 import generateMashups from "@/backend/MaGe/generator";
-import generateCode from "@/backend/MaGe/codeGenerator";
 import codeGenerator from "@/backend/SD/codeGen";
 import * as N3 from "n3";
 import { fetchAndStoreVocab, vocabStore } from "@/backend/MaGe/semantics";
@@ -127,7 +125,7 @@ export default {
         getIosTdAnnotations(state) {
             return state.allTdAnnotations.ios;
         },
-        getGenerationExecutionTime(state) {
+        getGenerationExecutionTimeBigInt(state) {
             let executionTime: bigint | number = state.result.executionTime;
             let numberOfConversions = 0;
             // Convert to micro-seconds
@@ -246,6 +244,89 @@ export default {
             }
 
             return {executionTime, stringUnit};
+        },
+        getGenerationExecutionTime(state) {
+            let executionTime: [number, number] = state.result.executionTime;
+            let fractionOfseconds = executionTime[1];
+            let multipleOfSeconds = executionTime[0];
+            let numberOfConversionsNs = 0;
+            let numberOfConversionsS = 0;
+            let result = 0
+            // Convert to micro-seconds
+            if(fractionOfseconds > 1000) {
+                fractionOfseconds = fractionOfseconds/1000;
+                numberOfConversionsNs++;
+                // Convert to milli-seconds
+                if(fractionOfseconds > 1000) {
+                    // Convert to number if possible
+                    fractionOfseconds = fractionOfseconds/1000;
+                    numberOfConversionsNs++;
+                    // Convert to seconds
+                    if(fractionOfseconds > 1000) {
+                        fractionOfseconds = fractionOfseconds/1000;
+                        numberOfConversionsNs++;
+                    }
+                }
+            }
+            // Convert to minutes
+            if(multipleOfSeconds > 60) {
+                    multipleOfSeconds = multipleOfSeconds/60;
+                    numberOfConversionsS++;
+                // Convert to hours 
+                if(multipleOfSeconds > 60) {
+                    multipleOfSeconds = multipleOfSeconds/60;
+                    numberOfConversionsS++;
+                    // Convert to days
+                    if(multipleOfSeconds > 24) {
+                        multipleOfSeconds = multipleOfSeconds/24;
+                        numberOfConversionsS++;
+                    }
+                }
+            }
+
+            let stringUnit: string = "";
+            if(multipleOfSeconds > 0) {
+                switch(numberOfConversionsS) {
+                    case 0:
+                        stringUnit = "s";
+                        break;
+                    case 1:
+                        stringUnit = "min";
+                        break;
+                    case 2:
+                        stringUnit = "h";
+                        break;
+                    case 3:
+                        stringUnit = "d";
+                        break;
+                }
+            } else if (numberOfConversionsS === 0) {
+                switch(numberOfConversionsNs) {
+                    case 0:
+                        stringUnit = "ns";
+                        break;
+                    case 1:
+                        stringUnit = "µs";
+                        break;
+                    case 2:
+                        stringUnit = "ms";
+                        break;
+                    case 3:
+                        stringUnit = "s";
+                        break;
+                }
+            }
+
+            if(multipleOfSeconds > 0) {
+                result = multipleOfSeconds;
+                if(numberOfConversionsS === 0 && numberOfConversionsNs === 2) {
+                    result = result + (fractionOfseconds/1000);
+                }
+            } else {
+                result = fractionOfseconds;
+            }
+
+            return {result, stringUnit};
         }
     },
     actions: {

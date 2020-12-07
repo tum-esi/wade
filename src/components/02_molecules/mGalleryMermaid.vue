@@ -47,7 +47,7 @@ export default Vue.extend({
         ...mapGetters('MashupStore',["getGenerationExecutionTime"]),
         timeText(): string {
             let generationExecutionTime = (this as any).getGenerationExecutionTime;
-            let result = `${generationExecutionTime.executionTime.toFixed(2)} ${generationExecutionTime.stringUnit}`;
+            let result = `${generationExecutionTime.result.toFixed(2)} ${generationExecutionTime.stringUnit}`;
             return result;
         }
     },

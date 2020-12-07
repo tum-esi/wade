@@ -685,12 +685,10 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
 
 /** Main function to generate mashups. Calls all other functions. */
 export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
-    let start = hrtime.bigint();
+    //let start = hrtime.bigint();
+    let start = hrtime();
     let interactionCombinations = await generateInteractionCombinations(generationForm);
     let designSpaceSize = getDesignSpaceSize(generationForm);
-
-    let totalMashups =  interactionCombinations.length;
-    console.log(`${totalMashups} mashups can be generated from given parameters. Design space size is: ${designSpaceSize}`);
 
     let imagesMDs: string[] = [];
     let plantUmls: string[] = [];
@@ -719,15 +717,19 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
         imagesMDs.push(mermaidUml);
         let plantUml = generatePlantUmlSeqDiagram(combiObject);
         plantUmls.push(plantUml);
-     }
-    let end = hrtime.bigint();
+    }
+
+    let end = hrtime(start);
+    //let end = hrtime.bigint();
+    let totalMashups =  interactionCombinations.length;
+
     let results = {
         designSpaceSize: designSpaceSize,
         mashupsGenerated: totalMashups,
         imagesMDs: imagesMDs,
         plantUmls: plantUmls,
         mashups: interactionCombinations,
-        executionTime: end - start
+        executionTime: end
     };
     
     return results;
