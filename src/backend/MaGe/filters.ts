@@ -44,17 +44,37 @@ export function sameType(...elements: MAGE.InteractionInterface[]) {
 export function similar(element1: MAGE.InteractionInterface, element2: MAGE.InteractionInterface, threshold: number) {
     return new Promise((resolve, reject) => {
         Req(
-            `http://127.0.0.1:5000/word2vec/similarity?w1=${element1.name}&w2==${element2.name}`, 
+            `http://localhost:5000/word2vec/similarity?w1=${element1.name}&w2==${element2.name}`, 
             (err, res, body) => {
                 if (err) { 
                     console.log(err);
                 } else if (res.statusCode === 200) {
-                    if (body > threshold) resolve(true)
-                    return
+                    if (body > threshold) resolve(true);
+                    return;
                 } else {
-                    console.log("Got HTTP response: " + res.statusCode)
+                    console.log("Got HTTP response: " + res.statusCode);
                 }
                 resolve(false)
+            }
+        )
+    })
+}
+
+export function similarDescription(description1: MAGE.InteractionInterface, description2: MAGE.InteractionInterface, threshold: number) {
+    return new Promise((resolve, reject) => {
+        Req(
+            `http://localhost:5000/word2vec/wmd?s1=${description1}&s2==${description2}`, 
+            (err, res, body) => {
+                if (err) { 
+                    console.log(err);
+                } else if (res.statusCode === 200) {
+                    console.log("Description Threshold: " + body);
+                    if (body < threshold) resolve(true);
+                    return;
+                } else {
+                    console.log("Got HTTP response: " + res.statusCode);
+                }
+                resolve(false);
             }
         )
     })

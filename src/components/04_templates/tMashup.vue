@@ -100,6 +100,7 @@ export default Vue.extend({
             this.$store.commit('SidebarStore/setActiveElement', id);
             const newMashup = (this as any).getMashup(this.$route.params.id);
             this.$store.commit('MashupStore/setCurrentMashup', newMashup);
+            this.mashupChildren = newMashup.children;
         }
     }
 });

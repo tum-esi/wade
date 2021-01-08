@@ -92,10 +92,21 @@
                     @input="$emit('change', onCheckBoxChecked('onlySimilarNames',$event.target.checked))">
                     <label>Only match interactions that have similar names</label>
                 </div>
-                <div v-show="filters.onlySimilarNames && filters.similarityThreshold">
+                <div v-show="filters.onlySimilarNames && filters.similarityThresholdNames">
                     <label class="margin-right-2pt">Similarity Threshold:</label>
-                    <input type="range" min="0" max="1" step="0.01" v-model="filters.similarityThreshold">
-                    <input class="fit-content" type="number" min="0" max="1" step="0.01" v-model="filters.similarityThreshold">
+                    <input type="range" min="0" max="1" step="0.01" v-model="filters.similarityThresholdNames">
+                    <input class="fit-content" type="number" min="0" max="1" step="0.01" v-model="filters.similarityThresholdNames">
+                </div>
+                <div>
+                    <input type="checkbox"
+                    :checked="filters.onlySimilarDescriptions"
+                    @input="$emit('change', onCheckBoxChecked('onlySimilarDescriptions',$event.target.checked))">
+                    <label>Only match interactions that have similar descriptions</label>
+                </div>
+                <div v-show="filters.onlySimilarDescriptions && filters.similarityThresholdDescriptions">
+                    <label class="margin-right-2pt">Similarity Threshold:</label>
+                    <input type="range" min="0" max="5" step="0.01" v-model="filters.similarityThresholdDescriptions">
+                    <input class="fit-content" type="number" min="0" max="5" step="0.01" v-model="filters.similarityThresholdDescriptions">
                 </div>
                 <div>
                     <input type="checkbox"
@@ -455,8 +466,12 @@ export default Vue.extend({
             let filters = this.filters;
             filters[prop] = checked;
             if(prop === "onlySimilarNames") {
-                if(checked) filters.similarityThreshold = 0.5;
-                else filters.similarityThreshold = null;
+                if(checked) filters.similarityThresholdNames = 0.5;
+                else filters.similarityThresholdNames = null;
+            }
+            if(prop === "onlySimilarDescriptions") {
+                if(checked) filters.similarityThresholdDescriptions = 0.5;
+                else filters.similarityThresholdDescriptions = null;
             }
             return filters;
         }

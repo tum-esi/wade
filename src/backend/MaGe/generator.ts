@@ -351,11 +351,21 @@ async function getMatchingOutputs(
         if (filters.onlySameType) {
             outputs = outputs.filter(element => Filters.sameType(input, element));
         }
-        if (filters.similarityThreshold) {
+        if (filters.onlySimilarNames && filters.similarityThresholdNames) {
             // since filter cannot by async, we have to filter manually.
             let newOutputs: MAGE.InteractionInterface[] = [];
             for (let element of outputs) {
-                let filterResults = await Filters.similar(input, element, filters.similarityThreshold);
+                let filterResults = await Filters.similar(input, element, filters.similarityThresholdNames);
+                if (filterResults) newOutputs.push(element);
+            }
+            return newOutputs;
+        }
+        if (filters.onlySimilarDescriptions && filters.similarityThresholdDescriptions) {
+            // since filter cannot by async, we have to filter manually.
+            let newOutputs: MAGE.InteractionInterface[] = [];
+            for (let element of outputs) {
+                let filterResults = await Filters.similarDescription((input.object as any).description, 
+                    (element.object as any).description, filters.similarityThresholdDescriptions);
                 if (filterResults) newOutputs.push(element);
             }
             return newOutputs;
@@ -649,7 +659,8 @@ function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interacti
 /** calculate size of design space ( how many mashups would be possible without any rules or filters ) */
 function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     let designSpaceSize = 0;
-    let n = 0;
+    let nInputs = 0;
+    let nOutputs = 0;
     let things = generationForm.things;
 
     let tdIds: string[] = [];
@@ -661,26 +672,40 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
         }
     })
 
-    uniqueTds.forEach(element => {
+    things.inputs.forEach(element => {
         let parsedTd: ThingDescription;
         if(!element.content) return;
         parsedTd = JSON.parse(element.content);
-        if (parsedTd.properties) n += Object.keys(parsedTd.properties).length;
         for(let prop in parsedTd.properties) {
-            if(parsedTd.properties[prop].observable) n++;
+            if(parsedTd.properties[prop].writeOnly) continue;
+            nInputs++;
+            if(parsedTd.properties[prop].observable) nInputs++;
         }
-        if (parsedTd.actions) n += Object.keys(parsedTd.actions).length;
-        if (parsedTd.events) n += Object.keys(parsedTd.events).length;
+        if (parsedTd.actions) nInputs += Object.keys(parsedTd.actions).length;
+        if (parsedTd.events) nInputs += Object.keys(parsedTd.events).length;
     })
 
-    let max_k = Number(generationForm.maxInputs) + Number(generationForm.maxOutputs);
-    let min_k =  Number(generationForm.minInputs) + Number(generationForm.minOutputs);
-    if (max_k > n) max_k = n;
-    for (let i = min_k; i <= max_k; i++) {
-        designSpaceSize += (Utils.factorial(n)/(Utils.factorial(i) * Utils.factorial(n - i)));
+    things.outputs.forEach(element => {
+        let parsedTd: ThingDescription;
+        if(!element.content) return;
+        parsedTd = JSON.parse(element.content);
+        for(let prop in parsedTd.properties) {
+            if(parsedTd.properties[prop].readOnly) continue;
+            nOutputs++;
+        }
+        if (parsedTd.actions) nOutputs += Object.keys(parsedTd.actions).length;
+    })
+
+    let max_k = generationForm.maxInputs + generationForm.maxOutputs;
+    let min_k =  generationForm.minInputs + generationForm.minOutputs;
+    let nTotal = nInputs + nOutputs; 
+    if (max_k > nTotal) max_k = nTotal;
+    for (let i = generationForm.minInputs; i <= generationForm.maxInputs; i++) {
+        for(let j = generationForm.minOutputs; j <= generationForm.maxOutputs; j++)
+        designSpaceSize += (Utils.factorial(nInputs)*Utils.factorial(nOutputs))/(Utils.factorial(i)*Utils.factorial(j)*Utils.factorial(nInputs - i)*Utils.factorial(nOutputs-j));
     }
 
-    return designSpaceSize;
+    return Math.round(designSpaceSize);
 }
 
 /** Main function to generate mashups. Calls all other functions. */
@@ -760,7 +785,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
           acceptedOutputInteractionTypes: string[],
           onlySameType: boolean,
           onlySimilarNames: boolean,
-          similarityThreshold: number | null,
+          onlySimilarDescriptions: boolean,
+          similarityThresholdNames: number | null,
+          similarityThresholdDescriptions: number | null,
           semanticMatch: boolean
     };
     public generation: {
@@ -774,9 +801,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
             outputs: [],
         };
         this.minInputs = 1,
-        this.maxInputs = 2,
+        this.maxInputs = 1,
         this.minOutputs = 1,
-        this.maxOutputs = 2,
+        this.maxOutputs = 1,
         this.maxThings = null,
         this.templates = {
             "use-event-template": true,
@@ -788,7 +815,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
             acceptedOutputInteractionTypes: [],
             onlySameType: false,
             onlySimilarNames: false,
-            similarityThreshold: null,
+            onlySimilarDescriptions: false,
+            similarityThresholdNames: null,
+            similarityThresholdDescriptions: null,
             semanticMatch: false,
             allowMixedTemplates: false,
         

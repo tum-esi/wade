@@ -1,4 +1,4 @@
-import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum } from '@/util/enums';
+import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum, StatusEnum } from '@/util/enums';
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingError } from '@/util/helpers';
@@ -378,6 +378,16 @@ export default {
                     break;
                 }
             }
+            const element = (state.tds as any[]).find(td => td.id === payload.id);
+            if(element.parentId !== "parent") {
+                for(let mashup of state.mashups as any[]) {
+                    let childIndex = mashup.children.findIndex(child => child.id === element.id);
+                    if(childIndex !== -1){
+                        mashup.children[childIndex].content = payload.content;
+                    }
+                }
+            }
+            
         },
         // Adds a new td / mashup / folder to tds / mashups / folders
         addElementToStore(state: any, payload: TD | Mashup | Folder) {

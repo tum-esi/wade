@@ -433,8 +433,10 @@ export default {
             });
             outputs.concat(inputs).forEach(td => {
                 let parsedTd = JSON.parse((td as WADE.TDElementInterface).content);
-                if (idsUsed.includes(parsedTd.id)) sdGenInput.tds += td.content;
-                sdGenInput.tds += ",";
+                if (idsUsed.includes(parsedTd.id)) {
+                    sdGenInput.tds += td.content;
+                    sdGenInput.tds += ",";
+                } 
             });
             sdGenInput.tds = sdGenInput.tds.slice(0,-1);
             sdGenInput.tds += "]";

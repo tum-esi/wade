@@ -22,7 +22,8 @@ yarn-error.log*
 *.sw?
 
 # Word to Vector directory
-custom-word-to-vec
+
 
 #Electron-builder output
 /dist_electron
+/build

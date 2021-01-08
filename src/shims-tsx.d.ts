@@ -472,7 +472,9 @@ declare global {
         allowMixedTemplates: boolean,
         onlySameType: boolean,
         onlySimilarNames: boolean,
-        similarityThreshold: number | null,
+        onlySimilarDescriptions: boolean,
+        similarityThresholdNames: number | null,
+        similarityThresholdDescriptions: number | null,
         semanticMatch: boolean,
         mustHaveInteractions?: VueInteractionInterface[]
         forbiddenInteractions?: VueInteractionInterface[],
