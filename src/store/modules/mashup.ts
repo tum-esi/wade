@@ -653,6 +653,7 @@ Code
                 if(typeof annotations === "string") annotations = [annotations];
                 // construct VueAnnotation objects
                 let readAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
+                let observeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 let writeAnnotationsToPush: MAGE.VueAnnotationInterface[] = [];
                 for(let annotation of annotations) {
                     let comment: string | null = null;
@@ -665,6 +666,15 @@ Code
                         description: comment,
                         restriction: "none"
                     });
+                    if(parsedTd.properties[prop].observable){
+                        observeAnnotationsToPush.push({
+                            annotation: annotation,
+                            type: 'property-observe',
+                            numberOfAccurance: 1,
+                            description: comment,
+                            restriction: "none"
+                        });
+                    };
                     writeAnnotationsToPush.push({
                         annotation: annotation,
                         type: 'property-write',
@@ -719,7 +729,7 @@ Code
                         }
                     }
                     if(parsedTd.properties[prop].observable) {
-                        for(let annotation of readAnnotationsToPush) {
+                        for(let annotation of observeAnnotationsToPush) {
                             let index = state.allAnnotations.propertyObservations.findIndex(a => {return a.annotation === annotation.annotation});
                             if(index !== -1) {
                                 state.allAnnotations.propertyObservations[index].numberOfAccurance++;
