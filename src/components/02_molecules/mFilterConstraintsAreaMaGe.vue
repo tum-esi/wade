@@ -116,12 +116,15 @@
                 </div>
             </div>
         </div>
-        <h4 v-if="showTdAnnotationsTable">Restrictions on TD Annotations</h4>
-        <mTdAnnotationSelectionMaGe v-if="showTdAnnotationsTable" :table="TdAnnotationsTable"/>
-        <h4 v-if="showAnnotationsTable">Restrictions on Interaction Annotations</h4>
-        <mAnnotationSelectionMaGe v-if="showAnnotationsTable" :table="AnnotationsTable" :filters="filters" :templates="templates"/>
-        <h4 v-if="showInteractionsTable">Restrictions on individual Interactions</h4>
-        <mInteractionSelectionMaGe v-if="showInteractionsTable" :table="InteractionsTable" :filters="filters" :templates="templates"/>
+        <div id="ltl-restriction">
+            <h4 v-if="showTdAnnotationsTable">Restrictions on TD Annotations</h4>
+            <mTdAnnotationSelectionMaGe v-if="showTdAnnotationsTable" :table="TdAnnotationsTable"/>
+            <h4 v-if="showAnnotationsTable">Restrictions on Interaction Annotations</h4>
+            <mAnnotationSelectionMaGe v-if="showAnnotationsTable" :table="AnnotationsTable" :filters="filters" :templates="templates"/>
+            <h4 v-if="showInteractionsTable">Restrictions on individual Interactions</h4>
+            <mInteractionSelectionMaGe v-if="showInteractionsTable" :table="InteractionsTable" :filters="filters" :templates="templates"/>
+        </div>
+        
     </div>
 </template>
 
@@ -480,6 +483,10 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+#ltl-restriction {
+    height: fit-content;
+}
+
 .filters-container {
     border: 0.5pt solid #393B3A;
     height: fit-content;
@@ -509,7 +516,7 @@ export default Vue.extend({
     justify-content: space-between;
     background-color: #939C9E;
     padding: 5pt;
-    height: 18%;
+    height: fit-content;
 }
 
 .fit-content {

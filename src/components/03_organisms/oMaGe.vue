@@ -53,8 +53,7 @@
         <mTemplateSelectionArea id="template-selection-area" v-model="generationForm.templates"/>
         <!--Filters and Constraints-->
         <mFilterConstraintsAreaMaGe 
-        id="filters-area" 
-        :class="filterAreaClass"
+        id="filters-area"
         v-model="generationForm.filters"
         :templates="generationForm.templates"/>
         <aButtonBasic
@@ -342,6 +341,7 @@ export default Vue.extend({
 
 #filters-area {
     width: 100%;
+     height: fit-content;
 }
 
 .filters-empty {

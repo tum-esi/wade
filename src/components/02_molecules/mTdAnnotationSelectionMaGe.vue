@@ -97,7 +97,7 @@ export default Vue.extend({
     align-content: flex-start;
     justify-content: flex-start;
     flex-flow: row nowrap;
-    height: 24.25%;
+    height: 175pt;
 }
 
 .add-icon {

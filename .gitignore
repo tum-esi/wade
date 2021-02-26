@@ -27,3 +27,7 @@ yarn-error.log*
 #Electron-builder output
 /dist_electron
 /build
+
+# A-MaGe related
+*.zip
+A-MaGe-Testing
