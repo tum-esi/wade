@@ -23,13 +23,14 @@ It is an Electron application.
 See the related paper **WADE: Timing Performance Benchmarking in Web of Things**.
 ```
 @inproceedings{skks:2020,    
-    author          = {Verena Eileen Schlott, Ege Korkan, Sebastian Kaebisch, Sebastian Steinhorst},
-    title           = {W-ADE: Timing Performance Benchmarking in Web of Things},
-    booktitle       = {International Conference on Web Engineering (ICWE 2020)},
-    location        = {Helsinki, Finland},
-    year            = {in press},
-    month           = {June},
-    day             = {9-12},
+	  author           = {Verena Eileen Schlott and Ege Korkan and Sebastian Kaebisch and Sebastian Steinhorst},
+    title            = {W-ADE: Timing Performance Benchmarking in Web of Things},
+    booktitle        = {International Conference on Web Engineering (ICWE 2020)},
+    location         = {Helsinki, Finland},
+    year             = {2020},
+    month            = {6},
+    doi				       = {https://doi.org/10.1007/978-3-030-50578-3_6},
+    url              = {https://s-steinhorst.github.io/PDF/2020-ICWE-W-ADE%20Timing%20Performance%20Benchmarking%20in%20Web%20of%20Things.pdf},
 }
 ```
 ---
