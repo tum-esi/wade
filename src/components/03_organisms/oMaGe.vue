@@ -130,7 +130,7 @@ export default Vue.extend({
             limitNumberOfElement: false,
             currentlyViewedMashup: 0,
             generationForm: new GenerationForm(),
-            mermaidDiv: document.getElementById("mermaid-all")
+            mermaidDiv: document.getElementById('mermaid-all')
         };
     },
 
@@ -139,57 +139,56 @@ export default Vue.extend({
         ...mapGetters('SidebarStore', ['getSidebarElement']),
         ...mapGetters('MashupStore', ['getMashupChildrenForDropdown', 'getInputsIds', 'getOutputsIds', 'getIosIds']),
         inputList(): WADE.ListInterface {
-            let ids: {label: string}[] = [];
-            for(let item of (this as any).getInputsIds) {
+            const ids: Array<{label: string}> = [];
+            for (const item of (this as any).getInputsIds) {
                 ids.push({label: item});
             }
-            let list: WADE.ListInterface = {
-                header: "Inputs",
+            const list: WADE.ListInterface = {
+                header: 'Inputs',
                 items: ids
-            }
+            };
             return list;
         },
         outputList(): WADE.ListInterface {
-            let ids: {label: string}[] = [];
-            for(let item of (this as any).getOutputsIds) {
+            const ids: Array<{label: string}> = [];
+            for (const item of (this as any).getOutputsIds) {
                 ids.push({label: item});
             }
-            let list: WADE.ListInterface = {
-                header: "Outputs",
+            const list: WADE.ListInterface = {
+                header: 'Outputs',
                 items: ids
-            }
+            };
             return list;
         },
         ioList(): WADE.ListInterface {
-            let ids: {label: string}[] = [];
-            for(let item of (this as any).getIosIds) {
+            const ids: Array<{label: string}> = [];
+            for (const item of (this as any).getIosIds) {
                 ids.push({label: item});
             }
-            let list: WADE.ListInterface = {
-                header: "IOs",
+            const list: WADE.ListInterface = {
+                header: 'IOs',
                items: ids
-            }
+            };
             return list;
         },
         table(): WADE.TableInterface {
-            let table = {
+            const table = {
                 columns: [this.inputList, this.outputList, this.ioList]
-            }
+            };
             return table;
         },
         filterAreaClass() {
             let number = 0;
-            console.log()
             number += (this as any).getInputsIds.length;
             number += (this as any).getOutputsIds.length;
             number += (this as any).getIosIds.length;
-            
-            if(number === 0) return "filters-empty";
-            return "filters-full";
+
+            if (number === 0) return 'filters-empty';
+            return 'filters-full';
         }
     },
     methods: {
-        ...mapActions('MashupStore',['generateMashups',"generateMashupCode"]),
+        ...mapActions('MashupStore', ['generateMashups', 'generateMashupCode']),
         onCurrentMashupSelected(event) {
             if (event.btnValue === 'add-new-mashup') {
 
@@ -199,21 +198,21 @@ export default Vue.extend({
             }
         },
         onAddElementSelected(event) {
-            const children: (TD | Mashup)[] = this.$store.getters['MashupStore/getMashupChildren'];
+            const children: Array<TD | Mashup> = this.$store.getters['MashupStore/getMashupChildren'];
             let childNeeded;
             for (const child of children) {
                 if (child.id === event.btnValue) childNeeded = child;
             }
             switch (event.btnKey) {
-                case 'add-input': 
-                    this.$store.commit('MashupStore/addToInputs', childNeeded); 
+                case 'add-input':
+                    this.$store.commit('MashupStore/addToInputs', childNeeded);
                     this.generationForm.things.inputs.push(childNeeded);
                     break;
                 case 'add-output':
-                    this.$store.commit('MashupStore/addToOutputs', childNeeded); 
+                    this.$store.commit('MashupStore/addToOutputs', childNeeded);
                     this.generationForm.things.outputs.push(childNeeded);
                     break;
-                case 'add-io': 
+                case 'add-io':
                     this.$store.commit('MashupStore/addToIos', childNeeded);
                     this.generationForm.things.inputs.push(childNeeded);
                     this.generationForm.things.outputs.push(childNeeded);
@@ -222,62 +221,62 @@ export default Vue.extend({
             }
         },
         deleteFromIO(elementIndex: number, table: string) {
-            switch(table) {
-                case 'inputs': 
-                    this.$store.commit('MashupStore/removeFromInputs', elementIndex); 
+            switch (table) {
+                case 'inputs':
+                    this.$store.commit('MashupStore/removeFromInputs', elementIndex);
                     break;
-                case 'outputs': 
-                    this.$store.commit('MashupStore/removeFromOutputs', elementIndex); 
+                case 'outputs':
+                    this.$store.commit('MashupStore/removeFromOutputs', elementIndex);
                     break;
-                case 'ios': 
-                    this.$store.commit('MashupStore/removeFromIos', elementIndex); 
+                case 'ios':
+                    this.$store.commit('MashupStore/removeFromIos', elementIndex);
                     break;
                 default: return;
             }
         },
         setMaxInputInteractions(): void {
-            this.generationForm.maxInputs = this.generationForm.minInputs > this.generationForm.maxInputs 
-            ? this.generationForm.minInputs 
+            this.generationForm.maxInputs = this.generationForm.minInputs > this.generationForm.maxInputs
+            ? this.generationForm.minInputs
             : this.generationForm.maxInputs;
         },
         setMaxOutputInteractions(): void {
-            this.generationForm.maxOutputs = this.generationForm.minOutputs > this.generationForm.maxOutputs 
-            ? this.generationForm.minOutputs 
+            this.generationForm.maxOutputs = this.generationForm.minOutputs > this.generationForm.maxOutputs
+            ? this.generationForm.minOutputs
             : this.generationForm.maxOutputs;
         },
         setCurrentViewedMashup(nr: number) {
             this.currentlyViewedMashup = nr;
         },
         setMaxElementsFilter(isChecked: boolean) {
-            if(isChecked) this.generationForm.maxThings = 2; else this.generationForm.maxThings = -1;
+            if (isChecked) this.generationForm.maxThings = 2; else this.generationForm.maxThings = -1;
         },
         setMaxElements(maxThings: number) {
             this.generationForm.maxThings = maxThings;
         },
         onGenerateMashupClick() {
-            this.$store.dispatch("MashupStore/generateMashups", {generationForm: this.generationForm}).then(() => {
-                this.mermaidDiv = document.getElementById("mermaid-all");
-                setTimeout(()=> {
-                    if(this.mermaidDiv) this.mermaidDiv.scrollIntoView({
-                        behavior: "smooth"
+            this.$store.dispatch('MashupStore/generateMashups', {generationForm: this.generationForm}).then(() => {
+                this.mermaidDiv = document.getElementById('mermaid-all');
+                setTimeout(() => {
+                    if (this.mermaidDiv) this.mermaidDiv.scrollIntoView({
+                        behavior: 'smooth'
                     });
-                },3)
-                
-            })
+                }, 3);
+
+            });
         },
-        generateCode(){
-            this.$store.dispatch("MashupStore/generateMashupCode");
+        generateCode() {
+            this.$store.dispatch('MashupStore/generateMashupCode');
         },
-        generateSD(){
-            this.$store.dispatch("MashupStore/generateSystemDescription", this.currentlyViewedMashup);
+        generateSD() {
+            this.$store.dispatch('MashupStore/generateSystemDescription', this.currentlyViewedMashup);
         }
     },
     mounted() {
         this.$nextTick(() => {
-            this.mermaidDiv = document.getElementById("mermaid-all");
+            this.mermaidDiv = document.getElementById('mermaid-all');
         });
     }
-})
+});
 </script>
 
 <style lang="less" scoped>

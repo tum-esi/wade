@@ -1,4 +1,4 @@
-import { sdToTd, interactionType, structureType, loopType } from "./util"
+import { sdToTd, interactionType, structureType, loopType } from './util';
 import beautify from 'js-beautify';
 
 // import fs = require( "fs" )
@@ -18,10 +18,10 @@ import beautify from 'js-beautify';
  * @param mashupLogic object representing the structure of the Mashups logic, tree-like
  * @param fName target filename (without file-extension), required for the index.js generation
  */
-export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashupLogic) { //, fName: string) {
+export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashupLogic) { // , fName: string) {
 
-    const varPrefix = "mavar";
-    const propPrefix = "mapro";
+    const varPrefix = 'mavar';
+    const propPrefix = 'mapro';
     let customCount = 0;
     const customDataPush = {};
     let customDataPushCount = 0;
@@ -33,12 +33,12 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                         `;
 
     // replace ? ? by ?? because beautifier produces this problem
-    const code = beautify(filestart + generateClassWotMashup().join("\n"), {
+    const code = beautify(filestart + generateClassWotMashup().join('\n'), {
         // eslint-disable-next-line camelcase
         indent_size: 4 // eslint-disable-line @typescript-eslint/camelcase
-    }).replace(/\? \?/g, "??");
+    }).replace(/\? \?/g, '??');
 
-    return {code, base}
+    return {code, base};
 
     // #############################
     // ######## Functions
@@ -67,8 +67,8 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
         `);
 
         // add vars for properties and variables
-        Object.getOwnPropertyNames(SD.variables).forEach( v => {jsOut.push("private "+ varPrefix + v + "\n")});
-        Object.getOwnPropertyNames(SD.properties).forEach( v => {jsOut.push("private " + propPrefix + v + "\n")});
+        Object.getOwnPropertyNames(SD.variables).forEach( v => {jsOut.push('private ' + varPrefix + v + '\n'); });
+        Object.getOwnPropertyNames(SD.properties).forEach( v => {jsOut.push('private ' + propPrefix + v + '\n'); });
 
         jsOut.push(genClassConstructor());
 
@@ -89,8 +89,8 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
         jsOut.push(genDataPushes());
 
         // close curly-braces of class WotMashup
-        jsOut.push("}");
-        return jsOut
+        jsOut.push('}');
+        return jsOut;
     }
 
     /**
@@ -98,7 +98,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      * top:path, top:functions:[name]:path, top:actions:[name]:path, top:properties:[name]:path
      */
     function genAppLogic() {
-        const out = [""];
+        const out = [''];
         // parse path to application logic
         if (mashupLogic.root) {
             out.push(`private execMashupLogic() {
@@ -121,7 +121,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                             })
                         }`
             );
-        })
+        });
 
         // add action handlers for every action with path
         Object.keys(mashupLogic.actions).forEach( prop => {
@@ -132,7 +132,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                             })
                         }`
             );
-        })
+        });
 
         // add function handlers for every function with path
         Object.keys(mashupLogic.functions).forEach( prop => {
@@ -143,10 +143,10 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                             })
                         }`
             );
-        })
+        });
 
-        out.push("");
-        return out.join("\n\n");
+        out.push('');
+        return out.join('\n\n');
     }
 
     /**
@@ -159,7 +159,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      */
     function genClassConstructor() {
 
-        const out = [""];
+        const out = [''];
 
         out.push(`  // eslint-disable-next-line no-shadow
                     constructor(WoT: WoT.WoT, tdDirectory?: string) {
@@ -177,21 +177,21 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             const currentTd = SD.things[tdTitle];
             currentTd.title = currentTd.title ? currentTd.title : currentTd.$id.slice(1);
             consTdArray.push(JSON.stringify(currentTd));
-        })
+        });
         out.push(`
                     const tds = [
-                        ${consTdArray.join(",\n")}
+                        ${consTdArray.join(',\n')}
                     ]
-    
+
                     const consume_promises: Promise<WoT.ConsumedThing>[] = []
                     tds.forEach( td => {
                         const TdPromise = WoT.consume(td)
                         consume_promises.push(TdPromise)
                     })
-    
+
                     Promise.all(consume_promises).then( myTDs => {
-    
-    
+
+
                         myTDs.forEach( data => {
                             this.consumed_things[data.getThingDescription().$id.slice(1)] = data
                         })`
@@ -204,11 +204,11 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                     ).then( exposedThing => {
                         this.thing = exposedThing
                         this.td = exposedThing.getThingDescription()
-                        ${Object.keys(SD.properties).length > 0 ? "this.add_properties()" : ""}
-                        ${Object.keys(SD.actions).some( prop => (SD.actions[prop].path !== undefined)) ? "this.add_actions()" : ""} 
+                        ${Object.keys(SD.properties).length > 0 ? 'this.add_properties()' : ''}
+                        ${Object.keys(SD.actions).some( prop => (SD.actions[prop].path !== undefined)) ? 'this.add_actions()' : ''}
                         this.add_data_pushes()
                         this.thing.expose()
-                        ${(mashupLogic.root) ? "this.execMashupLogic()" : ""}
+                        ${(mashupLogic.root) ? 'this.execMashupLogic()' : ''}
                     })
                 }, err => {
                     throw new Error("cannot consume mashup things Tds " + err)
@@ -216,7 +216,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             }`
         );
 
-        return out.join("\n\n")
+        return out.join('\n\n');
     }
 
     /**
@@ -225,29 +225,29 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      * - registers property read handlers
      */
     function genAddProperties() {
-        let out = "private add_properties(){\n// add property inits and handlers\n"
+        let out = 'private add_properties(){\n// add property inits and handlers\n';
         Object.keys(SD.properties).forEach( prop => {
 
-            if(SD.properties[prop].defaultInput !== undefined) {
+            if (SD.properties[prop].defaultInput !== undefined) {
 
-                out += `this.thing.writeProperty("${prop}", ${genDefaultString(SD.properties[prop].defaultInput)})\n`
+                out += `this.thing.writeProperty("${prop}", ${genDefaultString(SD.properties[prop].defaultInput)})\n`;
             }
 
-            if(SD.properties[prop].path !== undefined) {
-                out += `this.thing.setPropertyReadHandler("${prop}", (async() => await this.get_${prop}()))\n`
+            if (SD.properties[prop].path !== undefined) {
+                out += `this.thing.setPropertyReadHandler("${prop}", (async() => await this.get_${prop}()))\n`;
             } else {
                 out += `this.thing.setPropertyReadHandler("${prop}", () => {
                     return new Promise<any>((resolve, reject) => {
-                        resolve(${composeVarName({type: "property", name: prop})})
+                        resolve(${composeVarName({type: 'property', name: prop})})
                     })
-                })\n`
+                })\n`;
             }
         });
 
-        out += "}"
-        out = Object.keys(SD.properties).length > 0 ? out : ""
+        out += '}';
+        out = Object.keys(SD.properties).length > 0 ? out : '';
 
-        return out
+        return out;
     }
 
     /**
@@ -256,12 +256,12 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      */
     function genAddActions() {
         // OPT: add check for correct input with ajv
-        let out = `\n private add_actions() {\n// add action handlers`
+        let out = `\n private add_actions() {\n// add action handlers`;
 
         Object.keys(SD.actions).forEach( prop => {
-            if(SD.actions[prop].path !== undefined) {
+            if (SD.actions[prop].path !== undefined) {
                 out += `
-                    this.thing.setActionHandler("${prop}", inputData => {            
+                    this.thing.setActionHandler("${prop}", inputData => {
                         return new Promise((resolve, reject) => {
                             if (false) {
                                 reject(new Error ("Invalid input"))
@@ -271,36 +271,36 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                                 resolve(this.act_${prop}())
                             }
                         })
-                    })`
+                    })`;
             }
         });
         out += `
     }\n`;
 
-    out = Object.keys(SD.actions).some( prop => (SD.actions[prop].path !== undefined)) ? out : "";
+    out = Object.keys(SD.actions).some( prop => (SD.actions[prop].path !== undefined)) ? out : '';
 
-    return out
+    return out;
     }
 
     function genDataPushes() {
-        let out = "private add_data_pushes() {\n // add helper object for data pushes\n"
+        let out = 'private add_data_pushes() {\n // add helper object for data pushes\n';
         Object.keys(customDataPush).forEach( intrctSeq => {
-            out += "this.data_pushes[" + intrctSeq + "] = {} "
+            out += 'this.data_pushes[' + intrctSeq + '] = {} ';
             Object.keys(customDataPush[intrctSeq]).forEach( el => {
 
-                out += "this.data_pushes[" + intrctSeq + "][" + el + "] = false\n"
+                out += 'this.data_pushes[' + intrctSeq + '][' + el + '] = false\n';
 
-            })
-        })
-        out += "}";
-        return out
+            });
+        });
+        out += '}';
+        return out;
     }
 
     function parsePath(inPath: SDSQ.structureEl[]) {
 
-        let out = "// ### path: ###\n";
+        let out = '// ### path: ###\n';
         let nextEl = inPath.shift();
-        while(nextEl) {
+        while (nextEl) {
             if (nextEl.type === structureType.interact) {
 
                 out += parsePathAtomic(nextEl);
@@ -313,12 +313,10 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                 if (nextEl.elseContent !== undefined) {
                     out += `else {
                         ${parsePath(nextEl.elseContent)}
-                    }\n`
+                    }\n`;
                 }
 
-            } else if (nextEl.type === structureType.wait)
-
-                {out += `setTimeout( async () => {
+            } else if (nextEl.type === structureType.wait) {out += `setTimeout( async () => {
                     ${parsePath(inPath)}
                 }, ${nextEl.waitTime})\n`;
                 inPath = [];
@@ -326,14 +324,14 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             } else if (nextEl.type === structureType.loop) {
 
                 // TODO: take sync option into account
-                out += "// -- loop --\n";
+                out += '// -- loop --\n';
                 if (nextEl.loopOpts.type === loopType.logic ) {
-                    if (nextEl.loopOpts.exCount === "forever") {
-                    out += `while(${nextEl.loopOpts.exCount === "forever" ? "true" : nextEl.loopOpts.exCount})`
+                    if (nextEl.loopOpts.exCount === 'forever') {
+                    out += `while(${nextEl.loopOpts.exCount === 'forever' ? 'true' : nextEl.loopOpts.exCount})`;
                     } else {
                         out += `for(let i = 0; i < ${nextEl.loopOpts.exCount}; i++)`;
                     }
-                    out += `{\n${parsePath(nextEl.content)}\n}\n`
+                    out += `{\n${parsePath(nextEl.content)}\n}\n`;
                 } else {
                     out += `
                             setInterval( async () => {
@@ -348,13 +346,13 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
 
             } else if (nextEl.type === structureType.set) {
 
-                out += "// set\n"
+                out += '// set\n';
                 if (nextEl.get) {
-                    out += composeVarName(nextEl.set) + " = " + composeVarName(nextEl.get);
-                    if (nextEl.defaultInput !== undefined) {out += " ?? " + genDefaultString(nextEl.defaultInput);}
-                    out += "\n";
+                    out += composeVarName(nextEl.set) + ' = ' + composeVarName(nextEl.get);
+                    if (nextEl.defaultInput !== undefined) {out += ' ?? ' + genDefaultString(nextEl.defaultInput); }
+                    out += '\n';
                 } else if (nextEl.defaultInput !== undefined) {
-                    out += composeVarName(nextEl.set) + " = " + genDefaultString(nextEl.defaultInput) + "\n";
+                    out += composeVarName(nextEl.set) + ' = ' + genDefaultString(nextEl.defaultInput) + '\n';
                 } else {
                     // OPT: add set without defaultInput and without get -> set to data of act_xy(data)
                 }
@@ -363,15 +361,15 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
 
                 // OPT: add get/set to refs?
                 // OPT: allow refs to property path?
-                out += "// ref\n";
-                out += "this." + (nextEl.ref.type === "action" ? "act" : "func") + "_" + nextEl.ref.name + "()\n";
+                out += '// ref\n';
+                out += 'this.' + (nextEl.ref.type === 'action' ? 'act' : 'func') + '_' + nextEl.ref.name + '()\n';
             } else {
-                throw new Error("unknown structure");
+                throw new Error('unknown structure');
             }
             nextEl = inPath.shift();
         }
-        out += "\n// ### end path ###";
-        return out
+        out += '\n// ### end path ###';
+        return out;
 
         // -------internal Functions---(parsePath)------
 
@@ -381,23 +379,23 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
             const sends: string[] = [];
             const asyncs: string[] = [];
             let dataPC = 0;
-            const pre = "// -- interaction sequence --"
+            const pre = '// -- interaction sequence --';
             const hasDataPush = inEl.receiveIntrcts.some(
                 rec => (rec.type === interactionType.observeProperty || rec.type === interactionType.subscribeEvent)
             );
             if (hasDataPush) {
-                customDataPush[customDataPushCount] = {}
+                customDataPush[customDataPushCount] = {};
             }
 
             inEl.sendIntrcts.forEach( snd => {
-                const varname = "autoGenWrite" + customCount++;
-                const inname = "autoWriteInput" + customCount++;
+                const varname = 'autoGenWrite' + customCount++;
+                const inname = 'autoWriteInput' + customCount++;
                 let inpost;
-                const fIntr = (snd.type === interactionType.writeProperty) ? "writeProperty" : "invokeAction"
+                const fIntr = (snd.type === interactionType.writeProperty) ? 'writeProperty' : 'invokeAction';
                 if (snd.get || snd.defaultInput !== undefined) {
                     inpost = (snd.get && snd.defaultInput !== undefined) ?
                             `${composeVarName(snd.get)} ?? ${genDefaultString(snd.defaultInput)}` :
-                            (snd.get ? composeVarName(snd.get) : ((snd.defaultInput !== undefined) ? genDefaultString(snd.defaultInput) : ""));
+                            (snd.get ? composeVarName(snd.get) : ((snd.defaultInput !== undefined) ? genDefaultString(snd.defaultInput) : ''));
                     sends.unshift(`const ${varname} = this.consumed_things["${snd.to}"].` + fIntr + `("${snd.name}", ${inname})`);
                     sends.unshift(`const ${inname} = ` + inpost);
                 } else {
@@ -410,24 +408,24 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
 
                 let varname;
                 const fIntr = interactionType[rec.type];
-                let proto = "";
-                let hvar = "";
+                let proto = '';
+                let hvar = '';
                 if (rec.set) {
                     varname = composeVarName(rec.set);
                 } else {
-                    varname = "autoGenReceive" + customCount++;
+                    varname = 'autoGenReceive' + customCount++;
                     hvar = varname;
                 }
 
                 if (rec.type === interactionType.readProperty || rec.type === interactionType.invokeAction) {
-                    proto += `${rec.set ? "" : "let"} ${varname} = this.consumed_things["${rec.to}"].` + fIntr + `("${rec.name}")`
+                    proto += `${rec.set ? '' : 'let'} ${varname} = this.consumed_things["${rec.to}"].` + fIntr + `("${rec.name}")`;
                     waits.push(`${varname} = await ${varname}`);
                 } else if (rec.type === interactionType.subscribeEvent || rec.type === interactionType.observeProperty) {
-                    if (rec.set) {hvar = "autoGenReceive" + customCount++;}
+                    if (rec.set) {hvar = 'autoGenReceive' + customCount++; }
                     customDataPush[customDataPushCount][dataPC] = false;
 
                     proto += `this.consumed_things["${rec.to}"].` + fIntr + `("${rec.name}", async ${hvar} => {
-                             ${rec.set ? (varname + " = " + hvar) : ""}
+                             ${rec.set ? (varname + ' = ' + hvar) : ''}
                              `;
                     if (inEl.breakOnDataPushed) {
                         proto += `if (Object.keys(this.data_pushes[${customDataPushCount}]).every(el => {
@@ -435,7 +433,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                                     })) {
                                     this.data_pushes[${customDataPushCount}][${dataPC}] = true
                                     console.log("data push oneOf: " + ${hvar})
-                                    ${sends.join("\n")}
+                                    ${sends.join('\n')}
                                 } else {
                                     this.data_pushes[${customDataPushCount}][${dataPC}] = true
                                 }
@@ -446,7 +444,7 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                                         return (this.data_pushes[${customDataPushCount}][el] === true)
                                         })) {
                                         console.log("data push allOf: " + ${hvar})
-                                        ${sends.join("\n")}
+                                        ${sends.join('\n')}
                                     }
                                     `;
                     }
@@ -467,21 +465,21 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
                 }
 
                 syncs.push(proto);
-            })
+            });
 
 
 
-            let outCode = "";
-            let post = "";
+            let outCode = '';
+            let post = '';
 
-            if (!hasDataPush) {post = sends.join("\n");}
-            post += "\n// -- end intrct seq --\n";
+            if (!hasDataPush) {post = sends.join('\n'); }
+            post += '\n// -- end intrct seq --\n';
 
-            if (hasDataPush) {customDataPushCount++;}
+            if (hasDataPush) {customDataPushCount++; }
 
-            outCode = [pre, ...syncs, ...waits, ...asyncs, post].join("\n");
+            outCode = [pre, ...syncs, ...waits, ...asyncs, post].join('\n');
 
-            return outCode
+            return outCode;
         }
 
         /**
@@ -490,34 +488,34 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
          * @param cond condition as internal tree-object representation
          */
         function parseIfCondition(cond: SDSQ.comparison) {
-            let cOut = ""
+            let cOut = '';
 
-            if (cond.type === "all") {
-                cOut = "(" + cond.allOf.map(el => parseIfCondition(el)).join(" && ") +")";
-            } else if (cond.type === "one") {
-                cOut = "this.oneOf(" + cond.oneOf.map(el => parseIfCondition(el)).join(", ") +")";
-            } else if (cond.type === "any") {
-                cOut = "(" + cond.anyOf.map(el => parseIfCondition(el)).join(" || ") +")";
-            } else if (cond.type === "not") {
-                cOut = "!" + parseIfCondition(cond.not) + "";
-            } else if (cond.type === "var") {
-                cOut = composeVarName(cond.variable)
-                if(cond.value) {
-                    cOut = "(" + cOut + " === "
-                    if (typeof cond.value === "object") {
+            if (cond.type === 'all') {
+                cOut = '(' + cond.allOf.map(el => parseIfCondition(el)).join(' && ') + ')';
+            } else if (cond.type === 'one') {
+                cOut = 'this.oneOf(' + cond.oneOf.map(el => parseIfCondition(el)).join(', ') + ')';
+            } else if (cond.type === 'any') {
+                cOut = '(' + cond.anyOf.map(el => parseIfCondition(el)).join(' || ') + ')';
+            } else if (cond.type === 'not') {
+                cOut = '!' + parseIfCondition(cond.not) + '';
+            } else if (cond.type === 'var') {
+                cOut = composeVarName(cond.variable);
+                if (cond.value) {
+                    cOut = '(' + cOut + ' === ';
+                    if (typeof cond.value === 'object') {
                         cOut += composeVarName(cond.value);
-                    } else if (typeof cond.value === "string") {
-                        cOut += "\"" + cond.value + "\"";
-                    } else if (typeof cond.value === "number") {
+                    } else if (typeof cond.value === 'string') {
+                        cOut += '"' + cond.value + '"';
+                    } else if (typeof cond.value === 'number') {
                         cOut += cond.value.toFixed();
                     } else {
-                        throw new Error("problems with parse if value");
+                        throw new Error('problems with parse if value');
                     }
-                    cOut += ")";
+                    cOut += ')';
                 }
-            } else {throw new Error("problems with parseIfCondition");}
+            } else {throw new Error('problems with parseIfCondition'); }
 
-            return cOut
+            return cOut;
         }
     }
 
@@ -526,27 +524,27 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      * @param inDef default Input
      */
     function genDefaultString(inDef: SDSQ.typeDefaultInput) {
-        let out = "";
+        let out = '';
 
-        if (typeof inDef === "boolean") {
-            out = inDef + "";
-        } else if (typeof inDef === "string") {
-            out = "\"" + inDef + "\"";
-        } else if (typeof inDef === "number") {
+        if (typeof inDef === 'boolean') {
+            out = inDef + '';
+        } else if (typeof inDef === 'string') {
+            out = '"' + inDef + '"';
+        } else if (typeof inDef === 'number') {
             try {
                 out = inDef.toFixed();
-            } catch(err) {
-                console.log("defaultInput is no integer??");
+            } catch (err) {
+                console.log('defaultInput is no integer??');
                 out = inDef.toPrecision();
             }
-        } else if (typeof inDef === "object") {
+        } else if (typeof inDef === 'object') {
             out = JSON.stringify(inDef);
             // out = inDef
         } else {
-            throw new Error("problems with parse defaultInput value");
+            throw new Error('problems with parse defaultInput value');
         }
 
-        return out
+        return out;
     }
 
     /**
@@ -554,8 +552,8 @@ export default function generateTS(SD: SDSQ.sdTemplate, mashupLogic: SDSQ.mashup
      * (e.g. this.mavarXY for type: variable, name: XY)
      * @param arg object that contains information about the variable type and name
      */
-    function composeVarName(arg: {type: "variable" | "property"; name: string}) {
-        return ("this." + (arg.type === "property" ? propPrefix : varPrefix) + arg.name)
+    function composeVarName(arg: {type: 'variable' | 'property'; name: string}) {
+        return ('this.' + (arg.type === 'property' ? propPrefix : varPrefix) + arg.name);
     }
 
 }
@@ -573,8 +571,8 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
     // Protocols to expose the Mashup are configured here
     const protoServer: {[k: string]: {toServer: string; config: string}} = {
         http: {
-            toServer: "HttpServer",
-            config: "{port: 8080}"
+            toServer: 'HttpServer',
+            config: '{port: 8080}'
         }/* ,
         coap: {
             toServer: "CoapServer",
@@ -587,7 +585,7 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
     };
 
     // Protocols to consume (where their exist protocol bindings for the controller)
-    const protoClient = ["http", "coap", "mqtt"];
+    const protoClient = ['http', 'coap', 'mqtt'];
 
 
     // ########### program ###########
@@ -598,55 +596,55 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
 
     Object.keys(SD.things).forEach( thingName => {
         Object.keys(SD.things[thingName].actions).forEach( elName => {
-            const formAr = SD.things[thingName].actions[elName].forms
-            if (formAr === undefined){throw new Error("missing forms array in actions");}
+            const formAr = SD.things[thingName].actions[elName].forms;
+            if (formAr === undefined) {throw new Error('missing forms array in actions'); }
             formAr.forEach( form => {
-                protocol = form.href.split("://").shift();
+                protocol = form.href.split('://').shift();
                 if ( protocol && protoClient.some(p => (p === protocol)) ) {
                     toAdd.push(protocol);
                 } else {
-                    throw new Error("cannot add client form actions");
+                    throw new Error('cannot add client form actions');
                 }
-            })
+            });
         });
         Object.keys(SD.things[thingName].properties).forEach( elName => {
-            const formAr = SD.things[thingName].properties[elName].forms
-            if (formAr === undefined){throw new Error("missing forms array in properties");}
+            const formAr = SD.things[thingName].properties[elName].forms;
+            if (formAr === undefined) {throw new Error('missing forms array in properties'); }
             formAr.forEach( form => {
-                protocol = form.href.split("://").shift();
+                protocol = form.href.split('://').shift();
                 if ( protocol && protoClient.some(p => (p === protocol)) ) {
                     toAdd.push(protocol);
                 } else {
-                    throw new Error("cannot add client form properties");
+                    throw new Error('cannot add client form properties');
                 }
-            })
+            });
         });
         Object.keys(SD.things[thingName].events).forEach( elName => {
             const formAr = SD.things[thingName].events[elName].forms;
-            if (formAr === undefined){throw new Error("missing forms array in events");}
+            if (formAr === undefined) {throw new Error('missing forms array in events'); }
             formAr.forEach( form => {
-                protocol = form.href.split("://").shift();
+                protocol = form.href.split('://').shift();
                 if ( protocol && protoClient.some(p => (p === protocol)) ) {
                     toAdd.push(protocol);
                 } else {
-                    throw new Error("cannot add client form events");
+                    throw new Error('cannot add client form events');
                 }
-            })
-        })
-    })
+            });
+        });
+    });
 
     // Generate output that corresponds to the found protocols
-    let bindings = "";
-    let servers = "";
-    let addS = "";
-    let clients = "";
-    let addC = "";
+    let bindings = '';
+    let servers = '';
+    let addS = '';
+    let clients = '';
+    let addC = '';
 
     Object.keys(protoServer).forEach( key => {
             servers += `const ${key}Server = new ${protoServer[key].toServer}(${protoServer[key].config})\n`;
             bindings += `${protoServer[key].toServer} = require("@node-wot/binding-${key}").${protoServer[key].toServer}\n`;
             addS += `servient.addServer(${key}Server)\n`;
-    })
+    });
 
     const uniqToAdd = [...new Set(toAdd)];
 
@@ -654,21 +652,21 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
         const capProt = clientProt.slice(0, 1).toUpperCase() + clientProt.slice(1);
         clients += `${capProt}ClientFactory = require("@node-wot/binding-${clientProt}").${capProt}ClientFactory\n`;
         addC += `servient.addClientFactory(new ${capProt}ClientFactory())\n`;
-    })
+    });
 
     // compose the output file from the generated fragments, static code and filename
     const out: string[] = [];
     // out.push(`WotMashup = require("./${fileName}").WotMashup`);
     out.push('const TD_DIRECTORY = ""');
-    out.push('Servient = require("@node-wot/core").Servient')
+    out.push('Servient = require("@node-wot/core").Servient');
     out.push(bindings, clients, servers);
-    out.push("const servient = new Servient()");
+    out.push('const servient = new Servient()');
     out.push(addS);
     out.push(addC);
     out.push(`servient.start().then( WoT => {
     wotMashup = new WotMashup(WoT, TD_DIRECTORY) // you can change the wotDevice (wotMashup) to something that makes more sense
 })`);
 
-    return out.join("\n\n")
+    return out.join('\n\n');
 }
 

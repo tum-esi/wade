@@ -49,7 +49,7 @@ export default Vue.extend({
       };
     },
     computed: {
-        ...mapState('MashupStore', ['currentMashup','numberOfActiveTabs', "mashupTabbar"]),
+        ...mapState('MashupStore', ['currentMashup', 'numberOfActiveTabs', 'mashupTabbar']),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getTitle(): string {
             if (this.mashup) return this.mashup.title;
@@ -62,9 +62,9 @@ export default Vue.extend({
             if ((this as any).numberOfActiveTabs === 0) {
                 return 'mashup-editor-full';
             } else if ((this as any).numberOfActiveTabs === 1 && (this as any).mashupTabbar[0].tabIsActive) {
-                return 'mashup-editor-full'
+                return 'mashup-editor-full';
             } else if ((this as any).numberOfActiveTabs === 1 && !(this as any).mashupTabbar[0].tabIsActive) {
-                return 'mashup-editor-minimized'
+                return 'mashup-editor-minimized';
             } else if ((this as any).numberOfActiveTabs === 2 && (this as any).mashupTabbar[0].tabIsActive ) {
                 return 'mashup-editor-half';
             } else if ((this as any).numberOfActiveTabs === 2 && !(this as any).mashupTabbar[0].tabIsActive ) {
@@ -74,7 +74,7 @@ export default Vue.extend({
         },
         getMaGeClass(): string {
             if ((this as any).numberOfActiveTabs === 1 && (this as any).mashupTabbar[1].tabIsActive) {
-                return 'mage-full'
+                return 'mage-full';
             } else if ((this as any).numberOfActiveTabs === 2 && (this as any).mashupTabbar[1].tabIsActive ) {
                 return 'mage-half';
             }

@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'; 
+import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
@@ -70,21 +70,21 @@ export default Vue.extend({
         },
     },
     computed: {
-        ...mapGetters('MashupStore',['getInputsIds','getOutputsIds','getIosIds']),
+        ...mapGetters('MashupStore', ['getInputsIds', 'getOutputsIds', 'getIosIds']),
     },
     methods: {
-        ...mapMutations('MashupStore',['setTdAnnotationRestriction']),
+        ...mapMutations('MashupStore', ['setTdAnnotationRestriction']),
         showColumn(column: WADE.ListInterface): boolean {
-            let result: boolean = true;
-            if(column.items.length === 0) return false;
-            if(column.header === "Inputs" && (this as any).getInputsIds.length === 0) return false;
-            if(column.header === "Outputs" && (this as any).getOutputsIds.length === 0) return false;
-            if(column.header === "Ios" && (this as any).getIosIds.length === 0) return false;
-            
+            const result: boolean = true;
+            if (column.items.length === 0) return false;
+            if (column.header === 'Inputs' && (this as any).getInputsIds.length === 0) return false;
+            if (column.header === 'Outputs' && (this as any).getOutputsIds.length === 0) return false;
+            if (column.header === 'Ios' && (this as any).getIosIds.length === 0) return false;
+
             return true;
         },
-        isCheckedClass(annotation: MAGE.VueAnnotationInterface, category: "none" | "forbidden" | "mustHave") {
-            if(annotation.restriction === category) return "checked-class"
+        isCheckedClass(annotation: MAGE.VueAnnotationInterface, category: 'none' | 'forbidden' | 'mustHave') {
+            if (annotation.restriction === category) return 'checked-class';
             return null;
         }
     }

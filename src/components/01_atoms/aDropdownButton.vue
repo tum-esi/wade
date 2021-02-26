@@ -42,9 +42,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
-  name: "aDropdownButton",
+  name: 'aDropdownButton',
   props: {
     /**
      * Label of the button to be displayed.
@@ -52,7 +52,7 @@ export default Vue.extend({
     btnLabel: {
       type: String,
       required: false,
-      default: ""
+      default: ''
     },
     /**
      * Font awesome Icon to be displayed.
@@ -109,7 +109,7 @@ export default Vue.extend({
   data() {
     return {
       showDropdown: false,
-      key: ""
+      key: ''
     };
   },
   computed: {
@@ -119,19 +119,19 @@ export default Vue.extend({
   },
   methods: {
     getBtnKey() {
-      return "";
+      return '';
     },
     iconDropdownSrc(btnSrc: string): any {
       return require(`@/assets/${btnSrc}.png`);
     },
     dropDownClicked(dropdownElement: WADE.DropdownOptionInterface) {
-      this.$emit("dropdown-clicked", {
+      this.$emit('dropdown-clicked', {
         btnKey: this.btnKey,
         btnValue: dropdownElement.key,
         btnInput: dropdownElement.inputValue,
         parentId: null
       });
-      this.$eventHub.$emit("dropdown-clicked", {
+      this.$eventHub.$emit('dropdown-clicked', {
         btnKey: this.btnKey,
         btnValue: dropdownElement.key,
         btnInput: dropdownElement.inputValue,

@@ -16,21 +16,19 @@
 /* eslint-disable no-var */
 /* eslint-disable id-blacklist */
 let DEBUG = {
-  s: "",
-  m: "",
-  l: "",
-  e: ""
-}
+  s: '',
+  m: '',
+  l: '',
+  e: ''
+};
 // ########### - ###########
 
-function validateSeqD(this: any, string: string)
-{
+function validateSeqD(this: any, string: string) {
   init(string);
 
   var thisParser = this;
 
-  this.ParseException = function(b, e, s, o, x)
-  {
+  this.ParseException = function(b, e, s, o, x) {
     var begin = b;
     var end = e;
     var state = s;
@@ -39,52 +37,46 @@ function validateSeqD(this: any, string: string)
 
     // ########### adapted ###########
     DEBUG = {
-      s: string.slice(begin-1,end+1),
-      m: string.slice(begin-2,end+2),
-      l: string.slice(begin-15,end+15),
+      s: string.slice(begin - 1, end + 1),
+      m: string.slice(begin - 2, end + 2),
+      l: string.slice(begin - 15, end + 15),
       e: DEBUG.e
-    }
+    };
     // ########### - ###########
 
-    this.getBegin = function() {return begin;};
-    this.getEnd = function() {return end;};
-    this.getState = function() {return state;};
-    this.getExpected = function() {return expected;};
-    this.getOffending = function() {return offending;};
-    this.isAmbiguousInput = function() {return false;};
+    this.getBegin = function() {return begin; };
+    this.getEnd = function() {return end; };
+    this.getState = function() {return state; };
+    this.getExpected = function() {return expected; };
+    this.getOffending = function() {return offending; };
+    this.isAmbiguousInput = function() {return false; };
 
-    this.getMessage = function()
-    {
+    this.getMessage = function() {
       return offending < 0
-           ? "lexical analysis failed"
-           : "syntax error";
+           ? 'lexical analysis failed'
+           : 'syntax error';
     };
   };
 
-  function init(source)
-  {
+  function init(source) {
     input = source;
     size = source.length;
     reset(0, 0, 0);
   }
 
-  this.getInput = function()
-  {
+  this.getInput = function() {
     return input;
   };
 
-  this.getTokenOffset = function()
-  {
+  this.getTokenOffset = function() {
     return b0;
   };
 
-  this.getTokenEnd = function()
-  {
+  this.getTokenEnd = function() {
     return e0;
   };
 
-  function reset(l, b, e)
-  {
+  function reset(l, b, e) {
             b0 = b; e0 = b;
     l1 = l; b1 = b; e1 = e;
     l2 = 0;
@@ -101,67 +93,56 @@ function validateSeqD(this: any, string: string)
     memo = {};
   }
 
-  this.reset = function(l, b, e)
-  {
+  this.reset = function(l, b, e) {
     reset(l, b, e);
   };
 
-  this.getOffendingToken = function(e)
-  {
+  this.getOffendingToken = function(e) {
     var o = e.getOffending();
     return o >= 0 ? validateSeqD.TOKEN[o] : null;
   };
 
-  this.getExpectedTokenSet = function(e)
-  {
+  this.getExpectedTokenSet = function(e) {
     var expected;
-    if (e.getExpected() < 0)
-    {
+    if (e.getExpected() < 0) {
       expected = validateSeqD.getTokenSet(- e.getState());
-    }
-    else
-    {
+    } else {
       expected = [validateSeqD.TOKEN[e.getExpected()]];
     }
     return expected;
   };
 
-  this.getErrorMessage = function(e)
-  {
+  this.getErrorMessage = function(e) {
     var message = e.getMessage();
     var found = this.getOffendingToken(e);
     var tokenSet = this.getExpectedTokenSet(e);
     var size = e.getEnd() - e.getBegin();
-    message += (found == null ? "" : ", found " + found)
-            + "\nwhile expecting "
-            + (tokenSet.length == 1 ? tokenSet[0] : ("[" + tokenSet.join(", ") + "]"))
-            + "\n"
-            + (size == 0 || found != null ? "" : "after successfully scanning " + size + " characters beginning ");
+    message += (found == null ? '' : ', found ' + found)
+            + '\nwhile expecting '
+            + (tokenSet.length == 1 ? tokenSet[0] : ('[' + tokenSet.join(', ') + ']'))
+            + '\n'
+            + (size == 0 || found != null ? '' : 'after successfully scanning ' + size + ' characters beginning ');
     var prefix = input.substring(0, e.getBegin());
-    var lines = prefix.split("\n");
+    var lines = prefix.split('\n');
     var line = lines.length;
     var column = lines[line - 1].length + 1;
     return message
-         + "at line " + line + ", column " + column + ":\n..."
+         + 'at line ' + line + ', column ' + column + ':\n...'
          + input.substring(e.getBegin(), Math.min(input.length, e.getBegin() + 64))
-         + "...";
+         + '...';
   };
 
-  this.parse_mashup = function()
-  {
-    for (;;)
-    {
+  this.parse_mashup = function() {
+    for (;;) {
       parse_diagram();
       lookahead1(38);               // END | '@startuml'
-      if (l1 != 24)                 // '@startuml'
-      {
+      if (l1 != 24) {
         break;
       }
     }
   };
 
-  this.parse_safetitle = function()
-  {
+  this.parse_safetitle = function() {
     lookahead1(7);                  // '"'
     consume(11);                    // '"'
     lookahead1(2);                  // Title
@@ -170,15 +151,13 @@ function validateSeqD(this: any, string: string)
     consume(11);                    // '"'
   };
 
-  function parse_diagram()
-  {
+  function parse_diagram() {
     parse_header();
     parse_content();
     parse_footer();
   }
 
-  function parse_header()
-  {
+  function parse_header() {
     lookahead1(20);                 // '@startuml'
     consume(24);                    // '@startuml'
     lookahead1(1);                  // S
@@ -217,8 +196,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_footer()
-  {
+  function parse_footer() {
     consume(27);                    // '[<-'
     lookahead1(8);                  // '"Agent"'
     consume(12);                    // '"Agent"'
@@ -235,19 +213,15 @@ function validateSeqD(this: any, string: string)
     lookahead1(19);                 // '@enduml'
     consume(23);                    // '@enduml'
     lookahead1(48);                 // END | L | '@startuml'
-    if (l1 == 2)                    // L
-    {
+    if (l1 == 2) {
       consume(2);                   // L
     }
   }
 
-  function parse_content()
-  {
-    for (;;)
-    {
+  function parse_content() {
+    for (;;) {
       lookahead1(62);               // '...' | 'alt' | 'group' | 'loop' | 'note' | 'ref'
-      switch (l1)
-      {
+      switch (l1) {
       case 48:                      // 'loop'
         parse_loop();
         break;
@@ -269,21 +243,18 @@ function validateSeqD(this: any, string: string)
       lookahead1(66);               // '...' | '[<-' | 'alt' | 'else else' | 'end' | 'group' | 'loop' | 'note' | 'ref'
       if (l1 == 27                  // '[<-'
        || l1 == 39                  // 'else else'
-       || l1 == 40)                 // 'end'
-      {
+       || l1 == 40) {
         break;
       }
     }
   }
 
-  function parse_loop()
-  {
+  function parse_loop() {
     consume(48);                    // 'loop'
     lookahead1(1);                  // S
     consume(3);                     // S
     lookahead1(50);                 // Nr | 'every' | 'forever'
-    switch (l1)
-    {
+    switch (l1) {
     case 41:                        // 'every'
       consume(41);                  // 'every'
       lookahead1(1);                // S
@@ -309,8 +280,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_wait()
-  {
+  function parse_wait() {
     consume(19);                    // '...'
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -330,8 +300,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_condition()
-  {
+  function parse_condition() {
     consume(31);                    // 'alt'
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -343,8 +312,7 @@ function validateSeqD(this: any, string: string)
     lookahead1(0);                  // L
     consume(2);                     // L
     lookahead1(65);                 // '...' | 'alt' | 'end' | 'group' | 'loop' | 'note' | 'ref'
-    if (l1 != 40)                   // 'end'
-    {
+    if (l1 != 40) {
       parse_content();
     }
     consume(40);                    // 'end'
@@ -352,22 +320,18 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_comparison()
-  {
+  function parse_comparison() {
     lookahead1(63);                 // 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-    switch (l1)
-    {
+    switch (l1) {
     case 50:                        // 'not('
       consume(50);                  // 'not('
       lookahead1(64);               // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       parse_comparison();
       lookahead1(40);               // S | ')'
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       lookahead1(10);               // ')'
@@ -376,16 +340,13 @@ function validateSeqD(this: any, string: string)
     case 30:                        // 'allOf('
       consume(30);                  // 'allOf('
       lookahead1(64);               // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       parse_comparison();
-      for (;;)
-      {
+      for (;;) {
         lookahead1(49);             // S | ')' | ','
-        switch (l1)
-        {
+        switch (l1) {
         case 3:                     // S
           lookahead2(128, 44);      // ')' | ','
           break;
@@ -393,25 +354,21 @@ function validateSeqD(this: any, string: string)
           lk = l1;
         }
         if (lk != 15                // ','
-         && lk != 143)              // S ','
-        {
+         && lk != 143) {
           break;
         }
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         lookahead1(11);             // ','
         consume(15);                // ','
         lookahead1(64);             // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         parse_comparison();
       }
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       lookahead1(10);               // ')'
@@ -420,16 +377,13 @@ function validateSeqD(this: any, string: string)
     case 53:                        // 'oneOf('
       consume(53);                  // 'oneOf('
       lookahead1(64);               // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       parse_comparison();
-      for (;;)
-      {
+      for (;;) {
         lookahead1(49);             // S | ')' | ','
-        switch (l1)
-        {
+        switch (l1) {
         case 3:                     // S
           lookahead2(128, 44);      // ')' | ','
           break;
@@ -437,25 +391,21 @@ function validateSeqD(this: any, string: string)
           lk = l1;
         }
         if (lk != 15                // ','
-         && lk != 143)              // S ','
-        {
+         && lk != 143) {
           break;
         }
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         lookahead1(11);             // ','
         consume(15);                // ','
         lookahead1(64);             // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         parse_comparison();
       }
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       lookahead1(10);               // ')'
@@ -464,16 +414,13 @@ function validateSeqD(this: any, string: string)
     case 32:                        // 'anyOf('
       consume(32);                  // 'anyOf('
       lookahead1(64);               // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       parse_comparison();
-      for (;;)
-      {
+      for (;;) {
         lookahead1(49);             // S | ')' | ','
-        switch (l1)
-        {
+        switch (l1) {
         case 3:                     // S
           lookahead2(128, 44);      // ')' | ','
           break;
@@ -481,33 +428,28 @@ function validateSeqD(this: any, string: string)
           lk = l1;
         }
         if (lk != 15                // ','
-         && lk != 143)              // S ','
-        {
+         && lk != 143) {
           break;
         }
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         lookahead1(11);             // ','
         consume(15);                // ','
         lookahead1(64);             // S | 'allOf(' | 'anyOf(' | 'not(' | 'oneOf(' | 'property' | 'variable'
-        if (l1 == 3)                // S
-        {
+        if (l1 == 3) {
           consume(3);               // S
         }
         parse_comparison();
       }
-      if (l1 == 3)                  // S
-      {
+      if (l1 == 3) {
         consume(3);                 // S
       }
       lookahead1(10);               // ')'
       consume(14);                  // ')'
       break;
     default:
-      switch (l1)
-      {
+      switch (l1) {
       case 65:                      // 'variable'
         consume(65);                // 'variable'
         break;
@@ -519,24 +461,21 @@ function validateSeqD(this: any, string: string)
       lookahead1(5);                // VarName
       consume(8);                   // VarName
       lookahead1(54);               // L | S | ')' | ','
-      switch (l1)
-      {
+      switch (l1) {
       case 3:                       // S
         lookahead2(128, 52);        // ')' | ',' | '=='
         break;
       default:
         lk = l1;
       }
-      if (lk == 149)                // S '=='
-      {
+      if (lk == 149) {
         consume(3);                 // S
         lookahead1(17);             // '=='
         consume(21);                // '=='
         lookahead1(1);              // S
         consume(3);                 // S
         lookahead1(61);             // Nr | '"' | 'false' | 'property' | 'true' | 'variable'
-        switch (l1)
-        {
+        switch (l1) {
         case 64:                    // 'true'
           consume(64);              // 'true'
           break;
@@ -545,11 +484,9 @@ function validateSeqD(this: any, string: string)
           break;
         case 11:                    // '"'
           consume(11);              // '"'
-          for (;;)
-          {
+          for (;;) {
             lookahead1(42);         // Char | '"'
-            if (l1 != 9)            // Char
-            {
+            if (l1 != 9) {
               break;
             }
             consume(9);             // Char
@@ -560,8 +497,7 @@ function validateSeqD(this: any, string: string)
           consume(10);              // Nr
           break;
         default:
-          switch (l1)
-          {
+          switch (l1) {
           case 65:                  // 'variable'
             consume(65);            // 'variable'
             break;
@@ -577,8 +513,7 @@ function validateSeqD(this: any, string: string)
     }
   }
 
-  function parse_interaction()
-  {
+  function parse_interaction() {
     consume(46);                    // 'group'
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -594,31 +529,26 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_interactionRecCont()
-  {
+  function parse_interactionRecCont() {
     lookahead1(32);                 // 'par'
     consume(56);                    // 'par'
     lookahead1(0);                  // L
     consume(2);                     // L
-    for (;;)
-    {
+    for (;;) {
       lookahead1(55);               // '"Agent"' | 'break' | 'end' | 'note'
       if (l1 != 12                  // '"Agent"'
-       && l1 != 51)                 // 'note'
-      {
+       && l1 != 51) {
         break;
       }
       parse_interactionReceive();
       lookahead1(60);               // '"Agent"' | 'break' | 'else' | 'end' | 'note'
-      if (l1 == 38)                 // 'else'
-      {
+      if (l1 == 38) {
         consume(38);                // 'else'
         lookahead1(0);              // L
         consume(2);                 // L
       }
     }
-    if (l1 == 33)                   // 'break'
-    {
+    if (l1 == 33) {
       consume(33);                  // 'break'
       lookahead1(1);                // S
       consume(3);                   // S
@@ -637,23 +567,19 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_interactionSendCont()
-  {
+  function parse_interactionSendCont() {
     lookahead1(32);                 // 'par'
     consume(56);                    // 'par'
     lookahead1(0);                  // L
     consume(2);                     // L
-    for (;;)
-    {
+    for (;;) {
       lookahead1(51);               // '"Agent"' | 'end' | 'note'
-      if (l1 == 40)                 // 'end'
-      {
+      if (l1 == 40) {
         break;
       }
       parse_interactionSend();
       lookahead1(56);               // '"Agent"' | 'else' | 'end' | 'note'
-      if (l1 == 38)                 // 'else'
-      {
+      if (l1 == 38) {
         consume(38);                // 'else'
         lookahead1(0);              // L
         consume(2);                 // L
@@ -664,16 +590,13 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_interactionReceive()
-  {
-    if (l1 == 51)                   // 'note'
-    {
+  function parse_interactionReceive() {
+    if (l1 == 51) {
       parse_getset();
     }
     parse_interactionPre();
     lookahead1(58);                 // 'invokeAction:' | 'observeProperty:' | 'readProperty:' | 'subscribeEvent:'
-    switch (l1)
-    {
+    switch (l1) {
     case 63:                        // 'subscribeEvent:'
       parse_receiveSubs();
       break;
@@ -687,40 +610,31 @@ function validateSeqD(this: any, string: string)
       parse_receiveRead();
     }
     lookahead1(60);                 // '"Agent"' | 'break' | 'else' | 'end' | 'note'
-    switch (l1)
-    {
+    switch (l1) {
     case 51:                        // 'note'
       lookahead2(128, 1);           // S
-      switch (lk)
-      {
+      switch (lk) {
       case 131:                     // 'note' S
         lookahead3(256, 31);        // 'over'
-        switch (lk)
-        {
+        switch (lk) {
         case 311:                   // 'note' S 'over'
           lookahead4(384, 1);       // S
-          switch (lk)
-          {
+          switch (lk) {
           case 387:                 // 'note' S 'over' S
             lookahead5(512, 43);    // '"' | 'Agent'
-            switch (lk)
-            {
+            switch (lk) {
             case 523:               // 'note' S 'over' S '"'
               lookahead6(640, 21);  // 'Agent'
-              switch (lk)
-              {
+              switch (lk) {
               case 665:             // 'note' S 'over' S '"' 'Agent'
                 lookahead7(768, 39); // L | '"'
-                switch (lk)
-                {
+                switch (lk) {
                 case 770:           // 'note' S 'over' S '"' 'Agent' L
                   lookahead8(896, 53); // 'defaultInput' | 'get' | 'set'
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 933:         // 'note' S 'over' S '"' 'Agent' L 'defaultInput'
                     lookahead9(1024, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1027:      // 'note' S 'over' S '"' 'Agent' L 'defaultInput' S
                       lookahead10(1152, 59); // Nr | '"' | 'false' | 'true' | '{'
                       break;
@@ -728,8 +642,7 @@ function validateSeqD(this: any, string: string)
                     break;
                   case 941:         // 'note' S 'over' S '"' 'Agent' L 'get'
                     lookahead9(1280, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1283:      // 'note' S 'over' S '"' 'Agent' L 'get' S
                       lookahead10(1408, 47); // 'property' | 'variable'
                       break;
@@ -742,12 +655,10 @@ function validateSeqD(this: any, string: string)
                   break;
                 case 779:           // 'note' S 'over' S '"' 'Agent' '"'
                   lookahead8(1792, 0); // L
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 1794:        // 'note' S 'over' S '"' 'Agent' '"' L
                     lookahead9(1920, 53); // 'defaultInput' | 'get' | 'set'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1957:      // 'note' S 'over' S '"' 'Agent' '"' L 'defaultInput'
                       lookahead10(2048, 1); // S
                       break;
@@ -767,20 +678,16 @@ function validateSeqD(this: any, string: string)
               break;
             case 537:               // 'note' S 'over' S 'Agent'
               lookahead6(2432, 39); // L | '"'
-              switch (lk)
-              {
+              switch (lk) {
               case 2434:            // 'note' S 'over' S 'Agent' L
                 lookahead7(2560, 53); // 'defaultInput' | 'get' | 'set'
-                switch (lk)
-                {
+                switch (lk) {
                 case 2597:          // 'note' S 'over' S 'Agent' L 'defaultInput'
                   lookahead8(2688, 1); // S
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 2691:        // 'note' S 'over' S 'Agent' L 'defaultInput' S
                     lookahead9(2816, 59); // Nr | '"' | 'false' | 'true' | '{'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 2826:      // 'note' S 'over' S 'Agent' L 'defaultInput' S Nr
                       lookahead10(2944, 0); // L
                       break;
@@ -802,12 +709,10 @@ function validateSeqD(this: any, string: string)
                   break;
                 case 2605:          // 'note' S 'over' S 'Agent' L 'get'
                   lookahead8(3584, 1); // S
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 3587:        // 'note' S 'over' S 'Agent' L 'get' S
                     lookahead9(3712, 47); // 'property' | 'variable'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 3769:      // 'note' S 'over' S 'Agent' L 'get' S 'property'
                       lookahead10(3840, 1); // S
                       break;
@@ -825,16 +730,13 @@ function validateSeqD(this: any, string: string)
                 break;
               case 2443:            // 'note' S 'over' S 'Agent' '"'
                 lookahead7(4608, 0); // L
-                switch (lk)
-                {
+                switch (lk) {
                 case 4610:          // 'note' S 'over' S 'Agent' '"' L
                   lookahead8(4736, 53); // 'defaultInput' | 'get' | 'set'
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 4773:        // 'note' S 'over' S 'Agent' '"' L 'defaultInput'
                     lookahead9(4864, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 4867:      // 'note' S 'over' S 'Agent' '"' L 'defaultInput' S
                       lookahead10(4992, 59); // Nr | '"' | 'false' | 'true' | '{'
                       break;
@@ -842,8 +744,7 @@ function validateSeqD(this: any, string: string)
                     break;
                   case 4781:        // 'note' S 'over' S 'Agent' '"' L 'get'
                     lookahead9(5120, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 5123:      // 'note' S 'over' S 'Agent' '"' L 'get' S
                       lookahead10(5248, 47); // 'property' | 'variable'
                       break;
@@ -872,11 +773,9 @@ function validateSeqD(this: any, string: string)
     if (lk != 12                    // '"Agent"'
      && lk != 33                    // 'break'
      && lk != 38                    // 'else'
-     && lk != 40)                   // 'end'
-    {
+     && lk != 40) {
       lk = memoized(0, e0);
-      if (lk == 0)
-      {
+      if (lk == 0) {
         var b0A = b0; var e0A = e0; var l1A = l1;
         var b1A = b1; var e1A = e1; var l2A = l2;
         var b2A = b2; var e2A = e2; var l3A = l3;
@@ -888,45 +787,38 @@ function validateSeqD(this: any, string: string)
         var b8A = b8; var e8A = e8; var l9A = l9;
         var b9A = b9; var e9A = e9; var l10A = l10;
         var b10A = b10; var e10A = e10;
-        try
-        {
+        try {
           try_getset();
           lk = -1;
-        }
-        catch (p1A)
-        {
+        } catch (p1A) {
           lk = -2;
         }
-        b0 = b0A; e0 = e0A; l1 = l1A; if (l1 == 0) {end = e0A;} else {
-        b1 = b1A; e1 = e1A; l2 = l2A; if (l2 == 0) {end = e1A;} else {
-        b2 = b2A; e2 = e2A; l3 = l3A; if (l3 == 0) {end = e2A;} else {
-        b3 = b3A; e3 = e3A; l4 = l4A; if (l4 == 0) {end = e3A;} else {
-        b4 = b4A; e4 = e4A; l5 = l5A; if (l5 == 0) {end = e4A;} else {
-        b5 = b5A; e5 = e5A; l6 = l6A; if (l6 == 0) {end = e5A;} else {
-        b6 = b6A; e6 = e6A; l7 = l7A; if (l7 == 0) {end = e6A;} else {
-        b7 = b7A; e7 = e7A; l8 = l8A; if (l8 == 0) {end = e7A;} else {
-        b8 = b8A; e8 = e8A; l9 = l9A; if (l9 == 0) {end = e8A;} else {
-        b9 = b9A; e9 = e9A; l10 = l10A; if (l10 == 0) {end = e9A;} else {
+        b0 = b0A; e0 = e0A; l1 = l1A; if (l1 == 0) {end = e0A; } else {
+        b1 = b1A; e1 = e1A; l2 = l2A; if (l2 == 0) {end = e1A; } else {
+        b2 = b2A; e2 = e2A; l3 = l3A; if (l3 == 0) {end = e2A; } else {
+        b3 = b3A; e3 = e3A; l4 = l4A; if (l4 == 0) {end = e3A; } else {
+        b4 = b4A; e4 = e4A; l5 = l5A; if (l5 == 0) {end = e4A; } else {
+        b5 = b5A; e5 = e5A; l6 = l6A; if (l6 == 0) {end = e5A; } else {
+        b6 = b6A; e6 = e6A; l7 = l7A; if (l7 == 0) {end = e6A; } else {
+        b7 = b7A; e7 = e7A; l8 = l8A; if (l8 == 0) {end = e7A; } else {
+        b8 = b8A; e8 = e8A; l9 = l9A; if (l9 == 0) {end = e8A; } else {
+        b9 = b9A; e9 = e9A; l10 = l10A; if (l10 == 0) {end = e9A; } else {
         b10 = b10A; e10 = e10A; end = e10A; }}}}}}}}}}
         memoize(0, e0, lk);
       }
     }
-    if (lk == -1)
-    {
+    if (lk == -1) {
       parse_getset();
     }
   }
 
-  function parse_interactionSend()
-  {
-    if (l1 == 51)                   // 'note'
-    {
+  function parse_interactionSend() {
+    if (l1 == 51) {
       parse_getset();
     }
     parse_interactionPre();
     lookahead1(46);                 // 'invokeAction:' | 'writeProperty:'
-    switch (l1)
-    {
+    switch (l1) {
     case 67:                        // 'writeProperty:'
       parse_sendWrite();
       break;
@@ -935,40 +827,31 @@ function validateSeqD(this: any, string: string)
     }
     parse_sendPost();
     lookahead1(56);                 // '"Agent"' | 'else' | 'end' | 'note'
-    switch (l1)
-    {
+    switch (l1) {
     case 51:                        // 'note'
       lookahead2(128, 1);           // S
-      switch (lk)
-      {
+      switch (lk) {
       case 131:                     // 'note' S
         lookahead3(256, 31);        // 'over'
-        switch (lk)
-        {
+        switch (lk) {
         case 311:                   // 'note' S 'over'
           lookahead4(384, 1);       // S
-          switch (lk)
-          {
+          switch (lk) {
           case 387:                 // 'note' S 'over' S
             lookahead5(512, 43);    // '"' | 'Agent'
-            switch (lk)
-            {
+            switch (lk) {
             case 523:               // 'note' S 'over' S '"'
               lookahead6(640, 21);  // 'Agent'
-              switch (lk)
-              {
+              switch (lk) {
               case 665:             // 'note' S 'over' S '"' 'Agent'
                 lookahead7(768, 39); // L | '"'
-                switch (lk)
-                {
+                switch (lk) {
                 case 770:           // 'note' S 'over' S '"' 'Agent' L
                   lookahead8(896, 53); // 'defaultInput' | 'get' | 'set'
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 933:         // 'note' S 'over' S '"' 'Agent' L 'defaultInput'
                     lookahead9(1024, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1027:      // 'note' S 'over' S '"' 'Agent' L 'defaultInput' S
                       lookahead10(1152, 59); // Nr | '"' | 'false' | 'true' | '{'
                       break;
@@ -976,8 +859,7 @@ function validateSeqD(this: any, string: string)
                     break;
                   case 941:         // 'note' S 'over' S '"' 'Agent' L 'get'
                     lookahead9(1280, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1283:      // 'note' S 'over' S '"' 'Agent' L 'get' S
                       lookahead10(1408, 47); // 'property' | 'variable'
                       break;
@@ -990,12 +872,10 @@ function validateSeqD(this: any, string: string)
                   break;
                 case 779:           // 'note' S 'over' S '"' 'Agent' '"'
                   lookahead8(1792, 0); // L
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 1794:        // 'note' S 'over' S '"' 'Agent' '"' L
                     lookahead9(1920, 53); // 'defaultInput' | 'get' | 'set'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 1957:      // 'note' S 'over' S '"' 'Agent' '"' L 'defaultInput'
                       lookahead10(2048, 1); // S
                       break;
@@ -1015,20 +895,16 @@ function validateSeqD(this: any, string: string)
               break;
             case 537:               // 'note' S 'over' S 'Agent'
               lookahead6(2432, 39); // L | '"'
-              switch (lk)
-              {
+              switch (lk) {
               case 2434:            // 'note' S 'over' S 'Agent' L
                 lookahead7(2560, 53); // 'defaultInput' | 'get' | 'set'
-                switch (lk)
-                {
+                switch (lk) {
                 case 2597:          // 'note' S 'over' S 'Agent' L 'defaultInput'
                   lookahead8(2688, 1); // S
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 2691:        // 'note' S 'over' S 'Agent' L 'defaultInput' S
                     lookahead9(2816, 59); // Nr | '"' | 'false' | 'true' | '{'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 2826:      // 'note' S 'over' S 'Agent' L 'defaultInput' S Nr
                       lookahead10(2944, 0); // L
                       break;
@@ -1050,12 +926,10 @@ function validateSeqD(this: any, string: string)
                   break;
                 case 2605:          // 'note' S 'over' S 'Agent' L 'get'
                   lookahead8(3584, 1); // S
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 3587:        // 'note' S 'over' S 'Agent' L 'get' S
                     lookahead9(3712, 47); // 'property' | 'variable'
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 3769:      // 'note' S 'over' S 'Agent' L 'get' S 'property'
                       lookahead10(3840, 1); // S
                       break;
@@ -1073,16 +947,13 @@ function validateSeqD(this: any, string: string)
                 break;
               case 2443:            // 'note' S 'over' S 'Agent' '"'
                 lookahead7(4608, 0); // L
-                switch (lk)
-                {
+                switch (lk) {
                 case 4610:          // 'note' S 'over' S 'Agent' '"' L
                   lookahead8(4736, 53); // 'defaultInput' | 'get' | 'set'
-                  switch (lk)
-                  {
+                  switch (lk) {
                   case 4773:        // 'note' S 'over' S 'Agent' '"' L 'defaultInput'
                     lookahead9(4864, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 4867:      // 'note' S 'over' S 'Agent' '"' L 'defaultInput' S
                       lookahead10(4992, 59); // Nr | '"' | 'false' | 'true' | '{'
                       break;
@@ -1090,8 +961,7 @@ function validateSeqD(this: any, string: string)
                     break;
                   case 4781:        // 'note' S 'over' S 'Agent' '"' L 'get'
                     lookahead9(5120, 1); // S
-                    switch (lk)
-                    {
+                    switch (lk) {
                     case 5123:      // 'note' S 'over' S 'Agent' '"' L 'get' S
                       lookahead10(5248, 47); // 'property' | 'variable'
                       break;
@@ -1119,11 +989,9 @@ function validateSeqD(this: any, string: string)
     }
     if (lk != 12                    // '"Agent"'
      && lk != 38                    // 'else'
-     && lk != 40)                   // 'end'
-    {
+     && lk != 40) {
       lk = memoized(1, e0);
-      if (lk == 0)
-      {
+      if (lk == 0) {
         var b0A = b0; var e0A = e0; var l1A = l1;
         var b1A = b1; var e1A = e1; var l2A = l2;
         var b2A = b2; var e2A = e2; var l3A = l3;
@@ -1135,37 +1003,32 @@ function validateSeqD(this: any, string: string)
         var b8A = b8; var e8A = e8; var l9A = l9;
         var b9A = b9; var e9A = e9; var l10A = l10;
         var b10A = b10; var e10A = e10;
-        try
-        {
+        try {
           try_getset();
           lk = -1;
-        }
-        catch (p1A)
-        {
+        } catch (p1A) {
           lk = -2;
         }
-        b0 = b0A; e0 = e0A; l1 = l1A; if (l1 == 0) {end = e0A;} else {
-        b1 = b1A; e1 = e1A; l2 = l2A; if (l2 == 0) {end = e1A;} else {
-        b2 = b2A; e2 = e2A; l3 = l3A; if (l3 == 0) {end = e2A;} else {
-        b3 = b3A; e3 = e3A; l4 = l4A; if (l4 == 0) {end = e3A;} else {
-        b4 = b4A; e4 = e4A; l5 = l5A; if (l5 == 0) {end = e4A;} else {
-        b5 = b5A; e5 = e5A; l6 = l6A; if (l6 == 0) {end = e5A;} else {
-        b6 = b6A; e6 = e6A; l7 = l7A; if (l7 == 0) {end = e6A;} else {
-        b7 = b7A; e7 = e7A; l8 = l8A; if (l8 == 0) {end = e7A;} else {
-        b8 = b8A; e8 = e8A; l9 = l9A; if (l9 == 0) {end = e8A;} else {
-        b9 = b9A; e9 = e9A; l10 = l10A; if (l10 == 0) {end = e9A;} else {
+        b0 = b0A; e0 = e0A; l1 = l1A; if (l1 == 0) {end = e0A; } else {
+        b1 = b1A; e1 = e1A; l2 = l2A; if (l2 == 0) {end = e1A; } else {
+        b2 = b2A; e2 = e2A; l3 = l3A; if (l3 == 0) {end = e2A; } else {
+        b3 = b3A; e3 = e3A; l4 = l4A; if (l4 == 0) {end = e3A; } else {
+        b4 = b4A; e4 = e4A; l5 = l5A; if (l5 == 0) {end = e4A; } else {
+        b5 = b5A; e5 = e5A; l6 = l6A; if (l6 == 0) {end = e5A; } else {
+        b6 = b6A; e6 = e6A; l7 = l7A; if (l7 == 0) {end = e6A; } else {
+        b7 = b7A; e7 = e7A; l8 = l8A; if (l8 == 0) {end = e7A; } else {
+        b8 = b8A; e8 = e8A; l9 = l9A; if (l9 == 0) {end = e8A; } else {
+        b9 = b9A; e9 = e9A; l10 = l10A; if (l10 == 0) {end = e9A; } else {
         b10 = b10A; e10 = e10A; end = e10A; }}}}}}}}}}
         memoize(1, e0, lk);
       }
     }
-    if (lk == -1)
-    {
+    if (lk == -1) {
       parse_getset();
     }
   }
 
-  function parse_interactionPre()
-  {
+  function parse_interactionPre() {
     lookahead1(8);                  // '"Agent"'
     consume(12);                    // '"Agent"'
     lookahead1(1);                  // S
@@ -1183,8 +1046,7 @@ function validateSeqD(this: any, string: string)
     consume(3);                     // S
   }
 
-  function parse_receiveRead()
-  {
+  function parse_receiveRead() {
     consume(58);                    // 'readProperty:'
     parse_receiveMiddle();
     parse_readResponse();
@@ -1195,20 +1057,17 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_receiveSubs()
-  {
+  function parse_receiveSubs() {
     consume(63);                    // 'subscribeEvent:'
     parse_receiveSubsObsPost();
   }
 
-  function parse_receiveObs()
-  {
+  function parse_receiveObs() {
     consume(52);                    // 'observeProperty:'
     parse_receiveSubsObsPost();
   }
 
-  function parse_receiveInv()
-  {
+  function parse_receiveInv() {
     consume(47);                    // 'invokeAction:'
     parse_receiveMiddle();
     parse_invConfirmation();
@@ -1219,8 +1078,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_receiveSubsObsPost()
-  {
+  function parse_receiveSubsObsPost() {
     parse_receiveMiddle();
     parse_subsObsConfirmation();
     lookahead1(0);                  // L
@@ -1230,8 +1088,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_receiveMiddle()
-  {
+  function parse_receiveMiddle() {
     lookahead1(1);                  // S
     consume(3);                     // S
     parse_interactionName();
@@ -1242,18 +1099,15 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_sendWrite()
-  {
+  function parse_sendWrite() {
     consume(67);                    // 'writeProperty:'
   }
 
-  function parse_sendInv()
-  {
+  function parse_sendInv() {
     consume(47);                    // 'invokeAction:'
   }
 
-  function parse_sendPost()
-  {
+  function parse_sendPost() {
     lookahead1(1);                  // S
     consume(3);                     // S
     parse_interactionName();
@@ -1261,8 +1115,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function parse_readResponse()
-  {
+  function parse_readResponse() {
     parse_interactionTo();
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1284,8 +1137,7 @@ function validateSeqD(this: any, string: string)
     consume(60);                    // 'response'
   }
 
-  function parse_subsObsConfirmation()
-  {
+  function parse_subsObsConfirmation() {
     parse_interactionTo();
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1305,8 +1157,7 @@ function validateSeqD(this: any, string: string)
     consume(34);                    // 'confirmation'
   }
 
-  function parse_subsObsData()
-  {
+  function parse_subsObsData() {
     parse_interactionTo();
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1328,8 +1179,7 @@ function validateSeqD(this: any, string: string)
     consume(35);                    // 'data-pushed'
   }
 
-  function parse_invConfirmation()
-  {
+  function parse_invConfirmation() {
     parse_interactionTo();
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1351,8 +1201,7 @@ function validateSeqD(this: any, string: string)
     consume(54);                    // 'output'
   }
 
-  function parse_actTo()
-  {
+  function parse_actTo() {
     lookahead1(23);                 // 'activate'
     consume(29);                    // 'activate'
     lookahead1(1);                  // S
@@ -1360,8 +1209,7 @@ function validateSeqD(this: any, string: string)
     parse_interactionTo();
   }
 
-  function parse_deactTo()
-  {
+  function parse_deactTo() {
     lookahead1(26);                 // 'deactivate'
     consume(36);                    // 'deactivate'
     lookahead1(1);                  // S
@@ -1369,8 +1217,7 @@ function validateSeqD(this: any, string: string)
     parse_interactionTo();
   }
 
-  function parse_interactionTo()
-  {
+  function parse_interactionTo() {
     lookahead1(7);                  // '"'
     consume(11);                    // '"'
     lookahead1(3);                  // Ntitle
@@ -1379,8 +1226,7 @@ function validateSeqD(this: any, string: string)
     consume(11);                    // '"'
   }
 
-  function parse_interactionName()
-  {
+  function parse_interactionName() {
     lookahead1(7);                  // '"'
     consume(11);                    // '"'
     lookahead1(3);                  // Ntitle
@@ -1389,8 +1235,7 @@ function validateSeqD(this: any, string: string)
     consume(11);                    // '"'
   }
 
-  function parse_getset()
-  {
+  function parse_getset() {
     consume(51);                    // 'note'
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1399,31 +1244,26 @@ function validateSeqD(this: any, string: string)
     lookahead1(1);                  // S
     consume(3);                     // S
     lookahead1(43);                 // '"' | 'Agent'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consume(11);                  // '"'
     }
     lookahead1(21);                 // 'Agent'
     consume(25);                    // 'Agent'
     lookahead1(39);                 // L | '"'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consume(11);                  // '"'
     }
     lookahead1(0);                  // L
     consume(2);                     // L
-    for (;;)
-    {
+    for (;;) {
       lookahead1(53);               // 'defaultInput' | 'get' | 'set'
-      switch (l1)
-      {
+      switch (l1) {
       case 37:                      // 'defaultInput'
         consume(37);                // 'defaultInput'
         lookahead1(1);              // S
         consume(3);                 // S
         lookahead1(59);             // Nr | '"' | 'false' | 'true' | '{'
-        switch (l1)
-        {
+        switch (l1) {
         case 64:                    // 'true'
           consume(64);              // 'true'
           break;
@@ -1432,11 +1272,9 @@ function validateSeqD(this: any, string: string)
           break;
         case 11:                    // '"'
           consume(11);              // '"'
-          for (;;)
-          {
+          for (;;) {
             lookahead1(42);         // Char | '"'
-            if (l1 != 9)            // Char
-            {
+            if (l1 != 9) {
               break;
             }
             consume(9);             // Char
@@ -1448,11 +1286,9 @@ function validateSeqD(this: any, string: string)
           break;
         default:
           consume(69);              // '{'
-          for (;;)
-          {
+          for (;;) {
             lookahead1(41);         // Nchar | '}'
-            if (l1 != 6)            // Nchar
-            {
+            if (l1 != 6) {
               break;
             }
             consume(6);             // Nchar
@@ -1461,8 +1297,7 @@ function validateSeqD(this: any, string: string)
         }
         break;
       default:
-        switch (l1)
-        {
+        switch (l1) {
         case 45:                    // 'get'
           consume(45);              // 'get'
           break;
@@ -1472,8 +1307,7 @@ function validateSeqD(this: any, string: string)
         lookahead1(1);              // S
         consume(3);                 // S
         lookahead1(47);             // 'property' | 'variable'
-        switch (l1)
-        {
+        switch (l1) {
         case 65:                    // 'variable'
           consume(65);              // 'variable'
           break;
@@ -1488,8 +1322,7 @@ function validateSeqD(this: any, string: string)
       lookahead1(0);                // L
       consume(2);                   // L
       lookahead1(57);               // 'defaultInput' | 'end' | 'get' | 'set'
-      if (l1 == 40)                 // 'end'
-      {
+      if (l1 == 40) {
         break;
       }
     }
@@ -1502,8 +1335,7 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function try_getset()
-  {
+  function try_getset() {
     consumeT(51);                   // 'note'
     lookahead1(1);                  // S
     consumeT(3);                    // S
@@ -1512,31 +1344,26 @@ function validateSeqD(this: any, string: string)
     lookahead1(1);                  // S
     consumeT(3);                    // S
     lookahead1(43);                 // '"' | 'Agent'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consumeT(11);                 // '"'
     }
     lookahead1(21);                 // 'Agent'
     consumeT(25);                   // 'Agent'
     lookahead1(39);                 // L | '"'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consumeT(11);                 // '"'
     }
     lookahead1(0);                  // L
     consumeT(2);                    // L
-    for (;;)
-    {
+    for (;;) {
       lookahead1(53);               // 'defaultInput' | 'get' | 'set'
-      switch (l1)
-      {
+      switch (l1) {
       case 37:                      // 'defaultInput'
         consumeT(37);               // 'defaultInput'
         lookahead1(1);              // S
         consumeT(3);                // S
         lookahead1(59);             // Nr | '"' | 'false' | 'true' | '{'
-        switch (l1)
-        {
+        switch (l1) {
         case 64:                    // 'true'
           consumeT(64);             // 'true'
           break;
@@ -1545,11 +1372,9 @@ function validateSeqD(this: any, string: string)
           break;
         case 11:                    // '"'
           consumeT(11);             // '"'
-          for (;;)
-          {
+          for (;;) {
             lookahead1(42);         // Char | '"'
-            if (l1 != 9)            // Char
-            {
+            if (l1 != 9) {
               break;
             }
             consumeT(9);            // Char
@@ -1561,11 +1386,9 @@ function validateSeqD(this: any, string: string)
           break;
         default:
           consumeT(69);             // '{'
-          for (;;)
-          {
+          for (;;) {
             lookahead1(41);         // Nchar | '}'
-            if (l1 != 6)            // Nchar
-            {
+            if (l1 != 6) {
               break;
             }
             consumeT(6);            // Nchar
@@ -1574,8 +1397,7 @@ function validateSeqD(this: any, string: string)
         }
         break;
       default:
-        switch (l1)
-        {
+        switch (l1) {
         case 45:                    // 'get'
           consumeT(45);             // 'get'
           break;
@@ -1585,8 +1407,7 @@ function validateSeqD(this: any, string: string)
         lookahead1(1);              // S
         consumeT(3);                // S
         lookahead1(47);             // 'property' | 'variable'
-        switch (l1)
-        {
+        switch (l1) {
         case 65:                    // 'variable'
           consumeT(65);             // 'variable'
           break;
@@ -1601,8 +1422,7 @@ function validateSeqD(this: any, string: string)
       lookahead1(0);                // L
       consumeT(2);                  // L
       lookahead1(57);               // 'defaultInput' | 'end' | 'get' | 'set'
-      if (l1 == 40)                 // 'end'
-      {
+      if (l1 == 40) {
         break;
       }
     }
@@ -1615,8 +1435,7 @@ function validateSeqD(this: any, string: string)
     consumeT(2);                    // L
   }
 
-  function parse_ref()
-  {
+  function parse_ref() {
     consume(59);                    // 'ref'
     lookahead1(1);                  // S
     consume(3);                     // S
@@ -1625,22 +1444,19 @@ function validateSeqD(this: any, string: string)
     lookahead1(1);                  // S
     consume(3);                     // S
     lookahead1(43);                 // '"' | 'Agent'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consume(11);                  // '"'
     }
     lookahead1(21);                 // 'Agent'
     consume(25);                    // 'Agent'
     lookahead1(39);                 // L | '"'
-    if (l1 == 11)                   // '"'
-    {
+    if (l1 == 11) {
       consume(11);                  // '"'
     }
     lookahead1(0);                  // L
     consume(2);                     // L
     lookahead1(45);                 // 'action' | 'function'
-    switch (l1)
-    {
+    switch (l1) {
     case 44:                        // 'function'
       consume(44);                  // 'function'
       break;
@@ -1663,10 +1479,8 @@ function validateSeqD(this: any, string: string)
     consume(2);                     // L
   }
 
-  function consume(t)
-  {
-    if (l1 == t)
-    {
+  function consume(t) {
+    if (l1 == t) {
       b0 = b1; e0 = e1; l1 = l2; if (l1 != 0) {
       b1 = b2; e1 = e2; l2 = l3; if (l2 != 0) {
       b2 = b3; e2 = e3; l3 = l4; if (l3 != 0) {
@@ -1677,17 +1491,13 @@ function validateSeqD(this: any, string: string)
       b7 = b8; e7 = e8; l8 = l9; if (l8 != 0) {
       b8 = b9; e8 = e9; l9 = l10; if (l9 != 0) {
       b9 = b10; e9 = e10; l10 = 0; }}}}}}}}}
-    }
-    else
-    {
+    } else {
       error(b1, e1, 0, l1, t);
     }
   }
 
-  function consumeT(t)
-  {
-    if (l1 == t)
-    {
+  function consumeT(t) {
+    if (l1 == t) {
       b0 = b1; e0 = e1; l1 = l2; if (l1 != 0) {
       b1 = b2; e1 = e2; l2 = l3; if (l2 != 0) {
       b2 = b3; e2 = e3; l3 = l4; if (l3 != 0) {
@@ -1698,27 +1508,21 @@ function validateSeqD(this: any, string: string)
       b7 = b8; e7 = e8; l8 = l9; if (l8 != 0) {
       b8 = b9; e8 = e9; l9 = l10; if (l9 != 0) {
       b9 = b10; e9 = e10; l10 = 0; }}}}}}}}}
-    }
-    else
-    {
+    } else {
       error(b1, e1, 0, l1, t);
     }
   }
 
-  function lookahead1(set)
-  {
-    if (l1 == 0)
-    {
+  function lookahead1(set) {
+    if (l1 == 0) {
       l1 = match(set);
       b1 = begin;
       e1 = end;
     }
   }
 
-  function lookahead2(prefix, set)
-  {
-    if (l2 == 0)
-    {
+  function lookahead2(prefix, set) {
+    if (l2 == 0) {
       l2 = match(set);
       b2 = begin;
       e2 = end;
@@ -1726,10 +1530,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l2;
   }
 
-  function lookahead3(prefix, set)
-  {
-    if (l3 == 0)
-    {
+  function lookahead3(prefix, set) {
+    if (l3 == 0) {
       l3 = match(set);
       b3 = begin;
       e3 = end;
@@ -1737,10 +1539,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l3;
   }
 
-  function lookahead4(prefix, set)
-  {
-    if (l4 == 0)
-    {
+  function lookahead4(prefix, set) {
+    if (l4 == 0) {
       l4 = match(set);
       b4 = begin;
       e4 = end;
@@ -1748,10 +1548,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l4;
   }
 
-  function lookahead5(prefix, set)
-  {
-    if (l5 == 0)
-    {
+  function lookahead5(prefix, set) {
+    if (l5 == 0) {
       l5 = match(set);
       b5 = begin;
       e5 = end;
@@ -1759,10 +1557,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l5;
   }
 
-  function lookahead6(prefix, set)
-  {
-    if (l6 == 0)
-    {
+  function lookahead6(prefix, set) {
+    if (l6 == 0) {
       l6 = match(set);
       b6 = begin;
       e6 = end;
@@ -1770,10 +1566,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l6;
   }
 
-  function lookahead7(prefix, set)
-  {
-    if (l7 == 0)
-    {
+  function lookahead7(prefix, set) {
+    if (l7 == 0) {
       l7 = match(set);
       b7 = begin;
       e7 = end;
@@ -1781,10 +1575,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l7;
   }
 
-  function lookahead8(prefix, set)
-  {
-    if (l8 == 0)
-    {
+  function lookahead8(prefix, set) {
+    if (l8 == 0) {
       l8 = match(set);
       b8 = begin;
       e8 = end;
@@ -1792,10 +1584,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l8;
   }
 
-  function lookahead9(prefix, set)
-  {
-    if (l9 == 0)
-    {
+  function lookahead9(prefix, set) {
+    if (l9 == 0) {
       l9 = match(set);
       b9 = begin;
       e9 = end;
@@ -1803,10 +1593,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l9;
   }
 
-  function lookahead10(prefix, set)
-  {
-    if (l10 == 0)
-    {
+  function lookahead10(prefix, set) {
+    if (l10 == 0) {
       l10 = match(set);
       b10 = begin;
       e10 = end;
@@ -1814,10 +1602,8 @@ function validateSeqD(this: any, string: string)
     lk = prefix + l10;
   }
 
-  function error(b, e, s, l, t)
-  {
-    if (e >= ex)
-    {
+  function error(b, e, s, l, t) {
+    if (e >= ex) {
       bx = b;
       ex = e;
       sx = s;
@@ -1841,15 +1627,13 @@ function validateSeqD(this: any, string: string)
   var bx, ex, sx, lx, tx;
   var memo;
 
-  function memoize(i, e, v)
-  {
+  function memoize(i, e, v) {
     memo[(e << 1) + i] = v;
   }
 
-  function memoized(i, e)
-  {
+  function memoized(i, e) {
     var v = memo[(e << 1) + i];
-    return typeof v != "undefined" ? v : 0;
+    return typeof v != 'undefined' ? v : 0;
   }
 
   var input;
@@ -1858,46 +1642,36 @@ function validateSeqD(this: any, string: string)
   var begin;
   var end;
 
-  function match(tokenSetId)
-  {
+  function match(tokenSetId) {
     begin = end;
     var current = end;
     var result = validateSeqD.INITIAL[tokenSetId];
     var state = 0;
 
-    for (var code = result & 511; code != 0; )
-    {
+    for (var code = result & 511; code != 0; ) {
       var charclass;
       var c0 = current < size ? input.charCodeAt(current) : 0;
       ++current;
-      if (c0 < 0x80)
-      {
+      if (c0 < 0x80) {
         charclass = validateSeqD.MAP0[c0];
-      }
-      else if (c0 < 0xd800)
-      {
+      } else if (c0 < 0xd800) {
         var c1: any = c0 >> 5;
         charclass = validateSeqD.MAP1[(c0 & 31) + validateSeqD.MAP1[(c1 & 31) + validateSeqD.MAP1[c1 >> 5]]];
-      }
-      else
-      {
-        if (c0 < 0xdc00)
-        {
+      } else {
+        if (c0 < 0xdc00) {
           var c1 = current < size ? input.charCodeAt(current) : 0;
-          if (c1 >= 0xdc00 && c1 < 0xe000)
-          {
+          if (c1 >= 0xdc00 && c1 < 0xe000) {
             ++current;
             c0 = ((c0 & 0x3ff) << 10) + (c1 & 0x3ff) + 0x10000;
           }
         }
 
         var lo = 0, hi = 1;
-        for (var m = 1; ; m = (hi + lo) >> 1)
-        {
+        for (var m = 1; ; m = (hi + lo) >> 1) {
           if (validateSeqD.MAP2[m] > c0) hi = m - 1;
           else if (validateSeqD.MAP2[2 + m] < c0) lo = m + 1;
-          else {charclass = validateSeqD.MAP2[4 + m]; break;}
-          if (lo > hi) {charclass = 0; break;}
+          else {charclass = validateSeqD.MAP2[4 + m]; break; }
+          if (lo > hi) {charclass = 0; break; }
         }
       }
 
@@ -1905,8 +1679,7 @@ function validateSeqD(this: any, string: string)
       var i0 = (charclass << 9) + code - 1;
       code = validateSeqD.TRANSITION[(i0 & 15) + validateSeqD.TRANSITION[i0 >> 4]];
 
-      if (code > 511)
-      {
+      if (code > 511) {
         result = code;
         code &= 511;
         end = current;
@@ -1914,8 +1687,7 @@ function validateSeqD(this: any, string: string)
     }
 
     result >>= 9;
-    if (result == 0)
-    {
+    if (result == 0) {
       end = current - 1;
       var c1 = end < size ? input.charCodeAt(end) : 0;
       if (c1 >= 0xdc00 && c1 < 0xe000) --end;
@@ -1928,20 +1700,16 @@ function validateSeqD(this: any, string: string)
 
 }
 
-validateSeqD.getTokenSet = function(tokenSetId)
-{
+validateSeqD.getTokenSet = function(tokenSetId) {
   var set: any[] = [];
   var s = tokenSetId < 0 ? - tokenSetId : validateSeqD.INITIAL[tokenSetId] & 511;
-  for (var i = 0; i < 71; i += 32)
-  {
+  for (var i = 0; i < 71; i += 32) {
     var j = i;
     var i0 = (i >> 5) * 362 + s - 1;
     var i1 = i0 >> 1;
     var f = validateSeqD.EXPECTED[(i0 & 1) + validateSeqD.EXPECTED[(i1 & 3) + validateSeqD.EXPECTED[i1 >> 2]]];
-    for ( ; f != 0; f >>>= 1, ++j)
-    {
-      if ((f & 1) != 0)
-      {
+    for ( ; f != 0; f >>>= 1, ++j) {
+      if ((f & 1) != 0) {
         set.push(validateSeqD.TOKEN[j]);
       }
     }
@@ -2210,77 +1978,77 @@ validateSeqD.EXPECTED =
 
 validateSeqD.TOKEN =
 [
-  "(0)",
-  "END",
-  "L",
-  "S",
-  "Title",
-  "Ntitle",
-  "Nchar",
-  "Diatype",
-  "VarName",
-  "Char",
-  "Nr",
-  "'\"'",
-  "'\"Agent\"'",
-  "'()'",
-  "')'",
-  "','",
-  "'-'",
-  "'-->'",
-  "'->'",
-  "'...'",
-  "':'",
-  "'=='",
-  "'>'",
-  "'@enduml'",
-  "'@startuml'",
-  "'Agent'",
-  "'['",
-  "'[<-'",
-  "'action'",
-  "'activate'",
-  "'allOf('",
-  "'alt'",
-  "'anyOf('",
-  "'break'",
-  "'confirmation'",
-  "'data-pushed'",
-  "'deactivate'",
-  "'defaultInput'",
-  "'else'",
-  "'else else'",
-  "'end'",
-  "'every'",
-  "'false'",
-  "'forever'",
-  "'function'",
-  "'get'",
-  "'group'",
-  "'invokeAction:'",
-  "'loop'",
-  "'ms'",
-  "'not('",
-  "'note'",
-  "'observeProperty:'",
-  "'oneOf('",
-  "'output'",
-  "'over'",
-  "'par'",
-  "'property'",
-  "'readProperty:'",
-  "'ref'",
-  "'response'",
-  "'set'",
-  "'strict'",
-  "'subscribeEvent:'",
-  "'true'",
-  "'variable'",
-  "'wait'",
-  "'writeProperty:'",
-  "'x'",
-  "'{'",
-  "'}'"
+  '(0)',
+  'END',
+  'L',
+  'S',
+  'Title',
+  'Ntitle',
+  'Nchar',
+  'Diatype',
+  'VarName',
+  'Char',
+  'Nr',
+  '\'"\'',
+  '\'"Agent"\'',
+  '\'()\'',
+  '\')\'',
+  '\',\'',
+  '\'-\'',
+  '\'-->\'',
+  '\'->\'',
+  '\'...\'',
+  '\':\'',
+  '\'==\'',
+  '\'>\'',
+  '\'@enduml\'',
+  '\'@startuml\'',
+  '\'Agent\'',
+  '\'[\'',
+  '\'[<-\'',
+  '\'action\'',
+  '\'activate\'',
+  '\'allOf(\'',
+  '\'alt\'',
+  '\'anyOf(\'',
+  '\'break\'',
+  '\'confirmation\'',
+  '\'data-pushed\'',
+  '\'deactivate\'',
+  '\'defaultInput\'',
+  '\'else\'',
+  '\'else else\'',
+  '\'end\'',
+  '\'every\'',
+  '\'false\'',
+  '\'forever\'',
+  '\'function\'',
+  '\'get\'',
+  '\'group\'',
+  '\'invokeAction:\'',
+  '\'loop\'',
+  '\'ms\'',
+  '\'not(\'',
+  '\'note\'',
+  '\'observeProperty:\'',
+  '\'oneOf(\'',
+  '\'output\'',
+  '\'over\'',
+  '\'par\'',
+  '\'property\'',
+  '\'readProperty:\'',
+  '\'ref\'',
+  '\'response\'',
+  '\'set\'',
+  '\'strict\'',
+  '\'subscribeEvent:\'',
+  '\'true\'',
+  '\'variable\'',
+  '\'wait\'',
+  '\'writeProperty:\'',
+  '\'x\'',
+  '\'{\'',
+  '\'}\''
 ];
 // End
 
@@ -2290,11 +2058,11 @@ export default function checkSeqD(mashup: string) {
     try {
       const umlParser = new validateSeqD(mashup);
       umlParser.parse_mashup();
-    } catch(err) {
+    } catch (err) {
       DEBUG.e = err.getMessage();
       rej(DEBUG);
     }
-    res("Uml is valid");
-  })
+    res('Uml is valid');
+  });
 }
 // ########### - ###########

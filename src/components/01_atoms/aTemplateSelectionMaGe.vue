@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 export default Vue.extend({
     name: 'aTemplateSelectionMaGe',
     model: {
@@ -41,14 +41,14 @@ export default Vue.extend({
          * Checked status. Used for v-model
          */
         isChecked: Boolean
-        
+
     },
     computed: {
         getImg(): any {
             return require(`@/assets/${this.imgSrc}.png`);
         }
     }
-})
+});
 </script>
 
 <style lang="less" scoped>

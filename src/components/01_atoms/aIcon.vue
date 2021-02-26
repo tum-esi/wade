@@ -50,16 +50,16 @@ export default Vue.extend({
     data() {
         return {
             mouseover: false
-        }
+        };
     },
     computed: {
         getImg(): any {
-            let req = require(`@/assets/${this.iconSrcPath}.png`)
-            if(this.mouseOverIconSrcPath) {
-                req = this.mouseover ? require(`@/assets/${this.mouseOverIconSrcPath}.png`) : 
+            let req = require(`@/assets/${this.iconSrcPath}.png`);
+            if (this.mouseOverIconSrcPath) {
+                req = this.mouseover ? require(`@/assets/${this.mouseOverIconSrcPath}.png`) :
                 require(`@/assets/${this.iconSrcPath}.png`);
             }
-            return req
+            return req;
         }
     },
     methods: {

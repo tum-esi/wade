@@ -54,7 +54,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions("SidebarStore", ["deleteElementAndChildren"]),
+    ...mapActions('SidebarStore', ['deleteElementAndChildren']),
     ...mapMutations('SidebarStore', ['deleteSidebarElement', 'deleteElementFromStore']),
     addComponent(
       elements: WADE.SidebarElement[],

@@ -2,7 +2,7 @@ export function runServer() {
     var host = process.env.HOST || 'localhost';
     // Listen on a specific port via the PORT environment variable
     var port = process.env.PORT || 8082;
-    
+
     var cors_proxy = require('cors-anywhere');
     cors_proxy.createServer({
         originWhitelist: [], // Allow all origins

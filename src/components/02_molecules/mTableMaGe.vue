@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'; 
+import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
@@ -55,28 +55,28 @@ export default Vue.extend({
         }
     },
     computed: {
-        ...mapGetters('MashupStore',['getMashupChildrenForDropdown'])
+        ...mapGetters('MashupStore', ['getMashupChildrenForDropdown'])
     },
     methods: {
         deleteFromIO(elementIndex: number, columnIndex: number) {
-            switch(columnIndex) {
-                case 0: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"input"}); break;
-                case 1: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"output"}); break;
-                case 2: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io:"io"}); break;
+            switch (columnIndex) {
+                case 0: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io: 'input'}); break;
+                case 1: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io: 'output'}); break;
+                case 2: this.$store.dispatch('MashupStore/removeTdFromIo', {element: elementIndex, io: 'io'}); break;
                 default: return;
             }
         },
         onAddElementSelected(event) {
             const children: Array<TD | Mashup> = this.$store.getters['MashupStore/getMashupChildren'];
-            this.table.columns[0].header.toLowerCase
+            this.table.columns[0].header.toLowerCase;
             let childNeeded;
             for (const child of children) {
                 if (child.id === event.btnValue) childNeeded = child;
             }
             switch (event.btnKey) {
-                case 'add-to-inputs':   this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"input"}); break;
-                case 'add-to-outputs':  this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"output"}); break;
-                case 'add-to-ios':      this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io:"io"}); break;
+                case 'add-to-inputs':   this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io: 'input'}); break;
+                case 'add-to-outputs':  this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io: 'output'}); break;
+                case 'add-to-ios':      this.$store.dispatch('MashupStore/addTdToIo', {element: childNeeded, io: 'io'}); break;
                 default: return;
             }
         }

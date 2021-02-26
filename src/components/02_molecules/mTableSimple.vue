@@ -13,11 +13,11 @@
 
 <script lang="ts">
 /**
- * A simple table table component that is customizable using slots. 
+ * A simple table table component that is customizable using slots.
  * To introduce a new table component, just copy this code and use the header and row slots provided in aListSimple component
  * For information on using slots, please refer to https://vuejs.org/v2/guide/components-slots.html
  */
-import Vue from 'vue'; 
+import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 export default Vue.extend({
     name: 'mTableSimple',

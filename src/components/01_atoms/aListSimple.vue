@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue from 'vue';
 /**
- * A simple list component that is customizable using slots. 
+ * A simple list component that is customizable using slots.
  * For information on using slots, please refer to https://vuejs.org/v2/guide/components-slots.html
  */
 export default Vue.extend({
@@ -32,7 +32,7 @@ export default Vue.extend({
             required: true
         },
     }
-})
+});
 </script>
 
 <style lang="css" scoped>

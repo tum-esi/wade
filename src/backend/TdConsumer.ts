@@ -37,7 +37,7 @@ export default class TdConsumer {
         this.config = config;
         this.protocols = protocols;
     }
-    public async getConsumedTd() : Promise<{
+    public async getConsumedTd(): Promise<{
         tdJson: JSON | null,
         tdConsumed: WoT.ConsumedThing | null,
         tdState: TdStateEnum | null,

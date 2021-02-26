@@ -36,16 +36,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import aButtonBasic from "@/components/01_atoms/aButtonBasic.vue";
-import aDropdownButton from "@/components/01_atoms/aDropdownButton.vue";
-import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue";
-import { mapGetters, mapActions, mapMutations } from "vuex";
-import { TdStateEnum } from "@/util/enums";
-import { getFormattedJsonString, loggingError } from "@/util/helpers";
-import * as Api from "@/backend/Api";
+import Vue from 'vue';
+import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
+import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { TdStateEnum } from '@/util/enums';
+import { getFormattedJsonString, loggingError } from '@/util/helpers';
+import * as Api from '@/backend/Api';
 export default Vue.extend({
-  name: "oEditor",
+  name: 'oEditor',
   components: {
     aButtonBasic,
     aDropdownButton,
@@ -53,35 +53,35 @@ export default Vue.extend({
   },
   data() {
     return {
-      td: "",
+      td: '',
       TdFileList: [] as WADE.DropdownOptionInterface[],
       configButton: {
-        btnLabel: "Change Configuration",
-        btnClass: "btn-config-big",
-        btnOnClick: "open-config-tab"
+        btnLabel: 'Change Configuration',
+        btnClass: 'btn-config-big',
+        btnOnClick: 'open-config-tab'
       },
       saveTdBtn: {
-        btnLabel: "Save",
-        btnClass: "btn-config-small",
-        btnOnClick: "save-td"
+        btnLabel: 'Save',
+        btnClass: 'btn-config-small',
+        btnOnClick: 'save-td'
       }
     };
   },
   created() {
-    this.$eventHub.$on("fetched-td", this.tdChanged);
-    this.$eventHub.$on("dropdown-clicked", eventObject => {
+    this.$eventHub.$on('fetched-td', this.tdChanged);
+    this.$eventHub.$on('dropdown-clicked', eventObject => {
       this.dropDownReaction(eventObject);
     });
     this.tdChanged({ td: (this as any).getSavedTd(this.id) });
     this.loadTdFiles();
   },
   beforeDestroy() {
-    this.$eventHub.$off("fetched-td");
-    this.$eventHub.$off("dropdown-clicked");
+    this.$eventHub.$off('fetched-td');
+    this.$eventHub.$off('dropdown-clicked');
   },
   computed: {
-    ...mapGetters("TdStore", ["getEditorPlaceholder"]),
-    ...mapGetters("SidebarStore", ["getSavedTd", "getConfig", "getProtocols"]),
+    ...mapGetters('TdStore', ['getEditorPlaceholder']),
+    ...mapGetters('SidebarStore', ['getSavedTd', 'getConfig', 'getProtocols']),
     id(): string {
       return (this as any).$route.params.id;
     },
@@ -95,12 +95,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapMutations("SidebarStore", ["saveTdProtocols"]),
-    ...mapActions("TdStore", [
-      "resetInteractions",
-      "resetSelections",
-      "resetResults",
-      "processChangedTd"
+    ...mapMutations('SidebarStore', ['saveTdProtocols']),
+    ...mapActions('TdStore', [
+      'resetInteractions',
+      'resetSelections',
+      'resetResults',
+      'processChangedTd'
     ]),
     // Executed when td changed: via loading saved td/ fetching td/ user changed td
     tdChanged(args: {
@@ -108,7 +108,7 @@ export default Vue.extend({
       tdState?: TdStateEnum | null;
       errorMsg?: string;
     }) {
-      this.td = "";
+      this.td = '';
       if (args.td) {
         try {
           this.td = getFormattedJsonString(args.td);
@@ -125,13 +125,13 @@ export default Vue.extend({
         protocols: (this as any).getProtocols(this.id)
       });
       // Hide url bar if td changed
-      this.$emit("hide-url-bar");
+      this.$emit('hide-url-bar');
       // Reset result fields and interaction fields
       (this as any).resetInteractions();
       (this as any).resetSelections();
       (this as any).resetResults();
       // Update possible protocol list
-      this.$eventHub.$emit("selections-reseted");
+      this.$eventHub.$emit('selections-reseted');
     },
     loadTdFiles() {
       Api.showExampleTds().then(
@@ -139,21 +139,21 @@ export default Vue.extend({
           this.TdFileList = fileList as any;
         },
         reason => {
-          loggingError(new Error("getExampleTDs failed due reason:" + reason));
+          loggingError(new Error('getExampleTDs failed due reason:' + reason));
         }
       );
     },
     dropDownReaction(eventObject) {
-      if (eventObject.btnKey === "insert-example-td") {
+      if (eventObject.btnKey === 'insert-example-td') {
         Api.loadExampleTd(eventObject.btnValue).then(
           exampleTD => {
-            if (typeof exampleTD === "string") {
+            if (typeof exampleTD === 'string') {
               this.tdChanged({ td: exampleTD });
             }
           },
           reason => {
             loggingError(
-              new Error("load Example TDs failed due to reason:" + reason)
+              new Error('load Example TDs failed due to reason:' + reason)
             );
           }
         );
@@ -163,7 +163,7 @@ export default Vue.extend({
     }
   },
   watch: {
-    "$route.params.id"(id) {
+    '$route.params.id'(id) {
       this.tdChanged({ td: (this as any).getSavedTd(this.id) });
     }
   }

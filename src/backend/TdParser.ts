@@ -1,8 +1,8 @@
 // Parses a consumed Td to Vue 'Interaction' Component readable data
 
-import * as WoT from "wot-typescript-definitions";
-import { PossibleInteractionTypesEnum, ProtocolEnum } from "@/util/enums";
-import SizeCalculator from "@/backend/SizeCalculator";
+import * as WoT from 'wot-typescript-definitions';
+import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
+import SizeCalculator from '@/backend/SizeCalculator';
 
 export default class TdParser {
   private consumedTd: WoT.ConsumedThing | null;
@@ -57,11 +57,11 @@ export default class TdParser {
               this.consumedTd.getThingDescription().properties[property]
             ),
             btnKey: `property-${property}-observe`,
-            btnGeneralStyle: "btn-event-interaction",
-            btnSelectedStyle: "btn-event-interaction-selected",
+            btnGeneralStyle: 'btn-event-interaction',
+            btnSelectedStyle: 'btn-event-interaction-selected',
             interaction: async () => {
               if (!this.consumedTd)
-                return { error: "No consumed Thing available." };
+                return { error: 'No consumed Thing available.' };
               const response = await // TODO check if correct, has been properties[property].subscribe
               this.consumedTd.observeProperty(property, async res => {
                 return await res;
@@ -83,8 +83,8 @@ export default class TdParser {
           interactionType: PossibleInteractionTypesEnum.PROP_READ,
           interactionSelectBtn: {
             btnKey: `property-${property}-read`,
-            btnGeneralStyle: "btn-event-interaction",
-            btnSelectedStyle: "btn-event-interaction-selected",
+            btnGeneralStyle: 'btn-event-interaction',
+            btnSelectedStyle: 'btn-event-interaction-selected',
             interaction: async () => {
               return getReadResponseWithTiming(
                 this.consumedTd,
@@ -99,7 +99,7 @@ export default class TdParser {
         consumedTd: WoT.ConsumedThing | null,
         sizeCalculator: SizeCalculator
       ) {
-        if (!consumedTd) return { error: "No consumed Thing available." };
+        if (!consumedTd) return { error: 'No consumed Thing available.' };
         const startTime = process.hrtime();
         const response = await consumedTd
           .readProperty(property)
@@ -110,7 +110,7 @@ export default class TdParser {
               res,
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           })
           .catch(async err => {
@@ -121,7 +121,7 @@ export default class TdParser {
               error: err,
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           });
         if (response.res !== undefined && response.res !== null) {
@@ -143,8 +143,8 @@ export default class TdParser {
               this.consumedTd.getThingDescription().properties[property]
             ),
             btnKey: `property-${property}-write`,
-            btnGeneralStyle: "btn-event-interaction",
-            btnSelectedStyle: "btn-event-interaction-selected",
+            btnGeneralStyle: 'btn-event-interaction',
+            btnSelectedStyle: 'btn-event-interaction-selected',
             interaction: async (val: any, options?: any) => {
               return getWriteResponseWithTiming(
                 this.consumedTd,
@@ -163,17 +163,17 @@ export default class TdParser {
         sizeCalculator: SizeCalculator,
         options?: any
       ) {
-        if (!consumedTd) return { error: "No consumed Thing available." };
+        if (!consumedTd) return { error: 'No consumed Thing available.' };
         const startTime = process.hrtime();
         const response = await consumedTd
           .writeProperty(property, val, options)
           .then(async res => {
             const endTime = process.hrtime(startTime);
             return {
-              res: "Success",
+              res: 'Success',
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           })
           .catch(async err => {
@@ -184,7 +184,7 @@ export default class TdParser {
               error: err,
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           });
         if (response.res) {
@@ -216,8 +216,8 @@ export default class TdParser {
             this.consumedTd.getThingDescription().actions[action]
           ),
           btnKey: `action-${action}`,
-          btnGeneralStyle: "btn-event-interaction",
-          btnSelectedStyle: "btn-event-interaction-selected",
+          btnGeneralStyle: 'btn-event-interaction',
+          btnSelectedStyle: 'btn-event-interaction-selected',
           interaction: async (input?: any) => {
             return getActionsWithTiming(
               this.consumedTd,
@@ -233,7 +233,7 @@ export default class TdParser {
         sizeCalculator: SizeCalculator,
         input?: any
       ) {
-        if (!consumedTd) return { error: "No consumed Thing available." };
+        if (!consumedTd) return { error: 'No consumed Thing available.' };
         const startTime = process.hrtime();
         const response = await consumedTd
           .invokeAction(action, input)
@@ -241,10 +241,10 @@ export default class TdParser {
             await res;
             const endTime = process.hrtime(startTime);
             return {
-              res: res || "Success",
+              res: res || 'Success',
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           })
           .catch(async err => {
@@ -254,7 +254,7 @@ export default class TdParser {
               error: err,
               s: endTime[0],
               ms: endTime[1] / 1000000,
-              size: "n.A."
+              size: 'n.A.'
             };
           });
         // Measure size of input, if there is an input
@@ -276,13 +276,13 @@ export default class TdParser {
         interactionType: PossibleInteractionTypesEnum.EVENT_SUB,
         interactionSelectBtn: {
           btnKey: `select-${event}`,
-          btnGeneralStyle: "btn-event-interaction",
-          btnSelectedStyle: "btn-event-interaction-selected",
+          btnGeneralStyle: 'btn-event-interaction',
+          btnSelectedStyle: 'btn-event-interaction-selected',
           interaction: () => {
             return {
               subscribe: async (cbFunc: (data: any) => void) => {
                 if (!this.consumedTd)
-                  return { error: "No consumed Thing available." };
+                  return { error: 'No consumed Thing available.' };
                 const response = await this.consumedTd.subscribeEvent(
                   event,
                   async res => {

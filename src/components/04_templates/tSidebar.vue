@@ -67,7 +67,6 @@ export default Vue.extend({
       'getSidebarActive'
     ]),
     getSidebarStyle() {
-      console.log('route ', (this as any).$route.params.id);
       return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? 'sidebar full-width' : (this as any).getSidebarActive ? 'sidebar sidebar-visible' : 'sidebar';
     },
     getHeaderStyle() {

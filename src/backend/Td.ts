@@ -65,8 +65,8 @@ export class Mashup extends ParentElement implements WADE.MashupElementInterface
         super(param);
         this.parentId = param.parentId;
         this.type = ElementTypeEnum.MASHUP;
-        this.systemDescription = "";
-        this.mashupCode = "";
+        this.systemDescription = '';
+        this.mashupCode = '';
         this.tds = [];
         this.mashups = [];
         this.children = [];

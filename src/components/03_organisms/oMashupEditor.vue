@@ -88,7 +88,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapState('MashupStore', ['editorLanguage', "mashupTabbar", "showSd", "showCode"]),
+        ...mapState('MashupStore', ['editorLanguage', 'mashupTabbar', 'showSd', 'showCode']),
         ...mapGetters('MashupStore', ['getMashupSd', 'getMashupCode']),
         ...mapGetters('SidebarStore', ['getMashup', 'getSidebarElement']),
         getDropdownOptions(): WADE.DropdownOptionInterface[] {
@@ -103,7 +103,7 @@ export default Vue.extend({
                 return (this as any).getMashupSd;
             },
             set(sd: string) {
-                this.$store.commit("MashupStore/setMashupSd", sd);
+                this.$store.commit('MashupStore/setMashupSd', sd);
             }
         },
         mashupCode: {
@@ -111,22 +111,22 @@ export default Vue.extend({
                 return (this as any).getMashupCode;
             },
             set(code: string) {
-                this.$store.commit("MashupStore/setMashupCode", code);
+                this.$store.commit('MashupStore/setMashupCode', code);
             }
         },
         editorText: {
             get(): string {
-                let text = (this as any).showSd ? (this as any).mashupSd : (this as any).mashupCode;
+                const text = (this as any).showSd ? (this as any).mashupSd : (this as any).mashupCode;
                 return text;
             },
             set(text: string) {
-                if((this as any).showSd) {
-                    this.$store.commit("MashupStore/setMashupSd", text);
+                if ((this as any).showSd) {
+                    this.$store.commit('MashupStore/setMashupSd', text);
                 } else {
-                    this.$store.commit("MashupStore/setMashupCode", text);
+                    this.$store.commit('MashupStore/setMashupCode', text);
                 }
             }
-            
+
         }
     },
     methods: {

@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'; 
+import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
@@ -75,129 +75,129 @@ export default Vue.extend({
         },
         templates: {
             type: Object as () => {
-            "use-event-template": Boolean,
-            "use-action-template": Boolean,
-            "use-read-template": Boolean,
+            'use-event-template': Boolean,
+            'use-action-template': Boolean,
+            'use-read-template': Boolean,
             },
             required: true
         }
     },
     data() {
         return {
-            
-        }
+
+        };
     },
     computed: {
-        
+
     },
     methods: {
-        ...mapState('MashupStore', ["allAnnotations"]),
+        ...mapState('MashupStore', ['allAnnotations']),
         ...mapMutations('MashupStore', ['setInteractionRestriction']),
         showColumn(column: WADE.ListInterface): boolean {
-            let result: boolean = true;
-            if(column.items.length === 0) return false;
-            if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            const result: boolean = true;
+            if (column.items.length === 0) return false;
+            if (column.header === 'PropertyReads' && this.templates['use-read-template'] === false) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            if(column.header === "EventSubs" && this.templates["use-event-template"] === false) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (column.header === 'EventSubs' && this.templates['use-event-template'] === false) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            if(column.header === "PropertyObservations" && this.templates["use-event-template"] === false) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (column.header === 'PropertyObservations' && this.templates['use-event-template'] === false) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            if(column.header === "ActionReads" && this.templates["use-action-template"] === false) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (column.header === 'ActionReads' && this.templates['use-action-template'] === false) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (column.header === 'ActionInvokes' && !this.filters.acceptedOutputInteractionTypes.includes('action-invoke')) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) {
-                for(let item of column.items) {
-                    let interaction  = item.payload as MAGE.VueInteractionInterface;
-                    (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (column.header === 'PropertyWrites' && !this.filters.acceptedOutputInteractionTypes.includes('property-write')) {
+                for (const item of column.items) {
+                    const interaction  = item.payload as MAGE.VueInteractionInterface;
+                    (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 }
                 return false;
             }
-            
+
             return true;
         },
         showInteraction(interaction: MAGE.VueInteractionInterface): boolean {
-            let allAnnotations = (this as any).allAnnotations();
+            const allAnnotations = (this as any).allAnnotations();
             let result: boolean = true;
-            if(!this.filters.acceptedTypes.includes(interaction.dataType)) {
-                (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            if (!this.filters.acceptedTypes.includes(interaction.dataType)) {
+                (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                 return false;
             }
-            switch(interaction.type) {
-                case "property-read":
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.propertyReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+            switch (interaction.type) {
+                case 'property-read':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.propertyReads.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
                     }
                     break;
-                case "property-write": 
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.propertyWrites.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                case 'property-write':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.propertyWrites.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
                     }
                     break;
-                case "event-subscribe": 
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.eventSubs.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                case 'event-subscribe':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.eventSubs.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
                     }
                     break;
-                case "property-observe": 
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.propertyObservations.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                case 'property-observe':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.propertyObservations.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
                     }
                     break;
-                case "action-read": 
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.actionReads.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                case 'action-read':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.actionReads.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
                     }
                     break;
-                case "action-invoke": 
-                    for(let annotation of interaction.annotations) {
-                        if(allAnnotations.actionInvokes.some(a => {return a.annotation === annotation && a.restriction === "forbidden"})) {
-                            (this as any).setInteractionRestriction({interaction: interaction, restriction: 'none'});
+                case 'action-invoke':
+                    for (const annotation of interaction.annotations) {
+                        if (allAnnotations.actionInvokes.some(a => a.annotation === annotation && a.restriction === 'forbidden')) {
+                            (this as any).setInteractionRestriction({interaction, restriction: 'none'});
                             result = false;
                             break;
                         }
@@ -206,8 +206,8 @@ export default Vue.extend({
             }
             return result;
         },
-        isCheckedClass(interaction: MAGE.VueInteractionInterface, category: "none" | "forbidden" | "mustHave") {
-            if(interaction.restriction === category) return "checked-class"
+        isCheckedClass(interaction: MAGE.VueInteractionInterface, category: 'none' | 'forbidden' | 'mustHave') {
+            if (interaction.restriction === category) return 'checked-class';
             return null;
         }
     }

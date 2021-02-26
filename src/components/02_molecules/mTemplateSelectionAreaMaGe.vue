@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import aTemplateSelectionMaGe from '@/components/01_atoms/aTemplateSelectionMaGe.vue'
+import aTemplateSelectionMaGe from '@/components/01_atoms/aTemplateSelectionMaGe.vue';
 export default Vue.extend({
     name: 'mTemplateSelectionAreaMaGe',
     components: {
@@ -56,14 +56,14 @@ export default Vue.extend({
     props: {
         template: {
             type: Object as () => {
-            "use-event-template": Boolean,
-            "use-action-template": Boolean,
-            "use-read-template": Boolean,
+            'use-event-template': boolean,
+            'use-action-template': boolean,
+            'use-read-template': boolean,
             },
             required: true
         }
     }
-})
+});
 </script>
 
 <style lang="less" scoped>

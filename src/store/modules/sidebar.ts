@@ -180,8 +180,8 @@ export default {
                         id: payload.id,
                         hasChildren: true,
                         children: [],
-                        systemDescription: "",
-                        mashupCode: "",
+                        systemDescription: '',
+                        mashupCode: '',
                     };
                     const newMashup = new Mashup(mashupInterface);
                     commit('addElementToStore', newMashup);
@@ -308,13 +308,13 @@ export default {
             const elementList: any[] = state[`${payload.type}s`];
             let elementToDelete: TD | Mashup | Folder | undefined;
             elementToDelete = elementList.find(element => element.id === payload.id);
-            if(elementToDelete && elementToDelete.hasChildren) {
-                while(elementToDelete.children.length > 0) {
-                    let child = elementToDelete.children[0];
-                    await dispatch("deleteElementAndChildren", {id: child.id, type: child.type});
+            if (elementToDelete && elementToDelete.hasChildren) {
+                while (elementToDelete.children.length > 0) {
+                    const child = elementToDelete.children[0];
+                    await dispatch('deleteElementAndChildren', {id: child.id, type: child.type});
                 }
             }
-            commit("deleteElementFromStore", payload);
+            commit('deleteElementFromStore', payload);
         }
     },
     mutations: {
@@ -379,15 +379,15 @@ export default {
                 }
             }
             const element = (state.tds as any[]).find(td => td.id === payload.id);
-            if(element.parentId !== "parent") {
-                for(let mashup of state.mashups as any[]) {
-                    let childIndex = mashup.children.findIndex(child => child.id === element.id);
-                    if(childIndex !== -1){
+            if (element.parentId !== 'parent') {
+                for (const mashup of state.mashups as any[]) {
+                    const childIndex = mashup.children.findIndex(child => child.id === element.id);
+                    if (childIndex !== -1) {
                         mashup.children[childIndex].content = payload.content;
                     }
                 }
             }
-            
+
         },
         // Adds a new td / mashup / folder to tds / mashups / folders
         addElementToStore(state: any, payload: TD | Mashup | Folder) {
@@ -427,16 +427,16 @@ export default {
                 let finished = false;
                 for (const mashup of state.mashups as Mashup[]) {
                     if (mashup.id === elementToDelete.parentId) {
-                        const index = mashup.children.findIndex(child => {if(elementToDelete) return child.id === elementToDelete.id});
-                        if(index !== -1) mashup.children.splice(index, 1);
+                        const index = mashup.children.findIndex(child => {if (elementToDelete) return child.id === elementToDelete.id; });
+                        if (index !== -1) mashup.children.splice(index, 1);
                         finished = true;
                         break;
                     }
                 }
                 if (!finished) for (const folder of state.folders as Folder[]) {
                     if (folder.id === elementToDelete.parentId) {
-                        const index = folder.children.findIndex(child => {if(elementToDelete) return child.id === elementToDelete.id});
-                        if(index !== -1) folder.children.splice(index, 1);
+                        const index = folder.children.findIndex(child => {if (elementToDelete) return child.id === elementToDelete.id; });
+                        if (index !== -1) folder.children.splice(index, 1);
                         finished = true;
                         break;
                     }

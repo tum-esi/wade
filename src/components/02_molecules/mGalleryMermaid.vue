@@ -17,14 +17,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import aIconButton from '@/components/01_atoms/aIconButton.vue';
 import aViewerMermaid from '@/components/01_atoms/aViewerMermaid.vue';
 import { watch } from 'fs';
 export default Vue.extend({
     name: 'mGalleryMermaid',
-    components:{
+    components: {
         aIconButton,
         aViewerMermaid
     },
@@ -38,51 +38,51 @@ export default Vue.extend({
             required: true
         }
     },
-    data(){
+    data() {
         return {
             txtIndex: 0,
-        }
+        };
     },
     computed: {
-        ...mapGetters('MashupStore',["getGenerationExecutionTime"]),
+        ...mapGetters('MashupStore', ['getGenerationExecutionTime']),
         timeText(): string {
-            let generationExecutionTime = (this as any).getGenerationExecutionTime;
-            let result = `${generationExecutionTime.result.toFixed(2)} ${generationExecutionTime.stringUnit}`;
+            const generationExecutionTime = (this as any).getGenerationExecutionTime;
+            const result = `${generationExecutionTime.result.toFixed(2)} ${generationExecutionTime.stringUnit}`;
             return result;
         }
     },
     methods: {
         moveRight() {
-            let mermaidDiv = document.getElementById("mermaid-all");
+            const mermaidDiv = document.getElementById('mermaid-all');
             this.txtIndex = (this.txtIndex + 1) % this.txtArray.length ;
-            this.$emit("current-mashup-nr", this.txtIndex);
-            setTimeout(()=> {
-                if(mermaidDiv) mermaidDiv.scrollIntoView({
-                    behavior: "smooth"
+            this.$emit('current-mashup-nr', this.txtIndex);
+            setTimeout(() => {
+                if (mermaidDiv) mermaidDiv.scrollIntoView({
+                    behavior: 'smooth'
                 });
-            },3)
+            }, 3);
         },
         moveLeft() {
-            let mermaidDiv = document.getElementById("mermaid-all");
-            if(this.txtArray && this.txtIndex <= 0) {
-                this.txtIndex = this.txtArray.length-1;
+            const mermaidDiv = document.getElementById('mermaid-all');
+            if (this.txtArray && this.txtIndex <= 0) {
+                this.txtIndex = this.txtArray.length - 1;
             } else {
                 this.txtIndex--;
             }
-            this.$emit("current-mashup-nr", this.txtIndex);
-            setTimeout(()=> {
-                if(mermaidDiv) mermaidDiv.scrollIntoView({
-                    behavior: "smooth"
+            this.$emit('current-mashup-nr', this.txtIndex);
+            setTimeout(() => {
+                if (mermaidDiv) mermaidDiv.scrollIntoView({
+                    behavior: 'smooth'
                 });
-            },3)
+            }, 3);
         }
     },
     watch: {
         txtArray() {
-            if(this.txtArray) this.txtIndex = 0;
+            if (this.txtArray) this.txtIndex = 0;
         }
     }
-})
+});
 </script>
 
 <style lang="less" scoped>

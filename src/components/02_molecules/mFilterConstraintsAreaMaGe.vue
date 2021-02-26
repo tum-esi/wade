@@ -137,20 +137,20 @@ import { mapGetters, mapState } from 'vuex';
 export default Vue.extend({
     name: 'mFilterConstraintsAreaMaGe',
     model: {
-        prop: "filters",
-        event: "change"
+        prop: 'filters',
+        event: 'change'
     },
     props: {
         filters: {
             type: Object as () => MAGE.FiltersInterface,
             required: false,
-            
+
         },
         templates: {
             type: Object as () => {
-            "use-event-template": Boolean,
-            "use-action-template": Boolean,
-            "use-sub-template": Boolean,
+            'use-event-template': boolean,
+            'use-action-template': boolean,
+            'use-sub-template': boolean,
             },
             required: true
         }
@@ -163,82 +163,82 @@ export default Vue.extend({
     data() {
         return {
             typeWasDisabled: {
-                "null": true,
-                "integer": true,
-                "number": true,
-                "string": true,
-                "boolean": true,
-                "array": true,
-                "object": true
+                null: true,
+                integer: true,
+                number: true,
+                string: true,
+                boolean: true,
+                array: true,
+                object: true
             },
             outputTypeWasDisabled: {
-                "property-write": true,
-                "action-invoke": true
+                'property-write': true,
+                'action-invoke': true
             },
 
-        }
+        };
     },
     computed: {
-        ...mapState('MashupStore',["allInteractions", "allAnnotations", "allTdAnnotations"]),
+        ...mapState('MashupStore', ['allInteractions', 'allAnnotations', 'allTdAnnotations']),
         InteractionsTable() {
-            let allInteractions = (this as any).allInteractions;
-            let table: WADE.TableInterface = {columns: []};
-            let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
-            let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
-            let listE: WADE.ListInterface = {header: "EventSubs", items: []};
-            let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
-            let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
-            let listO: WADE.ListInterface = {header: "PropertyObservations", items: []}
-            for(let interactiontype in allInteractions) {
-                switch(interactiontype) {
-                    case "propertyWrites":
-                        let propertyWrites = allInteractions[interactiontype];
-                        for(let prop of propertyWrites) {
+            const allInteractions = (this as any).allInteractions;
+            const table: WADE.TableInterface = {columns: []};
+            const listW: WADE.ListInterface = {header: 'PropertyWrites', items: []};
+            const listR: WADE.ListInterface = {header: 'PropertyReads', items: []};
+            const listE: WADE.ListInterface = {header: 'EventSubs', items: []};
+            const listAR: WADE.ListInterface = {header: 'ActionReads', items: []};
+            const listA: WADE.ListInterface = {header: 'ActionInvokes', items: []};
+            const listO: WADE.ListInterface = {header: 'PropertyObservations', items: []};
+            for (const interactiontype in allInteractions) {
+                switch (interactiontype) {
+                    case 'propertyWrites':
+                        const propertyWrites = allInteractions[interactiontype];
+                        for (const prop of propertyWrites) {
                             listW.items.push({
                                 label: `${prop.title}: ${prop.name}`,
                                 payload: prop
                             });
                         }
                         break;
-                    case "propertyReads":
-                        let propertyReads = allInteractions[interactiontype];
-                        for(let prop of propertyReads) {
+                    case 'propertyReads':
+                        const propertyReads = allInteractions[interactiontype];
+                        for (const prop of propertyReads) {
                             listR.items.push({
                                 label: `${prop.title}: ${prop.name}`,
                                 payload: prop
                             });
                         }
                         break;
-                    case "eventSubs":
-                        let eventSubs = allInteractions[interactiontype];
-                        for(let event of eventSubs) {
+                    case 'eventSubs':
+                        const eventSubs = allInteractions[interactiontype];
+                        for (const event of eventSubs) {
                             listE.items.push({
                                 label: `${event.title}: ${event.name}`,
                                 payload: event
                             });
                         }
                         break;
-                    case "actionInvokes":
-                        let actionInvokes = allInteractions[interactiontype];
-                        for(let action of actionInvokes) {
+                    case 'actionInvokes':
+                        const actionInvokes = allInteractions[interactiontype];
+                        for (const action of actionInvokes) {
                             listA.items.push({
                                 label: `${action.title}: ${action.name}`,
                                 payload: action
                             });
                         }
                         break;
-                    case "actionReads":
-                        let actionReads = allInteractions[interactiontype];
-                        for(let action of actionReads) {
+                    case 'actionReads':
+                        const actionReads = allInteractions[interactiontype];
+                        for (const action of actionReads) {
                             listAR.items.push({
                                 label: `${action.title}: ${action.name}`,
                                 payload: action
                             });
                         }
                         break;
-                    case "propertyObservations":
-                        let propertyObservations = allInteractions[interactiontype];
-                        for(let observation of propertyObservations) {
+                    case 'propertyObservations':
+                        const propertyObservations = allInteractions[interactiontype];
+                        for (const observation of propertyObservations) {
                             listO.items.push({
                                 label: `${observation.title}: ${observation.name}`,
                                 payload: observation
@@ -250,70 +250,70 @@ export default Vue.extend({
             table.columns.push(listR);
             table.columns.push(listO);
             table.columns.push(listE);
-            table.columns.push(listAR)
+            table.columns.push(listAR);
             table.columns.push(listW);
             table.columns.push(listA);
             return table;
         },
         AnnotationsTable() {
-            let allAnnotations = (this as any).allAnnotations;
-            let table: WADE.TableInterface = {columns: []};
-            let listW: WADE.ListInterface = {header: "PropertyWrites", items: []};
-            let listR: WADE.ListInterface = {header: "PropertyReads", items: []};
-            let listE: WADE.ListInterface = {header: "EventSubs", items: []};
-            let listAR: WADE.ListInterface = {header: "ActionReads", items: []};
-            let listA: WADE.ListInterface = {header: "ActionInvokes", items: []};
-            let listO: WADE.ListInterface = {header: "PropertyObservations", items: []}
-            for(let annotationtype in allAnnotations) {
-                switch(annotationtype) {
-                    case "propertyWrites":
-                        let propertyWrites = allAnnotations[annotationtype];
-                        for(let annotation of propertyWrites) {
+            const allAnnotations = (this as any).allAnnotations;
+            const table: WADE.TableInterface = {columns: []};
+            const listW: WADE.ListInterface = {header: 'PropertyWrites', items: []};
+            const listR: WADE.ListInterface = {header: 'PropertyReads', items: []};
+            const listE: WADE.ListInterface = {header: 'EventSubs', items: []};
+            const listAR: WADE.ListInterface = {header: 'ActionReads', items: []};
+            const listA: WADE.ListInterface = {header: 'ActionInvokes', items: []};
+            const listO: WADE.ListInterface = {header: 'PropertyObservations', items: []};
+            for (const annotationtype in allAnnotations) {
+                switch (annotationtype) {
+                    case 'propertyWrites':
+                        const propertyWrites = allAnnotations[annotationtype];
+                        for (const annotation of propertyWrites) {
                             listW.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "propertyReads":
-                        let propertyReads = allAnnotations[annotationtype];
-                        for(let annotation of propertyReads) {
+                    case 'propertyReads':
+                        const propertyReads = allAnnotations[annotationtype];
+                        for (const annotation of propertyReads) {
                             listR.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "eventSubs":
-                        let eventSubs = allAnnotations[annotationtype];
-                        for(let annotation of eventSubs) {
+                    case 'eventSubs':
+                        const eventSubs = allAnnotations[annotationtype];
+                        for (const annotation of eventSubs) {
                             listE.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "actionInvokes":
-                        let actionInvokes = allAnnotations[annotationtype];
-                        for(let annotation of actionInvokes) {
+                    case 'actionInvokes':
+                        const actionInvokes = allAnnotations[annotationtype];
+                        for (const annotation of actionInvokes) {
                             listA.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "actionReads":
-                        let actionReads = allAnnotations[annotationtype];
-                        for(let annotation of actionReads) {
+                    case 'actionReads':
+                        const actionReads = allAnnotations[annotationtype];
+                        for (const annotation of actionReads) {
                             listAR.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                     case "propertyObservations":
-                        let propertyObservations = allAnnotations[annotationtype];
-                        for(let annotation of propertyObservations) {
+                     case 'propertyObservations':
+                        const propertyObservations = allAnnotations[annotationtype];
+                        for (const annotation of propertyObservations) {
                             listO.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
@@ -325,40 +325,40 @@ export default Vue.extend({
             table.columns.push(listR);
             table.columns.push(listO);
             table.columns.push(listE);
-            table.columns.push(listAR)
+            table.columns.push(listAR);
             table.columns.push(listW);
             table.columns.push(listA);
             return table;
         },
         TdAnnotationsTable() {
-            let allTdAnnotations = (this as any).allTdAnnotations;
-            let table: WADE.TableInterface = {columns: []};
-            let listI: WADE.ListInterface = {header: "Inputs", items: []};
-            let listO: WADE.ListInterface = {header: "Outputs", items: []};
-            let listIo: WADE.ListInterface = {header: "Ios", items: []};
-            for(let annotationtype in allTdAnnotations) {
-                switch(annotationtype) {
-                    case "inputs":
-                        let inputs = allTdAnnotations[annotationtype];
-                        for(let annotation of inputs) {
+            const allTdAnnotations = (this as any).allTdAnnotations;
+            const table: WADE.TableInterface = {columns: []};
+            const listI: WADE.ListInterface = {header: 'Inputs', items: []};
+            const listO: WADE.ListInterface = {header: 'Outputs', items: []};
+            const listIo: WADE.ListInterface = {header: 'Ios', items: []};
+            for (const annotationtype in allTdAnnotations) {
+                switch (annotationtype) {
+                    case 'inputs':
+                        const inputs = allTdAnnotations[annotationtype];
+                        for (const annotation of inputs) {
                             listI.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "outputs":
-                        let outputs = allTdAnnotations[annotationtype];
-                        for(let annotation of outputs) {
+                    case 'outputs':
+                        const outputs = allTdAnnotations[annotationtype];
+                        for (const annotation of outputs) {
                             listO.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
                             });
                         }
                         break;
-                    case "ios":
-                        let ios = allTdAnnotations[annotationtype];
-                        for(let annotation of ios) {
+                    case 'ios':
+                        const ios = allTdAnnotations[annotationtype];
+                        for (const annotation of ios) {
                             listIo.items.push({
                                 label: `${annotation.annotation}`,
                                 payload: annotation
@@ -373,28 +373,28 @@ export default Vue.extend({
             return table;
         },
         showInteractionsTable(): boolean {
-            let allInteractions = (this as any).allInteractions;
-            let result: boolean = false;
-            for(let interactionType in allInteractions){
-                if(allInteractions[interactionType].length > 0) return true;
+            const allInteractions = (this as any).allInteractions;
+            const result: boolean = false;
+            for (const interactionType in allInteractions) {
+                if (allInteractions[interactionType].length > 0) return true;
             }
-            return result
+            return result;
         },
         showAnnotationsTable(): boolean {
-            let allAnnotations = (this as any).allAnnotations;
-            let result: boolean = false;
-            for(let interactionType in allAnnotations){
-                if(allAnnotations[interactionType].length > 0) return true;
+            const allAnnotations = (this as any).allAnnotations;
+            const result: boolean = false;
+            for (const interactionType in allAnnotations) {
+                if (allAnnotations[interactionType].length > 0) return true;
             }
-            return result
+            return result;
         },
         showTdAnnotationsTable(): boolean {
-            let allTdAnnotations = (this as any).allTdAnnotations;
-            let result: boolean = false;
-            for(let interactionType in allTdAnnotations){
-                if(allTdAnnotations[interactionType].length > 0) return true;
+            const allTdAnnotations = (this as any).allTdAnnotations;
+            const result: boolean = false;
+            for (const interactionType in allTdAnnotations) {
+                if (allTdAnnotations[interactionType].length > 0) return true;
             }
-            return result
+            return result;
         }
     },
     methods: {
@@ -402,78 +402,78 @@ export default Vue.extend({
             return this.filters.acceptedTypes.includes(type);
         },
         disableType(type: MAGE.acceptedTypesEnum): boolean {
-            let interactions  = (this as any).allInteractions;
-            let filters = this.filters;
-            for(let interactionType in interactions) {
-                if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.dataType === type})) {
-                    if(!filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === true) {
+            const interactions  = (this as any).allInteractions;
+            const filters = this.filters;
+            for (const interactionType in interactions) {
+                if ((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => i.dataType === type)) {
+                    if (!filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === true) {
                         filters.acceptedTypes.push(type);
                         this.typeWasDisabled[type] = false;
-                        this.$emit("change",filters);
-                    } 
+                        this.$emit('change', filters);
+                    }
                     return false;
-                } 
+                }
             }
-            if(filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === false) {
+            if (filters.acceptedTypes.includes(type) && this.typeWasDisabled[type] === false) {
                 filters.acceptedTypes.splice(filters.acceptedTypes.indexOf(type), 1);
                 this.typeWasDisabled[type] = true;
-                this.$emit("change", filters);
-            } 
+                this.$emit('change', filters);
+            }
             return true;
         },
-        disableInputRestriction(type: "allowMixedTemplates"): boolean {
-            switch(type) {
-               case "allowMixedTemplates":
+        disableInputRestriction(type: 'allowMixedTemplates'): boolean {
+            switch (type) {
+               case 'allowMixedTemplates':
                    return false;
                    break;
             }
         },
-        disableOutputType(type: "property-write" | "action-invoke"): boolean {
-            let interactions  = (this as any).allInteractions;
-            let filters = this.filters;
-            for(let interactionType in interactions) {
-                if((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => {return i.type === type})) {
-                    if(!filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === true) {
+        disableOutputType(type: 'property-write' | 'action-invoke'): boolean {
+            const interactions  = (this as any).allInteractions;
+            const filters = this.filters;
+            for (const interactionType in interactions) {
+                if ((interactions[interactionType] as MAGE.VueInteractionInterface[]).some((i) => i.type === type)) {
+                    if (!filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === true) {
                         filters.acceptedOutputInteractionTypes.push(type);
                         this.outputTypeWasDisabled[type] = false;
-                        this.$emit("change", filters);
-                    } 
+                        this.$emit('change', filters);
+                    }
                     return false;
-                } 
+                }
             }
-            if(filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === false) {
+            if (filters.acceptedOutputInteractionTypes.includes(type) && this.outputTypeWasDisabled[type] === false) {
                 filters.acceptedOutputInteractionTypes.splice(filters.acceptedOutputInteractionTypes.indexOf(type), 1);
                 this.outputTypeWasDisabled[type] = true;
-                this.$emit("change", filters);
-            } 
-            return true
+                this.$emit('change', filters);
+            }
+            return true;
         },
-        outputTypeIsChecked(type: "action-invoke" | "property-write"): boolean {
+        outputTypeIsChecked(type: 'action-invoke' | 'property-write'): boolean {
             return this.filters.acceptedOutputInteractionTypes.includes(type);
         },
         onTypeConstraintChanged(type: MAGE.acceptedTypesEnum, checked: boolean): MAGE.FiltersInterface {
-            let filters = this.filters;
-            if      (checked && !filters.acceptedTypes.includes(type)) filters.acceptedTypes.push(type); 
+            const filters = this.filters;
+            if      (checked && !filters.acceptedTypes.includes(type)) filters.acceptedTypes.push(type);
             else if (!checked && filters.acceptedTypes.includes(type)) filters.acceptedTypes.splice(filters.acceptedTypes.indexOf(type), 1);
-            
+
             return filters;
         },
-        onOutputTypeConstraintChanged(type: "action-invoke" | "property-write", checked: boolean): MAGE.FiltersInterface {
-            let filters = this.filters;
-            if      (checked && !filters.acceptedOutputInteractionTypes.includes(type)) filters.acceptedOutputInteractionTypes.push(type); 
+        onOutputTypeConstraintChanged(type: 'action-invoke' | 'property-write', checked: boolean): MAGE.FiltersInterface {
+            const filters = this.filters;
+            if      (checked && !filters.acceptedOutputInteractionTypes.includes(type)) filters.acceptedOutputInteractionTypes.push(type);
             else if (!checked && filters.acceptedOutputInteractionTypes.includes(type)) filters.acceptedOutputInteractionTypes.splice(filters.acceptedOutputInteractionTypes.indexOf(type), 1);
-            
+
             return filters;
         },
         onCheckBoxChecked(prop: string, checked: boolean): MAGE.FiltersInterface {
-            let filters = this.filters;
+            const filters = this.filters;
             filters[prop] = checked;
-            if(prop === "onlySimilarNames") {
-                if(checked) filters.similarityThresholdNames = 0.5;
+            if (prop === 'onlySimilarNames') {
+                if (checked) filters.similarityThresholdNames = 0.5;
                 else filters.similarityThresholdNames = null;
             }
-            if(prop === "onlySimilarDescriptions") {
-                if(checked) filters.similarityThresholdDescriptions = 0.5;
+            if (prop === 'onlySimilarDescriptions') {
+                if (checked) filters.similarityThresholdDescriptions = 0.5;
                 else filters.similarityThresholdDescriptions = null;
             }
             return filters;

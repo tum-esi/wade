@@ -6,7 +6,8 @@
   "linterOptions": {
     "exclude": [
       "node_modules/**",
-      "src/plugins/*/node_modules/**"
+      "src/plugins/*/node_modules/**",
+      "src/backend/SD/**"
     ]
   },
   "rules": {

@@ -1,75 +1,75 @@
-"use strict";
+'use strict';
 
 // import Plantuml from "plantuml-encoder";
 import Combinatorics from 'js-combinatorics';
-import _ from "lodash";
-import Crypto from "crypto";
-import * as Filters from "./filters";
-import * as Utils from "./utils";
+import _ from 'lodash';
+import Crypto from 'crypto';
+import * as Filters from './filters';
+import * as Utils from './utils';
 import { ThingDescription } from 'wot-typescript-definitions';
 import { hrtime } from 'process';
 
-/** generate all the possible combinations of interactions for a given list of things and a given length */ 
+/** generate all the possible combinations of interactions for a given list of things and a given length */
 async function generateInteractionCombinations(generationForm: MAGE.GenerationFormInterace) {
-    let things = generationForm.things;
-    let filters = generationForm.filters;
-    let templates = generationForm.templates;
+    const things = generationForm.things;
+    const filters = generationForm.filters;
+    const templates = generationForm.templates;
 
-    let events:         MAGE.InputInteractionInterface[] = [];
-    let propertyReads:  MAGE.InputInteractionInterface[] = [];
+    let events: MAGE.InputInteractionInterface[] = [];
+    let propertyReads: MAGE.InputInteractionInterface[] = [];
     let propertyObservations: MAGE.InputInteractionInterface[] = [];
-    let actionReads:    MAGE.InputInteractionInterface[] = [];
-    let propertyWrites: MAGE.InteractionInterface[] = [];
-    let actions:        MAGE.InteractionInterface[] = [];
-    
+    let actionReads: MAGE.InputInteractionInterface[] = [];
+    const propertyWrites: MAGE.InteractionInterface[] = [];
+    const actions: MAGE.InteractionInterface[] = [];
+
     // get and categorize all input interactions
     things.inputs.forEach( thingDescription => {
-        let forbiddenAnnotationFound =  false
-        if(!thingDescription.content) return;
-        let parsedTd: ThingDescription = JSON.parse(thingDescription.content);
-        let types: string | string[] | undefined = parsedTd["@type"];
-        if(!types) types = [];
-        if(typeof types === "string") types = [types];
-        for(let type of types) {
-            if(filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type)) 
+        let forbiddenAnnotationFound =  false;
+        if (!thingDescription.content) return;
+        const parsedTd: ThingDescription = JSON.parse(thingDescription.content);
+        let types: string | string[] | undefined = parsedTd['@type'];
+        if (!types) types = [];
+        if (typeof types === 'string') types = [types];
+        for (const type of types) {
+            if (filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type))
             forbiddenAnnotationFound = true; break;
         }
-        if(!forbiddenAnnotationFound) {
-            let interactions = getInputInteractions(parsedTd, filters);
+        if (!forbiddenAnnotationFound) {
+            const interactions = getInputInteractions(parsedTd, filters);
             events.push(...interactions.events);
             propertyReads.push(...interactions.properties);
             actionReads.push(...interactions.actions);
             propertyObservations.push(...interactions.observations);
         }
-    })
+    });
 
     // get and categorize all output interactions
-    let forbiddenAnnotationFound =  false
+    let forbiddenAnnotationFound =  false;
     things.outputs.forEach( thingDescription => {
-        if(!thingDescription.content) return;
-        let parsedTd: ThingDescription = JSON.parse(thingDescription.content);
-        let types: string | string[] | undefined = parsedTd["@type"];
-        if(!types) types = [];
-        if(typeof types === "string") types = [types];
-        for(let type of types) {
-            if(filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type)) 
+        if (!thingDescription.content) return;
+        const parsedTd: ThingDescription = JSON.parse(thingDescription.content);
+        let types: string | string[] | undefined = parsedTd['@type'];
+        if (!types) types = [];
+        if (typeof types === 'string') types = [types];
+        for (const type of types) {
+            if (filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type))
             forbiddenAnnotationFound = true; break;
         }
-        if(!forbiddenAnnotationFound) {
-            let interactions = getOutputInteractions(parsedTd, filters);
+        if (!forbiddenAnnotationFound) {
+            const interactions = getOutputInteractions(parsedTd, filters);
             actions.push(...interactions.actions);
             propertyWrites.push(...interactions.properties);
         }
     });
 
-    let outputs: MAGE.InteractionInterface[] = []
-    if(filters.acceptedOutputInteractionTypes.includes("property-write")) outputs.push(...propertyWrites);
-    if(filters.acceptedOutputInteractionTypes.includes("action-invoke")) outputs.push(...actions);
+    const outputs: MAGE.InteractionInterface[] = [];
+    if (filters.acceptedOutputInteractionTypes.includes('property-write')) outputs.push(...propertyWrites);
+    if (filters.acceptedOutputInteractionTypes.includes('action-invoke')) outputs.push(...actions);
 
     // for each input, get matching outputs based on filters
     async function getMatchingOutputCombinations(input: MAGE.InputInteractionInterface) {
-        let matchingOutputs = await getMatchingOutputs(input, outputs, filters);
-        let matchingOutputCombinations: MAGE.InteractionInterface[][] = [];
+        const matchingOutputs = await getMatchingOutputs(input, outputs, filters);
+        const matchingOutputCombinations: MAGE.InteractionInterface[][] = [];
         for (let i = generationForm.minOutputs; i <= generationForm.maxOutputs; i++) {
             if (i > matchingOutputs.length) break;
             matchingOutputCombinations.push(...Combinatorics.bigCombination(matchingOutputs, i).toArray());
@@ -77,16 +77,16 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
         return matchingOutputCombinations;
     }
 
-    for (let input of events) {
+    for (const input of events) {
         input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
     }
-    for (let input of propertyReads) {
+    for (const input of propertyReads) {
         input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
     }
-    for (let input of actionReads) {
+    for (const input of actionReads) {
         input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
     }
-    for (let input of propertyObservations) {
+    for (const input of propertyObservations) {
         input.matchingOutputCombinations = await getMatchingOutputCombinations(input);
     }
     // remove inputs without matching outputs
@@ -96,19 +96,19 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     propertyObservations = propertyObservations.filter(observation => observation.matchingOutputCombinations && observation.matchingOutputCombinations.length > 0);
 
     // Calculate all possible output combinations for each input combinations and put them together
-    let interactionCombinations: MAGE.InteractionInterface[][] = [];
-    
-    let interactionsToCombine: MAGE.InputInteractionInterface[] = []
-    for(let template in templates) {
-        switch(template) {
-            case "use-event-template":
-                if(templates[template]) {
+    const interactionCombinations: MAGE.InteractionInterface[][] = [];
+
+    const interactionsToCombine: MAGE.InputInteractionInterface[] = [];
+    for (const template in templates) {
+        switch (template) {
+            case 'use-event-template':
+                if (templates[template]) {
                     interactionsToCombine.push(...events);
                     interactionsToCombine.push(...propertyObservations);
                 }
                 break;
-            case "use-read-template": if(templates[template]) interactionsToCombine.push(...propertyReads); break;
-            case "use-action-template": if(templates[template]) interactionsToCombine.push(...actionReads); break;
+            case 'use-read-template': if (templates[template]) interactionsToCombine.push(...propertyReads); break;
+            case 'use-action-template': if (templates[template]) interactionsToCombine.push(...actionReads); break;
         }
     }
 
@@ -118,253 +118,253 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
 
 /** parse a TD to return all interactions that can serve as an input */
 function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.FiltersInterface) {
-    let events: MAGE.InputInteractionInterface[] = [];
-    let propertyReads: MAGE.InputInteractionInterface[] = [];
-    let propertyObservations: MAGE.InputInteractionInterface[] = [];
-    let actionReads: MAGE.InputInteractionInterface[] = [];
-    for (let prop in thingDescription.properties) {
+    const events: MAGE.InputInteractionInterface[] = [];
+    const propertyReads: MAGE.InputInteractionInterface[] = [];
+    const propertyObservations: MAGE.InputInteractionInterface[] = [];
+    const actionReads: MAGE.InputInteractionInterface[] = [];
+    for (const prop in thingDescription.properties) {
         let dontAddRead = false;
         let dontAddObserve = false;
 
         let propAnnotations = thingDescription.properties[prop]['@type'];
-        if(!propAnnotations) propAnnotations = [];
-        if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
+        if (!propAnnotations) propAnnotations = [];
+        if (typeof propAnnotations === 'string') propAnnotations = [propAnnotations];
 
         // filter based on unwanted types
         if (!thingDescription.properties[prop].writeOnly) {
-            if(!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
-                if(thingDescription.properties[prop].type) continue;
-                else if(!thingDescription.properties[prop].type && !filters.acceptedTypes.includes("null")) continue;
+            if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
+                if (thingDescription.properties[prop].type) continue;
+                else if (!thingDescription.properties[prop].type && !filters.acceptedTypes.includes('null')) continue;
             }
             // filter interactions with unwanted annotations
-            if(filters.forbiddenAnnotations) {
+            if (filters.forbiddenAnnotations) {
                 let forbiddenReadFound = false;
                 let forbiddenObserveFound = false;
-                for(let annotation of propAnnotations) {
-                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-read")) {
+                for (const annotation of propAnnotations) {
+                    if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'property-read')) {
                         forbiddenReadFound = true;
                         break;
                     }
                 }
-                for(let annotation of propAnnotations) {
-                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-observe")) {
+                for (const annotation of propAnnotations) {
+                    if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'property-observe')) {
                         forbiddenObserveFound = true;
                         break;
                     }
                 }
-                if(forbiddenReadFound) dontAddRead = true;
-                if(forbiddenObserveFound) dontAddObserve = true;
+                if (forbiddenReadFound) dontAddRead = true;
+                if (forbiddenObserveFound) dontAddObserve = true;
             }
             // filter unwanted interactions
-            if(filters.forbiddenInteractions) {
-                if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                    inter.name === prop && inter.type === "property-read")) dontAddRead = true;
-                if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                        inter.name === prop && inter.type === "property-observe")) dontAddObserve = true;
+            if (filters.forbiddenInteractions) {
+                if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                    inter.name === prop && inter.type === 'property-read')) dontAddRead = true;
+                if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                        inter.name === prop && inter.type === 'property-observe')) dontAddObserve = true;
             }
-            if(!dontAddRead) propertyReads.push({
-                interactionType: "property-read", 
+            if (!dontAddRead) propertyReads.push({
+                interactionType: 'property-read',
                 name: prop,
                 object: thingDescription.properties[prop],
-                from: "Agent",
+                from: 'Agent',
                 to: thingDescription.title,
                 thingId: thingDescription.id,
-                id: ""
+                id: ''
             });
-            if(thingDescription.properties[prop].observable && !dontAddObserve) propertyObservations.push({
-                interactionType: "property-observe", 
+            if (thingDescription.properties[prop].observable && !dontAddObserve) propertyObservations.push({
+                interactionType: 'property-observe',
                 name: prop,
                 object: thingDescription.properties[prop],
-                from: "Agent",
+                from: 'Agent',
                 to: thingDescription.title,
                 thingId: thingDescription.id,
-                id: ""
+                id: ''
             });
         }
     }
-    for (let event in thingDescription.events) {
+    for (const event in thingDescription.events) {
 
         let eventAnnotations = thingDescription.events[event]['@type'];
-        if(!eventAnnotations) eventAnnotations = [];
-        if(typeof eventAnnotations === "string") eventAnnotations = [eventAnnotations];
+        if (!eventAnnotations) eventAnnotations = [];
+        if (typeof eventAnnotations === 'string') eventAnnotations = [eventAnnotations];
 
         // filter based on accepted types
-        if(!thingDescription.events[event].data && !filters.acceptedTypes.includes("null")) continue;
+        if (!thingDescription.events[event].data && !filters.acceptedTypes.includes('null')) continue;
         else if (thingDescription.events[event].data && !filters.acceptedTypes.includes(thingDescription.events[event].data.type)) {
-            if(thingDescription.events[event].data.type) continue;
-            else if (!thingDescription.events[event].data.type && !filters.acceptedTypes.includes("null")) continue;
+            if (thingDescription.events[event].data.type) continue;
+            else if (!thingDescription.events[event].data.type && !filters.acceptedTypes.includes('null')) continue;
         }
         // filter interactions with unwanted annotations
-        if(filters.forbiddenAnnotations) {
+        if (filters.forbiddenAnnotations) {
             let forbiddenFound = false;
-            for(let annotation of eventAnnotations) {
-                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "event-subscribe")) {
+            for (const annotation of eventAnnotations) {
+                if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'event-subscribe')) {
                     forbiddenFound = true;
                     break;
                 }
             }
-            if(forbiddenFound) continue;
+            if (forbiddenFound) continue;
         }
         // filter unwanted interactions
-        if(filters.forbiddenInteractions) {
-            if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                inter.name === event && inter.type === "event-subscribe")) continue;
+        if (filters.forbiddenInteractions) {
+            if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                inter.name === event && inter.type === 'event-subscribe')) continue;
         }
         events.push({
-            interactionType: "event-subscribe",
+            interactionType: 'event-subscribe',
             name: event,
             object: thingDescription.events[event],
-            from: "Agent",
+            from: 'Agent',
             to: thingDescription.title,
             thingId: thingDescription.id,
-            id: ""
+            id: ''
         });
     }
-    for (let action in thingDescription.actions) {
+    for (const action in thingDescription.actions) {
 
         let actionAnnotations = thingDescription.actions[action]['@type'];
-        if(!actionAnnotations) actionAnnotations = [];
-        if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
+        if (!actionAnnotations) actionAnnotations = [];
+        if (typeof actionAnnotations === 'string') actionAnnotations = [actionAnnotations];
 
-        if (!thingDescription.actions[action].output && !filters.acceptedTypes.includes("null")) continue
-        else if(thingDescription.actions[action].output && !filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) {
-            if(thingDescription.actions[action].output.type) continue;
-            else if(!thingDescription.actions[action].output.type && !filters.acceptedTypes.includes("null")) continue;
+        if (!thingDescription.actions[action].output && !filters.acceptedTypes.includes('null')) continue;
+        else if (thingDescription.actions[action].output && !filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) {
+            if (thingDescription.actions[action].output.type) continue;
+            else if (!thingDescription.actions[action].output.type && !filters.acceptedTypes.includes('null')) continue;
         }
         // filter interactions with unwanted annotations
-        if(filters.forbiddenAnnotations) {
+        if (filters.forbiddenAnnotations) {
             let forbiddenFound = false;
-            for(let annotation of actionAnnotations) {
-                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "action-read")) {
+            for (const annotation of actionAnnotations) {
+                if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'action-read')) {
                     forbiddenFound = true;
                     break;
                 }
             }
-            if(forbiddenFound) continue;
+            if (forbiddenFound) continue;
         }
         // filter unwanted interactions
-        if(filters.forbiddenInteractions) {
-            if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                inter.name === action && inter.type === "action-read")) continue;
+        if (filters.forbiddenInteractions) {
+            if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                inter.name === action && inter.type === 'action-read')) continue;
         }
         actionReads.push({
-            interactionType: "action-read",
+            interactionType: 'action-read',
             name: action,
             object: thingDescription.actions[action],
-            from: "Agent",
+            from: 'Agent',
             to: thingDescription.title,
             thingId: thingDescription.id,
-            id: ""
+            id: ''
         });
     }
-    return { "events": events, "properties": propertyReads, "actions": actionReads, "observations": propertyObservations };
+    return { events, properties: propertyReads, actions: actionReads, observations: propertyObservations };
 }
 
 /** parse a TD to return all interactions that can serve as an output */
 function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface) {
-    let actions: MAGE.InteractionInterface[] = [];
-    let propertyWrites: MAGE.InteractionInterface[] = [];
-    for (let prop in thingDescription.properties) {
+    const actions: MAGE.InteractionInterface[] = [];
+    const propertyWrites: MAGE.InteractionInterface[] = [];
+    for (const prop in thingDescription.properties) {
 
         let propAnnotations = thingDescription.properties[prop]['@type'];
-        if(!propAnnotations) propAnnotations = [];
-        if(typeof propAnnotations === "string") propAnnotations = [propAnnotations];
+        if (!propAnnotations) propAnnotations = [];
+        if (typeof propAnnotations === 'string') propAnnotations = [propAnnotations];
 
         if (!thingDescription.properties[prop].readOnly) {
             // filter based on accepted types
-            if(!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
-                if(thingDescription.properties[prop].type) continue;
-                else if(!thingDescription.properties[prop].type && !filters.acceptedTypes.includes("null")) continue;
+            if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
+                if (thingDescription.properties[prop].type) continue;
+                else if (!thingDescription.properties[prop].type && !filters.acceptedTypes.includes('null')) continue;
             }
             // filter interactions with unwanted annotations
-            if(filters.forbiddenAnnotations) {
+            if (filters.forbiddenAnnotations) {
                 let forbiddenFound = false;
-                for(let annotation of propAnnotations) {
-                    if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "property-write")) {
+                for (const annotation of propAnnotations) {
+                    if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'property-write')) {
                         forbiddenFound = true;
                         break;
                     }
                 }
-                if(forbiddenFound) continue;
+                if (forbiddenFound) continue;
             }
             // filter unwanted interactions
-            if(filters.forbiddenInteractions) {
-                if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                    inter.name === prop && inter.type === "property-write")) continue;
+            if (filters.forbiddenInteractions) {
+                if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                    inter.name === prop && inter.type === 'property-write')) continue;
             }
             propertyWrites.push({
-                interactionType: "property-write",
+                interactionType: 'property-write',
                 name: prop,
                 object: thingDescription.properties[prop],
-                from: "Agent",
+                from: 'Agent',
                 to: thingDescription.title,
-                id: Crypto.createHash("sha1").update(thingDescription.id+prop).digest("hex"),
+                id: Crypto.createHash('sha1').update(thingDescription.id + prop).digest('hex'),
                 thingId: thingDescription.id
             });
         }
     }
-    for (let action in thingDescription.actions) {
+    for (const action in thingDescription.actions) {
 
         let actionAnnotations = thingDescription.actions[action]['@type'];
-        if(!actionAnnotations) actionAnnotations = [];
-        if(typeof actionAnnotations === "string") actionAnnotations = [actionAnnotations];
-        
-        if (!thingDescription.actions[action].input && !filters.acceptedTypes.includes("null")) continue
-        else if(thingDescription.actions[action].input && !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) {
-            if(thingDescription.actions[action].input.type) continue;
-            else if(!thingDescription.actions[action].input.type && !filters.acceptedTypes.includes("null")) continue;
+        if (!actionAnnotations) actionAnnotations = [];
+        if (typeof actionAnnotations === 'string') actionAnnotations = [actionAnnotations];
+
+        if (!thingDescription.actions[action].input && !filters.acceptedTypes.includes('null')) continue;
+        else if (thingDescription.actions[action].input && !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) {
+            if (thingDescription.actions[action].input.type) continue;
+            else if (!thingDescription.actions[action].input.type && !filters.acceptedTypes.includes('null')) continue;
         }
         // filter interactions with unwanted annotations
-        if(filters.forbiddenAnnotations) {
+        if (filters.forbiddenAnnotations) {
             let forbiddenFound = false;
-            for(let annotation of actionAnnotations) {
-                if(filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === "action-invoke")) {
+            for (const annotation of actionAnnotations) {
+                if (filters.forbiddenAnnotations.some(a => a.annotation === annotation && a.type === 'action-invoke')) {
                     forbiddenFound = true;
                     break;
                 }
             }
-            if(forbiddenFound) continue;
+            if (forbiddenFound) continue;
         }
         // filter unwanted interactions
-        if(filters.forbiddenInteractions) {
-            if(filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id && 
-                inter.name === action && inter.type === "action-invoke")) continue;
+        if (filters.forbiddenInteractions) {
+            if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
+                inter.name === action && inter.type === 'action-invoke')) continue;
         }
         actions.push({
-            interactionType: "action-invoke",
+            interactionType: 'action-invoke',
             name: action,
             object: thingDescription.actions[action],
-            from: "Agent",
+            from: 'Agent',
             to: thingDescription.title,
-            id: Crypto.createHash("sha1").update(thingDescription.id+action).digest("hex"),
+            id: Crypto.createHash('sha1').update(thingDescription.id + action).digest('hex'),
             thingId: thingDescription.id
         });
     }
-    return { "actions": actions, "properties": propertyWrites };
+    return { actions, properties: propertyWrites };
 }
 
 /** filter a list of outputs to match a given input (event or property_read) */
 async function getMatchingOutputs(
-    input: MAGE.InputInteractionInterface, 
-    outputs: MAGE.InteractionInterface[], 
+    input: MAGE.InputInteractionInterface,
+    outputs: MAGE.InteractionInterface[],
     filters: MAGE.FiltersInterface) {
         if (filters.onlySameType) {
             outputs = outputs.filter(element => Filters.sameType(input, element));
         }
         if (filters.onlySimilarNames && filters.similarityThresholdNames) {
             // since filter cannot by async, we have to filter manually.
-            let newOutputs: MAGE.InteractionInterface[] = [];
-            for (let element of outputs) {
-                let filterResults = await Filters.similar(input, element, filters.similarityThresholdNames);
+            const newOutputs: MAGE.InteractionInterface[] = [];
+            for (const element of outputs) {
+                const filterResults = await Filters.similar(input, element, filters.similarityThresholdNames);
                 if (filterResults) newOutputs.push(element);
             }
             return newOutputs;
         }
         if (filters.onlySimilarDescriptions && filters.similarityThresholdDescriptions) {
             // since filter cannot by async, we have to filter manually.
-            let newOutputs: MAGE.InteractionInterface[] = [];
-            for (let element of outputs) {
-                let filterResults = await Filters.similarDescription((input.object as any).description, 
+            const newOutputs: MAGE.InteractionInterface[] = [];
+            for (const element of outputs) {
+                const filterResults = await Filters.similarDescription((input.object as any).description,
                     (element.object as any).description, filters.similarityThresholdDescriptions);
                 if (filterResults) newOutputs.push(element);
             }
@@ -385,275 +385,265 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
         allInputCombinations.push(...Combinatorics.bigCombination(inputs, i).toArray());
     }
     // filter input combinations that have more things than allowed
-    if(form.maxThings && form.maxThings > 0) allInputCombinations = allInputCombinations.filter(inputs_c => {if(form.maxThings) return getNumberOfThings(inputs_c) <= form.maxThings});
+    if (form.maxThings && form.maxThings > 0) allInputCombinations = allInputCombinations.filter(inputs_c => {if (form.maxThings) return getNumberOfThings(inputs_c) <= form.maxThings; });
     // filtering of mixed template inputs
-    if(!form.filters.allowMixedTemplates)  allInputCombinations = allInputCombinations.filter(inputs_c => {return isMixedInputTemplate(inputs_c)});
+    if (!form.filters.allowMixedTemplates)  allInputCombinations = allInputCombinations.filter(inputs_c => isMixedInputTemplate(inputs_c));
     // filter input based on must-have interactions
     if (form.filters.mustHaveInteractions && form.filters.mustHaveInteractions.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, 
-            form.filters.mustHaveInteractions.filter(i => i.type === "property-read" || i.type === "property-observe" || i.type === "event-subscribe" || i.type === "action-read"))});
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup,
+            form.filters.mustHaveInteractions.filter(i => i.type === 'property-read' || i.type === 'property-observe' || i.type === 'event-subscribe' || i.type === 'action-read')); });
     }
-    //filter input based on must-have annotations
-    if(form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup,
-            form.filters.mustHaveAnnotations.filter(a => a.type === "property-read" || a.type === "property-observe" || a.type === "event-subscribe" || a.type === "action-read"))});
+    // filter input based on must-have annotations
+    if (form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup,
+            form.filters.mustHaveAnnotations.filter(a => a.type === 'property-read' || a.type === 'property-observe' || a.type === 'event-subscribe' || a.type === 'action-read')); });
     }
-    //filter input based on must-have TD annotations
-    if(form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup,
-            form.filters.mustHaveTdAnnotations.filter(a => a.type === "input" || a.type === "io"), form)});
+    // filter input based on must-have TD annotations
+    if (form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup,
+            form.filters.mustHaveTdAnnotations.filter(a => a.type === 'input' || a.type === 'io'), form); });
     }
 
     allInputCombinations.forEach(inputs_c => {
-        let availableOutputs: MAGE.InteractionInterface[][][] = [];
-        inputs_c.forEach(input => {if(input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations);}) 
+        const availableOutputs: MAGE.InteractionInterface[][][] = [];
+        inputs_c.forEach(input => {if (input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations); });
         Utils.modifiedCartesianProduct(...availableOutputs)
         .filter(outputs_c => (outputs_c.length <= form.maxOutputs) && (outputs_c.length >= form.minOutputs))
         .forEach(outputs_c => {
             interactionCombinations.push([...inputs_c, ...outputs_c]);
         });
-    })
+    });
     // filter final combinations that have more things than allowed
-    if (form.maxThings && form.maxThings > 0) interactionCombinations = interactionCombinations.filter( mashup => {if(form.maxThings) return getNumberOfThings(mashup) <= form.maxThings});
+    if (form.maxThings && form.maxThings > 0) interactionCombinations = interactionCombinations.filter( mashup => {if (form.maxThings) return getNumberOfThings(mashup) <= form.maxThings; });
     // filter based on must-have interactions
     if (form.filters.mustHaveInteractions && form.filters.mustHaveInteractions.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, form.filters.mustHaveInteractions)});
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveInteractions) return mashupIncludesInteractions(mashup, form.filters.mustHaveInteractions); });
     }
-    //filter-based on must-have annotations
-    if(form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup, form.filters.mustHaveAnnotations)});
+    // filter-based on must-have annotations
+    if (form.filters.mustHaveAnnotations && form.filters.mustHaveAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveAnnotations) return mashupIncludesAnnotations(mashup, form.filters.mustHaveAnnotations); });
     }
-    //filter-based on must-have TD annotations
-    if(form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
-        interactionCombinations = interactionCombinations.filter(mashup => {if(form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup, form.filters.mustHaveTdAnnotations, form)});
+    // filter-based on must-have TD annotations
+    if (form.filters.mustHaveTdAnnotations && form.filters.mustHaveTdAnnotations.length > 0) {
+        interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup, form.filters.mustHaveTdAnnotations, form); });
     }
     return interactionCombinations;
 }
 
 function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHaveInteractions: MAGE.VueInteractionInterface[]): boolean {
     let isIncluded: boolean = true;
-    for(let mustHaveInteraction of mustHaveInteractions) {
-        for(let [index, interaction] of mashup.entries()) {
-            if(interaction.thingId ===  mustHaveInteraction.thingId && interaction.name === mustHaveInteraction.name &&
+    for (const mustHaveInteraction of mustHaveInteractions) {
+        for (const [index, interaction] of mashup.entries()) {
+            if (interaction.thingId ===  mustHaveInteraction.thingId && interaction.name === mustHaveInteraction.name &&
                 interaction.interactionType === mustHaveInteraction.type) break;
-            if(index === mashup.length-1) isIncluded = false;
+            if (index === mashup.length - 1) isIncluded = false;
         }
     }
     return isIncluded;
 }
 
 function mashupIncludesTdAnnotations(mashup: MAGE.InteractionInterface[],
-    mustHaveTdAnnotations: MAGE.VueAnnotationInterface[], form: MAGE.GenerationFormInterace): boolean {
+                                     mustHaveTdAnnotations: MAGE.VueAnnotationInterface[], form: MAGE.GenerationFormInterace): boolean {
         let isIncluded: boolean = true;
-        for(let mustHaveTdAnnotation of mustHaveTdAnnotations) {
-            innerloop:for(let [index, interaction] of mashup.entries()) {
-                let resultTd: WADE.TDElementInterface | WADE.MashupElementInterface | undefined = undefined;
+        for (const mustHaveTdAnnotation of mustHaveTdAnnotations) {
+            innerloop: for (const [index, interaction] of mashup.entries()) {
+                let resultTd: WADE.TDElementInterface | WADE.MashupElementInterface | undefined;
                 let parsedTd = null;
-                let types: string | string[] | undefined = undefined;
-                switch(interaction.interactionType) {
-                    case "property-read":
-                    case "action-read":
-                    case "event-subscribe":
-                        resultTd = form.things.inputs.find(td => {if(td.content) return JSON.parse(td.content).id === interaction.thingId});
-                        if(resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
-                        if(parsedTd) types = parsedTd["@type"];
-                        if(!types) types = [];
-                        if(typeof types === "string") types = [types];
-                        if(types.includes(mustHaveTdAnnotation.annotation)) break innerloop; 
+                let types: string | string[] | undefined;
+                switch (interaction.interactionType) {
+                    case 'property-read':
+                    case 'action-read':
+                    case 'event-subscribe':
+                        resultTd = form.things.inputs.find(td => {if (td.content) return JSON.parse(td.content).id === interaction.thingId; });
+                        if (resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
+                        if (parsedTd) types = parsedTd['@type'];
+                        if (!types) types = [];
+                        if (typeof types === 'string') types = [types];
+                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
                         break;
 
-                    case "property-write":
-                    case "action-invoke":
-                        resultTd = form.things.outputs.find(td => {if(td.content) return JSON.parse(td.content).id === interaction.thingId});
-                        if(resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
-                        if(parsedTd) types = parsedTd["@type"];
-                        if(!types) types = [];
-                        if(typeof types === "string") types = [types];
-                        if(types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
+                    case 'property-write':
+                    case 'action-invoke':
+                        resultTd = form.things.outputs.find(td => {if (td.content) return JSON.parse(td.content).id === interaction.thingId; });
+                        if (resultTd && resultTd.content) parsedTd = JSON.parse(resultTd.content);
+                        if (parsedTd) types = parsedTd['@type'];
+                        if (!types) types = [];
+                        if (typeof types === 'string') types = [types];
+                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
                         break;
                 }
-                if(index === mashup.length-1) isIncluded = false;
+                if (index === mashup.length - 1) isIncluded = false;
             }
-            if(!isIncluded) return isIncluded;
+            if (!isIncluded) return isIncluded;
         }
         return isIncluded;
 }
 
 function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
-    mustHaveAnnotations: MAGE.VueAnnotationInterface[]): boolean {
+                                   mustHaveAnnotations: MAGE.VueAnnotationInterface[]): boolean {
         let isIncluded: boolean = true;
-        for(let mustHaveAnnotation of mustHaveAnnotations) {
-            for(let [index, interaction] of mashup.entries()) {
-                let interactionAnnotations = interaction.object["@type"];
-                if(!interactionAnnotations) interactionAnnotations = [];
-                if(typeof interactionAnnotations === "string") interactionAnnotations = [interactionAnnotations];
-                if(interactionAnnotations.some(a => {return mustHaveAnnotation.annotation === a &&
-                    mustHaveAnnotation.type === interaction.interactionType })) break;
-                if(index === mashup.length-1) isIncluded = false;
+        for (const mustHaveAnnotation of mustHaveAnnotations) {
+            for (const [index, interaction] of mashup.entries()) {
+                let interactionAnnotations = interaction.object['@type'];
+                if (!interactionAnnotations) interactionAnnotations = [];
+                if (typeof interactionAnnotations === 'string') interactionAnnotations = [interactionAnnotations];
+                if (interactionAnnotations.some(a => {return mustHaveAnnotation.annotation === a &&
+                    mustHaveAnnotation.type === interaction.interactionType; })) break;
+                if (index === mashup.length - 1) isIncluded = false;
             }
-            if(!isIncluded) return isIncluded;
+            if (!isIncluded) return isIncluded;
         }
         return isIncluded;
 }
 
 function isMixedInputTemplate(inputs: MAGE.InputInteractionInterface[]): boolean {
-    let template: string = "";
-    for(let [index, input] of inputs.entries()) {
-        if(index === 0) {template = input.interactionType; continue;}
-        if(input.interactionType !== template) return false;
-        if(index === inputs.length - 1) return true;
+    let template: string = '';
+    for (const [index, input] of inputs.entries()) {
+        if (index === 0) {template = input.interactionType; continue; }
+        if (input.interactionType !== template) return false;
+        if (index === inputs.length - 1) return true;
     }
     return true;
 }
 
 /** Returns the number of Things that participate in a given list on interactions */
 function getNumberOfThings(interactions: MAGE.InteractionInterface[]) {
-    let thingIds: string[] = [];
+    const thingIds: string[] = [];
     interactions.forEach(inter => {
         if (!thingIds.includes(inter.thingId)) thingIds.push(inter.thingId);
-    })
+    });
     return thingIds.length;
 }
 
 /** Generate PlantUML textual code for a mashup
- * 
+ *
  * @param {Array} interactions - Array of interaction (ie: a mashup)
  */
 function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
-    let seqDiagram = "sequenceDiagram\n";
-    let interactions = mashupObject.interactions;
+    let seqDiagram = 'sequenceDiagram\n';
+    const interactions = mashupObject.interactions;
     let inputsDone = 0;
     let outputsDone = 0;
     interactions.forEach( interaction => {
         // Determine interaction label and return path
-        if (interaction.interactionType === "property-read") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `and\n`;
+        if (interaction.interactionType === 'property-read') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : readProperty: "${interaction.name}"\n`;
             inputsDone++;
-        } 
-        else if (interaction.interactionType === "action-read") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `and\n`;
+        } else if (interaction.interactionType === 'action-read') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : invokeAction: "${interaction.name}"\n`;
             inputsDone++;
-        }
-        else if (interaction.interactionType === "event-subscribe") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `and\n`;
+        } else if (interaction.interactionType === 'event-subscribe') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : subscribeEvent: "${interaction.name}"\n`;
-            inputsDone++;          
-        }
-        else if (interaction.interactionType === "property-observe") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `and\n`;
+            inputsDone++;
+        } else if (interaction.interactionType === 'property-observe') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->>+ ${interaction.to} : observeProperty: "${interaction.name}"\n`;
-            inputsDone++;          
-        }
-        else if (interaction.interactionType === "property-write") {
-            if(outputsDone == 0) seqDiagram += `par\n`;
-            if(outputsDone > 0) seqDiagram += `and\n`;
+            inputsDone++;
+        } else if (interaction.interactionType === 'property-write') {
+            if (outputsDone == 0) seqDiagram += `par\n`;
+            if (outputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->> ${interaction.to} : writeProperty: "${interaction.name}"\n`;
             outputsDone++;
-            if(outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
-        }    
-        else if(interaction.interactionType === "action-invoke") {
-            if(outputsDone == 0) seqDiagram += `par\n`;
-            if(outputsDone > 0) seqDiagram += `and\n`;
+            if (outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'action-invoke') {
+            if (outputsDone == 0) seqDiagram += `par\n`;
+            if (outputsDone > 0) seqDiagram += `and\n`;
             seqDiagram += `${interaction.from} ->> ${interaction.to} : invokeAction: "${interaction.name}"\n`;
             outputsDone++;
-            if(outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+            if (outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
         }
-        
-        
+
+
         // determine return path
-        if (interaction.interactionType === "property-read") {
+        if (interaction.interactionType === 'property-read') {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : response\n`;
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "event-subscribe" || interaction.interactionType === "property-observe") {
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'event-subscribe' || interaction.interactionType === 'property-observe') {
             seqDiagram += `${interaction.to} -->> ${interaction.from} : confirmation\n`;
             seqDiagram += `${interaction.to} ->>- ${interaction.from} : data-pushed\n`;
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "action-read") {
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'action-read') {
             seqDiagram += `${interaction.to} -->>- ${interaction.from} : output\n`;
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
         }
     });
-    seqDiagram += "\n";
-    return seqDiagram
+    seqDiagram += '\n';
+    return seqDiagram;
 }
 
 function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
     let seqDiagram = `@startuml ${mashupObject.mashupName}\n`;
-    seqDiagram+=`[->"Agent": top:${mashupObject.mashupName}()\nactivate "Agent"\n`;
-    seqDiagram+="group strict\n"
-    let interactions = mashupObject.interactions;
+    seqDiagram += `[->"Agent": top:${mashupObject.mashupName}()\nactivate "Agent"\n`;
+    seqDiagram += 'group strict\n';
+    const interactions = mashupObject.interactions;
     let inputsDone = 0;
     let outputsDone = 0;
     interactions.forEach( interaction => {
         // Determine interaction label and return path
-        if (interaction.interactionType === "property-read") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `else\n`;
+        if (interaction.interactionType === 'property-read') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : readProperty: "${interaction.name}"\n`;
             seqDiagram += `activate "${interaction.to}"\n`;
             inputsDone++;
-        } 
-        else if (interaction.interactionType === "action-read") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `else\n`;
+        } else if (interaction.interactionType === 'action-read') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : invokeAction: "${interaction.name}"\n`;
             seqDiagram += `activate "${interaction.to}"\n`;
             inputsDone++;
-        }
-        else if (interaction.interactionType === "event-subscribe") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `else\n`;
+        } else if (interaction.interactionType === 'event-subscribe') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : subscribeEvent: "${interaction.name}"\n`;
             seqDiagram += `activate "${interaction.to}"\n`;
-            inputsDone++;          
-        }
-        else if (interaction.interactionType === "property-observe") {
-            if(inputsDone == 0) seqDiagram += `par\n`;
-            if(inputsDone > 0) seqDiagram += `else\n`;
+            inputsDone++;
+        } else if (interaction.interactionType === 'property-observe') {
+            if (inputsDone == 0) seqDiagram += `par\n`;
+            if (inputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : observeProperty: "${interaction.name}"\n`;
             seqDiagram += `activate "${interaction.to}"\n`;
-            inputsDone++;          
-        }
-        else if (interaction.interactionType === "property-write") {
-            if(outputsDone == 0) seqDiagram += `par\n`;
-            if(outputsDone > 0) seqDiagram += `else\n`;
+            inputsDone++;
+        } else if (interaction.interactionType === 'property-write') {
+            if (outputsDone == 0) seqDiagram += `par\n`;
+            if (outputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : writeProperty: "${interaction.name}"\n`;
             outputsDone++;
-            if(outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
-        }    
-        else if(interaction.interactionType === "action-invoke") {
-            if(outputsDone == 0) seqDiagram += `par\n`;
-            if(outputsDone > 0) seqDiagram += `else\n`;
+            if (outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'action-invoke') {
+            if (outputsDone == 0) seqDiagram += `par\n`;
+            if (outputsDone > 0) seqDiagram += `else\n`;
             seqDiagram += `"${interaction.from}" -> "${interaction.to}" : invokeAction: "${interaction.name}"\n`;
             outputsDone++;
-            if(outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
+            if (outputsDone == mashupObject.numberOfOutputInteractions) seqDiagram += `end\n`;
         }
-        
-        
+
+
         // determine return path
-        if (interaction.interactionType === "property-read") {
+        if (interaction.interactionType === 'property-read') {
             seqDiagram += `"${interaction.to}" --> "${interaction.from}" : response\n`;
-            seqDiagram += `deactivate "${interaction.to}"\n`
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "event-subscribe" || interaction.interactionType === "property-observe") {
+            seqDiagram += `deactivate "${interaction.to}"\n`;
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'event-subscribe' || interaction.interactionType === 'property-observe') {
             seqDiagram += `"${interaction.to}" --> "${interaction.from}" : confirmation\n`;
             seqDiagram += `"${interaction.to}" ->> "${interaction.from}" : data-pushed\n`;
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
-        } else if (interaction.interactionType === "action-read") {
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+        } else if (interaction.interactionType === 'action-read') {
             seqDiagram += `"${interaction.to}" --> "${interaction.from}" : response\n`;
-            seqDiagram += `deactivate "${interaction.to}"\n`
-            if(inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
+            seqDiagram += `deactivate "${interaction.to}"\n`;
+            if (inputsDone == mashupObject.numberOfInputInteractions) seqDiagram += `end\n`;
         }
     });
-    seqDiagram+=`end\n[<-"Agent"\ndeactivate "Agent"\n`;
-    seqDiagram += "@enduml\n";
-    return seqDiagram
+    seqDiagram += `end\n[<-"Agent"\ndeactivate "Agent"\n`;
+    seqDiagram += '@enduml\n';
+    return seqDiagram;
 }
 
 /** calculate size of design space ( how many mashups would be possible without any rules or filters ) */
@@ -661,48 +651,48 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     let designSpaceSize = 0;
     let nInputs = 0;
     let nOutputs = 0;
-    let things = generationForm.things;
+    const things = generationForm.things;
 
-    let tdIds: string[] = [];
-    let uniqueTds: WADE.TDElementInterface[] = [];
+    const tdIds: string[] = [];
+    const uniqueTds: WADE.TDElementInterface[] = [];
     things.inputs.concat(things.outputs).forEach(td => {
         if (!tdIds.includes(td.id)) {
             uniqueTds.push(td);
             tdIds.push(td.id);
         }
-    })
+    });
 
     things.inputs.forEach(element => {
         let parsedTd: ThingDescription;
-        if(!element.content) return;
+        if (!element.content) return;
         parsedTd = JSON.parse(element.content);
-        for(let prop in parsedTd.properties) {
-            if(parsedTd.properties[prop].writeOnly) continue;
+        for (const prop in parsedTd.properties) {
+            if (parsedTd.properties[prop].writeOnly) continue;
             nInputs++;
-            if(parsedTd.properties[prop].observable) nInputs++;
+            if (parsedTd.properties[prop].observable) nInputs++;
         }
         if (parsedTd.actions) nInputs += Object.keys(parsedTd.actions).length;
         if (parsedTd.events) nInputs += Object.keys(parsedTd.events).length;
-    })
+    });
 
     things.outputs.forEach(element => {
         let parsedTd: ThingDescription;
-        if(!element.content) return;
+        if (!element.content) return;
         parsedTd = JSON.parse(element.content);
-        for(let prop in parsedTd.properties) {
-            if(parsedTd.properties[prop].readOnly) continue;
+        for (const prop in parsedTd.properties) {
+            if (parsedTd.properties[prop].readOnly) continue;
             nOutputs++;
         }
         if (parsedTd.actions) nOutputs += Object.keys(parsedTd.actions).length;
-    })
+    });
 
     let max_k = generationForm.maxInputs + generationForm.maxOutputs;
-    let min_k =  generationForm.minInputs + generationForm.minOutputs;
-    let nTotal = nInputs + nOutputs; 
+    const min_k =  generationForm.minInputs + generationForm.minOutputs;
+    const nTotal = nInputs + nOutputs;
     if (max_k > nTotal) max_k = nTotal;
     for (let i = generationForm.minInputs; i <= generationForm.maxInputs; i++) {
-        for(let j = generationForm.minOutputs; j <= generationForm.maxOutputs; j++)
-        designSpaceSize += (Utils.factorial(nInputs)*Utils.factorial(nOutputs))/(Utils.factorial(i)*Utils.factorial(j)*Utils.factorial(nInputs - i)*Utils.factorial(nOutputs-j));
+        for (let j = generationForm.minOutputs; j <= generationForm.maxOutputs; j++)
+        designSpaceSize += (Utils.factorial(nInputs) * Utils.factorial(nOutputs)) / (Utils.factorial(i) * Utils.factorial(j) * Utils.factorial(nInputs - i) * Utils.factorial(nOutputs - j));
     }
 
     return Math.round(designSpaceSize);
@@ -710,53 +700,53 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
 
 /** Main function to generate mashups. Calls all other functions. */
 export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
-    //let start = hrtime.bigint();
-    let start = hrtime();
-    let interactionCombinations = await generateInteractionCombinations(generationForm);
-    let designSpaceSize = getDesignSpaceSize(generationForm);
+    // let start = hrtime.bigint();
+    const start = hrtime();
+    const interactionCombinations = await generateInteractionCombinations(generationForm);
+    const designSpaceSize = getDesignSpaceSize(generationForm);
 
-    let imagesMDs: string[] = [];
-    let plantUmls: string[] = [];
-    for (let combi of interactionCombinations) {
+    const imagesMDs: string[] = [];
+    const plantUmls: string[] = [];
+    for (const combi of interactionCombinations) {
         let numberOfInputInteractions = 0;
         let numberOfOutputInteractions = 0;
-        for(let interaction of combi) {
-            switch(interaction.interactionType) {
-                case "property-read":
-                case "event-subscribe":
-                case "action-read":
-                case "property-observe":
+        for (const interaction of combi) {
+            switch (interaction.interactionType) {
+                case 'property-read':
+                case 'event-subscribe':
+                case 'action-read':
+                case 'property-observe':
                     numberOfInputInteractions++; break;
-                case "property-write":
-                case "action-invoke":
+                case 'property-write':
+                case 'action-invoke':
                     numberOfOutputInteractions++; break;
             }
         }
-        let combiObject = {
+        const combiObject = {
             mashupName: generationForm.mashupName,
             interactions: combi,
-            numberOfInputInteractions: numberOfInputInteractions,
-            numberOfOutputInteractions: numberOfOutputInteractions
-        }
-        let mermaidUml = generateMermaidSeqDiagram(combiObject);
+            numberOfInputInteractions,
+            numberOfOutputInteractions
+        };
+        const mermaidUml = generateMermaidSeqDiagram(combiObject);
         imagesMDs.push(mermaidUml);
-        let plantUml = generatePlantUmlSeqDiagram(combiObject);
+        const plantUml = generatePlantUmlSeqDiagram(combiObject);
         plantUmls.push(plantUml);
     }
 
-    let end = hrtime(start);
-    //let end = hrtime.bigint();
-    let totalMashups =  interactionCombinations.length;
+    const end = hrtime(start);
+    // let end = hrtime.bigint();
+    const totalMashups =  interactionCombinations.length;
 
-    let results = {
-        designSpaceSize: designSpaceSize,
+    const results = {
+        designSpaceSize,
         mashupsGenerated: totalMashups,
-        imagesMDs: imagesMDs,
-        plantUmls: plantUmls,
+        imagesMDs,
+        plantUmls,
         mashups: interactionCombinations,
         executionTime: end
     };
-    
+
     return results;
 }
 
@@ -775,9 +765,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     public  maxOutputs: number;
     public  maxThings: number | null;
     public  templates: {
-        "use-event-template": boolean;
-        "use-action-template": boolean;
-        "use-read-template": boolean;
+        'use-event-template': boolean;
+        'use-action-template': boolean;
+        'use-read-template': boolean;
     };
     public filters: {
           acceptedTypes: string[],
@@ -793,9 +783,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
     public generation: {
           generateCode: boolean,
           includeFunctionSkeletons: boolean
-    }
+    };
     constructor() {
-        this.mashupName="";
+        this.mashupName = '';
         this.things = {
             inputs: [],
             outputs: [],
@@ -806,9 +796,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
         this.maxOutputs = 1,
         this.maxThings = null,
         this.templates = {
-            "use-event-template": true,
-            "use-action-template": false,
-            "use-read-template": true,
+            'use-event-template': true,
+            'use-action-template': false,
+            'use-read-template': true,
         },
         this.filters = {
             acceptedTypes: [],
@@ -820,11 +810,11 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
             similarityThresholdDescriptions: null,
             semanticMatch: false,
             allowMixedTemplates: false,
-        
+
         },
         this.generation = {
             generateCode: false,
             includeFunctionSkeletons: false
-        }
+        };
     }
 }

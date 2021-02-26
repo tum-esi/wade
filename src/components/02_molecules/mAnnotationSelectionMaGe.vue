@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'; 
+import Vue from 'vue';
 import aListSimple from '@/components/01_atoms/aListSimple.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import aIcon from '@/components/01_atoms/aIcon.vue';
@@ -74,29 +74,29 @@ export default Vue.extend({
         },
         templates: {
             type: Object as () => {
-            "use-event-template": Boolean,
-            "use-action-template": Boolean,
-            "use-sub-template": Boolean,
+            'use-event-template': boolean,
+            'use-action-template': boolean,
+            'use-sub-template': boolean,
             },
             required: true
         }
     },
     methods: {
-        ...mapMutations('MashupStore',['setAnnotationRestriction']),
+        ...mapMutations('MashupStore', ['setAnnotationRestriction']),
         showColumn(column: WADE.ListInterface): boolean {
-            let result: boolean = true;
-            if(column.items.length === 0) return false;
-            if(column.header === "PropertyReads" && this.templates["use-read-template"] === false) return false;
-            if(column.header === "EventSubs" && this.templates["use-event-template"] === false) return false;
-            if(column.header === "PropertyObservations" && this.templates["use-event-template"] === false) return false;
-            if(column.header === "ActionReads" && this.templates["use-action-template"] === false) return false;
-            if(column.header === "ActionInvokes" && !this.filters.acceptedOutputInteractionTypes.includes("action-invoke")) return false;
-            if(column.header === "PropertyWrites" && !this.filters.acceptedOutputInteractionTypes.includes("property-write")) return false;
-            
+            const result: boolean = true;
+            if (column.items.length === 0) return false;
+            if (column.header === 'PropertyReads' && this.templates['use-read-template'] === false) return false;
+            if (column.header === 'EventSubs' && this.templates['use-event-template'] === false) return false;
+            if (column.header === 'PropertyObservations' && this.templates['use-event-template'] === false) return false;
+            if (column.header === 'ActionReads' && this.templates['use-action-template'] === false) return false;
+            if (column.header === 'ActionInvokes' && !this.filters.acceptedOutputInteractionTypes.includes('action-invoke')) return false;
+            if (column.header === 'PropertyWrites' && !this.filters.acceptedOutputInteractionTypes.includes('property-write')) return false;
+
             return true;
         },
-        isCheckedClass(annotation: MAGE.VueAnnotationInterface, category: "none" | "forbidden" | "mustHave") {
-            if(annotation.restriction === category) return "checked-class"
+        isCheckedClass(annotation: MAGE.VueAnnotationInterface, category: 'none' | 'forbidden' | 'mustHave') {
+            if (annotation.restriction === category) return 'checked-class';
             return null;
         }
     }

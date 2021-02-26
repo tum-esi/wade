@@ -262,8 +262,8 @@ declare global {
      */
     interface ListInterface {
       header: string;
-      items: {label: string; payload?: any;}[];
-      
+      items: Array<{label: string; payload?: any; }>;
+
     }
     /**
      * A interface for tables
@@ -426,18 +426,18 @@ declare global {
     // ----------------------------------- Enums -----------------------------------
     // =============================================================================
     enum templatesEnum {
-      EVENT = "use-event-template",
-      ACTION = "use-action-template",
-      SUBSCRIBTION = "use-sub-template"
+      EVENT = 'use-event-template',
+      ACTION = 'use-action-template',
+      SUBSCRIBTION = 'use-sub-template'
     }
 
     enum acceptedTypesEnum {
-      VOID = "void",
-      BOOLEAN = "boolean",
-      INTEGER = "integer",
-      NUMBER = "number",
-      ARRAY = "array",
-      OBJECT = "object"
+      VOID = 'void',
+      BOOLEAN = 'boolean',
+      INTEGER = 'integer',
+      NUMBER = 'number',
+      ARRAY = 'array',
+      OBJECT = 'object'
     }
 
     // =============================================================================
@@ -448,36 +448,36 @@ declare global {
       things: {
         inputs: WADE.TDElementInterface[]
         outputs: WADE.TDElementInterface[]
-      },
-      minInputs: number,
-      maxInputs: number,
-      minOutputs: number,
-      maxOutputs: number,
-      maxThings: number | null,
+      };
+      minInputs: number;
+      maxInputs: number;
+      minOutputs: number;
+      maxOutputs: number;
+      maxThings: number | null;
       templates: {
-        "use-event-template": boolean;
-        "use-action-template": boolean;
-        "use-read-template": boolean;
-      },
-      filters: FiltersInterface,
+        'use-event-template': boolean;
+        'use-action-template': boolean;
+        'use-read-template': boolean;
+      };
+      filters: FiltersInterface;
       generation: {
           generateCode: boolean,
           includeFunctionSkeletons: boolean
-      }
+      };
     }
 
     interface FiltersInterface {
-        acceptedTypes: string[],
-        acceptedOutputInteractionTypes: string[],
-        allowMixedTemplates: boolean,
-        onlySameType: boolean,
-        onlySimilarNames: boolean,
-        onlySimilarDescriptions: boolean,
-        similarityThresholdNames: number | null,
-        similarityThresholdDescriptions: number | null,
-        semanticMatch: boolean,
-        mustHaveInteractions?: VueInteractionInterface[]
-        forbiddenInteractions?: VueInteractionInterface[],
+        acceptedTypes: string[];
+        acceptedOutputInteractionTypes: string[];
+        allowMixedTemplates: boolean;
+        onlySameType: boolean;
+        onlySimilarNames: boolean;
+        onlySimilarDescriptions: boolean;
+        similarityThresholdNames: number | null;
+        similarityThresholdDescriptions: number | null;
+        semanticMatch: boolean;
+        mustHaveInteractions?: VueInteractionInterface[];
+        forbiddenInteractions?: VueInteractionInterface[];
         mustHaveAnnotations?: VueAnnotationInterface[];
         forbiddenAnnotations?: VueAnnotationInterface[];
         mustHaveTdAnnotations?: VueAnnotationInterface[];
@@ -485,42 +485,42 @@ declare global {
     }
 
     interface InteractionInterface {
-      interactionType: string,
-      name: string,
-      object: object,
-      from: string,
-      to: string,
-      thingId: string
-      id: string,
+      interactionType: string;
+      name: string;
+      object: object;
+      from: string;
+      to: string;
+      thingId: string;
+      id: string;
     }
 
     interface InputInteractionInterface extends InteractionInterface {
-      interactionType: "event-subscribe" | "property-read" | "action-read" | "property-observe",
-      matchingOutputCombinations?: MAGE.InteractionInterface[][],
+      interactionType: 'event-subscribe' | 'property-read' | 'action-read' | 'property-observe';
+      matchingOutputCombinations?: MAGE.InteractionInterface[][];
     }
 
     interface VueInteractionInterface {
-      title: string, 
-      thingId: string, 
-      name: string, 
-      description: string, 
-      annotations: string[],
-      dataType: "null" | "string" | "integer" | "number" | "boolean" | "array" | "object",
-      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" | "property-observe",
-      restriction: "none" | "forbidden" | "mustHave"
+      title: string;
+      thingId: string;
+      name: string;
+      description: string;
+      annotations: string[];
+      dataType: 'null' | 'string' | 'integer' | 'number' | 'boolean' | 'array' | 'object';
+      type: 'property-read' | 'event-subscribe' | 'property-write' | 'action-read' | 'action-invoke' | 'property-observe';
+      restriction: 'none' | 'forbidden' | 'mustHave';
     }
 
     interface VueAnnotationInterface {
-      annotation: string,
-      type: "property-read" | "event-subscribe" | "property-write" | "action-read" | "action-invoke" |  "property-observe" | "input" | "output" | "io",
-      numberOfAccurance: number,
-      description: string | null,
-      restriction: "none" | "forbidden" | "mustHave";
+      annotation: string;
+      type: 'property-read' | 'event-subscribe' | 'property-write' | 'action-read' | 'action-invoke' |  'property-observe' | 'input' | 'output' | 'io';
+      numberOfAccurance: number;
+      description: string | null;
+      restriction: 'none' | 'forbidden' | 'mustHave';
     }
 
     interface storedVocabInterface {
-      vocabUrl: string,
-      numberOfAccurances: number,
+      vocabUrl: string;
+      numberOfAccurances: number;
     }
 
     interface MashupGenerationResult {
@@ -534,84 +534,84 @@ declare global {
 
   namespace SDSQ {
     enum interactionType {
-      subscribeEvent = "subscribeEvent",
-      invokeAction = "invokeAction",
-      readProperty = "readProperty",
-      writeProperty = "writeProperty",
-      observeProperty = "observeProperty"
-    }
-    
-    enum interactionTypeOfReceive {
-      subscribeEvent = "subscribeEvent",
-      invokeAction = "invokeAction",
-      readProperty = "readProperty",
-      observeProperty = "observeProperty"
-    }
-    
-    enum interactionTypeOfSend {
-      invokeAction = "invokeAction",
-      writeProperty = "writeProperty",
-    }
-    
-    enum structureType {
-      interact = "interact",
-      loop = "loop",
-      wait = "wait",
-      case = "case",
-      get = "get",
-      set = "set",
-      ref = "ref"
-    }
-    
-    enum loopType {
-      timed = "timed",
-      logic = "logical"
-    }
-    
-    enum interactionDir {
-      receive = "receive",
-      send = "send"
+      subscribeEvent = 'subscribeEvent',
+      invokeAction = 'invokeAction',
+      readProperty = 'readProperty',
+      writeProperty = 'writeProperty',
+      observeProperty = 'observeProperty'
     }
 
-    type mashupLogic = {
-      name: string,
-      root: structureEl[] | undefined,
+    enum interactionTypeOfReceive {
+      subscribeEvent = 'subscribeEvent',
+      invokeAction = 'invokeAction',
+      readProperty = 'readProperty',
+      observeProperty = 'observeProperty'
+    }
+
+    enum interactionTypeOfSend {
+      invokeAction = 'invokeAction',
+      writeProperty = 'writeProperty',
+    }
+
+    enum structureType {
+      interact = 'interact',
+      loop = 'loop',
+      wait = 'wait',
+      case = 'case',
+      get = 'get',
+      set = 'set',
+      ref = 'ref'
+    }
+
+    enum loopType {
+      timed = 'timed',
+      logic = 'logical'
+    }
+
+    enum interactionDir {
+      receive = 'receive',
+      send = 'send'
+    }
+
+    interface mashupLogic {
+      name: string;
+      root: structureEl[] | undefined;
       actions: {
           [k: string]: structureEl[]
-      },
+      };
       functions: {
           [k: string]: structureEl[]
-      },
+      };
       properties: {
           [k: string]: structureEl[]
-      }
+      };
     }
-  
-    type interactionAll = interactionReceive | interactionSend
+
+    type interactionAll = interactionReceive | interactionSend;
 
     type interactionReceive = interactionProto & {
         direction: interactionDir.receive,
         type: interactionType.observeProperty | interactionType.invokeAction | interactionType.readProperty | interactionType.subscribeEvent,
         set?: {
-            type: "variable" | "property",
+            type: 'variable' | 'property',
             name: string
         }
-    }
+    };
 
     type interactionSend = interactionProto & {
         direction: interactionDir.send,
         type: interactionType.invokeAction | interactionType.writeProperty,
         get?: {
-            type: "variable" | "property",
+            type: 'variable' | 'property',
             name: string
         },
         defaultInput?: typeDefaultInput
-    }
+    };
 
-    type interactionProto = {
-        to: string,
-        name: string,
-        formRef?: number
+    interface interactionProto {
+        to: string;
+        name: string;
+        formRef?: number;
     }
 
     type loopOptions = {
@@ -619,110 +619,110 @@ declare global {
         period: number
     } | {
         type: loopType.logic,
-        exCount: number | "forever"
-    }
+        exCount: number | 'forever'
+    };
 
-    type structureEl = structElWait | structElLoop | structElCondition | structElAtomic | structElGet | structElSet | structElRef
+    type structureEl = structElWait | structElLoop | structElCondition | structElAtomic | structElGet | structElSet | structElRef;
 
-    type structElRef = {
-        type: structureType.ref,
+    interface structElRef {
+        type: structureType.ref;
         ref: {
-            type: "action" | "function",
+            type: 'action' | 'function',
             name: string
-        }
+        };
     }
 
-    type structElGet = {
-        type: structureType.get,
-        get: typeGetSet
+    interface structElGet {
+        type: structureType.get;
+        get: typeGetSet;
     }
 
-    type structElSet = {
-        type: structureType.set,
-        set: typeGetSet,
-        get?: typeGetSet,
-        defaultInput?: any
+    interface structElSet {
+        type: structureType.set;
+        set: typeGetSet;
+        get?: typeGetSet;
+        defaultInput?: any;
     }
 
-    type structElWait = {
-        type: structureType.wait,
-        waitTime: number
+    interface structElWait {
+        type: structureType.wait;
+        waitTime: number;
     }
 
-    type structElLoop = {
-        type: structureType.loop,
-        content: structureEl[],
-        loopOpts: loopOptions
+    interface structElLoop {
+        type: structureType.loop;
+        content: structureEl[];
+        loopOpts: loopOptions;
     }
 
-    type structElCondition = {
-        type: structureType.case,
-        content: structureEl[],
-        elseContent?: structureEl[],
-        condition: comparison
+    interface structElCondition {
+        type: structureType.case;
+        content: structureEl[];
+        elseContent?: structureEl[];
+        condition: comparison;
     }
 
     type comparison = {
-        type: "var",
+        type: 'var',
         variable: typeGetSet,
         value?: string | number | typeGetSet
     } | {
-        type: "not",
+        type: 'not',
         not: comparison
     } | {
-        type: "all",
+        type: 'all',
         allOf: comparison[]
     } | {
-        type: "any",
+        type: 'any',
         anyOf: comparison[]
     } | {
-        type: "one",
+        type: 'one',
         oneOf: comparison[]
+    };
+
+    interface structElAtomic {
+        type: structureType.interact;
+        receiveIntrcts: interactionReceive[];
+        sendIntrcts: interactionSend[];
+        breakOnDataPushed: boolean;
     }
 
-    type structElAtomic = {
-        type: structureType.interact,
-        receiveIntrcts: interactionReceive[],
-        sendIntrcts: interactionSend[],
-        breakOnDataPushed: boolean
-    }
-
-    type typeGetSet = {
-        type: "variable" | "property",
-        name: string
+    interface typeGetSet {
+        type: 'variable' | 'property';
+        name: string;
     }
 
     // type newtdTemplate = WoTTDSchema16October2019
     // type newsdTemplate = SDValidationSchema
 
-    interface tdTemplate{
-        id: string,
-        "@context": any[],
-        "@type": string,
-        title: string,
-        description: string,
-        securityDefinitions: {},
-        security: string,
+    interface tdTemplate {
+        id: string;
+        '@context': any[];
+        '@type': string;
+        title: string;
+        description: string;
+        securityDefinitions: {};
+        security: string;
         properties: {
             [k: string]: {
                 readOnly?: boolean,
                 [k: string]: any
             }
-        },
+        };
         actions: {
             [k: string]: {
                 forms?: any,
                 [k: string]: any
             }
-        },
-        events: {[k: string]: any},
-        base?: string
+        };
+        events: {[k: string]: any};
+        base?: string;
     }
 
-    interface sdTemplate extends tdTemplate{
+    interface sdTemplate extends tdTemplate {
         things: {
             [k: string]: subthing
-        },
+        };
         variables: {
             [k: string]: {
                 path?: pathEl[],
@@ -730,102 +730,102 @@ declare global {
                 defaultInput?: any,
                 [k: string]: any
             }
-        },
+        };
         properties: {
             [k: string]: {
                 path?: pathEl[],
                 defaultInput?: any
             }
-        },
+        };
         functions: {
             [k: string]: {
                 path: pathEl[],
                 [k: string]: any
             }
-        },
+        };
         actions: {
             [k: string]: {
                 forms: any,
                 path: pathEl[],
                 description?: string
             }
-        },
-        path: pathEl[]
+        };
+        path: pathEl[];
     }
 
-    interface subthing{
-            "$id": string,
-            base: string,
-            id?,
-            "@context"?,
-            "@type"?,
-            title?,
-            description?,
+    interface subthing {
+            '$id': string;
+            base: string;
+            id?;
+            '@context'?;
+            '@type'?;
+            title?;
+            description?;
             properties: {
                 [k: string]: {
-                    forms?: {
+                    forms?: Array<{
                         href: string, op
-                    }[],
+                    }>,
                     [k: string]: any
                 }
-            },
+            };
             actions: {
                 [k: string]: {
-                    forms?: {
+                    forms?: Array<{
                         href: string, op
-                    }[],
+                    }>,
                     [k: string]: any
                 }
-            },
+            };
             events: {
                 [k: string]: {
-                    forms?: {
+                    forms?: Array<{
                         href: string, op
-                    }[],
+                    }>,
                     [k: string]: any
                 }
-            }
+            };
     }
     // type newtdForms = WoTTDSchema16October2019["forms"]
 
     interface tdForms {
-        op: string | string[],
-        href: string,
-        contentType: string,
-        contentCoding?: string,
-        subprotocol?: string,
-        security?: string | string[],
-        scopes?: string | string[],
+        op: string | string[];
+        href: string;
+        contentType: string;
+        contentCoding?: string;
+        subprotocol?: string;
+        security?: string | string[];
+        scopes?: string | string[];
         response?: {
             contentType: string
-        },
-        [k: string]: any
+        };
+        [k: string]: any;
     }
 
     interface validProtocols {
-        http: number,
-        https: number,
-        coap: number,
-        coaps: number,
-        mqtt: number,
-        null: number
+        http: number;
+        https: number;
+        coap: number;
+        coaps: number;
+        mqtt: number;
+        null: number;
     }
 
     // type newpathEl = PathElement
-    type pathEl = pathWait | pathLoop | pathCase | pathInteract | pathSet | pathGet | pathRef
+    type pathEl = pathWait | pathLoop | pathCase | pathInteract | pathSet | pathGet | pathRef;
 
     interface pathWait {
-        wait: number
+        wait: number;
     }
 
     // type pathLoop = Loop
     // TODO could also use get?
     interface pathLoop {
         loop: {
-            type: "logical" | "timed",
+            type: 'logical' | 'timed',
             defaultInput: number | true,
             path: pathEl[]
-        }
+        };
     }
 
     //    type pathCondition = Case
@@ -838,55 +838,55 @@ declare global {
             else: {
                 path?: pathEl[]
             }
-        }
+        };
     }
 
-    type ofWord = {allOf: ifWord[]} | {oneOf: ifWord[]} | {anyOf: ifWord[]}
+    type ofWord = {allOf: ifWord[]} | {oneOf: ifWord[]} | {anyOf: ifWord[]};
     type ifWord = ofWord |
                     {not: ifWord} |
                     {get: { $ref: string},
-                    output?: typeOutput}
+                    output?: typeOutput};
 
 
-    type pathInteract = {
-        receive: pathInteractReceive[],
-        send: pathInteractSend[],
-        breakOnDataPushed?: boolean
+    interface pathInteract {
+        receive: pathInteractReceive[];
+        send: pathInteractSend[];
+        breakOnDataPushed?: boolean;
     }
 
-    type pathInteractReceive = {
+    interface pathInteractReceive {
             form: {
                 $ref: string
-            },
-            set?: {$ref: string},
-            op: "subscribeevent" | "observeproperty" | "readproperty" | "invokeaction"
+            };
+            set?: {$ref: string};
+            op: 'subscribeevent' | 'observeproperty' | 'readproperty' | 'invokeaction';
     }
 
-    type pathInteractSend = {
+    interface pathInteractSend {
             form: {
                 $ref: string
-            },
-            get?: {$ref: string},
-            defaultInput?: any,
-            op: "writeproperty"| "invokeaction"
+            };
+            get?: {$ref: string};
+            defaultInput?: any;
+            op: 'writeproperty'| 'invokeaction';
     }
 
-    type pathRef = {
-        $ref: string
+    interface pathRef {
+        $ref: string;
     }
 
-    type pathSet = {
-        set: {$ref: string},
-        defaultInput?: typeDefaultInput,
-        get?: {$ref: string}
+    interface pathSet {
+        set: {$ref: string};
+        defaultInput?: typeDefaultInput;
+        get?: {$ref: string};
     }
 
-    type pathGet = {
-        get: {$ref: string}
+    interface pathGet {
+        get: {$ref: string};
     }
 
-    type typeDefaultInput = boolean | number | string
-    type typeOutput = number | string | {$ref: string}
+    type typeDefaultInput = boolean | number | string;
+    type typeOutput = number | string | {$ref: string};
 
     }
 }

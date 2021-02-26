@@ -21,13 +21,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import aHeaderElement from "@/components/01_atoms/aHeaderElement.vue";
-import aFormfield from "@/components/01_atoms/aFormfield.vue";
-import aFooterElement from "@/components/01_atoms/aFooterElement.vue";
+import Vue from 'vue';
+import aHeaderElement from '@/components/01_atoms/aHeaderElement.vue';
+import aFormfield from '@/components/01_atoms/aFormfield.vue';
+import aFooterElement from '@/components/01_atoms/aFooterElement.vue';
 
 export default Vue.extend({
-  name: "oModal",
+  name: 'oModal',
   components: {
     aHeaderElement,
     aFormfield,
@@ -41,51 +41,51 @@ export default Vue.extend({
   },
   data() {
     return {
-      src: require("@/assets/mashup.png"),
+      src: require('@/assets/mashup.png'),
       hasError: false,
       newElement: {
-        type: "",
+        type: '',
         data: [{}],
-        parentId: ""
+        parentId: ''
       },
-      defaultSrc: "",
+      defaultSrc: '',
       footerButtons: [
         {
-          btnClass: "btn-grey",
-          btnLabel: "Cancel",
-          btnOnClick: "cancel-btn-clicked"
+          btnClass: 'btn-grey',
+          btnLabel: 'Cancel',
+          btnOnClick: 'cancel-btn-clicked'
         },
         {
-          btnClass: "btn-pos",
-          btnLabel: "Create",
-          btnOnClick: "create-btn-clicked"
+          btnClass: 'btn-pos',
+          btnLabel: 'Create',
+          btnOnClick: 'create-btn-clicked'
         }
       ]
     };
   },
   created() {
-    this.$eventHub.$on("create-btn-clicked", this.create);
-    this.$eventHub.$on("cancel-btn-clicked", this.cancel);
+    this.$eventHub.$on('create-btn-clicked', this.create);
+    this.$eventHub.$on('cancel-btn-clicked', this.cancel);
   },
   mounted() {
     // Auto-focus First input field on open
-    const firstInputEl: HTMLElement = <HTMLElement>(
+    const firstInputEl: HTMLElement = (
       document.querySelectorAll(
-        ".middle-container-el .form-field-basic-input"
+        '.middle-container-el .form-field-basic-input'
       )[0]
-    );
+    ) as HTMLElement;
     firstInputEl.focus();
   },
   beforeDestroy() {
-    this.$eventHub.$off("create-btn-clicked");
-    this.$eventHub.$off("cancel-btn-clicked");
+    this.$eventHub.$off('create-btn-clicked');
+    this.$eventHub.$off('cancel-btn-clicked');
   },
   methods: {
     cancel() {
-      this.$emit("cancel");
+      this.$emit('cancel');
       // Delete input from form elements
       (this as any).$refs.formElement.forEach((element: any) => {
-        element.input = "";
+        element.input = '';
       });
     },
     create() {
@@ -93,10 +93,10 @@ export default Vue.extend({
       let hasError = false;
       this.newElement.type = this.modalElement.type;
       this.newElement.data = [];
-      this.newElement.parentId = this.modalElement.parentId || "";
+      this.newElement.parentId = this.modalElement.parentId || '';
 
       // Check if formfields are correct
-      this.$eventHub.$emit("check-has-error");
+      this.$eventHub.$emit('check-has-error');
       const formElements: WADE.BasicFormFieldOutputInterface[] | any = this
         .$refs.formElement;
       formElements.forEach((element: WADE.BasicFormFieldOutputInterface) => {
@@ -112,12 +112,12 @@ export default Vue.extend({
             value: element.input
           };
           this.newElement.data.push(newDataElement);
-          element.input = "";
+          element.input = '';
         }
       });
       // Create a new element
       if (!hasError) {
-        this.$emit("create-element", this.newElement);
+        this.$emit('create-element', this.newElement);
       }
     }
   }
