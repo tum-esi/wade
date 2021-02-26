@@ -1,6 +1,4 @@
 'use strict';
-
-// import Plantuml from "plantuml-encoder";
 import Combinatorics from 'js-combinatorics';
 import _ from 'lodash';
 import Crypto from 'crypto';
@@ -442,8 +440,10 @@ function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHav
     return isIncluded;
 }
 
-function mashupIncludesTdAnnotations(mashup: MAGE.InteractionInterface[],
-                                     mustHaveTdAnnotations: MAGE.VueAnnotationInterface[], form: MAGE.GenerationFormInterace): boolean {
+function mashupIncludesTdAnnotations(
+    mashup: MAGE.InteractionInterface[],
+    mustHaveTdAnnotations: MAGE.VueAnnotationInterface[],
+    form: MAGE.GenerationFormInterace): boolean {
         let isIncluded: boolean = true;
         for (const mustHaveTdAnnotation of mustHaveTdAnnotations) {
             innerloop: for (const [index, interaction] of mashup.entries()) {

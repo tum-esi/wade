@@ -42,7 +42,7 @@
     "@node-wot/binding-mqtt": "^0.7.1",
     "@node-wot/binding-coap": "^0.7.1",
     "@node-wot/binding-websockets": "^0.7.1",
-    "@node-wot/core": "^0.7.1",
+    "@node-wot/core": "0.7.4",
     "coap": "^0.23.1",
     "core-js": "^2.6.5",
     "cors-anywhere": "^0.4.3",

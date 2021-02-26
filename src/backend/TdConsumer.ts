@@ -1,3 +1,5 @@
+// Until the node-aead-crypto issue gets fixed, please leave coap and websockets commented out.
+
 import { Servient } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
 // import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
@@ -5,6 +7,7 @@ import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
 import * as WoT from 'wot-typescript-definitions';
+
 
 export default class TdConsumer {
     // default coap port = 5683;
