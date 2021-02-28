@@ -150,11 +150,12 @@ A-MaGe is a mashup generator for the Web of Things designed to take advantage of
 See the related paper **A-MaGe: Atomic Mashup Generation for the Web of Things**
 
 ```
-@unpublished{a-mage2021 ,
-  author = {Ege Korkan and Fady Salama and Sebastian Kaebisch and Sebastian Steinhorst},
-  title = {A-MaGe: Atomic Mashup Generation for the Web of Things},
-  note = {Manuscript submitted for publication in International Conference on Web Engineering (ICWE 2021)},
-  year = {2021}
+@inproceedings{ksks:2020,    
+    author           = {Ege Korkan and Fady Salama and Sebastian Kaebisch and Sebastian Steinhorst},
+    title            = {A-MaGe: Atomic Mashup Generator for the Web of Things},
+    booktitle        = {2021 International Conference on Web Engineering (ICWE)},
+    location         = {Biarritz, France},
+    year             = {in press}
 }
 
 ```
