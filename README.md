@@ -65,8 +65,7 @@ You need to have [Node.js](https://nodejs.org/en/) installed. It is highly recom
   ```  
   After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
   comes with other disadvantages).
-- The [Shadow Thing](https://github.com/tum-esi/shadow-thing) packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of virtual thing fails under windows and so would
-the installation of WADE if Virtual Thing was added to the packet.
+- The [Shadow Thing](https://github.com/tum-esi/shadow-thing) packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the packet.
 - Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
 
 ## Project setup
