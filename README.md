@@ -7,8 +7,9 @@
 4. [How to Install the Application](#how-to-install-the-application)  
 5. [How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)  
 6. [Errors and Known Problems](#errors-and-known-problems)  
-7. [Interaction Timing Vocabulary](#interaction-timing-vocabulary)  
-8. [Adding or Working on Issues](#adding-or-working-on-issues)
+7. [Interaction Timing Vocabulary](#interaction-timing-vocabulary)
+8. [A-MaGe](#-a-mage)
+9. [Adding or Working on Issues](#adding-or-working-on-issues)
 
 ---
 ## **W**eb of Things **A**PI **D**evelopment **E**nvironment
@@ -149,7 +150,7 @@ A-MaGe is a mashup generator for the Web of Things designed to take advantage of
 See the related paper **A-MaGe: Atomic Mashup Generation for the Web of Things**
 
 ```
-@inproceedings{ksks:2020,    
+@inproceedings{amage:2021,    
     author           = {Ege Korkan and Fady Salama and Sebastian Kaebisch and Sebastian Steinhorst},
     title            = {A-MaGe: Atomic Mashup Generator for the Web of Things},
     booktitle        = {2021 International Conference on Web Engineering (ICWE)},
