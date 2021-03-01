@@ -42,9 +42,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
-  name: "aDropdownButton",
+  name: 'aDropdownButton',
   props: {
     /**
      * Label of the button to be displayed.
@@ -52,7 +52,7 @@ export default Vue.extend({
     btnLabel: {
       type: String,
       required: false,
-      default: ""
+      default: ''
     },
     /**
      * Font awesome Icon to be displayed.
@@ -109,7 +109,7 @@ export default Vue.extend({
   data() {
     return {
       showDropdown: false,
-      key: ""
+      key: ''
     };
   },
   computed: {
@@ -119,19 +119,19 @@ export default Vue.extend({
   },
   methods: {
     getBtnKey() {
-      return "";
+      return '';
     },
     iconDropdownSrc(btnSrc: string): any {
       return require(`@/assets/${btnSrc}.png`);
     },
     dropDownClicked(dropdownElement: WADE.DropdownOptionInterface) {
-      this.$emit("dropdown-clicked", {
+      this.$emit('dropdown-clicked', {
         btnKey: this.btnKey,
         btnValue: dropdownElement.key,
         btnInput: dropdownElement.inputValue,
         parentId: null
       });
-      this.$eventHub.$emit("dropdown-clicked", {
+      this.$eventHub.$emit('dropdown-clicked', {
         btnKey: this.btnKey,
         btnValue: dropdownElement.key,
         btnInput: dropdownElement.inputValue,
@@ -228,13 +228,13 @@ export default Vue.extend({
 }
 
 .button-label-container {
-  background: #b5dfdd;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  border: none;
+    background: #b5dfdd;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1%;
+    border: none;
 }
 
 .button-label-container:hover {
@@ -244,6 +244,13 @@ export default Vue.extend({
 
 .button-label {
   font-size: 13px;
+}
+
+/* Dropdown styling for MaGe mashup selection */
+.dropdown-container-mashup {
+    left: 0;
+    width: 100%;
+    margin-top: 6%;
 }
 
 /* btn style for sidebar dropdown options */
@@ -257,17 +264,17 @@ export default Vue.extend({
 
 /* btn style for mashup options */
 .mashup-icon-style {
-  width: 6%;
-  padding: 7px 3px 7px 7px;
+    width: 6%;
+    padding: 1%;
 }
 
 /* === Styles for the dropdown box in the TD Editor Tab (Load Example TD) */
-.dropdown-custom-editor {
-  left: 0px;
-  width: max-content;
-  max-width: 300px;
-  top: 30px;
-  margin-top: 0;
+.dropdown-custom-editor{
+    left: 0px;
+    width: max-content;
+    max-width: 300px;
+    top: 30px;
+    margin-top: 0;
 }
 
 .dropdown-custom-vt {

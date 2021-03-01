@@ -21,5 +21,13 @@ yarn-error.log*
 *.sln
 *.sw?
 
+# Word to Vector directory
+
+
 #Electron-builder output
 /dist_electron
+/build
+
+# A-MaGe related
+*.zip
+A-MaGe-Testing

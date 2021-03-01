@@ -10,6 +10,7 @@ module.exports = {
     },
   },
   configureWebpack: {
+    devtool: 'source-map',
     plugins: [
       new MonacoWebpackPlugin({
         languages: ['typescript', 'javascript', 'json']

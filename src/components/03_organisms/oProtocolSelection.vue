@@ -5,7 +5,7 @@
         </div>
         <div class="protocol-area">
             <p></p>
-            <div v-for="(element,index) in allProtocols">
+            <div v-for="(element, index) in allProtocols" :key="index">
             <input 
                 type="radio"
                 name="protocol"

@@ -15,7 +15,7 @@ export default new Vuex.Store({
     TdStore,
     MashupStore,
     ModalStore,
-    TextStore
+    TextStore,
   },
   state: {
 

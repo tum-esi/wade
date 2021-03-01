@@ -10,8 +10,8 @@ import * as Monaco from 'monaco-editor';
 
 export default Vue.extend({
     model: {
-        prop: "code",
-        event: "change"
+        prop: 'code',
+        event: 'change'
     },
     props: {
         code: {
@@ -27,12 +27,12 @@ export default Vue.extend({
         return {
             monacoEditor: {} as Monaco.editor.IStandaloneCodeEditor,
             modelContentListener: {} as Monaco.IDisposable,
-        }
+        };
     },
     mounted() {
-        this.$nextTick(function () {
-            let container = document.getElementById("monaco-editor"); 
-            if(container) this.monacoEditor = Monaco.editor.create(container, {
+        this.$nextTick(function() {
+            const container = document.getElementById('monaco-editor');
+            if (container) this.monacoEditor = Monaco.editor.create(container, {
                 language: this.language,
                 value: this.code,
                 scrollBeyondLastLine: false,
@@ -41,26 +41,26 @@ export default Vue.extend({
             });
             window.onresize = () => {
                 this.monacoEditor.layout();
-            }
-            this.$eventHub.$on("tab-clicked", () => {setTimeout(() => {this.monacoEditor.layout()}, 3)});
-            this.modelContentListener = this.monacoEditor.onDidChangeModelContent((e) => this.$emit("change", this.monacoEditor.getValue()));
-        })
+            };
+            this.$eventHub.$on('tab-clicked', () => {setTimeout(() => {this.monacoEditor.layout(); }, 3); });
+            this.modelContentListener = this.monacoEditor.onDidChangeModelContent((e) => this.$emit('change', this.monacoEditor.getValue()));
+        });
     },
     beforeDestroy() {
-        this.$eventHub.$off("tab-clicked");
+        this.$eventHub.$off('tab-clicked');
         this.modelContentListener.dispose();
         this.monacoEditor.dispose();
     },
     watch: {
-        code: function(newCode: string, oldCode: string) {
-            if(this.monacoEditor.getValue() !== newCode) this.monacoEditor.setValue(newCode);
+        code(newCode: string, oldCode: string) {
+            if (this.monacoEditor.getValue() !== newCode) this.monacoEditor.setValue(newCode);
         },
-        language: function(newLanguage: string, oldLanguage: string) {
-            let model = this.monacoEditor.getModel();
-            if(model) Monaco.editor.setModelLanguage(model, newLanguage);
+        language(newLanguage: string, oldLanguage: string) {
+            const model = this.monacoEditor.getModel();
+            if (model) Monaco.editor.setModelLanguage(model, newLanguage);
         }
     }
-})
+});
 </script>
 
 <style>

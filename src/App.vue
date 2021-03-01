@@ -24,6 +24,7 @@ import oModal from '@/components/03_organisms/oModal.vue';
 import { ElementTypeEnum } from '@/util/enums';
 import { remote } from 'electron';
 
+
 export default Vue.extend({
   name: 'App',
   components: {

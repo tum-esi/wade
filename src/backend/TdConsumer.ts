@@ -1,10 +1,13 @@
+// Until the node-aead-crypto issue gets fixed, please leave coap and websockets commented out.
+
 import { Servient } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
-import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
+// import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
 import * as WoT from 'wot-typescript-definitions';
+
 
 export default class TdConsumer {
     // default coap port = 5683;
@@ -37,8 +40,12 @@ export default class TdConsumer {
         this.config = config;
         this.protocols = protocols;
     }
-
-    public async getConsumedTd() {
+    public async getConsumedTd(): Promise<{
+        tdJson: JSON | null,
+        tdConsumed: WoT.ConsumedThing | null,
+        tdState: TdStateEnum | null,
+        errorMsg: string | null
+    }> {
         await this.parseTdJson(this.td);
 
         // if the td is in valid json format, consume it.
@@ -112,13 +119,13 @@ export default class TdConsumer {
             await this.servient.addClientFactory(new MqttClientFactory());
         }
 
-        if (this.protocols.indexOf('coap') !== -1) {
-            await this.servient.addClientFactory(new CoapClientFactory());
-        }
+        // if (this.protocols.indexOf('coap') !== -1) {
+        //     await this.servient.addClientFactory(new CoapClientFactory());
+        // }
 
-        if (this.protocols.indexOf('coaps') !== -1) {
-            await this.servient.addClientFactory(new CoapsClientFactory());
-        }
+        // if (this.protocols.indexOf('coaps') !== -1) {
+        //     await this.servient.addClientFactory(new CoapsClientFactory());
+        // }
 
         if (this.protocols.indexOf('http') !== -1) {
             await this.servient.addClientFactory(new HttpClientFactory({}));

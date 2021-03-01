@@ -5,7 +5,7 @@
     @mouseleave="showCollapseBtn = false"
   >
     <aTabHeader 
-      class="sidebar-header"
+      class="sidebar-header shadow"
       :class="getHeaderStyle"
       :isSidebarVisible="isSidebarVisible"
       :showCollapseBtn="showCollapseBtn"
@@ -43,6 +43,7 @@ import aTabHeader from '@/components/01_atoms/aTabHeader.vue';
 import aSearchbar from '@/components/01_atoms/aSearchbar.vue';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import mSidebarElementGroup from '@/components/02_molecules/mSidebarElementGroup.vue';
+import { loggingError } from '../../util/helpers';
 
 export default Vue.extend({
   name: 'tSidebar',
@@ -66,7 +67,6 @@ export default Vue.extend({
       'getSidebarActive'
     ]),
     getSidebarStyle() {
-      console.log('route ', (this as any).$route.params.id);
       return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? 'sidebar full-width' : (this as any).getSidebarActive ? 'sidebar sidebar-visible' : 'sidebar';
     },
     getHeaderStyle() {
@@ -79,7 +79,6 @@ export default Vue.extend({
       this.$emit('home-clicked');
     },
     toggleSidebar() {
-      console.log('HEyho');
       this.isSidebarVisible = !this.isSidebarVisible;
       (this as any).setSidebarActiveStatus(this.isSidebarVisible);
     },
@@ -88,7 +87,18 @@ export default Vue.extend({
     },
     openModuleAddElement(element: any) {
       this.$emit('open-module-element', element);
-    }
+    },
+    dropDownReaction(eventObject) {
+            if (eventObject.btnKey === 'btn-plugin-clicked') {
+              if (eventObject.btnValue === 'open-mage') {
+                this.$emit('mage-clicked');
+              } else {
+                loggingError(new Error('unknown plugin in dropdown'));
+              }
+            } else {
+                // event not relevant for this function
+            }
+        }
   }
 });
 </script>
@@ -143,6 +153,9 @@ export default Vue.extend({
 /* "Add-dropdown" btn */
 .dropdown-btn {
   width: 20%;
+}
+.shadow {
+  box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.19) !important;
 }
 </style>
 

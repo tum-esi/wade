@@ -2,13 +2,15 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store/store';
+import * as corsAnywhere from '@/backend/MaGe/corsAnywhere.ts';
 
 Vue.config.productionTip = false;
 Vue.prototype.$eventHub = new Vue(); // Global event bus
 
+corsAnywhere.runServer();
 // Check if element of path url is available, if not navigate home
 router.beforeEach((to, from, next) => {
-  const pathAvailable = to.name === 'home' ? true : (to.name === 'thingDescription'
+  const pathAvailable = to.name === 'home' || to.name === 'mage' ? true : (to.name === 'thingDescription'
       || to.name === 'folder'
       || to.name === 'mashup'
       || to.name === 'config'

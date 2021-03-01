@@ -1,21 +1,21 @@
-import TdConsumer from "./TdConsumer";
-import TdParser from "./TdParser";
-import PerformancePrediction from "./PerformancePrediction";
-import ConfidenceCalculator from "./ConfidenceCalculator";
+import TdConsumer from './TdConsumer';
+import TdParser from './TdParser';
+import PerformancePrediction from './PerformancePrediction';
+import ConfidenceCalculator from './ConfidenceCalculator';
 import {
   PossibleInteractionTypesEnum,
   TdStateEnum,
   InteractionStateEnum,
   ProtocolEnum
-} from "@/util/enums";
-import { isDevelopment } from "@/util/helpers";
-import MessageHandler from "./MessageHandler";
-import VtCall from "./VtCall";
-import * as stream from "stream";
-import * as fs from "fs";
-import * as path from "path";
+} from '@/util/enums';
+import { isDevelopment } from '@/util/helpers';
+import MessageHandler from './MessageHandler';
+import VtCall from './VtCall';
+import * as stream from 'stream';
+import * as fs from 'fs';
+import * as path from 'path';
 
-let tdConsumer: any = null;
+let tdConsumer: null | TdConsumer  = null;
 
 export function retrieveProtocols(td: string): ProtocolEnum[] | null {
   const protocols = [] as ProtocolEnum[];
@@ -32,19 +32,19 @@ export function retrieveProtocols(td: string): ProtocolEnum[] | null {
       if (!interactions.hasOwnProperty(el)) continue;
       if (!interactions[el].forms) break;
       for (const form of interactions[el].forms) {
-        if (form.href && form.href.indexOf("http") !== -1) {
+        if (form.href && form.href.indexOf('http') !== -1) {
           protocols.push(ProtocolEnum.HTTP);
         }
-        if (form.href && form.href.indexOf("https") !== -1) {
+        if (form.href && form.href.indexOf('https') !== -1) {
           protocols.push(ProtocolEnum.HTTPS);
         }
-        if (form.href && form.href.indexOf("mqtt") !== -1) {
+        if (form.href && form.href.indexOf('mqtt') !== -1) {
           protocols.push(ProtocolEnum.MQTT);
         }
-        if (form.href && form.href.indexOf("coap") !== -1) {
+        if (form.href && form.href.indexOf('coap') !== -1) {
           protocols.push(ProtocolEnum.COAP);
         }
-        if (form.href && form.href.indexOf("coaps") !== -1) {
+        if (form.href && form.href.indexOf('coaps') !== -1) {
           protocols.push(ProtocolEnum.COAPS);
         }
       }
@@ -57,20 +57,20 @@ export function retrieveProtocols(td: string): ProtocolEnum[] | null {
 
   // checking the base for protocols
 
-  if (tdJson.base){
-    if (tdJson.base.indexOf("http") !== -1) {
+  if (tdJson.base) {
+    if (tdJson.base.indexOf('http') !== -1) {
       protocols.push(ProtocolEnum.HTTP);
     }
-    if (tdJson.base.indexOf("https") !== -1) {
+    if (tdJson.base.indexOf('https') !== -1) {
       protocols.push(ProtocolEnum.HTTPS);
     }
-    if (tdJson.base.indexOf("mqtt") !== -1) {
+    if (tdJson.base.indexOf('mqtt') !== -1) {
       protocols.push(ProtocolEnum.MQTT);
     }
-    if (tdJson.base.indexOf("coap") !== -1) {
+    if (tdJson.base.indexOf('coap') !== -1) {
       protocols.push(ProtocolEnum.COAP);
     }
-    if (tdJson.base.indexOf("coaps") !== -1) {
+    if (tdJson.base.indexOf('coaps') !== -1) {
       protocols.push(ProtocolEnum.COAPS);
     }
   }
@@ -159,9 +159,9 @@ export async function startPerformancePrediction(
 }
 
 export async function invokeInteractions(selectedInteractions) {
-  let resultProps: any[] = [];
-  let resultActions: any[] = [];
-  let resultEvents: any[] = [];
+  const resultProps: any[] = [];
+  const resultActions: any[] = [];
+  const resultEvents: any[] = [];
 
   for (const interaction in selectedInteractions) {
     if (!selectedInteractions.hasOwnProperty(interaction)) {
@@ -179,7 +179,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.PROP_READ:
         if (interactionSelectBtn.interaction) {
           // Invoke property read (no input)
-          let resultProp = await selectedInteractions[
+          const resultProp = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction();
 
@@ -197,7 +197,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.PROP_WRITE:
         if (interactionSelectBtn.interaction) {
           // Invoke property write (with input)
-          let resultProp = await selectedInteractions[
+          const resultProp = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction(interactionSelectBtn.input);
 
@@ -209,7 +209,7 @@ export async function invokeInteractions(selectedInteractions) {
             resultError: resultProp.error ? true : false,
             resultSize:
               resultProp.size === undefined
-                ? "n.a."
+                ? 'n.a.'
                 : `Input ${resultProp.size}`
           });
         }
@@ -218,7 +218,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.PROP_OBSERVE_READ:
       case PossibleInteractionTypesEnum.PROP_OBSERVE_WRITE:
         if (interactionSelectBtn.interaction) {
-          let resultProp = await selectedInteractions[
+          const resultProp = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction();
 
@@ -256,7 +256,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.ACTION:
         if (interactionSelectBtn.interaction) {
           // Invoke action (possibily with input)
-          let resultAction = await selectedInteractions[
+          const resultAction = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction(interactionSelectBtn.input);
 
@@ -299,7 +299,7 @@ export function createNewVt(
         res(newVtCall);
       },
       err => {
-        rej(new Error("creating Virtual Thing had problems:" + err));
+        rej(new Error('creating Virtual Thing had problems:' + err));
       }
     );
   });
@@ -324,43 +324,43 @@ export function showExampleTds() {
     let pathToExamples: string;
 
     if (isDevelopment()) {
-      if (process.platform === "darwin") {
+      if (process.platform === 'darwin') {
         pathToExamples = path.join(
           __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "example-tds"
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          'example-tds'
         );
       } else {
         pathToExamples = path.join(
           __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "example-tds"
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          'example-tds'
         );
       }
     } else {
       if (process.resourcesPath) {
-        pathToExamples = path.join(process.resourcesPath, "example-tds");
+        pathToExamples = path.join(process.resourcesPath, 'example-tds');
       } else {
-        pathToExamples = "";
-        rej(new Error("process resources Path is undefined"));
+        pathToExamples = '';
+        rej(new Error('process resources Path is undefined'));
       }
     }
 
     fs.readdir(pathToExamples, (err, fileList) => {
       if (err) {
-        rej(new Error("Problem at reading example tds: " + err));
+        rej(new Error('Problem at reading example tds: ' + err));
       } else {
         const output = [] as WADE.DropdownOptionInterface[];
         fileList.forEach((file, ind) => {
@@ -377,43 +377,43 @@ export function loadExampleTd(exampleTdPath: string) {
     let pathToExamples: string;
 
     if (isDevelopment()) {
-      if (process.platform === "darwin") {
+      if (process.platform === 'darwin') {
         pathToExamples = path.join(
           __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "example-tds"
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          'example-tds'
         );
       } else {
         pathToExamples = path.join(
           __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "example-tds"
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          '..',
+          'example-tds'
         );
       }
     } else {
       if (process.resourcesPath) {
-        pathToExamples = path.join(process.resourcesPath, "example-tds");
+        pathToExamples = path.join(process.resourcesPath, 'example-tds');
       } else {
-        pathToExamples = "";
-        rej(new Error("process resources Path is undefined"));
+        pathToExamples = '';
+        rej(new Error('process resources Path is undefined'));
       }
     }
 
     fs.readFile(path.join(pathToExamples, exampleTdPath), (err, data) => {
       if (err) {
-        rej(new Error("Problem at reading the example Td file: " + err));
+        rej(new Error('Problem at reading the example Td file: ' + err));
       } else {
         let output: string;
         output = data.toString();

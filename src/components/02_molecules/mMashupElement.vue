@@ -1,19 +1,19 @@
 <template>
     <div
-        class="mashup-td-element-container"
+        class="mashup-element-container"
         :class="{ 'isActiveTd': isActiveTd }"
         @click.prevent="showCurrentTd = !showCurrentTd"
     >
-        <label class="mashup-td-label">{{ this.td.id }}</label>
+        <label class="mashup-element-label">{{ this.element.id }}</label>
         <img
-            class="mashup-td-show-interactions-icon"
+            class="mashup-element-show-interactions-icon"
             @mouseover="interactionsHover = true"
             @mouseleave="interactionsHover = false"
             :src="showCurrentTd ? interactionsHover ? srcPathDropdownWhite : srcPathDropdown : interactionsHover ? srcPathDropdownClosedWhite : srcPathDropdownClosed"
             @click.stop="showCurrentTd = !showCurrentTd"
         />
         <img
-          class="mashup-td-delete-icon"
+          class="mashup-element-delete-icon"
           @mouseover="deleteHover = true"
           @mouseleave="deleteHover = false"
           :src="deleteHover ? srcPathDeleteWhite : srcPathDelete"
@@ -27,9 +27,9 @@ import Vue from 'vue';
 import { ElementTypeEnum } from '../../util/enums';
 
 export default Vue.extend({
-  name: 'mMashupTdElement',
+  name: 'mMashupElement',
   props: {
-    td: {
+    element: {
       type: Object,
       required: true
     }
@@ -55,14 +55,14 @@ export default Vue.extend({
   },
   methods: {
     deleteBtnClicked() {
-      this.$emit('delete-element', this.td.id, ElementTypeEnum.TD);
+      this.$emit('delete-element', this.element.id, this.element.type);
     },
   }
 });
 </script>
 
 <style scoped>
-.mashup-td-element-container {
+.mashup-element-container {
     height: 50px;
     width: 100%;
     margin: 0 auto;
@@ -72,22 +72,22 @@ export default Vue.extend({
     border-top: 1px solid #393B3A;
 }
 
-.mashup-td-element-container:hover {
+.mashup-element-container:hover {
     background: #1234;
 }
 
-.mashup-td-label {
+.mashup-element-label {
   width: 100%;
   overflow: hidden;
 }
 
-.mashup-td-show-interactions-icon {
+.mashup-element-show-interactions-icon {
     padding: 10px;
     height: 40px;
     width: 40px;
 }
 
-.mashup-td-delete-icon {
+.mashup-element-delete-icon {
   padding: 7px 5px 7px 0px;
   max-height: 40px;
   max-width: 40px;

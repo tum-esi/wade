@@ -73,27 +73,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
-  name: "aInteractionInput",
+  name: 'aInteractionInput',
   created() {
-    this.$eventHub.$on("selections-reseted", () => {
+    this.$eventHub.$on('selections-reseted', () => {
       this.deselect();
     });
   },
   beforeDestroy() {
-    this.$eventHub.$off("selections-reseted");
+    this.$eventHub.$off('selections-reseted');
   },
   data() {
     return {
       btnSelected: false,
-      inputValue: "",
+      inputValue: '',
       dropdownVisible: false,
-      placeholder: "",
-      currentSrc: require("@/assets/circle.png"),
-      srcUnselected: require("@/assets/circle.png"),
-      srcSelected: require("@/assets/checked_circle.png"),
-      srcSelectionNotPossibele: require("@/assets/circle_grey.png")
+      placeholder: '',
+      currentSrc: require('@/assets/circle.png'),
+      srcUnselected: require('@/assets/circle.png'),
+      srcSelected: require('@/assets/checked_circle.png'),
+      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
     };
   },
   props: {
@@ -158,10 +158,10 @@ export default Vue.extend({
   },
   computed: {
     getBtnLabel(): string {
-      return this.btnSelected ? "Selected" : "Select";
+      return this.btnSelected ? 'Selected' : 'Select';
     },
     getPlaceholder(): string {
-      return this.placeholder ? this.placeholder : "Write";
+      return this.placeholder ? this.placeholder : 'Write';
     },
     getBtnSourcePath(): any {
       return this.btnSelected ? this.srcSelected : this.srcUnselected;
@@ -170,14 +170,14 @@ export default Vue.extend({
       if ((this as any).inputValue === false) {
         return this.inputValue;
       }
-      return this.inputValue ? this.inputValue : "Select";
+      return this.inputValue ? this.inputValue : 'Select';
     },
     getButtonSelectedStyle(): string {
-      return this.btnSelected ? "btn-selection-container-selected" : "";
+      return this.btnSelected ? 'btn-selection-container-selected' : '';
     },
     isInputEmpty(): boolean {
       if (
-        (typeof this.inputValue === "string" && this.inputValue.length <= 0) ||
+        (typeof this.inputValue === 'string' && this.inputValue.length <= 0) ||
         this.inputValue === null ||
         this.inputValue === undefined
       ) {
@@ -190,12 +190,12 @@ export default Vue.extend({
   methods: {
     checkInputType(inputType: string): boolean {
       if (
-        (inputType === "text" &&
-          this.btnInputType.propType === "string" &&
+        (inputType === 'text' &&
+          this.btnInputType.propType === 'string' &&
           !this.btnInputType.propEnum) ||
-        (this.btnInputType.propType === "array" &&
+        (this.btnInputType.propType === 'array' &&
           !this.btnInputType.propEnum) ||
-        (this.btnInputType.propType === "object" && !this.btnInputType.propEnum)
+        (this.btnInputType.propType === 'object' && !this.btnInputType.propEnum)
       ) {
         // sets placeholder to proper cased propType
         this.placeholder =
@@ -205,8 +205,8 @@ export default Vue.extend({
       }
 
       if (
-        inputType === "number" &&
-        ["integer", "float", "double", "number"].indexOf(
+        inputType === 'number' &&
+        ['integer', 'float', 'double', 'number'].indexOf(
           this.btnInputType.propType
         ) !== -1 &&
         !this.btnInputType.propEnum
@@ -226,7 +226,7 @@ export default Vue.extend({
       // When btn is selected emit selection change
       if (this.btnSelected) {
         this.$emit(
-          "select-with-input",
+          'select-with-input',
           this.element,
           isDropdown ? this.inputValue : this.getParsedInputValue(),
           true
@@ -241,29 +241,29 @@ export default Vue.extend({
       this.currentSrc = this.srcSelected;
       // Emit new selection
       this.$emit(
-        "select-with-input",
+        'select-with-input',
         this.element,
         this.getParsedInputValue(),
         false
       );
     },
     deselect() {
-      this.inputValue = "";
+      this.inputValue = '';
       this.btnSelected = false;
       this.currentSrc = this.srcUnselected;
-      this.$emit("deselect");
+      this.$emit('deselect');
     },
     // Parse string input to correct data type (do not show in UI)
     getParsedInputValue() {
       let parsedInputValue: any = this.inputValue;
       if (
-        ["integer", "float", "double", "number"].indexOf(
+        ['integer', 'float', 'double', 'number'].indexOf(
           this.btnInputType.propType
         ) !== -1
       ) {
         parsedInputValue = parseInt(this.inputValue, 10);
       }
-      if (this.btnInputType.propType === "object") {
+      if (this.btnInputType.propType === 'object') {
         try {
           parsedInputValue = JSON.parse(this.inputValue);
         } catch {
@@ -271,7 +271,7 @@ export default Vue.extend({
           parsedInputValue = null;
         }
       }
-      if (this.btnInputType.propType === "array") {
+      if (this.btnInputType.propType === 'array') {
         const jsonArr = parsedInputValue.replace(/([^\[\],\s]+)/g, '"$&"');
         try {
           parsedInputValue = JSON.parse(jsonArr);
@@ -279,8 +279,8 @@ export default Vue.extend({
           // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
-        if (!parsedInputValue || typeof parsedInputValue === "string")
-          parsedInputValue = this.inputValue.split(" ");
+        if (!parsedInputValue || typeof parsedInputValue === 'string')
+          parsedInputValue = this.inputValue.split(' ');
       }
       return parsedInputValue;
     }

@@ -16,9 +16,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
-  name: "aFormfield",
+  name: 'aFormfield',
   props: {
     form: {
       type: Object as () => WADE.BasicFormFieldInterface,
@@ -27,7 +27,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      input: "",
+      input: '',
       hasError: false,
       hasDuplicateError: false,
       key: this.form.key
@@ -42,27 +42,27 @@ export default Vue.extend({
       ) {
         return this.form.rules.errorMessage;
       } else {
-        return "";
+        return '';
       }
     },
     errorDuplicateMessage(): string {
       if (this.form.rules && this.form.rules.errorMessageDuplicate) {
         return this.form.rules.errorMessageDuplicate;
       } else {
-        return "";
+        return '';
       }
     }
   },
   created() {
-    this.$eventHub.$on("check-has-error", this.checkError);
+    this.$eventHub.$on('check-has-error', this.checkError);
   },
   beforeDestroy() {
-    this.$eventHub.$off("check-has-error");
+    this.$eventHub.$off('check-has-error');
   },
   methods: {
     // Is called by parent component to check if all inputs are correct
     checkError() {
-      if (this.form.isRequired && this.input === "") {
+      if (this.form.isRequired && this.input === '') {
         this.hasError = true;
         return; // Return when there's already an error here
       } else {
@@ -72,8 +72,8 @@ export default Vue.extend({
       if (this.form.mustBeUnique) {
         // check store if unique id
         this.hasDuplicateError =
-          this.input !== "" &&
-          this.$store.getters["SidebarStore/doesIdAlreadyExist"](this.input);
+          this.input !== '' &&
+          this.$store.getters['SidebarStore/doesIdAlreadyExist'](this.input);
       }
     }
   }

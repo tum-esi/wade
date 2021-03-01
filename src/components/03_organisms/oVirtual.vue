@@ -12,10 +12,7 @@
           :statusMessage="vconfigStatus"
         ></aConfigStatusBar>
         <div class="vconfig-area">
-          <mCodeEditor
-            language="json"
-            :code="currentVirtualConfig"
-          ></mCodeEditor>
+          <aEditorMonaco language="json" :code = "currentVirtualConfig"/>
         </div>
 
         <div class="vconfig-btns">
@@ -40,17 +37,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapGetters, mapMutations } from "vuex";
-import { TdVirtualConfigEnum } from "@/util/enums";
-import { getFormattedJsonString } from "@/util/helpers";
-import aButtonBasic from "@/components/01_atoms/aButtonBasic.vue";
-import aConfigStatusBar from "@/components/01_atoms/aConfigStatusBar.vue";
-import aEditorMonaco from "@/components/01_atoms/aEditorMonaco.vue";
-import { setTimeout } from "timers";
+import Vue from 'vue';
+import { mapGetters, mapMutations } from 'vuex';
+import { TdVirtualConfigEnum } from '@/util/enums';
+import { getFormattedJsonString } from '@/util/helpers';
+import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
+import aConfigStatusBar from '@/components/01_atoms/aConfigStatusBar.vue';
+import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
+import { setTimeout } from 'timers';
 
 export default Vue.extend({
-  name: "oVirtual",
+  name: 'oVirtual',
   components: {
     aButtonBasic,
     aConfigStatusBar,
@@ -63,36 +60,36 @@ export default Vue.extend({
   },
   data() {
     return {
-      vconfig: "",
+      vconfig: '',
       vconfigStatus: TdVirtualConfigEnum.INFO as TdVirtualConfigEnum,
-      format: "raw",
+      format: 'raw',
       showHelp: false,
       resetVConfigBtn: {
-        btnLabel: "Reset Config to default",
-        btnClass: "btn-config-small",
-        btnOnClick: "reset-config"
+        btnLabel: 'Reset Config to default',
+        btnClass: 'btn-config-small',
+        btnOnClick: 'reset-config'
       },
       saveVConfigBtn: {
-        btnLabel: "Save Config",
-        btnClass: "btn-config-small",
-        btnOnClick: "save-config",
+        btnLabel: 'Save Config',
+        btnClass: 'btn-config-small',
+        btnOnClick: 'save-config',
         btnActive: false
       },
       showHelpBtn: {
-        btnLabelShow: "Show Config Format Help",
-        btnLabelHide: "Hide Config Format Help",
-        btnClassShow: "show-format",
-        btnClassHide: "hide-format",
-        btnOnClick: "show-help"
+        btnLabelShow: 'Show Config Format Help',
+        btnLabelHide: 'Hide Config Format Help',
+        btnClassShow: 'show-format',
+        btnClassHide: 'hide-format',
+        btnOnClick: 'show-help'
       }
     };
   },
   computed: {
-    ...mapGetters("SidebarStore", [
-      "getVirtualConfig",
-      "getDefaultVirtualConfig"
+    ...mapGetters('SidebarStore', [
+      'getVirtualConfig',
+      'getDefaultVirtualConfig'
     ]),
-    ...mapGetters("TdStore", ["getProtocols"]),
+    ...mapGetters('TdStore', ['getProtocols']),
     id() {
       return this.$route.params.id;
     },
@@ -120,7 +117,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapMutations("SidebarStore", ["saveTdVirtualConfig"]),
+    ...mapMutations('SidebarStore', ['saveTdVirtualConfig']),
     getSavedVirtualConfig(isDefault: boolean = false): string {
       return getFormattedJsonString(
         isDefault
@@ -156,7 +153,7 @@ export default Vue.extend({
   },
   watch: {
     // Check if router id changed
-    "$route.params.id"(id) {
+    '$route.params.id'(id) {
       this.vconfig = this.getSavedVirtualConfig();
     }
   }

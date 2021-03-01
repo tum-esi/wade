@@ -21,7 +21,7 @@
 
 <script lang='ts'>
 import Vue from 'vue';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import aSidebarElement from '@/components/01_atoms/aSidebarElement.vue';
 
 export default Vue.extend({
@@ -54,6 +54,7 @@ export default Vue.extend({
     };
   },
   methods: {
+    ...mapActions('SidebarStore', ['deleteElementAndChildren']),
     ...mapMutations('SidebarStore', ['deleteSidebarElement', 'deleteElementFromStore']),
     addComponent(
       elements: WADE.SidebarElement[],
@@ -187,7 +188,7 @@ export default Vue.extend({
     },
     deleteElement(id: string, type: string) {
       this.deleteSidebarElement({ id, type });
-      this.deleteElementFromStore({ id, type });
+      this.deleteElementAndChildren({ id, type });
       this.$eventHub.$emit('sidebar-element-removed', id);
       if (this.$router.currentRoute.name !== 'home') this.$router.push({name: 'home'});
     },

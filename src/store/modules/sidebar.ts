@@ -1,8 +1,9 @@
-import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum } from '@/util/enums';
+import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum, StatusEnum } from '@/util/enums';
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingError } from '@/util/helpers';
 import { virtualConfigDefault } from '@/util/defaults';
+import { TD, Folder, Mashup } from '@/backend/Td';
 
 
 export default {
@@ -116,9 +117,12 @@ export default {
                         iconSrcPath: ElementTypeEnum.TD,
                         numOfParents: 0,
                     };
-                    commit('addElementToStore', {
-                        id: newElement.id,
-                        type: newElement.type,
+                    const tdInterface: WADE.TDElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        id: payload.id,
+                        hasChildren: false,
                         content: '',
                         config: state.configDefault,
                         vconfig: virtualConfigDefault,
@@ -127,7 +131,9 @@ export default {
                             outMsg: [],
                             vt: undefined // not necessary, but used to remember that property is used
                         }
-                    });
+                    };
+                    const newTD = new TD(tdInterface);
+                    commit('addElementToStore', newTD);
                     return newElement;
                 case ElementTypeEnum.FOLDER:
                     newElement = {
@@ -141,7 +147,17 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
+                    const folderInterface: WADE.FolderElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        description: payload.description || '',
+                        id: payload.id,
+                        hasChildren: true,
+                        children: []
+                    };
+                    const newFolder = new Folder(folderInterface);
+                    commit('addElementToStore', newFolder);
                     return newElement;
                 case ElementTypeEnum.MASHUP:
                     newElement = {
@@ -156,7 +172,19 @@ export default {
                         numOfParents: 0,
                         children: []
                     };
-                    commit('addElementToStore', { id: newElement.id, type: newElement.type });
+                    const mashupInterface: WADE.MashupElementInterface = {
+                        parentId: payload.parentId ? payload.parentId : 'parent',
+                        type: payload.type,
+                        title: payload.title,
+                        description: payload.description || '',
+                        id: payload.id,
+                        hasChildren: true,
+                        children: [],
+                        systemDescription: '',
+                        mashupCode: '',
+                    };
+                    const newMashup = new Mashup(mashupInterface);
+                    commit('addElementToStore', newMashup);
                     return newElement;
                 default:
                     break;
@@ -275,6 +303,18 @@ export default {
                     break;
                 }
             }
+        },
+        async deleteElementAndChildren({state, commit, dispatch}, payload: {id: string, type: string}) {
+            const elementList: any[] = state[`${payload.type}s`];
+            let elementToDelete: TD | Mashup | Folder | undefined;
+            elementToDelete = elementList.find(element => element.id === payload.id);
+            if (elementToDelete && elementToDelete.hasChildren) {
+                while (elementToDelete.children.length > 0) {
+                    const child = elementToDelete.children[0];
+                    await dispatch('deleteElementAndChildren', {id: child.id, type: child.type});
+                }
+            }
+            commit('deleteElementFromStore', payload);
         }
     },
     mutations: {
@@ -338,18 +378,68 @@ export default {
                     break;
                 }
             }
+            const element = (state.tds as any[]).find(td => td.id === payload.id);
+            if (element.parentId !== 'parent') {
+                for (const mashup of state.mashups as any[]) {
+                    const childIndex = mashup.children.findIndex(child => child.id === element.id);
+                    if (childIndex !== -1) {
+                        mashup.children[childIndex].content = payload.content;
+                    }
+                }
+            }
+
         },
         // Adds a new td / mashup / folder to tds / mashups / folders
-        addElementToStore(state: any, payload: { id: string, type: string }) {
+        addElementToStore(state: any, payload: TD | Mashup | Folder) {
             state[`${payload.type}s`].push(payload);
+            let finished = false;
+            if (payload.parentId !== 'parent') {
+                for (const mashup of state.mashups as Mashup[]) {
+                    if (mashup.id === payload.parentId ) {
+                        mashup[`${payload.type}s`].push(payload);
+                        mashup.children.push(payload as TD | Mashup);
+                        finished = true;
+                        break;
+                    }
+                }
+                if (!finished) for (const folder of state.folders as Folder[]) {
+                    if (folder.id === payload.parentId ) {
+                        folder[`${payload.type}s`].push(payload);
+                        folder.children.push(payload);
+                        finished = true;
+                        break;
+                    }
+                }
+            }
         },
         // Delete td/ mashup/ folder from tds/ mashups/ folders
-        deleteElementFromStore(state: any, payload: any) {
+        deleteElementFromStore(state: any, payload: {id: string, type: string}) {
             const elementList = state[`${payload.type}s`];
-            for (const element of elementList) {
+            let elementToDelete: TD | Mashup | Folder | undefined;
+            for (const element of elementList as (TD[] | Mashup[] | Folder[])) {
                 if (element.id === payload.id) {
+                    elementToDelete = element;
                     elementList.splice(elementList.indexOf(element), 1);
-                    return;
+                    break;
+                }
+            }
+            if (elementToDelete && elementToDelete.parentId !== 'parent') {
+                let finished = false;
+                for (const mashup of state.mashups as Mashup[]) {
+                    if (mashup.id === elementToDelete.parentId) {
+                        const index = mashup.children.findIndex(child => {if (elementToDelete) return child.id === elementToDelete.id; });
+                        if (index !== -1) mashup.children.splice(index, 1);
+                        finished = true;
+                        break;
+                    }
+                }
+                if (!finished) for (const folder of state.folders as Folder[]) {
+                    if (folder.id === elementToDelete.parentId) {
+                        const index = folder.children.findIndex(child => {if (elementToDelete) return child.id === elementToDelete.id; });
+                        if (index !== -1) folder.children.splice(index, 1);
+                        finished = true;
+                        break;
+                    }
                 }
             }
         },
@@ -418,7 +508,7 @@ export default {
          * whether the maximum array size of the output field is
          * reached
          *
-          *  @         param state given vuex state
+         *  @         param state given vuex state
          * @param payload id of the td, outMsg to add:
          *                              - content The message to display
          *                              - isError Is it an Error message?
@@ -617,7 +707,7 @@ export default {
         /**
          * Returns either a specific sidebar element when param has 'id'
          * or an array of sidebar elements, when param has 'type'
-          *  @          param state store state
+         *  @          param state store state
          */
         getSidebarElement(state: any) {
             return (elToFind) => {
@@ -639,6 +729,26 @@ export default {
                 findElement(elToFind, state.sidebarElements);
                 return sidebarElement;
             };
+        },
+        getTd(state: any, id: string): TD | null {
+            for (const td of state.tds) {
+                if (td.id === id) return td;
+            }
+            return null;
+        },
+        getMashup(state: any) {
+            return (id: string) => {
+                for (const mashup of state.mashups) {
+                    if (mashup.id === id) return mashup;
+                }
+                return null;
+            };
+        },
+        getFolder(state: any, id: string): Folder | null {
+            for (const folder of state.folders) {
+                if (folder.id === id) return folder;
+            }
+            return null;
         },
         doesIdAlreadyExist(state: any) {
             return (id: string) => {

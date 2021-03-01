@@ -18,6 +18,7 @@
         :btnSrc="tabDropdownButton.btnSrc"
         :btnDropdownOptions="tabDropdownButton.btnDropdownOptions"
         />
+      <img class="icon" v-else-if="iconSrcPath && showIcon" :src="getImage" v-on:click="$emit('tab-clicked', tabId)">
       <label 
         v-if="tabTitle" 
         :class="tabLabelStyle" 
@@ -39,6 +40,11 @@ export default Vue.extend({
     aDropdownButton
   },
   props: {
+    iconSrcPath: {
+      type: String,
+      required: false,
+      default: null
+    },
     /**
      * To reference tab when clicked.
      */
@@ -117,12 +123,27 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: true
+    },
+    showIcon: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
+  },
+  computed: {
+    getImage() {
+      return require(`@/assets/${this.iconSrcPath}.png`);
     }
   }
 });
 </script>
 
 <style scoped>
+.icon {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .tab-container {
   display: flex;
   align-items: center;
