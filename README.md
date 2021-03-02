@@ -50,24 +50,12 @@ See the related paper **WADE: Timing Performance Benchmarking in Web of Things**
 ---
 ## Prerequisites
 
-You need to have [Node.js](https://nodejs.org/en/) installed. It is highly recommended to also have [Yarn](https://yarnpkg.com/) installed
+You need to have [Node.js](https://nodejs.org/en/) version >= 12.9 installed. It is highly recommended to also have [Yarn](https://yarnpkg.com/) installed
 
 ---
 ## How to install the application
 
 **Step 1:** Clone the repository to your local machine.
-
-## Known Problems
-- [Install node-aead-crypto to avoid failing dev build and build](https://github.com/tum-esi/wade/issues/9),
-   because coap-binding seems to need it might be necessary (it isn't installed
-   with current node version because it shouldn't be needed anymore):  
-  ```
-  npm install -f node-aead-crypto
-  ```  
-  After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
-  comes with other disadvantages).
-- The [Shadow Thing](https://github.com/tum-esi/shadow-thing) packet needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the packet.
-- Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
 
 ## Project setup
 ```
@@ -81,16 +69,13 @@ cd wade
 yarn install 
 ```
 
-
-**Step 3:** Check if `./node_modules/@node-wot/core/dist/servient.js` contains `var vm2_1 = require("vm2");` in line 3. If so, please remove line 3 and lines 15-68.
-
-**Step 4:** Build the electron application. (_If you run into any errors, check here: [Errors and Known Problems](#errors-and-known-problems)_)
+**Step 3:** Build the electron application. (_If you run into any errors, check here: [Errors and Known Problems](#errors-and-known-problems)_)
 
 ```
 yarn run electron:build
 ```
 
-**Step 5:** Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
+**Step 4:** Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
 
 ---
 ## How to get started with development
@@ -123,14 +108,9 @@ Also checkout the [Adding or Working on Issues](#adding-or-working-on-issues) se
 
 - [Install node-aead-crypto to avoid failing dev build and build](https://github.com/tum-esi/wade/issues/9),
    because coap-binding seems to need it might be necessary (it isn't installed
-   with current node version because it shouldn't be needed anymore):
+   with current node version because it shouldn't be needed anymore). To solve this, a script was added to comment out the part that caused the failure, as it is not needed for Node.js version >= 10. If issue persists, please check if lines 52-55 in `./node_modules/node-dtls-client/build/lib/AEADCrypto.js` are commented out.
 
-  ```
-  npm install -f node-aead-crypto
-  ```
-
-  After installing node-aead-crypto you should delete the dependency from your package.json, so it isn't added to the wade package on the next commit. Also installing a previous "node" version could solve the problem (but
-  comes with other disadvantages).
+- If the W-ADE builds but shows a white screen, it is probably an issue caused by [vm2](https://github.com/patriksimek/vm2) that is used by node-wot servient. The postinstall script comments the problematic parts out but if the issue persists, please check first that lines 3, 15-68 in `./node_modules/@node-wot/core/dist/servient.js` are commented out.
 
 - The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the package.json.
 
