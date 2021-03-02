@@ -57,7 +57,6 @@ You need to have [Node.js](https://nodejs.org/en/) version >= 12.9 installed. It
 
 **Step 1:** Clone the repository to your local machine.
 
-## Project setup
 ```
 git clone https://github.com/tum-esi/wade.git
 ```
