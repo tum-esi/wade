@@ -27,7 +27,7 @@
       <div v-if="!showHelp" class="show-config">
         <aConfigStatusBar class="config-status" :statusMessage="configStatus"></aConfigStatusBar>
         <div v-if="format === 'raw'" class="config-area">
-          <aEditorMonaco language="json" :code="currentConfig"/>
+          <aEditorMonaco language="json" v-model="currentConfig"/>
         </div>
         <div v-else class="config-area">
           <div class="config-area-form-container">

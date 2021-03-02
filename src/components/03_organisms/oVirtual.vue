@@ -12,7 +12,7 @@
           :statusMessage="vconfigStatus"
         ></aConfigStatusBar>
         <div class="vconfig-area">
-          <aEditorMonaco language="json" :code = "currentVirtualConfig"/>
+          <aEditorMonaco language="json" v-model="currentVirtualConfig"/>
         </div>
 
         <div class="vconfig-btns">
