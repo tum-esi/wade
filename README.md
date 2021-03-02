@@ -5,11 +5,11 @@
 2. [What can you do with W-ADE](#what-can-you-do-with-w-ade)  
 3. [Prerequisites](#prerequisites)  
 4. [How to Install the Application](#how-to-install-the-application)  
-5. [How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)  
-6. [Errors and Known Problems](#errors-and-known-problems)  
-7. [Interaction Timing Vocabulary](#interaction-timing-vocabulary)
-8. [A-MaGe](#-a-mage)
-9. [Adding or Working on Issues](#adding-or-working-on-issues)
+5. [How to Get Started with Development (open in dev mode)](#how-to-get-started-with-development)    
+6. [Interaction Timing Vocabulary](#interaction-timing-vocabulary)
+7. [A-MaGe](#-a-mage)
+8. [Errors and Known Problems](#errors-and-known-problems)
+9.  [Adding or Working on Issues](#adding-or-working-on-issues)
 
 ---
 ## **W**eb of Things **A**PI **D**evelopment **E**nvironment
@@ -94,29 +94,6 @@ If you want to add your changes to W-ADE, please fork the repository and create 
 Also checkout the [Adding or Working on Issues](#adding-or-working-on-issues) section.
 
 ---
-## Errors and Known Problems
-
-- If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
-
-- 
-  ```
-  cd wade 
-  rm -r -f node_modules
-  yarn install 
-  yarn run electron:build
-  ```
-
-- [Install node-aead-crypto to avoid failing dev build and build](https://github.com/tum-esi/wade/issues/9),
-   because coap-binding seems to need it might be necessary (it isn't installed
-   with current node version because it shouldn't be needed anymore). To solve this, a script was added to comment out the part that caused the failure, as it is not needed for Node.js version >= 10. If issue persists, please check if lines 52-55 in `./node_modules/node-dtls-client/build/lib/AEADCrypto.js` are commented out.
-
-- If the W-ADE builds but shows a white screen, it is probably an issue caused by [vm2](https://github.com/patriksimek/vm2) that is used by node-wot servient. The postinstall script comments the problematic parts out but if the issue persists, please check first that lines 3, 15-68 in `./node_modules/@node-wot/core/dist/servient.js` are commented out.
-
-- The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the package.json.
-
-- Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
-
----
 ## Interaction Timing Vocabulary
 
 To be able to add measured timing performance benchmarks to a Thing Description, a vocabulary set that is aligned with the current Thing Description was developed.   
@@ -151,6 +128,30 @@ Latest version of [Python](https://www.python.org/) and the following packages
 
 ---
  To run the NLP-Sever, run the Python script `./NLP/word2vec-api.py`
+
+---
+
+## Errors and Known Problems
+
+- If you already downloaded the W-ADE repository earlier and have problems with either installing the node dependencies or building the application. Delete the node_modules folder and install/ build the application again.
+
+- 
+  ```
+  cd wade 
+  rm -r -f node_modules
+  yarn install 
+  yarn run electron:build
+  ```
+
+- [Install node-aead-crypto to avoid failing dev build and build](https://github.com/tum-esi/wade/issues/9),
+   because coap-binding seems to need it might be necessary (it isn't installed
+   with current node version because it shouldn't be needed anymore). To solve this, a script was added to comment out the part that caused the failure, as it is not needed for Node.js version >= 10. If issue persists, please check if lines 52-55 in `./node_modules/node-dtls-client/build/lib/AEADCrypto.js` are commented out.
+
+- If the W-ADE builds but shows a white screen, it is probably an issue caused by [vm2](https://github.com/patriksimek/vm2) that is used by node-wot servient. The postinstall script comments the problematic parts out but if the issue persists, please check first that lines 3, 15-68 in `./node_modules/@node-wot/core/dist/servient.js` are commented out.
+
+- The [*Shadow Thing*](https://github.com/tum-esi/shadow-thing) package needs to be installed locally (not just a symlink in ./node_modules/) in order to work in the production build, and it has to be installed manually anyway if you want to make **Virtual Thing** work in WADE. The reason therefore is, that automatic installation of shadow thing fails under windows and so would the installation of WADE if Shadow Thing was added to the package.json.
+
+- Vuex version 3.1.2 leads to build problems -> [Issue 10](https://github.com/tum-esi/wade/issues/10)
 
 ---
 ## Adding or Working on Issues
