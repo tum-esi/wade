@@ -71,9 +71,8 @@ import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
 import tPerformance from '@/components/04_templates/tPerformance.vue';
-import { Url } from 'url';
 import { TdStateEnum, TDTabsEnum } from '../../util/enums';
-import { ftruncate } from 'fs';
+import * as Api from '@/backend/Api';
 
 export default Vue.extend({
   name: 'tThingDescription',
@@ -114,10 +113,7 @@ export default Vue.extend({
         let td: null | string = null;
         let errorMsg: null | string = null;
         let tdState: null | TdStateEnum = null;
-        const fetchedTd = await fetch(url)
-          .then(response => {
-            return response.json();
-          })
+        const fetchedTd = await Api.fetchTD(url)
           .then(myJson => {
             td = JSON.stringify(myJson);
             tdState = TdStateEnum.VALID_TD_FETCHED;

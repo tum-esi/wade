@@ -19,7 +19,7 @@ let tdConsumer: null | TdConsumer  = null;
 
 export function retrieveProtocols(td: string): ProtocolEnum[] | null {
   const protocols = [] as ProtocolEnum[];
-  let tdJson;
+  let tdJson: { properties: any; actions: any; events: any; base: string | string[]; };
   try {
     tdJson = JSON.parse(td);
   } catch (error) {
@@ -120,6 +120,13 @@ export async function consumeAndParseTd(
     errorMsg: null,
     tdState: consumedTd.tdState
   };
+}
+
+export async function fetchTD(uri: string) {
+  if (!tdConsumer) {
+    tdConsumer = new TdConsumer('', null, ['']);
+  } 
+  return tdConsumer.fetchTD(uri);
 }
 
 export async function resetAll() {
@@ -255,7 +262,7 @@ export async function invokeInteractions(selectedInteractions) {
 
       case PossibleInteractionTypesEnum.ACTION:
         if (interactionSelectBtn.interaction) {
-          // Invoke action (possibily with input)
+          // Invoke action (possibly with input)
           const resultAction = await selectedInteractions[
             interaction
           ].interactionSelectBtn.interaction(interactionSelectBtn.input);
@@ -310,7 +317,7 @@ export function removeVt(VT: VtCall) {
     VT.stopVt().then(
       () => {
         VT = null as any;
-        res();
+        res(null);
       },
       err => {
         rej(err);

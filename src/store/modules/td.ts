@@ -1,8 +1,6 @@
 import * as Api from '@/backend/Api';
 import { RESULT_MESSAGES, VtStatus } from '@/util/enums';
 import { InteractionStateEnum, TdStateEnum, ProtocolEnum } from '@/util/enums';
-import * as stream from 'stream';
-import VtCall from '@/backend/VtCall';
 
 export default {
     namespaced: true,
