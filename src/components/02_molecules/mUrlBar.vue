@@ -8,7 +8,7 @@
             :btnClass="button.btnClass"
             :btnLabel="button.btnLabel"
             :btnOnClick="button.btnOnClick"
-            :btnActive="urlValid"
+            :btnActive="true"
         />
         <span style="width: 2%;"></span>
         <aButtonCancel class="hide-urlbar-btn" v-on:cancel-btn-clicked="$emit('cancel-btn-clicked')"/>

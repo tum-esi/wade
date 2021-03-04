@@ -71,9 +71,8 @@ import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
 import tPerformance from '@/components/04_templates/tPerformance.vue';
-import { Url } from 'url';
 import { TdStateEnum, TDTabsEnum } from '../../util/enums';
-import { ftruncate } from 'fs';
+import * as Api from '@/backend/Api';
 
 export default Vue.extend({
   name: 'tThingDescription',
@@ -109,36 +108,6 @@ export default Vue.extend({
         btnClass: 'btn-url-bar',
         btnOnClick: 'btn-clicked'
       },
-      async fetchFunction(url: string) {
-        // TODO: Error Handling connection time out
-        let td: null | string = null;
-        let errorMsg: null | string = null;
-        let tdState: null | TdStateEnum = null;
-        const fetchedTd = await fetch(url)
-          .then(response => {
-            return response.json();
-          })
-          .then(myJson => {
-            td = JSON.stringify(myJson);
-            tdState = TdStateEnum.VALID_TD_FETCHED;
-            return {
-              td,
-              tdState,
-              errorMsg
-            };
-          })
-          .catch(err => {
-            errorMsg = err;
-            tdState = TdStateEnum.INVALID_TD_FETCHED;
-            td = null;
-            return {
-              td,
-              tdState,
-              errorMsg
-            };
-          });
-        (this as any).$eventHub.$emit('fetched-td', fetchedTd);
-      }
     };
   },
   computed: {
@@ -150,6 +119,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapMutations('TdStore', ['setActiveTab']),
+    ...mapActions('TdStore',['fetchTD']),
     hideUrlBar() {
       if (this.showUrlBar) this.showUrlBar = false;
     },
@@ -168,7 +138,12 @@ export default Vue.extend({
         tabbarKey: 'tdTabs',
         activeTab: this.currentTabId
       });
-    }
+    },
+    async fetchFunction(url: string) {
+        (this as any).fetchTD({uri: url}).then((fetchedTd) => {
+          if(fetchedTd) (this as any).$eventHub.$emit('fetched-td', fetchedTd);
+        })
+      }
   },
   watch: {
     // Check if router id changed and change active sidebar element
