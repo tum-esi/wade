@@ -24,7 +24,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: true},
+    webPreferences: { nodeIntegration: true, webSecurity: false},
     icon: path.join(__static, 'icon.png')
   });
   // win.setMenu(null);
