@@ -53,7 +53,8 @@ export enum TdStateEnum {
   INVALID_TD_EMPTY = 'INVALID TD: TD may not be empty object.',
   INVALID_CONSUMED_TD = 'CONSUME ERROR: TD could not be consumed.',
   INVALID_TD = 'INVALID TD: TD is invalid.',
-  VALID_TD = 'VALID TD: TD is valid.'
+  VALID_TD = 'VALID TD: TD is valid.',
+  TD_FETCHING = 'FETCHING TD...'
 }
 
 export enum TdConfigEnum {

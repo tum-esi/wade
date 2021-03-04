@@ -317,7 +317,7 @@ export function removeVt(VT: VtCall) {
     VT.stopVt().then(
       () => {
         VT = null as any;
-        res(null);
+        res(true);
       },
       err => {
         rej(err);

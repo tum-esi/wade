@@ -6,7 +6,6 @@ import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 import { TdStateEnum } from '@/util/enums';
 import * as WoT from 'wot-typescript-definitions';
 
-
 export default class TdConsumer {
     // default coap port = 5683;
     // default mqtt port = 1883;
@@ -87,9 +86,33 @@ export default class TdConsumer {
         }
     }
 
-    // fetches TD
+    /** A method that fetches a TD using node-wot fetch API.
+     * The method takes a URI string as input and returns a Promise of a WoT.ThingDescription.
+     * If no connection is established for 3 seconds, the fetching times out and throws "Fetching Timed Out".
+     * Otherwise, if any other error occurs, the fetching is initiated upto 3 times.
+     * If the error is persists, the error is thrown
+     * @param uri A uri string that represents that represents the TD resource 
+     */
     async fetchTD(uri: string) {
-        return this.helper.fetch(uri);
+        let errorCount = 0
+        let helper = this.helper;
+        let errorMsg: string | Error | null = null; 
+        let td: WoT.ThingDescription;
+        return new Promise<WoT.ThingDescription>(async (resolve, reject) => {
+            setTimeout(() => {
+                reject("Fetching Timed Out");
+            },3000);
+            do {
+                try {
+                    td = await helper.fetch(uri)
+                    if(td) return resolve(td); else errorCount++;
+                } catch (err) {
+                    errorMsg = err;
+                    errorCount++;
+                }
+            } while(errorCount <= 3)
+            reject(errorMsg);
+        })
     }
 
     // Tries to consume given td json object

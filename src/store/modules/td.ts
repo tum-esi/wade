@@ -87,6 +87,40 @@ export default {
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
+        /** An action that fetches an TD and updates the status bar if an error occurs
+         * 
+         * @param payload an object that includes the property uri, which is a the string of the URI for the TD resource
+         */
+        async fetchTD({ commit, state }, payload: {uri: string}) {
+                commit('setTdState', TdStateEnum.TD_FETCHING);
+                commit('setErrorMsg', null);
+                commit('setInteractionState', null);
+                commit('setStatusMessage');
+            return Api.fetchTD(payload.uri).then(myJson => {
+                let td = JSON.stringify(myJson);
+                let tdState = TdStateEnum.VALID_TD_FETCHED;
+                let errorMsg = null;
+                let fetchedTd = {
+                  td,
+                  tdState,
+                  errorMsg
+                }; 
+                console.log(fetchedTd);
+                commit('setTdState', tdState);
+                commit('setErrorMsg', null);
+                commit('setInteractionState', null);
+                commit('setStatusMessage');
+                return fetchedTd;
+              })
+              .catch( (err) => {
+                    let tdState = TdStateEnum.INVALID_TD_FETCHED;
+                    commit('setTdState', tdState);
+                    commit('setErrorMsg', err);
+                    commit('setInteractionState', null);
+                    commit('setStatusMessage');
+                }
+              )
+        },
         async processChangedTd({ commit, state }, payload: any) {
             // Do not consume td when its empty or not in correct format
             if (!payload.td || payload.td.length <= 0) {
