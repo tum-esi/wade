@@ -8,7 +8,11 @@ export const parser = new N3.Parser();
 export let vocabStore = new N3.Store();
 
 
-
+/** A function that fetches a semantic vocabulary and stores it in an N3 graph
+ * 
+ * @param {string} url the url of the vocabulary
+ * @returns {Promise<boolean>}
+ */
 export async function fetchAndStoreVocab(url: string): Promise<boolean> {
     let response: Response | null = null;
     let contentTypeString: string | null = null;
@@ -20,16 +24,14 @@ export async function fetchAndStoreVocab(url: string): Promise<boolean> {
         }
     };
     try {
-        response =  await fetch(`http://localhost:8082/${url}`, requestInit);
-        // console.log(response.headers.get('content-type'));
+        response =  await fetch(url, requestInit);
         contentTypeString = response.headers.get('content-type');
     } catch (error) {
-        // console.log(error);
         return error;
     }
 
    if (response && response.ok) {
-        const rdfxmlParser = new RdfXmlParser({
+        const rdfXmlParser = new RdfXmlParser({
             dataFactory: DataFactory,
         });
         const jsonLdParser = new JsonLdParser({
@@ -38,15 +40,13 @@ export async function fetchAndStoreVocab(url: string): Promise<boolean> {
         const text = await response.text();
         if (!contentTypeString) {
             if (text.search('xml') !== -1) {
-                rdfxmlParser
+                rdfXmlParser
                 .on('data', (quad) => {
                     quad.graph = namedNode(url);
                     vocabStore.addQuad(quad);
                 });
-                // .on('error', console.error)
-                // .on('end', () => console.log('All triples were parsed!'));
-            rdfxmlParser.write(text);
-            rdfxmlParser.end();
+            rdfXmlParser.write(text);
+            rdfXmlParser.end();
             }
         } else if (contentTypeString && (contentTypeString.search('json') !== -1)) {
             jsonLdParser
@@ -54,20 +54,16 @@ export async function fetchAndStoreVocab(url: string): Promise<boolean> {
                     quad.graph = namedNode(url);
                     vocabStore.addQuad(quad);
                 });
-                // .on('error', console.error)
-                // .on('end', () => console.log('All JSON-LD triples were parsed!'));
-            rdfxmlParser.write(text);
-            rdfxmlParser.end();
+            rdfXmlParser.write(text);
+            rdfXmlParser.end();
         } else if (contentTypeString && (contentTypeString.search('xml') !== -1)) {
-            rdfxmlParser
+            rdfXmlParser
                 .on('data', (quad) => {
                     quad.graph = namedNode(url);
                     vocabStore.addQuad(quad);
                 });
-                // .on('error', console.error)
-                // .on('end', () => console.log('All RDF/XML triples were parsed!'));
-            rdfxmlParser.write(text);
-            rdfxmlParser.end();
+            rdfXmlParser.write(text);
+            rdfXmlParser.end();
         } else if (contentTypeString && (contentTypeString.search('turtle') !== -1)) {
             parser.parse(text, (error, quad, prefixes) => {
                 if (quad) {

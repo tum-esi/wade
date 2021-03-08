@@ -642,7 +642,7 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
 
     Object.keys(protoServer).forEach( key => {
             servers += `const ${key}Server = new ${protoServer[key].toServer}(${protoServer[key].config})\n`;
-            bindings += `${protoServer[key].toServer} = require("@node-wot/binding-${key}").${protoServer[key].toServer}\n`;
+            bindings += `const ${protoServer[key].toServer} = require("@node-wot/binding-${key}").${protoServer[key].toServer}\n`;
             addS += `servient.addServer(${key}Server)\n`;
     });
 
@@ -650,7 +650,7 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
 
     uniqToAdd.forEach( clientProt => {
         const capProt = clientProt.slice(0, 1).toUpperCase() + clientProt.slice(1);
-        clients += `${capProt}ClientFactory = require("@node-wot/binding-${clientProt}").${capProt}ClientFactory\n`;
+        clients += `const ${capProt}ClientFactory = require("@node-wot/binding-${clientProt}").${capProt}ClientFactory\n`;
         addC += `servient.addClientFactory(new ${capProt}ClientFactory())\n`;
     });
 
@@ -658,7 +658,7 @@ function generateIndexJS(SD: SDSQ.sdTemplate) { // , fileName: string) {
     const out: string[] = [];
     // out.push(`WotMashup = require("./${fileName}").WotMashup`);
     out.push('const TD_DIRECTORY = ""');
-    out.push('Servient = require("@node-wot/core").Servient');
+    out.push('const Servient = require("@node-wot/core").Servient');
     out.push(bindings, clients, servers);
     out.push('const servient = new Servient()');
     out.push(addS);
