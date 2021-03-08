@@ -38,97 +38,220 @@ export default {
         inputs:     null as Array<TD|Mashup> | null,
         outputs:    null as Array<TD|Mashup> | null,
         ios:        null as Array<TD|Mashup> | null,
-        allInteractions: {propertyReads: [], propertyWrites: [], propertyObservations: [], eventSubs: [], actionReads: [], actionInvokes: []},
-        allAnnotations: {propertyReads: [], propertyWrites: [], propertyObservations: [], eventSubs: [], actionReads: [], actionInvokes: []},
-        allTdAnnotations: {inputs: [], outputs: [], ios: []},
+        allInteractions: {
+            propertyReads: [] as MAGE.VueInteractionInterface[], 
+            propertyWrites: [] as MAGE.VueInteractionInterface[],
+            propertyObservations: [] as MAGE.VueInteractionInterface[],
+            eventSubs: [] as MAGE.VueInteractionInterface[],
+            actionReads: [] as MAGE.VueInteractionInterface[],
+            actionInvokes: [] as MAGE.VueInteractionInterface[]
+        },
+        allAnnotations: {
+            propertyReads: [] as MAGE.VueAnnotationInterface[],
+            propertyWrites: [] as MAGE.VueAnnotationInterface[],
+            propertyObservations: [] as MAGE.VueAnnotationInterface[],
+            eventSubs: [] as MAGE.VueAnnotationInterface[],
+            actionReads: [] as MAGE.VueAnnotationInterface[],
+            actionInvokes: [] as MAGE.VueAnnotationInterface[]
+        },
+        allTdAnnotations: {
+            inputs: [] as MAGE.VueAnnotationInterface[],
+            outputs: [] as MAGE.VueAnnotationInterface[],
+            ios: [] as MAGE.VueAnnotationInterface[]
+        },
         storedVocabs: [] as MAGE.storedVocabInterface[],
-        generationForm: null as MAGE.GenerationFormInterace | null,
+        generationForm: null as MAGE.GenerationFormInterface | null,
         result: null as MAGE.MashupGenerationResult | null,
         mashupLogic: null as object | null,
         editorLanguage: 'json',
     },
     getters: {
-        getMashupCode(state): string {
+        /** Getter for mashup code
+         * 
+         * @param state store state
+         * @returns {string} mashup code
+         */
+        getMashupCode(state:any): string {
             return (state.currentMashup as Mashup).mashupCode;
         },
-        getMashupSd(state): string {
+        /** Getter for SD
+         * 
+         * @param state store state
+         * @returns {string} the SD
+         */
+        getMashupSd(state: any): string {
             return (state.currentMashup as Mashup).systemDescription;
         },
-        getMashupChildren(state): Array<TD | Mashup> {
+        /** Getter for mashup Children
+         * 
+         * @param state 
+         * @returns {Array<TD | Mashup>} an array of mashup children
+         */
+        getMashupChildren(state: any): Array<TD | Mashup> {
             return (state.currentMashup as Mashup).children;
         },
-        getMashupChildrenForDropdown(state): Array<TD|Mashup> | null {
+        /** Getter for mashup children encapsulated for `DropdownOptions`
+         * 
+         * @param state store state
+         * @returns {WADE.DropdownOptionInterface[]} an array of dropdown options
+         */
+        getMashupChildrenForDropdown(state: any): WADE.DropdownOptionInterface[] {
             const mashup = state.currentMashup as Mashup;
-            const result = [] as any;
+            const result: WADE.DropdownOptionInterface[] = [];
             for (const element of mashup.children) {
                 result.push({title: element.id, key: element.id});
             }
             return result;
         },
-        getInputsIds(state): string[] {
+        /** Getter for IDs of input TDs
+         * 
+         * @param state store state
+         * @returns {string[]} an array containing the IDs
+         */
+        getInputsIds(state: any): string[] {
             const ids: string[] = [];
             for (const input of state.inputs as Array<TD|Mashup>) {
                 ids.push(input.id);
             }
             return ids;
         },
-        getOutputsIds(state): string[] {
+        /** Getter for IDs of output TDs
+         * 
+         * @param state store state
+         * @returns an array containing the IDs
+         */
+        getOutputsIds(state: any): string[] {
             const ids: string[] = [];
             for (const output of state.outputs as Array<TD|Mashup>) {
                 ids.push(output.id);
             }
             return ids;
         },
-        getIosIds(state): string[] {
+        /** Getter for IDs of input/output TDs
+         * 
+         * @param state store state
+         * @returns an array containing the IDs
+         */
+        getIosIds(state: any): string[] {
             const ids: string[] = [];
             for (const io of state.ios as Array<TD|Mashup>) {
                 ids.push(io.id);
             }
             return ids;
         },
-        getPropertyReads(state) {
+        /** Getter for property-read interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueInteractionInterface[]} array of all added property-read interactions
+         */
+        getPropertyReads(state: any): MAGE.VueInteractionInterface[] {
             return state.allInteractions.propertyReads;
         },
-        getPropertyWrites(state) {
+        /** Getter for property-write interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueInteractionInterface[]} array of all added property-write interactions
+         */
+        getPropertyWrites(state: any): MAGE.VueInteractionInterface[] {
             return state.allInteractions.propertyWrites;
         },
-        getEventSubs(state) {
+        /** Getter for event-subscription interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueInteractionInterface[]} array of all added event-subscription interactions
+         */
+        getEventSubs(state: any): MAGE.VueInteractionInterface[] {
             return state.allInteractions.eventSubs;
         },
-        getActionReads(state) {
+        /**  Getter for action-invoke interactions considered as input interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueInteractionInterface[]} array of all input action-invoke interactions interactions
+         */
+        getActionReads(state: any): MAGE.VueInteractionInterface[] {
             return state.allInteractions.actionReads;
         },
-        getActionInvokes(state) {
+        /**  Getter for action-invoke interactions considered as output interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueInteractionInterface[]} array of all output action-invoke interactions interactions
+         */
+        getActionInvokes(state: any) {
             return state.allInteractions.actionInvokes;
         },
-        getPropertyReadAnnotations(state) {
+        /** Getter for all annotations of property-read interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of property-read interaction annotations
+         */
+        getPropertyReadAnnotations(state: any) {
             return state.allAnnotations.propertyReads;
         },
-        getPropertyWriteAnnotations(state) {
+        /** Getter for all annotations of property-write interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of property-write interaction annotations
+         */
+        getPropertyWriteAnnotations(state: any) {
             return state.allAnnotations.propertyWrites;
         },
-        getEventSubAnnotations(state) {
+        /** Getter for all annotations of event-subscribe interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of event-subscribe interaction annotations
+         */
+        getEventSubAnnotations(state: any) {
             return state.allAnnotations.eventSubs;
         },
-        getActionReadAnnotations(state) {
+        /** Getter for all annotations of action-invoke interactions that are considered as input interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of input action-invoke interaction annotations
+         */
+        getActionReadAnnotations(state: any) {
             return state.allAnnotations.actionReads;
         },
-        getActionInvokeAnnotations(state) {
+        /** Getter for all annotations of action-invoke interactions that are considered as output interactions
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of output action-invoke interaction annotations
+         */
+        getActionInvokeAnnotations(state: any) {
             return state.allAnnotations.actionInvokes;
         },
-        getInputsTdAnnotations(state) {
+        /** Getter for all top-level annotations of input TDs
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of top-level input TDs annotations
+         */
+        getInputsTdAnnotations(state: any) {
             return state.allTdAnnotations.inputs;
         },
-        getOutputsTdAnnotations(state) {
+        /** Getter for all top-level annotations of output TDs
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of top-level output TDs annotations
+         */
+        getOutputsTdAnnotations(state: any) {
             return state.allTdAnnotations.outputs;
         },
-        getIosTdAnnotations(state) {
+        /** Getter for all top-level annotations of input/output TDs
+         * 
+         * @param state store state
+         * @returns {MAGE.VueAnnotationInterface[]} array of top-level input/output TDs annotations
+         */
+        getIosTdAnnotations(state: any) {
             return state.allTdAnnotations.ios;
         },
-        getGenerationExecutionTimeBigInt(state) {
+        /** Converter of execution time in bigint format
+         * 
+         * @param state store state
+         * @returns {number | bigint, string} an object that holds the execution time and its corresponding unit
+         */
+        getGenerationExecutionTimeBigInt(state: any) {
             let executionTime: bigint | number = state.result.executionTime;
             let numberOfConversions = 0;
-            // Convert to micro-seconds
+            // Convert to microseconds
             if (executionTime > 1000) {
                 // Convert to number if possible
                 if (executionTime <= Number.MAX_SAFE_INTEGER) {
@@ -138,9 +261,8 @@ export default {
                     executionTime = executionTime / 1000n;
                 }
                 numberOfConversions++;
-                // Convert to milli-seconds
+                // Convert to milliseconds
                 if (executionTime > 1000) {
-                    // Convert to number if possible
                     if (typeof executionTime === 'number') {
                         executionTime = executionTime / 1000;
                     // Convert to number if possible
@@ -215,6 +337,7 @@ export default {
                     }
                 }
             }
+            // Get unit
             let stringUnit: string = '';
             switch (numberOfConversions) {
                 case 0:
@@ -245,25 +368,30 @@ export default {
 
             return {executionTime, stringUnit};
         },
-        getGenerationExecutionTime(state) {
+        /** Converter of execution time in number format
+         * 
+         * @param state store state
+         * @returns  
+         */
+        getGenerationExecutionTime(state: any) {
             const executionTime: [number, number] = state.result.executionTime;
-            let fractionOfseconds = executionTime[1];
+            let fractionOfSeconds = executionTime[1];
             let multipleOfSeconds = executionTime[0];
             let numberOfConversionsNs = 0;
             let numberOfConversionsS = 0;
             let result = 0;
             // Convert to micro-seconds
-            if (fractionOfseconds > 1000) {
-                fractionOfseconds = fractionOfseconds / 1000;
+            if (fractionOfSeconds > 1000) {
+                fractionOfSeconds = fractionOfSeconds / 1000;
                 numberOfConversionsNs++;
-                // Convert to milli-seconds
-                if (fractionOfseconds > 1000) {
+                // Convert to milliseconds
+                if (fractionOfSeconds > 1000) {
                     // Convert to number if possible
-                    fractionOfseconds = fractionOfseconds / 1000;
+                    fractionOfSeconds = fractionOfSeconds / 1000;
                     numberOfConversionsNs++;
                     // Convert to seconds
-                    if (fractionOfseconds > 1000) {
-                        fractionOfseconds = fractionOfseconds / 1000;
+                    if (fractionOfSeconds > 1000) {
+                        fractionOfSeconds = fractionOfSeconds / 1000;
                         numberOfConversionsNs++;
                     }
                 }
@@ -284,6 +412,7 @@ export default {
                 }
             }
 
+            // Get unit
             let stringUnit: string = '';
             if (multipleOfSeconds > 0) {
                 switch (numberOfConversionsS) {
@@ -317,23 +446,30 @@ export default {
                 }
             }
 
+            //compose multiple seconds together
             if (multipleOfSeconds > 0) {
                 result = multipleOfSeconds;
                 if (numberOfConversionsS === 0 && numberOfConversionsNs === 2) {
-                    result = result + (fractionOfseconds / 1000);
+                    result = result + (fractionOfSeconds / 1000);
                 }
             } else {
-                result = fractionOfseconds;
+                result = fractionOfSeconds;
             }
 
             return {result, stringUnit};
         }
     },
+
     actions: {
+        /** An action that extracts all inputs from the store state and then starts the generation of mashups
+         * 
+         * @param {{generationForm: MAGE.GenerationFormInterface}} generationPayload an object that contain the generation form
+         */
         async generateMashups({commit, state},
                               generationPayload: {
-                generationForm: MAGE.GenerationFormInterace,
+                generationForm: MAGE.GenerationFormInterface,
             }) {
+                // Remove stored semantic vocabulary graphs
                 for (let [index, vocab] of (state.storedVocabs as MAGE.storedVocabInterface[]).entries()) {
                     if (vocab.numberOfAccurances === 0) {
                         vocabStore.deleteGraph(new N3.NamedNode(vocab.vocabUrl));
@@ -342,17 +478,19 @@ export default {
                     }
                 }
 
+                 // add input and output devices to the form
                 const inputs: TD[] = [];
                 const outputs: TD[] = [];
                 inputs.push(...state.inputs);
                 outputs.push(...state.outputs);
-
                 generationPayload.generationForm.things.inputs = inputs;
                 generationPayload.generationForm.things.outputs = outputs;
                 for (const io of state.ios) {
                     generationPayload.generationForm.things.inputs.push(io);
                     generationPayload.generationForm.things.outputs.push(io);
                 }
+
+                // add forbidden and must-have interactions to the form
                 const forbiddenInteractions: MAGE.VueInteractionInterface[] = [];
                 const mustHaveInteractions: MAGE.VueInteractionInterface[] = [];
                 for (const interactionType in state.allInteractions) {
@@ -371,6 +509,8 @@ export default {
                         }
                     }
                 }
+
+                // add forbidden and must-have interaction level annotations to the form
                 const forbiddenAnnotations: MAGE.VueAnnotationInterface[] = [];
                 const mustHaveAnnotations: MAGE.VueAnnotationInterface[] = [];
                 for (const interactionType in state.allAnnotations) {
@@ -389,6 +529,8 @@ export default {
                         }
                     }
                 }
+
+                // add forbidden and must-have top-level annotations to the form 
                 const forbiddenTdAnnotations: MAGE.VueAnnotationInterface[] = [];
                 const mustHaveTdAnnotations: MAGE.VueAnnotationInterface[] = [];
                 for (const tdType in state.allTdAnnotations) {
@@ -414,13 +556,23 @@ export default {
                 generationPayload.generationForm.filters.mustHaveAnnotations = mustHaveAnnotations;
                 generationPayload.generationForm.filters.forbiddenTdAnnotations = forbiddenTdAnnotations;
                 generationPayload.generationForm.filters.mustHaveTdAnnotations = mustHaveTdAnnotations;
+
+                // set result-ready flag to false
                 commit('setResultReady', false);
+                // set the generation form
                 commit('setGenerationForm', generationPayload.generationForm);
+                // generate mashups
                 generateMashups(generationPayload.generationForm).then((result) => {
+                    // set result
                     commit('setResult', result);
+                    // change result flag
                     commit('toggleResultReady');
                 });
         },
+        /** An action that generates the System Description out of the results
+         * 
+         * @param {number} mashupNr the index of the mashups in the results array
+         */
         async generateSystemDescription({state, commit}, mashupNr: number) {
             const mashupGenerationResult =  state.result as MAGE.MashupGenerationResult;
             const sdGenInput: {'mashup-uml': string, tds: string} = {'mashup-uml': mashupGenerationResult.plantUmls[mashupNr], 'tds': '['};
@@ -441,11 +593,12 @@ export default {
             sdGenInput.tds = sdGenInput.tds.slice(0, -1);
             sdGenInput.tds += ']';
 
-
+            // validate sequence diagram of mashup
             checkSeqD(sdGenInput['mashup-uml'])
             .then(() => {
                 let mashupLogic: SDSQ.mashupLogic;
                 let outSD: string;
+                // try to parse sequence diagram
                 try {
                     mashupLogic = parseSeqD(sdGenInput['mashup-uml']);
                     state.mashupLogic = mashupLogic;
@@ -453,20 +606,28 @@ export default {
                     return;
                 }
 
+                // try to generate SD
                 try {
                     outSD = generateSD(mashupLogic, sdGenInput.tds);
                 } catch (error) {
                     return;
                 }
+                // open editor
                 commit('setTabActive', 'editor');
+                // set SD as result
                 commit('setMashupSd', outSD);
+                // set editor language
                 state.editorLanguage = 'json';
+                // set flags for editor
                 state.showSd = true; state.showCode = false;
             })
             .catch(() => {
                 return;
             });
         },
+        /** Generate SD code
+         * 
+         */
         async generateMashupCode({getters, commit, state}) {
             const sd = getters.getMashupSd;
             const mashupCodeParts = codeGenerator(JSON.parse(sd), state.mashupLogic);
@@ -490,6 +651,10 @@ Code
             state.showSd = false; state.showCode = true;
 
         },
+        /** an action that adds a TD into either inputs, outputs or io
+         * 
+         * @param {{element: TD|Mashup, io: 'input'|'output'|'io'}} payload an object that contains the TD and a string that identifies where to add the TD
+         */
         async addTdToIo({dispatch, commit, state}: any, payload: {element: TD|Mashup, io: 'input'|'output'|'io'}) {
             await dispatch('addTdVocab', {element: payload.element});
             commit('addTdAnnotations', payload);
@@ -499,25 +664,44 @@ Code
                 case 'io': commit('addToIos', payload.element); break;
             }
         },
+        /** An action that adds the TD semantic vocabularies to the store
+         * 
+         * @param payload an object containing the TD
+         */
         async addTdVocab({state}: any, payload: {element: TD}) {
             const td = payload.element.content;
             const parsedTd = JSON.parse(td);
             const uris = parsedTd['@context'] as string | any[];
+            // if string, then only the TD context is available, therefore ignore
             if (typeof uris === 'string') return;
+            // check all item in array
             for (const vocabObject of uris) {
+                // if only string, ignore
                 if (typeof vocabObject === 'string') continue;
+                // for objects
                 for (const vocab in vocabObject) {
+                    // ignore @language
+                    // TODO: take this into consideration when using NLP!!
                     if (vocab === '@language') continue;
+                    // get URI of vocab
                     const uri = vocabObject[vocab] as string;
+                    // check if Vocab is already added
                     const index = (state.storedVocabs as MAGE.storedVocabInterface[]).findIndex(v => v.vocabUrl === uri);
+                    // if available, add to number of accurance 
                     if (index !== -1) state.storedVocabs[index].numberOfAccurances++;
                     else {
+                        // add vocab
                         (state.storedVocabs as MAGE.storedVocabInterface[]).push({vocabUrl: uri, numberOfAccurances: 1});
+                        // fetch vocab and store it
                         await fetchAndStoreVocab(uri);
                     }
                 }
             }
         },
+        /** Remove TD from inputs, outputs or io
+         * 
+         * @param payload an object that contains the TD and a string that identifies from where the TD should be removed
+         */
         removeTdFromIo({dispatch, commit, state}: any, payload: {element: number, io: 'input'|'output'|'io'}) {
             commit('removeTdAnnotations', payload);
             switch (payload.io) {
@@ -528,12 +712,27 @@ Code
         }
     },
     mutations: {
+        /** Setter for mashup SD
+         * 
+         * @param state store state
+         * @param {string} mashupSd SD in string format
+         */
         setMashupSd(state: any, mashupSd: string) {
             (state.currentMashup as Mashup).systemDescription = mashupSd;
         },
+        /** Setter for mashup code
+         * 
+         * @param state store state
+         * @param code code in string format
+         */
         setMashupCode(state: any, code: string) {
             (state.currentMashup as Mashup).mashupCode = code;
         },
+        /** A mutation that resets the store state when a new mashup is opened
+         * 
+         * @param state store state
+         * @param {Mashup} mashup the mashup object
+         */
         setCurrentMashup(state: any, mashup: Mashup) {
             (state.currentMashup as Mashup) = mashup;
             (state.inputs as Array<TD|Mashup>) = [];
@@ -562,72 +761,126 @@ Code
             state.showCode = false;
             state.showSd = true;
         },
-        setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterace) {
+        /** Setter of the generation from
+         * 
+         * @param state store state
+         * @param {MAGE.GenerationFormInterface} generationForm the generation form object
+         */
+        setGenerationForm(state: any, generationForm: MAGE.GenerationFormInterface) {
             state.generationForm = generationForm;
         },
-        setResult(state: any, result: object) {
+        /** Setter for the generation result
+         * 
+         * @param state store state
+         * @param {MAGE.MashupGenerationResult} result the result object
+         */
+        setResult(state: any, result: MAGE.MashupGenerationResult) {
             state.result = result;
         },
+        /** Setter for the result-ready flag
+         * 
+         * @param state store state
+         * @param {boolean} ready the value to set
+         */
         setResultReady(state: any, ready: boolean) {
             state.resultReady = ready;
         },
+        /** A mutation that adds TDs to input TDs array in the store
+         * 
+         * @param state store state
+         * @param {Array<TD|Mashup>} elements an array containing the elements to be added
+         */
         addToInputs(state: any, ...elements: Array<TD|Mashup>) {
             const elementsFiltered = elements;
             let index = 0;
+            // filter out elements that are already in the inputs array.
             for (const element of elementsFiltered) {
                 if ((state.inputs as Array<TD|Mashup>).includes(element)) elementsFiltered.splice(index, 1);
                 index++;
             }
+            // add to inputs array
             (state.inputs as Array<TD|Mashup>).push(...elementsFiltered);
+            // remove from output and input/output arrays if found
             for (const element of elementsFiltered) {
                 let indexToDelete = (state.outputs as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromOutputs', indexToDelete);
                 indexToDelete = (state.ios as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromIos', indexToDelete);
+                // categorize the TD interactions
                 (this as any).commit('MashupStore/categorizeTdInteractions', {element, io: 'input'});
             }
         },
+        /** A mutation that adds TDs to output TDs array in the store
+         * 
+         * @param state  store state
+         * @param elements an array containing the elements to be added
+         */
         addToOutputs(state: any, ...elements: Array<TD|Mashup>) {
             const elementsFiltered = elements;
             let index = 0;
+            // filter out elements that are already in the outputs array.
             for (const element of elementsFiltered) {
                 if ((state.outputs as Array<TD|Mashup>).includes(element)) elementsFiltered.splice(index, 1);
                 index++;
             }
+            // add to outputs array
             (state.outputs as Array<TD|Mashup>).push(...elementsFiltered);
+            // remove from input and input/output arrays if found
             for (const element of elementsFiltered) {
                 let indexToDelete = (state.inputs as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromInputs', indexToDelete);
                 indexToDelete = (state.ios as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromIos', indexToDelete);
+                // categorize the TD interactions
                 (this as any).commit('MashupStore/categorizeTdInteractions', {element, io: 'output'});
             }
         },
+        /** A mutation that adds TDs to output TDs array in the store
+         * 
+         * @param state store state
+         * @param elements an array containing the elements to be added
+         */
         addToIos(state: any, ...elements: Array<TD|Mashup>) {
             const elementsFiltered = elements;
             let index = 0;
+            // filter out elements that are already in the input/output array.
             for (const element of elementsFiltered) {
                 if ((state.ios as Array<TD|Mashup>).includes(element)) elementsFiltered.splice(index, 1);
                 index++;
             }
+            // add to input/output array
             (state.ios as Array<TD|Mashup>).push(...elementsFiltered);
+            // remove from input and output arrays if found
             for (const element of elementsFiltered) {
                 let indexToDelete = (state.inputs as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromInputs', indexToDelete);
                 indexToDelete = (state.outputs as Array<TD|Mashup>).indexOf(element);
                 if (indexToDelete !== -1) (this as any).commit('MashupStore/removeFromOutputs', indexToDelete);
+                // categorize the TD interactions
                 (this as any).commit('MashupStore/categorizeTdInteractions', {element, io: 'io'});
             }
         },
+        /** A mutation that categorizes the interactions of a TD
+         * 
+         * @param state store state
+         * @param payload an object that contains the TD `element` and a string label `io` to identify if it is an input, output or input/output TD
+         */
         categorizeTdInteractions(state: any, payload: {element: TD, io: string}) {
             const parsedTd = JSON.parse(payload.element.content);
-
+            /** a function that fetches the description of an annotation if available
+             * 
+             * @param {string} annotation an annotation
+             * @returns {string | null} returns the description of a string if found, else returns `null`
+             */
             function getAnnotationDescription(annotation: string): string | null {
+                // split annotation in context and annotation name
                 const parts = annotation.split(':');
+                // find the URI of the context
                 for (const vocabObj of parsedTd['@context']) {
                     if (typeof vocabObj === 'string') continue;
                     for (const vocab in vocabObj) {
                         if (vocab === parts[0]) {
+                            // when found, get the description from the corresponding graph
                             const uri = vocabObj[vocab];
                             const tmp = vocabStore.getObjects(
                                 new N3.NamedNode(`${uri}${parts[1]}`),
@@ -641,6 +894,7 @@ Code
                 return null;
             }
 
+            // categorize properties
             for (const prop in parsedTd.properties) {
                 const description = parsedTd.properties[prop].description ? parsedTd.properties[prop].description : null;
                 let annotations = parsedTd.properties[prop]['@type'] as string | string[] | undefined;
@@ -786,6 +1040,8 @@ Code
                     }
                 }
             }
+
+            // categorize events
             for (const event in parsedTd.events) {
                 const description = parsedTd.events[event].description ? parsedTd.events[event].description : null;
                 let annotations = parsedTd.events[event]['@type'] as string | string[] | undefined;
@@ -833,6 +1089,8 @@ Code
                     }
                 }
             }
+
+            // categorize actions
             for (const action in parsedTd.actions) {
                 const description = parsedTd.actions[action].description ? parsedTd.actions[action].description : null;
                 let annotations = parsedTd.actions[action]['@type'] as string | string[] | undefined;
@@ -936,13 +1194,22 @@ Code
                 }
             }
         },
+        /** A mutation that adds the top-level annotation of the TD in input, output ot input/output array
+         * 
+         * @param state store state
+         * @param payload an object containing the TD `element` and a string label `io` that must be `"input"`, `"output"` or `"io"`
+         */
         addTdAnnotations(state: any, payload: {element: TD, io: 'input' | 'output' | 'io'}) {
             const td = payload.element.content;
             const parsedTd = JSON.parse(td);
             let annotations: string | string[] | undefined = parsedTd['@type'];
             if (!annotations) return;
             if (typeof annotations === 'string') annotations = [annotations];
-
+            /** a function that generates annotation objects to add to the annotations array
+             * 
+             * @param annotations an array of annotation strings
+             * @returns {MAGE.VueAnnotationInterface[]} an array of annotation objects
+             */
             function getAnnotationObjects(annotations: string[]): MAGE.VueAnnotationInterface[] {
                 let description: string | null = null;
                 const resultAnnotation: MAGE.VueAnnotationInterface[] = [];
@@ -992,6 +1259,11 @@ Code
             }
             state.allTdAnnotations[`${payload.io}s`].push(...getAnnotationObjects(annotations));
         },
+        /** Setter for the interaction restriction
+         * 
+         * @param state store states
+         * @param payload an object that contains an interaction object `interaction` and a restriction label `restriction` that must be either `"none"` or `"forbidden"` or `"mustHave"`
+         */
         setInteractionRestriction(state: any, payload: {interaction: MAGE.VueInteractionInterface, restriction: 'none' | 'forbidden' | 'mustHave'}) {
             let index: number;
             const interaction = payload.interaction;
@@ -1024,6 +1296,11 @@ Code
             }
 
         },
+        /** Setter for interaction-level annotation restriction
+         * 
+         * @param state store state
+         * @param payload an object that contains an annotation object `annotation` and a restriction label `restriction` that must be either `"none"` or `"forbidden"` or `"mustHave"`
+         */
         setAnnotationRestriction(state: any, payload: {annotation: MAGE.VueAnnotationInterface, restriction: 'none' | 'forbidden' | 'mustHave'}) {
             let index: number;
             const annotation = payload.annotation;
@@ -1049,6 +1326,11 @@ Code
                     if (index !== -1) (state.allAnnotations.propertyObservations as MAGE.VueAnnotationInterface[])[index].restriction = restriction;  break;
             }
         },
+        /** Setter for top-level annotation restriction
+         * 
+         * @param state store state
+         * @param payload an object that contains an annotation object `annotation` and a restriction label `restriction` that must be either `"none"` or `"forbidden"` or `"mustHave"`
+         */
         setTdAnnotationRestriction(state: any, payload: {annotation: MAGE.VueAnnotationInterface, restriction: 'none' | 'forbidden' | 'mustHave'}) {
             let index: number;
             const annotation = payload.annotation;
@@ -1057,44 +1339,82 @@ Code
             index = annotationArray.findIndex(a => a.annotation === annotation.annotation);
             if (index !== -1) state.allTdAnnotations[`${annotation.type}s`][index].restriction = restriction;
         },
+        /** A mutation that removes a TD from inputs array
+         * 
+         * @param state store state
+         * @param {TD|Mashup|number} element either a TD instance or a index of the TD in the array
+         */
         removeFromInputs(state: any, element: TD|Mashup|number) {
             if (typeof element === 'number') {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', state.inputs[element]);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element: state.inputs[element]});
                 (state.inputs as Array<TD|Mashup>).splice(element, 1);
             } else {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', element);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element});
                 const indexToDelete = (state.inputs as Array<TD|Mashup>).indexOf(element);
                 (state.inputs as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
         },
+        /** A mutation that removes a TD from outputs array
+         * 
+         * @param state store state
+         * @param {TD|Mashup|number} element either a TD instance or a index of the TD in the array
+         */
         removeFromOutputs(state: any, element: TD|Mashup|number) {
             if (typeof element === 'number') {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', state.outputs[element]);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element: state.outputs[element]});
                 (state.outputs as Array<TD|Mashup>).splice(element, 1);
             } else {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', element);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element});
                 const indexToDelete = (state.outputs as Array<TD|Mashup>).indexOf(element);
                 (state.outputs as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
         },
+        /** A mutation that removes a TD from inputs/outputs array
+         * 
+         * @param state store state
+         * @param {TD|Mashup|number} element either a TD instance or a index of the TD in the array
+         */
         removeFromIos(state: any, element: TD|Mashup|number) {
             if (typeof element === 'number') {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', state.ios[element]);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element: state.ios[element]});
                 (state.ios as Array<TD|Mashup>).splice(element, 1);
             } else {
+                // remove associated interactions
                 (this as any).commit('MashupStore/removeInteractions', element);
+                // remove associated semantic vocabularies
                 (this as any).commit('MashupStore/removeVocabs', {element});
                 const indexToDelete = (state.ios as Array<TD|Mashup>).indexOf(element);
                 (state.ios as Array<TD|Mashup>).splice(indexToDelete, 1);
             }
         },
+        /** A mutation that removes interactions associated with a TD
+         * 
+         * @param state store state
+         * @param {TD} element a TD
+         */
         removeInteractions(state: any, element: TD) {
             const parsedTd = JSON.parse(element.content);
+            /** A function that removes all annotations associated with an interaction
+             * 
+             * @param {MAGE.VueInteractionInterface} interaction the interaction
+             * @param {'properties' | 'events' | 'actions'} type the type of the interaction
+             * @param {'propertyReads' | 'propertyWrites' | 'eventSubs' | 'actionReads' | 'actionInvokes' | 'propertyObservations'} category the category of the interaction
+             */
             function removeAnnotations(
                 interaction: MAGE.VueInteractionInterface,
                 type: 'properties' | 'events' | 'actions',
@@ -1170,6 +1490,11 @@ Code
                 }
             }
         },
+        /** A mutation that removes the vocabularies associated with a TD
+         * 
+         * @param state store state
+         * @param payload an object containing a TD instance `element`
+         */
         removeVocabs(state: any, payload: {element: TD}) {
             const td = payload.element.content;
             const parsedTd = JSON.parse(td);
@@ -1184,6 +1509,11 @@ Code
                 }
             }
         },
+        /** A mutation that removes top-level TD annotations
+         * 
+         * @param state store state
+         * @param payload an object that contains the index of the TD `element` in the array and the a string label identifying which array it is in. `io`  must be either `"input"`, `"output"` or `"io"`
+         */
         removeTdAnnotations(state: any, payload: {element: number, io: 'input' | 'output' | 'io'}) {
             const tdObject: TD = state[`${payload.io}s`][payload.element];
             const td = tdObject.content;
@@ -1197,6 +1527,11 @@ Code
                 if (annotationIndex !== -1) annotationsArray.splice(annotationIndex, 1);
             }
         },
+        /** A mutation that toggles a tab
+         * 
+         * @param state store state
+         * @param {string} tabId the id of the tab
+         */
         toggleTab(state: any, tabId: string) {
             for (const tab of state.mashupTabbar) {
                 if (tab.tabId === tabId) {
@@ -1206,9 +1541,18 @@ Code
                 }
             }
         },
+        /** A mutation that toggles result-ready flag
+         * 
+         * @param state store state
+         */
         toggleResultReady(state) {
             state.resultReady = !state.resultReady;
         },
+        /** A mutation that sets a tab to active
+         * 
+         * @param state store state
+         * @param {string} tabId the tab id
+         */
         setTabActive(state: any, tabId: string) {
             for (const tab of state.mashupTabbar) {
                 if (tab.tabId === tabId) {
@@ -1219,6 +1563,11 @@ Code
                 }
             }
         },
+        /** A mutation that sets a tab to inactive
+         * 
+         * @param state store state
+         * @param {string} tabId the tab id
+         */
         setTabInactive(state: any, tabId: string) {
             for (const tab of state.mashupTabbar) {
                 if (tab.tabId === tabId) {

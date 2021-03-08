@@ -71,6 +71,7 @@
     "@types/mermaid": "^8.2.1",
     "@types/n3": "^1.4.4",
     "@types/node": "^12.12.11",
+    "@types/request": "^2.48.5",
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-typescript": "^3.12.1",
     "@vue/cli-service": "^3.12.1",

@@ -4,11 +4,14 @@ import _ from 'lodash';
 import Crypto from 'crypto';
 import * as Filters from './filters';
 import * as Utils from './utils';
-import { ThingDescription } from 'wot-typescript-definitions';
 import { hrtime } from 'process';
 
-/** generate all the possible combinations of interactions for a given list of things and a given length */
-async function generateInteractionCombinations(generationForm: MAGE.GenerationFormInterace) {
+/**
+ * Generate all the possible combinations of interactions for a given list of things and a given length
+ * @param {MAGE.GenerationFormInterface} generationForm an object that contains all required parameters.
+ * @returns {MAGE.InteractionInterface[][]} a 2-dimensional array containing all input-output interaction combinations
+ */
+async function generateInteractionCombinations(generationForm: MAGE.GenerationFormInterface): Promise<MAGE.InteractionInterface[][]> {
     const things = generationForm.things;
     const filters = generationForm.filters;
     const templates = generationForm.templates;
@@ -24,14 +27,16 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     things.inputs.forEach( thingDescription => {
         let forbiddenAnnotationFound =  false;
         if (!thingDescription.content) return;
-        const parsedTd: ThingDescription = JSON.parse(thingDescription.content);
+        const parsedTd: any = JSON.parse(thingDescription.content);
         let types: string | string[] | undefined = parsedTd['@type'];
         if (!types) types = [];
         if (typeof types === 'string') types = [types];
+        // check if the TD is annotated using a forbidden annotation
         for (const type of types) {
             if (filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type))
             forbiddenAnnotationFound = true; break;
         }
+        // add interactions of TD if TD is not annotated with forbidden annotations
         if (!forbiddenAnnotationFound) {
             const interactions = getInputInteractions(parsedTd, filters);
             events.push(...interactions.events);
@@ -45,14 +50,16 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     let forbiddenAnnotationFound =  false;
     things.outputs.forEach( thingDescription => {
         if (!thingDescription.content) return;
-        const parsedTd: ThingDescription = JSON.parse(thingDescription.content);
+        const parsedTd: any = JSON.parse(thingDescription.content);
         let types: string | string[] | undefined = parsedTd['@type'];
         if (!types) types = [];
         if (typeof types === 'string') types = [types];
+        // check if the TD is annotated using a forbidden annotation
         for (const type of types) {
             if (filters.forbiddenTdAnnotations && filters.forbiddenTdAnnotations.some(a => a.annotation === type))
             forbiddenAnnotationFound = true; break;
         }
+        // add interactions of TD if TD is not annotated with forbidden annotations
         if (!forbiddenAnnotationFound) {
             const interactions = getOutputInteractions(parsedTd, filters);
             actions.push(...interactions.actions);
@@ -60,6 +67,7 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
         }
     });
 
+    // filter output interactions based on their types (propertyWrites and/or actionInvokes)
     const outputs: MAGE.InteractionInterface[] = [];
     if (filters.acceptedOutputInteractionTypes.includes('property-write')) outputs.push(...propertyWrites);
     if (filters.acceptedOutputInteractionTypes.includes('action-invoke')) outputs.push(...actions);
@@ -114,21 +122,28 @@ async function generateInteractionCombinations(generationForm: MAGE.GenerationFo
     return interactionCombinations;
 }
 
-/** parse a TD to return all interactions that can serve as an input */
-function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.FiltersInterface) {
+/** Parses a TD to return all interactions that can serve as an input
+ * 
+ * @param  thingDescription a parsed JSON object representing the TD
+ * @param {MAGE.FiltersInterface} filters an object containing the filters and constraints which were defined in the generation form
+ * @returns {{ events: MAGE.InputInteractionInterface[], properties: MAGE.InputInteractionInterface[], actions: MAGE.InputInteractionInterface[], observations: MAGE.InputInteractionInterface[] }} an object containing four arrays of all input interaction found in the TD that conform to the specified constraints
+ */
+function getInputInteractions(thingDescription: any, filters: MAGE.FiltersInterface): { events: MAGE.InputInteractionInterface[]; properties: MAGE.InputInteractionInterface[]; actions: MAGE.InputInteractionInterface[]; observations: MAGE.InputInteractionInterface[]; } {
     const events: MAGE.InputInteractionInterface[] = [];
     const propertyReads: MAGE.InputInteractionInterface[] = [];
     const propertyObservations: MAGE.InputInteractionInterface[] = [];
     const actionReads: MAGE.InputInteractionInterface[] = [];
+    // check property interaction affordances
     for (const prop in thingDescription.properties) {
         let dontAddRead = false;
         let dontAddObserve = false;
 
+        // extract annotations
         let propAnnotations = thingDescription.properties[prop]['@type'];
         if (!propAnnotations) propAnnotations = [];
         if (typeof propAnnotations === 'string') propAnnotations = [propAnnotations];
 
-        // filter based on unwanted types
+        // filter based on accepted types
         if (!thingDescription.properties[prop].writeOnly) {
             if (!filters.acceptedTypes.includes(thingDescription.properties[prop].type)) {
                 if (thingDescription.properties[prop].type) continue;
@@ -180,8 +195,10 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             });
         }
     }
+    // check event interaction affordances
     for (const event in thingDescription.events) {
 
+        // extract annotations
         let eventAnnotations = thingDescription.events[event]['@type'];
         if (!eventAnnotations) eventAnnotations = [];
         if (typeof eventAnnotations === 'string') eventAnnotations = [eventAnnotations];
@@ -218,17 +235,21 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             id: ''
         });
     }
+    // check action interaction affordances
     for (const action in thingDescription.actions) {
 
+        // extract annotations
         let actionAnnotations = thingDescription.actions[action]['@type'];
         if (!actionAnnotations) actionAnnotations = [];
         if (typeof actionAnnotations === 'string') actionAnnotations = [actionAnnotations];
 
+        // filter based on accepted types
         if (!thingDescription.actions[action].output && !filters.acceptedTypes.includes('null')) continue;
         else if (thingDescription.actions[action].output && !filters.acceptedTypes.includes(thingDescription.actions[action].output.type)) {
             if (thingDescription.actions[action].output.type) continue;
             else if (!thingDescription.actions[action].output.type && !filters.acceptedTypes.includes('null')) continue;
         }
+
         // filter interactions with unwanted annotations
         if (filters.forbiddenAnnotations) {
             let forbiddenFound = false;
@@ -240,11 +261,13 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
             }
             if (forbiddenFound) continue;
         }
+
         // filter unwanted interactions
         if (filters.forbiddenInteractions) {
             if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
                 inter.name === action && inter.type === 'action-read')) continue;
         }
+
         actionReads.push({
             interactionType: 'action-read',
             name: action,
@@ -258,12 +281,17 @@ function getInputInteractions(thingDescription: ThingDescription, filters: MAGE.
     return { events, properties: propertyReads, actions: actionReads, observations: propertyObservations };
 }
 
-/** parse a TD to return all interactions that can serve as an output */
-function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface) {
+/** Parse a TD to return all interactions that can serve as an output
+ * 
+ * @param thingDescription a parsed JSON object representing the TD
+ * @param {MAGE.FiltersInterface} filters an object containing the filters and constraints which were defined in the generation form
+ * @returns {{ actions: MAGE.InteractionInterface[], properties: MAGE.InteractionInterface[] }} an object containing two arrays of all output interaction found in the TD that conform to the specified constraints
+ */
+function getOutputInteractions(thingDescription: any, filters: MAGE.FiltersInterface): { actions: MAGE.InteractionInterface[]; properties: MAGE.InteractionInterface[]; } {
     const actions: MAGE.InteractionInterface[] = [];
     const propertyWrites: MAGE.InteractionInterface[] = [];
     for (const prop in thingDescription.properties) {
-
+        // extract annotations
         let propAnnotations = thingDescription.properties[prop]['@type'];
         if (!propAnnotations) propAnnotations = [];
         if (typeof propAnnotations === 'string') propAnnotations = [propAnnotations];
@@ -285,11 +313,13 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
                 }
                 if (forbiddenFound) continue;
             }
+
             // filter unwanted interactions
             if (filters.forbiddenInteractions) {
                 if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
                     inter.name === prop && inter.type === 'property-write')) continue;
             }
+
             propertyWrites.push({
                 interactionType: 'property-write',
                 name: prop,
@@ -301,17 +331,20 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
             });
         }
     }
-    for (const action in thingDescription.actions) {
 
+    for (const action in thingDescription.actions) {
+        // extract annotations
         let actionAnnotations = thingDescription.actions[action]['@type'];
         if (!actionAnnotations) actionAnnotations = [];
         if (typeof actionAnnotations === 'string') actionAnnotations = [actionAnnotations];
 
+        // filter based on accepted types
         if (!thingDescription.actions[action].input && !filters.acceptedTypes.includes('null')) continue;
         else if (thingDescription.actions[action].input && !filters.acceptedTypes.includes(thingDescription.actions[action].input.type)) {
             if (thingDescription.actions[action].input.type) continue;
             else if (!thingDescription.actions[action].input.type && !filters.acceptedTypes.includes('null')) continue;
         }
+
         // filter interactions with unwanted annotations
         if (filters.forbiddenAnnotations) {
             let forbiddenFound = false;
@@ -323,11 +356,13 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
             }
             if (forbiddenFound) continue;
         }
+
         // filter unwanted interactions
         if (filters.forbiddenInteractions) {
             if (filters.forbiddenInteractions.some(inter => inter.thingId === thingDescription.id &&
                 inter.name === action && inter.type === 'action-invoke')) continue;
         }
+
         actions.push({
             interactionType: 'action-invoke',
             name: action,
@@ -341,11 +376,17 @@ function getOutputInteractions(thingDescription, filters: MAGE.FiltersInterface)
     return { actions, properties: propertyWrites };
 }
 
-/** filter a list of outputs to match a given input (event or property_read) */
+/** Filter a list of output affordances to match a given input affordance.
+ * 
+ * @param {MAGE.InputInteractionInterface} input the input affordance
+ * @param {MAGE.InteractionInterface[]} outputs an array containing all output affordances
+ * @param {MAGE.FiltersInterface} filters an object containing filters and constraints 
+ * @returns {Promise<MAGE.InteractionInterface[]>} an array containing the filtered output affordances
+ */
 async function getMatchingOutputs(
     input: MAGE.InputInteractionInterface,
     outputs: MAGE.InteractionInterface[],
-    filters: MAGE.FiltersInterface) {
+    filters: MAGE.FiltersInterface): Promise<MAGE.InteractionInterface[]> {
         if (filters.onlySameType) {
             outputs = outputs.filter(element => Filters.sameType(input, element));
         }
@@ -353,7 +394,7 @@ async function getMatchingOutputs(
             // since filter cannot by async, we have to filter manually.
             const newOutputs: MAGE.InteractionInterface[] = [];
             for (const element of outputs) {
-                const filterResults = await Filters.similar(input, element, filters.similarityThresholdNames);
+                const filterResults = await Filters.similar(input.name, element.name, filters.similarityThresholdNames);
                 if (filterResults) newOutputs.push(element);
             }
             return newOutputs;
@@ -373,8 +414,13 @@ async function getMatchingOutputs(
         }
     return outputs;
 }
-/** for a list of inputs, return all possible input/output combinations */
-function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MAGE.GenerationFormInterace) {
+/** For a list of inputs, return all possible input/output combinations
+ * 
+ * @param {MAGE.InputInteractionInterface[]} inputs an array containing all inputs
+ * @param {MAGE.GenerationFormInterface} form an object representing the generation form
+ * @returns {MAGE.InteractionInterface[][]} a 2-dimensional array containing the input-output combinations
+ */
+function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MAGE.GenerationFormInterface): MAGE.InteractionInterface[][] {
     let interactionCombinations: MAGE.InteractionInterface[][] = [];
     // calculate all input combinations
     let allInputCombinations: MAGE.InputInteractionInterface[][] = [];
@@ -401,7 +447,6 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
         interactionCombinations = interactionCombinations.filter(mashup => {if (form.filters.mustHaveTdAnnotations) return mashupIncludesTdAnnotations(mashup,
             form.filters.mustHaveTdAnnotations.filter(a => a.type === 'input' || a.type === 'io'), form); });
     }
-
     allInputCombinations.forEach(inputs_c => {
         const availableOutputs: MAGE.InteractionInterface[][][] = [];
         inputs_c.forEach(input => {if (input.matchingOutputCombinations) availableOutputs.push(input.matchingOutputCombinations); });
@@ -428,6 +473,12 @@ function getFinalCombinations(inputs: MAGE.InputInteractionInterface[], form: MA
     return interactionCombinations;
 }
 
+/** Check if a mashup includes a specific interaction or not
+ * 
+ * @param {MAGE.InteractionInterface[]} mashup an array of the mashup's interactions
+ * @param {MAGE.VueInteractionInterface[]} mustHaveInteractions an array of the interactions that must be included in the mashup
+ * @returns {boolean} returns `true` if the mashup contains all interactions in `mustHaveInteractions`, otherwise returns `false`
+ */
 function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHaveInteractions: MAGE.VueInteractionInterface[]): boolean {
     let isIncluded: boolean = true;
     for (const mustHaveInteraction of mustHaveInteractions) {
@@ -440,18 +491,26 @@ function mashupIncludesInteractions(mashup: MAGE.InteractionInterface[], mustHav
     return isIncluded;
 }
 
+/** Checks if a mashup includes at least one interaction from TDs annotated with top-level annotations
+ * 
+ * @param {MAGE.InteractionInterface[]} mashup an array containing the interactions of the mashup
+ * @param {MAGE.VueAnnotationInterface[]} mustHaveTdAnnotations an array containing the must-have top-level annotations
+ * @param {MAGE.GenerationFormInterface} form the generation form
+ * @returns {boolean} returns `true` if the mashup contains at least one interaction for each top-level annotation specified in `mustHaveTdAnnotations`, otherwise returns `false`
+ */
 function mashupIncludesTdAnnotations(
     mashup: MAGE.InteractionInterface[],
     mustHaveTdAnnotations: MAGE.VueAnnotationInterface[],
-    form: MAGE.GenerationFormInterace): boolean {
+    form: MAGE.GenerationFormInterface): boolean {
         let isIncluded: boolean = true;
         for (const mustHaveTdAnnotation of mustHaveTdAnnotations) {
-            innerloop: for (const [index, interaction] of mashup.entries()) {
+            innerLoop: for (const [index, interaction] of mashup.entries()) {
                 let resultTd: WADE.TDElementInterface | WADE.MashupElementInterface | undefined;
                 let parsedTd = null;
                 let types: string | string[] | undefined;
                 switch (interaction.interactionType) {
                     case 'property-read':
+                    case 'property-observe':
                     case 'action-read':
                     case 'event-subscribe':
                         resultTd = form.things.inputs.find(td => {if (td.content) return JSON.parse(td.content).id === interaction.thingId; });
@@ -459,7 +518,7 @@ function mashupIncludesTdAnnotations(
                         if (parsedTd) types = parsedTd['@type'];
                         if (!types) types = [];
                         if (typeof types === 'string') types = [types];
-                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
+                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerLoop;
                         break;
 
                     case 'property-write':
@@ -469,7 +528,7 @@ function mashupIncludesTdAnnotations(
                         if (parsedTd) types = parsedTd['@type'];
                         if (!types) types = [];
                         if (typeof types === 'string') types = [types];
-                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerloop;
+                        if (types.includes(mustHaveTdAnnotation.annotation)) break innerLoop;
                         break;
                 }
                 if (index === mashup.length - 1) isIncluded = false;
@@ -479,6 +538,12 @@ function mashupIncludesTdAnnotations(
         return isIncluded;
 }
 
+/** Checks if a mashup includes interactions that are annotated with a set of specified annotations
+ * 
+ * @param {MAGE.InteractionInterface[]} mashup an array containing the interactions of the mashup
+ * @param {MAGE.VueAnnotationInterface[]} mustHaveAnnotations an array containing the must-have interaction-annotation 
+ * @returns {boolean} returns `true` if there is at least one interaction for each annotation in `mustHaveAnnotations`, otherwise returns `false`
+ */
 function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
                                    mustHaveAnnotations: MAGE.VueAnnotationInterface[]): boolean {
         let isIncluded: boolean = true;
@@ -496,6 +561,11 @@ function mashupIncludesAnnotations(mashup: MAGE.InteractionInterface[],
         return isIncluded;
 }
 
+/** Checks if a mashup uses mixed input templates (uses different types of input interactions)
+ * 
+ * @param {MAGE.InputInteractionInterface[]} inputs array of input interactions
+ * @returns {boolean} returns `true` if mashup uses mixed input templates, else returns `false`
+ */
 function isMixedInputTemplate(inputs: MAGE.InputInteractionInterface[]): boolean {
     let template: string = '';
     for (const [index, input] of inputs.entries()) {
@@ -506,8 +576,12 @@ function isMixedInputTemplate(inputs: MAGE.InputInteractionInterface[]): boolean
     return true;
 }
 
-/** Returns the number of Things that participate in a given list on interactions */
-function getNumberOfThings(interactions: MAGE.InteractionInterface[]) {
+/** Returns the number of Things that participate in a given list on interactions
+ * 
+ * @param {MAGE.InteractionInterface[]} interactions an array containing the interactions
+ * @returns {number} the number of Things participating in `interactions`
+ */
+function getNumberOfThings(interactions: MAGE.InteractionInterface[]): number {
     const thingIds: string[] = [];
     interactions.forEach(inter => {
         if (!thingIds.includes(inter.thingId)) thingIds.push(inter.thingId);
@@ -515,11 +589,12 @@ function getNumberOfThings(interactions: MAGE.InteractionInterface[]) {
     return thingIds.length;
 }
 
-/** Generate PlantUML textual code for a mashup
+/** Generates an mermaid.js textual code for sequence diagram representation of the mashup
  *
- * @param {Array} interactions - Array of interaction (ie: a mashup)
+ * @param {{mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}} mashupObject - an object containing the mashup and additional metadata (mashup name, number of input and output interactions)
+ * @returns {string} an SD-compliant PlantUML textual code for a mashup
  */
-function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
+function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}): string {
     let seqDiagram = 'sequenceDiagram\n';
     const interactions = mashupObject.interactions;
     let inputsDone = 0;
@@ -578,7 +653,12 @@ function generateMermaidSeqDiagram(mashupObject: {mashupName: string, interactio
     return seqDiagram;
 }
 
-function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}) {
+/** Generates an SD-compliant PlantUML textual code for a mashup
+ *
+ * @param {{mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}} mashupObject - an object containing the mashup and additional metadata (mashup name, number of input and output interactions)
+ * @returns {string} an SD-compliant PlantUML textual code for a mashup
+ */
+function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interactions: MAGE.InteractionInterface[], numberOfInputInteractions: number, numberOfOutputInteractions: number}): string {
     let seqDiagram = `@startuml ${mashupObject.mashupName}\n`;
     seqDiagram += `[->"Agent": top:${mashupObject.mashupName}()\nactivate "Agent"\n`;
     seqDiagram += 'group strict\n';
@@ -646,8 +726,12 @@ function generatePlantUmlSeqDiagram(mashupObject: {mashupName: string, interacti
     return seqDiagram;
 }
 
-/** calculate size of design space ( how many mashups would be possible without any rules or filters ) */
-function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
+/** Calculates size of design space, i.e. how many mashups would be possible without any rules or filters
+ * 
+ * @param {MAGE.GenerationFormInterface} generationForm an object representation of the generation form
+ * @returns {number} the maximum number of mashups that can be generated
+ */
+function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterface): number {
     let designSpaceSize = 0;
     let nInputs = 0;
     let nOutputs = 0;
@@ -663,7 +747,7 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     });
 
     things.inputs.forEach(element => {
-        let parsedTd: ThingDescription;
+        let parsedTd: any;
         if (!element.content) return;
         parsedTd = JSON.parse(element.content);
         for (const prop in parsedTd.properties) {
@@ -676,7 +760,7 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     });
 
     things.outputs.forEach(element => {
-        let parsedTd: ThingDescription;
+        let parsedTd: any;
         if (!element.content) return;
         parsedTd = JSON.parse(element.content);
         for (const prop in parsedTd.properties) {
@@ -698,8 +782,12 @@ function getDesignSpaceSize(generationForm: MAGE.GenerationFormInterace) {
     return Math.round(designSpaceSize);
 }
 
-/** Main function to generate mashups. Calls all other functions. */
-export default async function generateMashups(generationForm: MAGE.GenerationFormInterace) {
+/** A function that generates mashups based on TDs, filters, and constraints specified in the generation form
+ * 
+ * @param {MAGE.GenerationFormInterface} generationForm an object representation of the generation form
+ * @returns {Promise<MAGE.MashupGenerationResult>} a Promise containing the results of the mashup generation encapsulated in an object. `designSpaceSize` contains the maximum number of mashups that can be generated. `mashupsGenerated` is the number of generated mashups. `imagesMD` is an array containing the strings used for mermaid.js. `plantUmls` is an array containing PlantUML textual code. `mashups` is a 2-dimensional array containing all generated mashups as arrays of interactions.
+ */
+export default async function generateMashups(generationForm: MAGE.GenerationFormInterface): Promise<MAGE.MashupGenerationResult> {
     // let start = hrtime.bigint();
     const start = hrtime();
     const interactionCombinations = await generateInteractionCombinations(generationForm);
@@ -750,10 +838,10 @@ export default async function generateMashups(generationForm: MAGE.GenerationFor
     return results;
 }
 
-/**
- * Class
+/** A class of the GenerationForm 
+ * 
  */
-export class GenerationForm implements MAGE.GenerationFormInterace {
+export class GenerationForm implements MAGE.GenerationFormInterface {
     public mashupName: string;
     public things: {
         inputs: WADE.TDElementInterface[]
@@ -784,6 +872,9 @@ export class GenerationForm implements MAGE.GenerationFormInterace {
           generateCode: boolean,
           includeFunctionSkeletons: boolean
     };
+    /**
+     * @constructor
+     */
     constructor() {
         this.mashupName = '';
         this.things = {

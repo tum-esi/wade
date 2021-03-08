@@ -443,7 +443,14 @@ declare global {
     // =============================================================================
     // --------------------------------- Interfaces --------------------------------
     // =============================================================================
-    interface GenerationFormInterace  {
+    /**
+     * @typedef {object} GenerationFormInterface
+     * @property {string} mashupName
+     */
+    interface GenerationFormInterface  {
+      /**
+       * @property {string} mashupName
+       */
       mashupName: string;
       things: {
         inputs: WADE.TDElementInterface[]
@@ -484,6 +491,9 @@ declare global {
         forbiddenTdAnnotations?: VueAnnotationInterface[];
     }
 
+    /**
+     * @typedef {object} InteractionInterface
+     */
     interface InteractionInterface {
       interactionType: string;
       name: string;
