@@ -75,7 +75,7 @@
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-typescript": "^3.12.1",
     "@vue/cli-service": "^3.12.1",
-    "electron": "^9.1.0",
+    "electron": "^13.6.6",
     "electron-devtools-installer": "^3.1.1",
     "electron-icon-builder": "^1.0.2",
     "less": "^3.10.3",
