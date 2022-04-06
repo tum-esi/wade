@@ -55,6 +55,8 @@ You need to have [Node.js](https://nodejs.org/en/) version >= 12.9 installed. It
 ---
 ## How to install the application
 
+### Install from sources
+
 **Step 1:** Clone the repository to your local machine.
 
 ```
@@ -75,6 +77,12 @@ yarn run electron:build
 ```
 
 **Step 4:** Navigate into the folder 'dist_electron' and install the application. After installing it you can start the application on your machine.
+
+### Install from releases
+
+You can also download the pre-built version of the application directly from the Releases tab of this repository.
+The installer specific to your platform can be found within the Assets section of a release.
+Keep in mind, that running the software under Mac OS requires [additional steps](https://support.apple.com/en-mn/guide/mac-help/mh40616/mac). 
 
 ---
 ## How to get started with development
