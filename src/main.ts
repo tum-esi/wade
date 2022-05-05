@@ -2,7 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store/store';
-import * as corsAnywhere from '@/backend/MaGe/corsAnywhere.ts';
+import * as corsAnywhere from '@/backend/MaGe/corsAnywhere';
 
 Vue.config.productionTip = false;
 Vue.prototype.$eventHub = new Vue(); // Global event bus

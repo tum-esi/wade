@@ -59,17 +59,17 @@ export default class TdAnnotater {
         const elName = ['write', 'read', 'Write', 'Read'].some(el => performanceMeasurement.name.includes(el)) ? performanceMeasurement.name.replace(/(: write|: read)/ig, '') : performanceMeasurement.name;
 
         // Check if property
-        if (this._td.properties[elName]) {
+        if (this._td.properties![elName]) {
             // Check wether it is a read or write propery
             typeOfMeasurementContext =
                 performanceMeasurement.name.toLowerCase().includes('write') ? TypeOfMeasurementContext.DYNAMIC_PROPERTY_WRITE : TypeOfMeasurementContext.DYNAMIC_PROPERTY_READ;
-            tdElement = this._td.properties[elName];
+            tdElement = this._td.properties![elName];
         }
 
         // Check if action
-        if (this._td.actions[elName]) {
+        if (this._td.actions![elName]) {
             typeOfMeasurementContext = TypeOfMeasurementContext.DYNAMIC_ACTION;
-            tdElement = this._td.actions[elName];
+            tdElement = this._td.actions![elName];
         }
 
         return { typeOfMeasurementContext, tdElement, elName};
@@ -149,11 +149,12 @@ export default class TdAnnotater {
         interactionName: string,
         data: any)
         : string {
-        // Create measurementContext if non-existent
-        if (!this._td.measurementContext) this._td.measurementContext = [];
+        // Create measurementContext
+        this._td.measurementContext = [];
+        const mContext: any = this._td.measurementContext;
 
         // Create new element and add it to the measurementContext
-        this._td.measurementContext.push({
+        mContext.push({
             [`${type}/${interactionName}`]: {
                 repetitions:
                     data.overallIterations && typeof data.overallIterations === 'string' ? parseInt(data.overallIterations) : data.overallIterations,

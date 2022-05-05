@@ -2058,7 +2058,7 @@ export default function checkSeqD(mashup: string) {
     try {
       const umlParser = new validateSeqD(mashup);
       umlParser.parse_mashup();
-    } catch (err) {
+    } catch (err: any) {
       DEBUG.e = err.getMessage();
       rej(DEBUG);
     }

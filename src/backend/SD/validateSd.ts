@@ -10,7 +10,7 @@ const schema = JSON.parse(fs.readFileSync(schemaFilePath, 'utf8'));
 
 // TODO: throw new Error for invalid SD
 export default function checkSD(sdFileContent: string, checkRequired = true) {
-    return new Promise( (res, rej) => {
+    return new Promise<void>( (res, rej) => {
         if (checkRequired === false) {
             res();
         } else {

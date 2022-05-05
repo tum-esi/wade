@@ -108,7 +108,7 @@ import mTableSimple from '@/components/02_molecules/mTableSimple.vue';
 import mTableMaGe from '@//components/02_molecules/mTableMaGe.vue';
 import mTemplateSelectionArea from '@/components/02_molecules/mTemplateSelectionAreaMaGe.vue';
 import mFilterConstraintsAreaMaGe from '@/components/02_molecules/mFilterConstraintsAreaMaGe.vue';
-import generateMashups from '@/backend/MaGe/generator.ts';
+import generateMashups from '@/backend/MaGe/generator';
 
 export default Vue.extend({
     components: {

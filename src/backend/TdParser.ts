@@ -6,6 +6,7 @@ import SizeCalculator from '@/backend/SizeCalculator';
 
 export default class TdParser {
   private consumedTd: WoT.ConsumedThing | null;
+  private eventSubscriptions: {[key: string]: WoT.Subscription}[];
   private parsedTd: any;
   private protocols: ProtocolEnum[];
   private SizeCalculator: any;
@@ -21,6 +22,7 @@ export default class TdParser {
       eventInteractions: []
     };
     this.protocols = protocols;
+    this.eventSubscriptions = [];
 
     this.SizeCalculator = new SizeCalculator();
 
@@ -40,7 +42,7 @@ export default class TdParser {
       if (
         !this.consumedTd
           .getThingDescription()
-          .properties.hasOwnProperty(property)
+          .properties!.hasOwnProperty(property)
       ) {
         continue;
       }
@@ -54,7 +56,7 @@ export default class TdParser {
           interactionType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
           interactionSelectBtn: {
             btnInputType: this.getCorrectInputType(
-              this.consumedTd.getThingDescription().properties[property]
+              this.consumedTd.getThingDescription().properties![property]
             ),
             btnKey: `property-${property}-observe`,
             btnGeneralStyle: 'btn-event-interaction',
@@ -75,7 +77,7 @@ export default class TdParser {
 
       // Readable properties
       if (
-        !this.consumedTd.getThingDescription().properties[property].writeOnly
+        !this.consumedTd.getThingDescription().properties![property].writeOnly
       ) {
         this.parsedTd.propertyInteractions.push({
           interactionName: property,
@@ -132,7 +134,7 @@ export default class TdParser {
 
       // Writeable properties (have input)
       if (
-        !this.consumedTd.getThingDescription().properties[property].readOnly
+        !this.consumedTd.getThingDescription().properties![property].readOnly
       ) {
         this.parsedTd.propertyInteractions.push({
           interactionName: property,
@@ -140,7 +142,7 @@ export default class TdParser {
           interactionType: PossibleInteractionTypesEnum.PROP_WRITE,
           interactionSelectBtn: {
             btnInputType: this.getCorrectInputType(
-              this.consumedTd.getThingDescription().properties[property]
+              this.consumedTd.getThingDescription().properties![property]
             ),
             btnKey: `property-${property}-write`,
             btnGeneralStyle: 'btn-event-interaction',
@@ -202,7 +204,7 @@ export default class TdParser {
     if (!this.consumedTd) return;
     for (const action in this.consumedTd.getThingDescription().actions) {
       if (
-        !this.consumedTd.getThingDescription().actions.hasOwnProperty(action)
+        !this.consumedTd.getThingDescription().actions!.hasOwnProperty(action)
       ) {
         continue;
       }
@@ -213,7 +215,7 @@ export default class TdParser {
         interactionType: PossibleInteractionTypesEnum.ACTION,
         interactionSelectBtn: {
           btnInputType: this.getCorrectInputTypeActions(
-            this.consumedTd.getThingDescription().actions[action]
+            this.consumedTd.getThingDescription().actions![action]
           ),
           btnKey: `action-${action}`,
           btnGeneralStyle: 'btn-event-interaction',
@@ -267,7 +269,7 @@ export default class TdParser {
   private parseEvents() {
     if (!this.consumedTd) return;
     for (const event in this.consumedTd.getThingDescription().events) {
-      if (!this.consumedTd.getThingDescription().events.hasOwnProperty(event)) {
+      if (!this.consumedTd.getThingDescription().events!.hasOwnProperty(event)) {
         continue;
       }
       const eventInteraction = {
@@ -290,14 +292,18 @@ export default class TdParser {
                     cbFunc(res);
                   }
                 );
+                this.eventSubscriptions.push({event: response});
                 return response;
               },
               unsubscribe: async () => {
                 if (this.consumedTd) {
-                  const response = await this.consumedTd.unsubscribeEvent(
-                    event
-                  );
-                  return response;
+                  let i: number
+                  do {
+                    i = this.eventSubscriptions.findIndex(e => e.hasOwnProperty(event));
+                    this.eventSubscriptions[i][event].stop();
+                    this.eventSubscriptions.splice(i, 1);
+
+                  } while (i != -1)
                 }
               }
             };

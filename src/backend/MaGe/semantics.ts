@@ -27,7 +27,8 @@ export async function fetchAndStoreVocab(url: string): Promise<boolean> {
         response =  await fetch(url, requestInit);
         contentTypeString = response.headers.get('content-type');
     } catch (error) {
-        return error;
+        console.error(error);
+        return false;
     }
 
    if (response && response.ok) {

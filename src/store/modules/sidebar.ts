@@ -390,7 +390,9 @@ export default {
 
         },
         // Adds a new td / mashup / folder to tds / mashups / folders
-        addElementToStore(state: any, payload: TD | Mashup | Folder) {
+        // TODO: Resolve conflicts for payload type
+        // addElementToStore(state: any, payload: TD | Mashup | Folder) {
+        addElementToStore(state: any, payload: any) {
             state[`${payload.type}s`].push(payload);
             let finished = false;
             if (payload.parentId !== 'parent') {
