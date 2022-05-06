@@ -34,6 +34,7 @@ export default class TdConsumer {
         this.servient = new Servient();
         this.helper = new Helpers(this.servient);
         // Add all ClientFactories
+        // TODO: Remove CoapServer creation when node-wot fixes it
         this.servient.addClientFactory(new CoapClientFactory(new CoapServer()));
         this.servient.addClientFactory(new CoapsClientFactory());
         this.servient.addClientFactory(new HttpClientFactory({}));
