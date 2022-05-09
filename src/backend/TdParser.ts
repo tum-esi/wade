@@ -292,18 +292,18 @@ export default class TdParser {
                     cbFunc(res);
                   }
                 );
-                this.eventSubscriptions.push({event: response});
+                this.eventSubscriptions.push({[event]: response});
                 return response;
               },
               unsubscribe: async () => {
                 if (this.consumedTd) {
                   let i: number
-                  do {
+                  while (true) {
                     i = this.eventSubscriptions.findIndex(e => e.hasOwnProperty(event));
+                    if (i === -1) break;
                     this.eventSubscriptions[i][event].stop();
                     this.eventSubscriptions.splice(i, 1);
-
-                  } while (i != -1)
+                  }
                 }
               }
             };
