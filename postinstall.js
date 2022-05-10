@@ -37,7 +37,7 @@ try {
     return
 }
 
-if(!lines[14].startsWith("// ")) lines[2] = "// " + lines[2];
+if(!lines[14].startsWith("// ")) lines[14] = "// " + lines[14];
 for(let i=28; i<83; i++){
     if(!lines[i].startsWith("// ")) lines[i] = "// " + lines[i];
 }

@@ -1108,7 +1108,7 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@node-wot/binding-coap@^0.8.0":
+"@node-wot/binding-coap@~0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@node-wot/binding-coap/-/binding-coap-0.8.0.tgz#eecaf649c182901ce23655e12e168f4e25de3e08"
   integrity sha512-5SyFu3pxKZWPFyK5OetMIh9O/xMapLMtBZxcHnh+BhulLfLX9qjdGxUWi0Gkq6UsV99kAQ8mp0JtefIDCNObrA==
@@ -1122,7 +1122,7 @@
     slugify "^1.4.5"
     wot-typescript-definitions "0.8.0-SNAPSHOT.22"
 
-"@node-wot/binding-http@0.8.0", "@node-wot/binding-http@^0.8.0":
+"@node-wot/binding-http@0.8.0", "@node-wot/binding-http@~0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@node-wot/binding-http/-/binding-http-0.8.0.tgz#ad5a5b3f57503b190f3d356d188d4be97e9a348b"
   integrity sha512-nYgWfjVM7Lto+NkCzOVi5enZFq4yixZYJLN3jZ4xyzarUEhvDYgzZAQXqhBEc5tOGFvfKXEUwWcxlc/uaOjDPA==
@@ -1138,7 +1138,7 @@
     rxjs "5.5.11"
     slugify "^1.4.5"
 
-"@node-wot/binding-mqtt@^0.8.0":
+"@node-wot/binding-mqtt@~0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@node-wot/binding-mqtt/-/binding-mqtt-0.8.0.tgz#b80192570801163b3e4bd2fba8c72384cfc68323"
   integrity sha512-G0S3ch1AE8WtATkjuJYiR6TfUAJvvGn21sXDXM1l2EO0QWv1vQiTcxb9TZUO1DqPGI2ZUztA2Ay3JQEz5/2WMQ==
@@ -1149,7 +1149,7 @@
     mqtt "^4.2.8"
     rxjs "5.5.11"
 
-"@node-wot/binding-websockets@^0.8.0":
+"@node-wot/binding-websockets@~0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@node-wot/binding-websockets/-/binding-websockets-0.8.0.tgz#5bd6a73e0e3855ab679ecb3eb41078dc974a2017"
   integrity sha512-j4gz54a3xBjcHEO8AYUlj4NPdhK2HInPo8SUcpWJlqYPIFwZQEFJJButX7EccT+BHB2iJIYFXZuMFZGEBxGwpQ==
@@ -1160,7 +1160,7 @@
     slugify "^1.4.5"
     ws "^7.5.4"
 
-"@node-wot/core@0.8.0", "@node-wot/core@^0.8.0":
+"@node-wot/core@0.8.0", "@node-wot/core@~0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@node-wot/core/-/core-0.8.0.tgz#86435b60b4585e4f0b41a47bc5b3b9b55aef5c05"
   integrity sha512-6iJo2v4l6i+bDcvLW7/a6Shfy/4BZsgDhlDuX6UUxJL32VmjD+90qAw9H02MkOaQnf0UrmWK+zy640iQiQz2Hw==
@@ -13047,7 +13047,7 @@ wot-thing-model-types@^1.1.0-3-February-2022:
   resolved "https://registry.yarnpkg.com/wot-thing-model-types/-/wot-thing-model-types-1.1.0-3-February-2022.tgz#faf75146f948554d0de08ba65e14ea0752dbb2dd"
   integrity sha512-IYetSr4Z7DmXESMg2OKDyIPTRwGSciIMuJBPyABNptNHodbwcMHx/48GO0kx6TpsDy9gBYkGO1SFXvt1/NZoMw==
 
-wot-typescript-definitions@0.8.0-SNAPSHOT.22, wot-typescript-definitions@^0.8.0-SNAPSHOT.22:
+wot-typescript-definitions@0.8.0-SNAPSHOT.22, wot-typescript-definitions@~0.8.0-SNAPSHOT.22:
   version "0.8.0-SNAPSHOT.22"
   resolved "https://registry.yarnpkg.com/wot-typescript-definitions/-/wot-typescript-definitions-0.8.0-SNAPSHOT.22.tgz#d2164003f0dd1832e21ea5600bca7e68ba8d13e9"
   integrity sha512-1K57EfbZkLderX5/hTVGkBjmTAwm/bZNdp1aywgKK1Tov5Ml2oAJRyhr4i3q5+75gZfSjU30Sxu0/WyOirAFRw==
