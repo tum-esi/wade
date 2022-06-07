@@ -22,7 +22,6 @@ import { mapGetters, mapActions, mapMutations } from 'vuex';
 import tSidebar from '@/components/04_templates/tSidebar.vue';
 import oModal from '@/components/03_organisms/oModal.vue';
 import { ElementTypeEnum } from '@/util/enums';
-import { remote } from 'electron';
 
 
 export default Vue.extend({
@@ -41,11 +40,9 @@ export default Vue.extend({
   },
   created() {
     this.$eventHub.$on('open-modal-element', this.openModal);
-    window.addEventListener('resize', this.changeWindowSize);
   },
   beforeDestroy() {
     this.$eventHub.$off('open-modal-element');
-    window.addEventListener('resize', this.changeWindowSize);
   },
   computed: {
     ...mapGetters('ModalStore', ['getElementTd', 'getElementMashup', 'getElementFolder']),
@@ -56,9 +53,6 @@ export default Vue.extend({
   methods: {
     ...mapActions('SidebarStore', ['addNewElement']),
     ...mapMutations('SidebarStore', ['addSidebarElement']),
-    changeWindowSize() {
-      // console.log('windowSize:', remote.getCurrentWindow().getSize());
-    },
     openModal(element: any) {
       switch (element.btnValue) {
         case ElementTypeEnum.FOLDER:

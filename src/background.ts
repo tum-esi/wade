@@ -7,6 +7,7 @@ import {
 } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
+import PersistedState from 'vuex-electron-store';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -16,6 +17,8 @@ let win: BrowserWindow | null;
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }]);
 
+PersistedState.initRenderer();
+
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -24,7 +27,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: true, webSecurity: false},
+    webPreferences: { nodeIntegration: true, webSecurity: false, contextIsolation: false },
     icon: path.join(__static, 'icon.png')
   });
   // win.setMenu(null);
