@@ -6,7 +6,7 @@ import SizeCalculator from '@/backend/SizeCalculator';
 
 export default class TdParser {
   private consumedTd: WoT.ConsumedThing | null;
-  private eventSubscriptions: {[key: string]: WoT.Subscription}[];
+  private eventSubscriptions: {[key: string]: WoT.Subscription};
   private parsedTd: any;
   private protocols: ProtocolEnum[];
   private SizeCalculator: any;
@@ -22,7 +22,7 @@ export default class TdParser {
       eventInteractions: []
     };
     this.protocols = protocols;
-    this.eventSubscriptions = [];
+    this.eventSubscriptions = {};
 
     this.SizeCalculator = new SizeCalculator();
 
@@ -243,7 +243,7 @@ export default class TdParser {
             await res;
             const endTime = process.hrtime(startTime);
             return {
-              res: res || 'Success',
+              res: res,
               s: endTime[0],
               ms: endTime[1] / 1000000,
               size: 'n.A.'
@@ -292,18 +292,12 @@ export default class TdParser {
                     cbFunc(res);
                   }
                 );
-                this.eventSubscriptions.push({[event]: response});
+                this.eventSubscriptions[event] = response;
                 return response;
               },
               unsubscribe: async () => {
-                if (this.consumedTd) {
-                  let i: number
-                  while (true) {
-                    i = this.eventSubscriptions.findIndex(e => e.hasOwnProperty(event));
-                    if (i === -1) break;
-                    this.eventSubscriptions[i][event].stop();
-                    this.eventSubscriptions.splice(i, 1);
-                  }
+                if (this.consumedTd && this.eventSubscriptions.hasOwnProperty(event)) {
+                  await this.eventSubscriptions[event].stop();
                 }
               }
             };
