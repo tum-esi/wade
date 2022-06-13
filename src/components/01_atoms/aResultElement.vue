@@ -101,9 +101,9 @@ export default Vue.extend({
                  */
                 if (this.subscription) (this as any).resultValue.unsubscribe();
                 this.subscription = (this as any).resultValue.subscribe(
-                    (res) => {
+                    async (res) => {
                         // this.resultValText = res;
-                        this.resultBuffer = res;
+                        this.resultBuffer = await res.value();
                         this.writeResult();
                     }
                 );

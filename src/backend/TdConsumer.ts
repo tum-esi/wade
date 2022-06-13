@@ -80,7 +80,7 @@ export default class TdConsumer {
             this.tdState = TdStateEnum.VALID_TD_JSON;
             // May not be empty json
             if (Object.getOwnPropertyNames(this.tdJson).length === 0) this.tdState = TdStateEnum.INVALID_TD_EMPTY;
-        } catch (err) {
+        } catch (err: any) {
             this.tdState = TdStateEnum.INVALID_TD_JSON;
             this.errorMsg = err;
         }
@@ -97,7 +97,9 @@ export default class TdConsumer {
         let errorCount = 0
         let helper = this.helper;
         let errorMsg: string | Error | null = null; 
-        let td: WoT.ThingDescription;
+        // TODO: This is a workaround until fetch returns WoT.ThingDescription (instead of unknown)
+        // let td: WoT.ThingDescription;
+        let td: any;
         return new Promise<WoT.ThingDescription>(async (resolve, reject) => {
             setTimeout(() => {
                 reject("Fetching Timed Out");
@@ -106,7 +108,7 @@ export default class TdConsumer {
                 try {
                     td = await helper.fetch(uri)
                     if(td) return resolve(td); else errorCount++;
-                } catch (err) {
+                } catch (err: any) {
                     errorMsg = err;
                     errorCount++;
                 }
@@ -137,19 +139,20 @@ export default class TdConsumer {
             };
 
             // Add broker credentials
-            const mqttBrokerServer = new MqttBrokerServer(
-                MQTT_CONFIG.broker,
-                MQTT_CONFIG.username,
-                MQTT_CONFIG.password,
-                MQTT_CONFIG.clientId
-            );
+            const mqttBrokerServer = new MqttBrokerServer({
+                uri: MQTT_CONFIG.broker,
+                user: MQTT_CONFIG.username,
+                psw: MQTT_CONFIG.password,
+                clientId: MQTT_CONFIG.clientId,
+            });
             this.servient.addServer(mqttBrokerServer);
         }
 
         // await servient.addClientFactory(new WebSocketClientFactory());
         // await servient.addClientFactory(new WebSocketSecureClientFactory());
 
-        await this.servient.start().then( async (factory: WoT.WoT) => {
+        // TODO: Change `any` after resolving where did WoT interface go
+        await this.servient.start().then( async (factory: any) => {
             if (this.tdJson) {
                 const TdPromise = factory.consume(this.tdJson);
                 await TdPromise.then( (Td) => {this.tdConsumed = Td; },

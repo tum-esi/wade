@@ -193,7 +193,7 @@ export async function invokeInteractions(selectedInteractions) {
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp.error ? resultProp.error : resultProp.res,
+            resultValue: resultProp.error ? resultProp.error : (await resultProp.res.value()),
             resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
             resultError: resultProp.error ? true : false,
             resultSize: resultProp.size
@@ -272,7 +272,7 @@ export async function invokeInteractions(selectedInteractions) {
             resultTitle: interactionTitle,
             resultValue: resultAction.error
               ? resultAction.error
-              : resultAction.res,
+              : (await resultAction.res.value() || 'Success'),
             resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
             resultError: resultAction.error ? true : false,
             resultSize: resultAction.size

@@ -40,7 +40,7 @@ export default class VtCall {
     }
 
     public launchVt() {
-        return new Promise( (res, rej) => {
+        return new Promise<void>( (res, rej) => {
             this.status = VtStatus.STARTUP;
             this.initTmpFolder()
             .then( () => {
@@ -76,7 +76,7 @@ export default class VtCall {
     }
 
     public stopVt() {
-        return new Promise( (res, rej) => {
+        return new Promise<void>( (res, rej) => {
             if (this.VtProcess !== null) {
                 this.VtProcess.kill();
 
@@ -111,7 +111,7 @@ export default class VtCall {
     }
 
     private initTmpFolder() {
-        return new Promise((res, rej) => {
+        return new Promise<void>((res, rej) => {
 
             this.usedTempFolder = null;
 
@@ -131,7 +131,7 @@ export default class VtCall {
     }
 
     private writeTD() {
-        return new Promise( (res, rej) => {
+        return new Promise<void>( (res, rej) => {
                 if (this.usedTempFolder !== null) {
                     try {
                         fs.writeFileSync(path.join(this.usedTempFolder, 'vt-td.json'), this.givenTD);
@@ -145,7 +145,7 @@ export default class VtCall {
         });
     }
     private writeVtConfig() {
-        return new Promise( (res, rej) => {
+        return new Promise<void>( (res, rej) => {
             if (this.usedTempFolder !== null) {
                 try {
                     fs.writeFileSync(
@@ -162,7 +162,7 @@ export default class VtCall {
         });
     }
     private startVt() {
-        return new Promise( (res, rej) => {
+        return new Promise<void>( (res, rej) => {
             let pathToVt: string;
             if (isDevelopment()) {
                 pathToVt = path.join(__dirname, '..', '..', '..', '..', '..', 'virtual-thing', 'dist', 'cli.js');
