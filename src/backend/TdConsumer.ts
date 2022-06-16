@@ -1,6 +1,6 @@
 import { Servient, Helpers } from '@node-wot/core';
 import { HttpClientFactory, HttpsClientFactory } from '@node-wot/binding-http';
-import { CoapClientFactory, CoapsClientFactory, CoapServer } from '@node-wot/binding-coap';
+import { CoapClientFactory, CoapsClientFactory } from '@node-wot/binding-coap';
 import { MqttClientFactory, MqttBrokerServer } from '@node-wot/binding-mqtt';
 // import { WebSocketClientFactory, WebSocketSecureClientFactory } from '@node-wot/binding-websockets';
 import { TdStateEnum } from '@/util/enums';
@@ -34,8 +34,7 @@ export default class TdConsumer {
         this.servient = new Servient();
         this.helper = new Helpers(this.servient);
         // Add all ClientFactories
-        // TODO: Remove CoapServer creation when node-wot fixes it
-        this.servient.addClientFactory(new CoapClientFactory(new CoapServer()));
+        this.servient.addClientFactory(new CoapClientFactory());
         this.servient.addClientFactory(new CoapsClientFactory());
         this.servient.addClientFactory(new HttpClientFactory({}));
         this.servient.addClientFactory(new HttpsClientFactory({}));

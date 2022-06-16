@@ -272,7 +272,7 @@ export async function invokeInteractions(selectedInteractions) {
             resultTitle: interactionTitle,
             resultValue: resultAction.error
               ? resultAction.error
-              : resultAction.res,
+              : (await resultAction.res.value() || 'Success'),
             resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
             resultError: resultAction.error ? true : false,
             resultSize: resultAction.size
