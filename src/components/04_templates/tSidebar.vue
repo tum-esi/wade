@@ -79,8 +79,8 @@ export default Vue.extend({
       this.$emit('home-clicked');
     },
     toggleSidebar() {
-      this.isSidebarVisible = !this.isSidebarVisible;
-      (this as any).setSidebarActiveStatus(this.isSidebarVisible);
+      (this as any).isSidebarVisible = !(this as any).isSidebarVisible;
+      (this as any).setSidebarActiveStatus((this as any).isSidebarVisible);
     },
     sidebarElementClicked(elementId: string, elementType: string) {
       this.$emit('sidebar-element-clicked', elementId, elementType);

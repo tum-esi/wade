@@ -39,7 +39,7 @@ export default Vue.extend({
     };
   },
   created() {
-    this.$eventHub.$on('open-modal-element', this.openModal);
+    this.$eventHub.$on('open-modal-element', (this as any).openModal);
   },
   beforeDestroy() {
     this.$eventHub.$off('open-modal-element');
@@ -56,28 +56,28 @@ export default Vue.extend({
     openModal(element: any) {
       switch (element.btnValue) {
         case ElementTypeEnum.FOLDER:
-          this.modalElement = (this as any).getElementFolder;
-          this.modalElement.parentId = element.parentId;
+          (this as any).modalElement = (this as any).getElementFolder;
+          (this as any).modalElement.parentId = element.parentId;
           break;
         case ElementTypeEnum.MASHUP:
-          this.modalElement = (this as any).getElementMashup;
-          this.modalElement.parentId = element.parentId;
+          (this as any).modalElement = (this as any).getElementMashup;
+          (this as any).modalElement.parentId = element.parentId;
           break;
         case ElementTypeEnum.TD:
-          this.modalElement = (this as any).getElementTd;
-          this.modalElement.parentId = element.parentId;
+          (this as any).modalElement = (this as any).getElementTd;
+          (this as any).modalElement.parentId = element.parentId;
           break;
         default:
-          this.modalElement = (this as any).getElementTd;
-          this.modalElement.parentId = element.parentId;
+          (this as any).modalElement = (this as any).getElementTd;
+          (this as any).modalElement.parentId = element.parentId;
       }
-      this.isModalVisible = true;
+      (this as any).isModalVisible = true;
     },
     closeModal() {
-      this.isModalVisible = false;
+      (this as any).isModalVisible = false;
     },
     async createNewElement(newElement: any) {
-      this.isModalVisible = false;
+      (this as any).isModalVisible = false;
       if (!newElement.data) return;
       const newEl = {
         type: newElement.type,

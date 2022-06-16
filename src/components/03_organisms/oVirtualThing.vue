@@ -80,8 +80,8 @@ export default Vue.extend({
         };
     },
     created() {
-        this.$eventHub.$on('dropdown-clicked', (eventObject) => {this.copyLinksToClipboard(eventObject); });
-        this.tdChanged({ td: (this as any).getSavedTd(this.id)});
+        this.$eventHub.$on('dropdown-clicked', (eventObject) => {(this as any).copyLinksToClipboard(eventObject); });
+        (this as any).tdChanged({ td: (this as any).getSavedTd(this.id)});
     },
     beforeDestroy() {
         this.$eventHub.$off('dropdown-clicked');
@@ -143,7 +143,7 @@ export default Vue.extend({
     watch: {
         // watch if the id changes to set the status of the current TD correct in the TD-store
         '$route.params.id'(id) {
-            this.tdChanged({ td: (this as any).getSavedTd(this.id)});
+            (this as any).tdChanged({ td: (this as any).getSavedTd(this.id)});
         }
     }
 });
