@@ -54,7 +54,7 @@ export default Vue.extend({
     aEditorMonaco
   },
   created() {
-    this.vconfig = getFormattedJsonString(
+    (this as any).vconfig = getFormattedJsonString(
       (this as any).getVirtualConfig(this.id)
     );
   },
@@ -95,23 +95,23 @@ export default Vue.extend({
     },
     currentVirtualConfig: {
       get(): string {
-        return this.vconfig;
+        return (this as any).vconfig;
       },
       async set(value: string) {
-        this.vconfig = value;
+        (this as any).vconfig = value;
         // Check if there are unsaved changes
-        this.saveVConfigBtn.btnActive = !(
-          (this as any).getSavedVirtualConfig() === this.vconfig
+        (this as any).saveVConfigBtn.btnActive = !(
+          (this as any).getSavedVirtualConfig() === (this as any).vconfig
         );
         // Check if config has JSON format
         try {
-          JSON.parse(this.vconfig);
-          this.vconfigStatus = this.saveVConfigBtn.btnActive
+          JSON.parse((this as any).vconfig);
+          (this as any).vconfigStatus = (this as any).saveVConfigBtn.btnActive
             ? TdVirtualConfigEnum.UNSAVED
             : TdVirtualConfigEnum.INFO;
         } catch (error) {
-          this.saveVConfigBtn.btnActive = false;
-          this.vconfigStatus = TdVirtualConfigEnum.ERROR;
+          (this as any).saveVConfigBtn.btnActive = false;
+          (this as any).vconfigStatus = TdVirtualConfigEnum.ERROR;
         }
       }
     }
@@ -129,32 +129,32 @@ export default Vue.extend({
     //     this.showHelp = !this.showHelp;
     // },
     resetVirtualConfigBtnClicked() {
-      this.vconfig = this.getSavedVirtualConfig(true);
+      (this as any).vconfig = (this as any).getSavedVirtualConfig(true);
       // If default config differs from saved config, it needs to be saved
-      if ((this as any).getSavedVirtualConfig() !== this.vconfig) {
-        this.vconfigStatus = TdVirtualConfigEnum.UNSAVED;
-        this.saveVConfigBtn.btnActive = true;
+      if ((this as any).getSavedVirtualConfig() !== (this as any).vconfig) {
+        (this as any).vconfigStatus = TdVirtualConfigEnum.UNSAVED;
+        (this as any).saveVConfigBtn.btnActive = true;
       } else {
-        this.vconfigStatus = TdVirtualConfigEnum.INFO;
-        this.saveVConfigBtn.btnActive = false;
+        (this as any).vconfigStatus = TdVirtualConfigEnum.INFO;
+        (this as any).saveVConfigBtn.btnActive = false;
       }
     },
     btnSaveVirtualConfigClicked() {
       (this as any).saveTdVirtualConfig({
         id: this.id,
-        vconfig: JSON.parse(this.vconfig)
+        vconfig: JSON.parse((this as any).vconfig)
       });
-      this.vconfigStatus = TdVirtualConfigEnum.SAVE_SUCCESS;
-      this.saveVConfigBtn.btnActive = false;
+      (this as any).vconfigStatus = TdVirtualConfigEnum.SAVE_SUCCESS;
+      (this as any).saveVConfigBtn.btnActive = false;
       setTimeout(() => {
-        this.vconfigStatus = TdVirtualConfigEnum.INFO;
+        (this as any).vconfigStatus = TdVirtualConfigEnum.INFO;
       }, 1500);
     }
   },
   watch: {
     // Check if router id changed
     '$route.params.id'(id) {
-      this.vconfig = this.getSavedVirtualConfig();
+      (this as any).vconfig = (this as any).getSavedVirtualConfig();
     }
   }
 });

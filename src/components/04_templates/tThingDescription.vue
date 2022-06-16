@@ -90,8 +90,8 @@ export default Vue.extend({
     tPerformance
   },
   created() {
-    this.changeActiveTab();
-    this.$eventHub.$on('dropdown-clicked', this.tabClicked);
+    (this as any).changeActiveTab();
+    this.$eventHub.$on('dropdown-clicked', (this as any).tabClicked);
     this.$store.commit('SidebarStore/setActiveElement', this.$route.params.id);
   },
   beforeDestroy() {
@@ -121,13 +121,13 @@ export default Vue.extend({
     ...mapMutations('TdStore', ['setActiveTab']),
     ...mapActions('TdStore',['fetchTD']),
     hideUrlBar() {
-      if (this.showUrlBar) this.showUrlBar = false;
+      if ((this as any).showUrlBar) (this as any).showUrlBar = false;
     },
     tabClicked(args: any | TDTabsEnum) {
       if (args.btnValue === 'td-url') {
-        this.showUrlBar = true;
+        (this as any).showUrlBar = true;
       }
-      if (typeof args === 'string') this.currentTabId = args;
+      if (typeof args === 'string') (this as any).currentTabId = args;
       // this.$router.push({
       //   name: 'config',
       //   params: { type: 'td', id: this.id, tab: 'config' }
@@ -136,7 +136,7 @@ export default Vue.extend({
     changeActiveTab(): void {
       (this as any).setActiveTab({
         tabbarKey: 'tdTabs',
-        activeTab: this.currentTabId
+        activeTab: (this as any).currentTabId
       });
     },
     async fetchFunction(url: string) {
@@ -149,12 +149,12 @@ export default Vue.extend({
     // Check if router id changed and change active sidebar element
     '$route.params.id'(id) {
       this.$store.commit('SidebarStore/setActiveElement', id);
-      this.tdId = id;
-      this.currentTabId = TDTabsEnum.EDITOR;
+      (this as any).tdId = id;
+      (this as any).currentTabId = TDTabsEnum.EDITOR;
     },
     // Change active tab if tab id changed
     'currentTabId'() {
-      this.changeActiveTab();
+      (this as any).changeActiveTab();
     }
   }
 });

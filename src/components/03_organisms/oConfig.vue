@@ -81,7 +81,7 @@ export default Vue.extend({
     aEditorMonaco
   },
   created() {
-    this.config = getFormattedJsonString((this as any).getConfig(this.id));
+    (this as any).config = getFormattedJsonString((this as any).getConfig(this.id));
   },
   data() {
     return {
@@ -154,23 +154,23 @@ export default Vue.extend({
     },
     currentConfig: {
       get(): string {
-        return this.config;
+        return (this as any).config;
       },
       async set(value: string) {
-        this.config = value;
+        (this as any).config = value;
         // Check if there are unsaved changes
-        this.saveConfigBtn.btnActive = !(
-          (this as any).getSavedConfig() === this.config
+        (this as any).saveConfigBtn.btnActive = !(
+          (this as any).getSavedConfig() === (this as any).config
         );
         // Check if config has JSON format
         try {
-          JSON.parse(this.config);
-          this.configStatus = this.saveConfigBtn.btnActive
+          JSON.parse((this as any).config);
+          (this as any).configStatus = (this as any).saveConfigBtn.btnActive
             ? TdConfigEnum.UNSAVED
             : TdConfigEnum.INFO;
         } catch (error) {
-          this.saveConfigBtn.btnActive = false;
-          this.configStatus = TdConfigEnum.ERROR;
+          (this as any).saveConfigBtn.btnActive = false;
+          (this as any).configStatus = TdConfigEnum.ERROR;
         }
       }
     }
@@ -185,35 +185,35 @@ export default Vue.extend({
       );
     },
     showHelpClicked() {
-      this.showHelp = !this.showHelp;
+      (this as any).showHelp = !(this as any).showHelp;
     },
     resetConfigBtnClicked() {
-      this.config = this.getSavedConfig(true);
+      (this as any).config = (this as any).getSavedConfig(true);
       // If default config differs from saved config, it needs to be saved
-      if ((this as any).getSavedConfig() !== this.config) {
-        this.configStatus = TdConfigEnum.UNSAVED;
-        this.saveConfigBtn.btnActive = true;
+      if ((this as any).getSavedConfig() !== (this as any).config) {
+        (this as any).configStatus = TdConfigEnum.UNSAVED;
+        (this as any).saveConfigBtn.btnActive = true;
       } else {
-        this.configStatus = TdConfigEnum.INFO;
-        this.saveConfigBtn.btnActive = false;
+        (this as any).configStatus = TdConfigEnum.INFO;
+        (this as any).saveConfigBtn.btnActive = false;
       }
     },
     btnSaveConfigClicked() {
       (this as any).saveTdConfig({
         id: this.id,
-        config: JSON.parse(this.config)
+        config: JSON.parse((this as any).config)
       });
-      this.configStatus = TdConfigEnum.SAVE_SUCCESS;
-      this.saveConfigBtn.btnActive = false;
+      (this as any).configStatus = TdConfigEnum.SAVE_SUCCESS;
+      (this as any).saveConfigBtn.btnActive = false;
       setTimeout(() => {
-        this.configStatus = TdConfigEnum.INFO;
+        (this as any).configStatus = TdConfigEnum.INFO;
       }, 1500);
     }
   },
   watch: {
     // Check if router id changed
     '$route.params.id'(id) {
-      this.config = this.getSavedConfig();
+      (this as any).config = (this as any).getSavedConfig();
     }
   }
 });
