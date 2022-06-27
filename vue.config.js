@@ -1,8 +1,11 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const { defineConfig } = require('@vue/cli-service')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
-module.exports = {
+module.exports = defineConfig({
+  transpileDependencies: true,
   pluginOptions: {
     electronBuilder: {
+      nodeIntegration: true,
       builderOptions: {
         // options placed here will be merged with default configuration and passed to electron-builder
         extraResources: ["example-tds", "./node_modules/virtual-thing"],
@@ -17,4 +20,4 @@ module.exports = {
       })
     ]
   }
-};
+})
