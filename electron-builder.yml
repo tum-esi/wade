@@ -1,0 +1,3 @@
+"linux": {
+  "target": ["AppImage", "dir"]
+}
