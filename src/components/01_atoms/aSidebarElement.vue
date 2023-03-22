@@ -3,11 +3,28 @@
     class="sidebar-element-container"
     v-on:click="sidebarElementClicked"
     @mouseover="showOptions = true"
-    @mouseleave="showOptions = false"
+    @mouseleave="showOptions = false;"
   >
-    <div class="sidebar-elment-inner-container" :class="{ 'active': isActive }" :style="styleCss">
+    <div class="sidebar-element-inner-container" :class="{ 'active': isActive }" :style="styleCss">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath" />
-      <label class="sidebar-element-label">{{ title }}</label>
+      <div v-if="!isRenameActive">
+        <label 
+          class="sidebar-element-label"
+          @dblclick= "activateRename"
+        >{{ title }}</label>
+      </div>
+      <div v-else>
+        <input 
+        ref="renameInput" 
+        type="text"
+        v-model.trim="newId"
+        :title="showRenameInputError"
+        class="sidebar-element-input"
+        @blur="sidebarElementRenamed" 
+        @keyup.enter="sidebarElementRenamed"
+        @input="canRename">
+      </div>
+      
       <img
         :style="children && children.length > 0 ? '' : 'visibility: hidden;'"
         class="sidebar-element-icon-dropdown"
@@ -38,6 +55,9 @@
         />
       </div>
     </div>
+    <div v-if="showRenameInputError" class="sidebar-element-input-popover">
+      <p>{{ renameInputErrorMessage }}</p>
+    </div>
     <oModal 
       v-if="isModalVisible"
       v-show="isModalVisible"
@@ -50,7 +70,7 @@
 <script lang='ts'>
 import Vue from 'vue';
 import { ElementTypeEnum } from '@/util/enums';
-import { mapMutations, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import aDropdownButton from '@/components/01_atoms/aDropdownButton.vue';
 import oModal from '@/components/03_organisms/oModal.vue';
 
@@ -109,6 +129,10 @@ export default Vue.extend({
       deleteHover: false,
       childrenHover: false,
       optionsHover: false,
+      isRenameActive: false,
+      newId: this.id,
+      renameInputErrorMessage: '',
+      showRenameInputError: false,
       srcPathOptions: 'options',
       srcPathOptionsWhite: 'options_white',
       srcPathDropdown: require('@/assets/arrow_down.png'),
@@ -122,7 +146,8 @@ export default Vue.extend({
   computed: {
     ...mapGetters('SidebarStore', [
       'isActiveElement',
-      'sidebarElementDropdown'
+      'sidebarElementDropdown',
+      'doesIdAlreadyExist'
     ]),
     isActive(): any {
       return (this as any).isActiveElement(this.id, this.type);
@@ -141,6 +166,17 @@ export default Vue.extend({
     sidebarElementClicked() {
       this.$emit('element-clicked', this.id, this.type);
     },
+    sidebarElementRenamed() {
+      if (!this.canRename()) {
+        this.newId = this.id;
+        this.isRenameActive = false;
+        this.showRenameInputError = false;
+        return;
+      }
+
+      this.isRenameActive = false;
+      this.$emit('element-renamed', this.id, this.type, this.newId);
+    },
     deleteBtnClicked() {
       this.$emit('delete-element', this.id, this.type);
     },
@@ -154,19 +190,47 @@ export default Vue.extend({
       this.isDropdownShown = false;
       element.parentId = this.id;
       this.$emit('dropdown-clicked', element);
-    }
+    },
+    activateRename() {
+      this.isRenameActive = true; 
+      this.newId = this.id;
+      this.$nextTick(() => {
+        const renameInputRef = this.$refs.renameInput as HTMLInputElement;
+        renameInputRef.focus();
+      });      
+    },
+    canRename(): boolean {
+
+      if (this.newId.length === 0 || this.newId.length > 30) {
+        this.renameInputErrorMessage = 'The element\'s name should have at least 5 and maximal 30 characters.';
+        this.showRenameInputError = true;
+        return false;
+      }
+
+      const idExists = (this as any).doesIdAlreadyExist(this.newId);
+
+      if (idExists && this.newId !== this.id) {
+        this.renameInputErrorMessage = 'Another element with the same name exists. Please change the name.';
+        this.showRenameInputError = true;
+      } else {
+        this.showRenameInputError = false;
+      }
+      
+      return !idExists;
+    },
   }
 });
 </script>
 
 <style scoped>
 .sidebar-element-container {
+  position: relative;
   border-bottom: 1px solid #393b3a;
   height: 50px;
   display: flex;
 }
 
-.sidebar-elment-inner-container {
+.sidebar-element-inner-container {
   width: 100%;
   display: flex;
   align-items: center;
@@ -192,11 +256,29 @@ export default Vue.extend({
   -webkit-filter: brightness(3);
   filter: brightness(3);
 }
-
 .sidebar-element-label {
   width: 65%;
   overflow: hidden;
   white-space: nowrap;
+}
+.sidebar-element-input {
+  font-size: 16px;
+  width: 100%;
+  overflow: hidden;
+  background-color: transparent;
+  border: none;
+}
+
+.sidebar-element-input-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 10px;
+  color: #393B3A;
+  background-color: #A36A5B;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-element-icon-dropdown,
