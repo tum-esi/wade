@@ -3,7 +3,7 @@
         <div class="interaction-name"><label>{{ interactionName }}</label></div>
         <div class="interaction-options">
             <aButtonSelect 
-                v-if="(interactionType === 'select' || interactionType === 'property-read' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType) || interactionType === 'property-observe-read'"
+                v-if="(interactionType === 'select' || interactionType === 'property-read' || interactionType === 'property-read-all' || interactionType === 'property-read-multiple' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType) || interactionType === 'property-observe-read'"
                 class="interaction-select-btn"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"

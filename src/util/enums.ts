@@ -21,12 +21,28 @@ export enum ElementTitleEnum {
 
 export enum PossibleInteractionTypesEnum {
   PROP_READ = 'property-read',
+  PROP_READ_ALL = 'property-read-all',
+  PROP_READ_MULTIPLE = 'property-read-multiple',
   PROP_WRITE = 'property-write',
+  PROP_WRITE_ALL = 'property-write-all',
+  PROP_WRITE_MULTIPLE = 'property-write-multiple',
   PROP_OBSERVE_READ = 'property-observe-read',
   PROP_OBSERVE_WRITE = 'property-observe-write',
   ACTION = 'action-invoke',
   EVENT_SUB = 'event-subscribe',
-  EVENT_UNSUB = 'event-unsubscribe'
+  EVENT_UNSUB = 'event-unsubscribe',
+}
+
+export enum MetaInteractionTypesEnum {
+  PROP_READ_ALL = 'readallproperties',
+  PROP_READ_MULTIPLE = 'readmultipleproperties',
+  PROP_WRITE_ALL = 'writeallproperties',
+  PROP_WRITE_MULTIPLE = 'writemultipleproperties',
+  PROP_OBSERVE_ALL = 'observeallproperties',
+  PROP_UNOBSERVE_ALL = 'unobserveallproperties',
+  ACTION_QUERY_ALL = 'queryallactions',
+  EVENT_SUB_ALL = 'subscribeallevents',
+  EVENT_UNSUB_ALL = 'unsubscribeallevents'
 }
 
 export enum InteractionStateEnum {

@@ -1,7 +1,7 @@
 // Parses a consumed Td to Vue 'Interaction' Component readable data
 
 import * as WoT from 'wot-typescript-definitions';
-import { PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
+import { MetaInteractionTypesEnum, PossibleInteractionTypesEnum, ProtocolEnum } from '@/util/enums';
 import SizeCalculator from '@/backend/SizeCalculator';
 
 export default class TdParser {
@@ -19,7 +19,8 @@ export default class TdParser {
     this.parsedTd = {
       propertyInteractions: [],
       actionInteractions: [],
-      eventInteractions: []
+      eventInteractions: [],
+      metaInteractions: [],
     };
     this.protocols = protocols;
     this.eventSubscriptions = {};
@@ -29,6 +30,7 @@ export default class TdParser {
     this.parseProperties();
     this.parseActions();
     this.parseEvents();
+    this.parseMetaInteractions();
   }
 
   public getParsedTd() {
@@ -305,6 +307,148 @@ export default class TdParser {
         }
       };
       this.parsedTd.eventInteractions.push(eventInteraction);
+    }
+  }
+
+  private parseMetaInteractions() {
+    if (!this.consumedTd) return;
+
+    const forms = this.consumedTd.getThingDescription().forms;
+
+    if (!forms) return;
+
+    for (const metaInteraction of forms) {
+      let operations: string[] = [];
+
+      if (!metaInteraction.op) return;
+
+      if (metaInteraction.op instanceof Array) operations = metaInteraction.op;
+      else operations.push(metaInteraction.op);
+
+      for (const operation of operations) {
+        switch (operation) {
+          case MetaInteractionTypesEnum.PROP_READ_ALL:
+            this.parsedTd.propertyInteractions.push({
+              interactionName: 'Read All',
+              interactionTitle: `${operation} (r)`,
+              interactionType: PossibleInteractionTypesEnum.PROP_READ_ALL,
+              interactionSelectBtn: {
+                btnKey: 'read-all',
+                btnGeneralStyle: 'btn-event-interaction',
+                btnSelectedStyle: 'btn-event-interaction-selected',
+                interaction: async () => {
+                  return getReadAllResponseWithTiming(
+                    this.consumedTd,
+                    this.SizeCalculator
+                  );
+                }
+              }
+            });
+            break;
+          case MetaInteractionTypesEnum.PROP_READ_MULTIPLE:
+            this.parsedTd.propertyInteractions.push({
+              interactionName: operation,
+              interactionTitle: `${operation} (r)`,
+              interactionType: PossibleInteractionTypesEnum.PROP_READ_MULTIPLE,
+              interactionSelectBtn: {
+                btnKey: operation,
+                btnGeneralStyle: 'btn-event-interaction',
+                btnSelectedStyle: 'btn-event-interaction-selected',
+                interaction: async () => {
+                  // return getReadResponseWithTiming(
+                  //   this.consumedTd,
+                  //   this.SizeCalculator
+                  // );
+                }
+              }
+            });
+            break;
+          case MetaInteractionTypesEnum.PROP_WRITE_ALL:
+            this.parsedTd.propertyInteractions.push({
+              interactionName: operation,
+              interactionTitle: `${operation} (w)`,
+              interactionType: PossibleInteractionTypesEnum.PROP_WRITE_ALL,
+              interactionSelectBtn: {
+                btnKey: PossibleInteractionTypesEnum.PROP_WRITE_ALL,
+                btnGeneralStyle: 'btn-event-interaction',
+                btnSelectedStyle: 'btn-event-interaction-selected',
+                interaction: async () => {
+                  // return getReadResponseWithTiming(
+                  //   this.consumedTd,
+                  //   this.SizeCalculator
+                  // );
+                }
+              }
+            });
+            break;
+          case MetaInteractionTypesEnum.PROP_WRITE_MULTIPLE:
+            this.parsedTd.propertyInteractions.push({
+              interactionName: operation,
+              interactionTitle: `${operation} (w)`,
+              interactionType: PossibleInteractionTypesEnum.PROP_WRITE_MULTIPLE,
+              interactionSelectBtn: {
+                btnKey: PossibleInteractionTypesEnum.PROP_WRITE_MULTIPLE,
+                btnGeneralStyle: 'btn-event-interaction',
+                btnSelectedStyle: 'btn-event-interaction-selected',
+                interaction: async () => {
+                  // return getReadResponseWithTiming(
+                  //   this.consumedTd,
+                  //   this.SizeCalculator
+                  // );
+                }
+              }
+            });
+            break;
+          // case MetaInteractionTypesEnum.PROP_OBSERVE_ALL:
+          //   break;
+          // case MetaInteractionTypesEnum.PROP_UNOBSERVE_ALL:
+          //   break;
+          // case MetaInteractionTypesEnum.ACTION_QUERY_ALL:
+          //   break;
+          // case MetaInteractionTypesEnum.EVENT_SUB_ALL:
+          //   break;
+          // case MetaInteractionTypesEnum.EVENT_UNSUB_ALL:
+          //   break;
+          default:
+            break;
+
+        }
+      }
+      
+      async function getReadAllResponseWithTiming(
+        consumedTd: WoT.ConsumedThing | null,
+        sizeCalculator: SizeCalculator
+      ) {
+        if (!consumedTd) return { error: 'No consumed Thing available.' };
+        const startTime = process.hrtime();
+        const response = await consumedTd
+          .readAllProperties()
+          .then(async res => {
+            await res;
+            const endTime = process.hrtime(startTime);
+            return {
+              res,
+              s: endTime[0],
+              ms: endTime[1] / 1000000,
+              size: 'n.A.'
+            };
+          })
+          .catch(async err => {
+            await err;
+            const endTime = process.hrtime(startTime);
+            return {
+              res: undefined,
+              error: err,
+              s: endTime[0],
+              ms: endTime[1] / 1000000,
+              size: 'n.A.'
+            };
+          });
+        if (response.res !== undefined && response.res !== null) {
+          response.size = sizeCalculator.getSize(response.res);
+        }
+        return response;
+      }
     }
   }
 
