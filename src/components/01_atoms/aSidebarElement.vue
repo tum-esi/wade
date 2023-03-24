@@ -3,27 +3,24 @@
     class="sidebar-element-container"
     v-on:click="sidebarElementClicked"
     @mouseover="showOptions = true"
-    @mouseleave="showOptions = false;"
+    @mouseleave="showOptions = false"
   >
     <div class="sidebar-element-inner-container" :class="{ 'active': isActive }" :style="styleCss">
       <img v-if="iconSrcPath" class="sidebar-element-icon-type" :src="getIconSrcPath" />
-      <div v-if="!isRenameActive">
-        <label 
-          class="sidebar-element-label"
-          @dblclick= "activateRename"
-        >{{ title }}</label>
-      </div>
-      <div v-else>
-        <input 
-        ref="renameInput" 
-        type="text"
-        v-model.trim="newId"
-        :title="showRenameInputError"
-        class="sidebar-element-input"
-        @blur="sidebarElementRenamed" 
-        @keyup.enter="sidebarElementRenamed"
-        @input="canRename">
-      </div>
+      <label v-if="!isRenameActive"
+        class="sidebar-element-label"
+        @dblclick= "activateRename"
+      >{{ title }}</label>
+      <input 
+      v-else
+      ref="renameInput" 
+      type="text"
+      v-model.trim="newId"
+      :title="showRenameInputError"
+      class="sidebar-element-input"
+      @blur="sidebarElementRenamed" 
+      @keyup.enter="sidebarElementRenamed"
+      @input="canRename">
       
       <img
         :style="children && children.length > 0 ? '' : 'visibility: hidden;'"
@@ -257,14 +254,15 @@ export default Vue.extend({
   filter: brightness(3);
 }
 .sidebar-element-label {
-  width: 65%;
+  width: 108px;
   overflow: hidden;
   white-space: nowrap;
 }
 .sidebar-element-input {
   font-size: 16px;
-  width: 100%;
+  width: 108px;
   overflow: hidden;
+  box-sizing: border-box;
   background-color: transparent;
   border: none;
 }
