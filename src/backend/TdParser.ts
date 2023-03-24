@@ -144,6 +144,7 @@ export default class TdParser {
             btnInputType: this.getCorrectInputType(
               this.consumedTd.getThingDescription().properties![property]
             ),
+            btnInputSchema: this.consumedTd.getThingDescription().properties![property],
             btnKey: `property-${property}-write`,
             btnGeneralStyle: 'btn-event-interaction',
             btnSelectedStyle: 'btn-event-interaction-selected',
@@ -217,6 +218,7 @@ export default class TdParser {
           btnInputType: this.getCorrectInputTypeActions(
             this.consumedTd.getThingDescription().actions![action]
           ),
+          btnInputSchema: this.consumedTd.getThingDescription().actions![action].input,
           btnKey: `action-${action}`,
           btnGeneralStyle: 'btn-event-interaction',
           btnSelectedStyle: 'btn-event-interaction-selected',

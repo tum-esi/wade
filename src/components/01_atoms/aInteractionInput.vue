@@ -66,7 +66,7 @@
       <img
         class="select-btn"
         @click.prevent="btnSelected ? deselect() : select()"
-        :src="!isInputEmpty ? currentSrc : srcSelectionNotPossibele"
+        :src="!isInputEmpty && isInputValid() ? currentSrc : srcSelectionNotPossible"
       />
     </div>
   </div>
@@ -74,6 +74,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import Ajv from 'ajv';
+
 export default Vue.extend({
   name: 'aInteractionInput',
   created() {
@@ -93,7 +95,7 @@ export default Vue.extend({
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
       srcSelected: require('@/assets/checked_circle.png'),
-      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
+      srcSelectionNotPossible: require('@/assets/circle_grey.png')
     };
   },
   props: {
@@ -119,6 +121,13 @@ export default Vue.extend({
     btnInputType: {
       type: Object,
       required: true
+    },
+    /**
+     * Input data shema to validate the user input.
+     */
+    btnInputSchema: {
+      type: Object,
+      required: false
     },
     /**
      * Button css style. Can either be 'btn-grey' or 'btn-pos' or any other custom style.
@@ -223,6 +232,7 @@ export default Vue.extend({
         this.dropdownVisible = !this.dropdownVisible;
         (this as any).inputValue = input;
       }
+
       // When btn is selected emit selection change
       if (this.btnSelected) {
         this.$emit(
@@ -235,7 +245,7 @@ export default Vue.extend({
     },
     select() {
       // Cannot be selected when there's no input value
-      if (this.isInputEmpty || !this.element) return;
+      if (this.isInputEmpty || !this.element || !this.isInputValid()) return;
       // Change UI selection
       this.btnSelected = true;
       this.currentSrc = this.srcSelected;
@@ -256,6 +266,7 @@ export default Vue.extend({
     // Parse string input to correct data type (do not show in UI)
     getParsedInputValue() {
       let parsedInputValue: any = this.inputValue;
+
       if (
         ['integer', 'float', 'double', 'number'].indexOf(
           this.btnInputType.propType
@@ -282,7 +293,25 @@ export default Vue.extend({
         if (!parsedInputValue || typeof parsedInputValue === 'string')
           parsedInputValue = this.inputValue.split(' ');
       }
+
       return parsedInputValue;
+    },
+    isInputValid(): boolean {
+      if (this.btnInputSchema) {
+        const ajv = new Ajv();
+        const validate = ajv.compile(this.btnInputSchema);
+
+        const valid = validate(this.getParsedInputValue());
+        
+        if (!valid) {
+          console.log(validate.errors);
+          this.$emit('show-error-message', validate.errors![0].message);
+          return false;
+        }
+      }
+
+      this.$emit('remove-error-message');
+      return true;
     }
   }
 });

@@ -18,13 +18,19 @@
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnInputType="interactionSelectBtn.btnInputType"
+                :btnInputSchema="interactionSelectBtn.btnInputSchema"
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
                 :element="element"
                 v-on:select-with-input="selectWithInput"
                 v-on:deselect="$emit('deselect')"
+                v-on:show-error-message="showErrorMessage"
+                v-on:remove-error-message="removeErrorMessage"
             />
 
+        </div>
+        <div v-if="showInteractionError" class="interaction-popover">
+            <p>{{ interactionErrorMessage }}</p>
         </div>
     </div>
 </template>
@@ -41,6 +47,12 @@ export default Vue.extend({
         aDropdownButton,
         aInteractionInput,
         aButtonSelect
+    },
+    data() {
+        return {
+            showInteractionError: false,
+            interactionErrorMessage: ''
+        }
     },
     props: {
         interactionType: {
@@ -66,6 +78,18 @@ export default Vue.extend({
     methods: {
         selectWithInput(element: any, inputValue: any, changeInput: boolean) {
             this.$emit('select-with-input', element, inputValue, changeInput);
+        },
+        showErrorMessage(message) {
+            this.interactionErrorMessage = message;
+            this.showInteractionError = true;
+
+            setTimeout(() => {
+                this.removeErrorMessage();
+            }, 5000);
+        },
+        removeErrorMessage() {
+            this.interactionErrorMessage = '';
+            this.showInteractionError = false;
         }
     }
 });
@@ -73,6 +97,7 @@ export default Vue.extend({
 
 <style scoped>
 .interaction-container {
+    position: relative;
     display: flex;
     width: 100%;
     height: 35px;
@@ -100,5 +125,17 @@ export default Vue.extend({
 
 .interaction-dropdown-btn {
     height: 100%;
+}
+
+.interaction-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 10px;
+  color: #393B3A;
+  background-color: #A36A5B;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 </style>
