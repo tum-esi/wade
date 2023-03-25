@@ -9,12 +9,14 @@
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
+                :btnDisabled="showInteractionError"
                 v-on:select="$emit('select')"
                 v-on:deselect="$emit('deselect')"
             />
 
             <aInteractionInput
                 v-else-if="interactionType === 'property-write' || interactionType === 'action-invoke' || interactionType === 'property-observe-write' && interactionSelectBtn.btnInputType.propType"
+                ref="interactionInput"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnInputType="interactionSelectBtn.btnInputType"
@@ -29,9 +31,7 @@
             />
 
         </div>
-        <div v-if="showInteractionError" class="interaction-popover">
-            <p>{{ interactionErrorMessage }}</p>
-        </div>
+        <div v-if="showInteractionError" class="interaction-popover">{{interactionErrorMessage}}</div>
     </div>
 </template>
 
@@ -82,10 +82,6 @@ export default Vue.extend({
         showErrorMessage(message) {
             this.interactionErrorMessage = message;
             this.showInteractionError = true;
-
-            setTimeout(() => {
-                this.removeErrorMessage();
-            }, 5000);
         },
         removeErrorMessage() {
             this.interactionErrorMessage = '';
@@ -131,9 +127,15 @@ export default Vue.extend({
   position: absolute;
   top: 100%;
   left: 0;
+  overflow-y: scroll;
   z-index: 1;
   width: 100%;
+  height: 50px;
+  border: 1px solid #393B3A;
+  border-radius: 3px;
   padding: 10px;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
   color: #393B3A;
   background-color: #A36A5B;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);

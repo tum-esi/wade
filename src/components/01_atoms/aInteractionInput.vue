@@ -66,7 +66,7 @@
       <img
         class="select-btn"
         @click.prevent="btnSelected ? deselect() : select()"
-        :src="!isInputEmpty && isInputValid() ? currentSrc : srcSelectionNotPossible"
+        :src="!hasError && !isInputEmpty ? currentSrc : srcSelectionNotPossible"
       />
     </div>
   </div>
@@ -194,6 +194,27 @@ export default Vue.extend({
       } else {
         return false;
       }
+    },
+    hasError(): boolean {
+      let errorMessage = '\n';
+
+      const validationResult = this.getInputValidationResult();
+
+      if (validationResult) {
+        for (const result of validationResult) {
+          errorMessage += `- ${result}\n`;
+        }
+      }
+
+      errorMessage = errorMessage.trim();
+      
+      if (errorMessage) {
+        this.$emit('show-error-message', errorMessage);
+        return true;
+      } else {
+        this.$emit('remove-error-message', errorMessage);
+        return false;
+      }
     }
   },
   methods: {
@@ -245,7 +266,7 @@ export default Vue.extend({
     },
     select() {
       // Cannot be selected when there's no input value
-      if (this.isInputEmpty || !this.element || !this.isInputValid()) return;
+      if (this.isInputEmpty || !this.element || this.hasError) return;
       // Change UI selection
       this.btnSelected = true;
       this.currentSrc = this.srcSelected;
@@ -278,7 +299,6 @@ export default Vue.extend({
         try {
           parsedInputValue = JSON.parse(this.inputValue);
         } catch {
-          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
       }
@@ -287,7 +307,6 @@ export default Vue.extend({
         try {
           parsedInputValue = JSON.parse(jsonArr);
         } catch {
-          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
         if (!parsedInputValue || typeof parsedInputValue === 'string')
@@ -296,23 +315,31 @@ export default Vue.extend({
 
       return parsedInputValue;
     },
-    isInputValid(): boolean {
+    getInputValidationResult(): any {
+      if (this.isInputEmpty) {
+        return; 
+      }
+
       if (this.btnInputSchema) {
-        const ajv = new Ajv();
+        const ajv = new Ajv({ allErrors: true });
         const validate = ajv.compile(this.btnInputSchema);
 
         const valid = validate(this.getParsedInputValue());
         
         if (!valid) {
-          console.log(validate.errors);
-          this.$emit('show-error-message', validate.errors![0].message);
-          return false;
-        }
-      }
+          const errorMessages: (string | undefined) [] = [];
+          for (const error of validate.errors!) {
+            if (error.instancePath) {
+              errorMessages.push(`${error.instancePath} ${error.message}`);
+            } else {
+              errorMessages.push(error.message);
+            }
+          }
 
-      this.$emit('remove-error-message');
-      return true;
-    }
+          return errorMessages;
+        } 
+      }
+    },
   }
 });
 </script>
