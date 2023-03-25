@@ -1,10 +1,13 @@
 <template>
   <div 
+    ref="sidebar"
     :class="getSidebarStyle"
+    :style="{ width: `${width}px` }"
     @mouseover="showCollapseBtn = true"
     @mouseleave="showCollapseBtn = false"
   >
-    <aTabHeader 
+    <div class="sidebar-left">
+      <aTabHeader 
       class="sidebar-header shadow"
       :class="getHeaderStyle"
       :isSidebarVisible="isSidebarVisible"
@@ -13,26 +16,29 @@
       v-on:tab-clicked="homeClicked"
       v-on:tab-label-clicked="homeClicked"
       v-on:tab-btn-clicked="toggleSidebar"
-    />
-    <div :class="isSidebarVisible ? 'sidebar-content' : 'sidebar-content invisible'">
-      <div class="add-element-container">
-        <!-- <aSearchbar class="searchbar" /> -->
-        <label> Add Element </label>
-        <aDropdownButton
-          class="dropdown-btn"
-          :btnKey="getAddNewButton.btnKey"
-          :btnSrc="getAddNewButton.btnSrc"
-          :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
-          v-on:dropdown-clicked="openModuleAddElement"
-        />
-      </div>
-      <div class="sidebar-elements-container">
-        <mSidebarElementGroup
-          v-on:element-clicked="sidebarElementClicked"
-          v-on:dropdown-clicked="openModuleAddElement"
-        />
+      />
+      <div :class="isSidebarVisible ? 'sidebar-content' : 'sidebar-content invisible'">
+        <div class="add-element-container">
+          <!-- <aSearchbar class="searchbar" /> -->
+          <label> Add Element </label>
+          <aDropdownButton
+            class="dropdown-btn"
+            :btnKey="getAddNewButton.btnKey"
+            :btnSrc="getAddNewButton.btnSrc"
+            :btnDropdownOptions="getAddNewButton.btnDropdownOptions"
+            v-on:dropdown-clicked="openModuleAddElement"
+          />
+        </div>
+        <div class="sidebar-elements-container">
+          <mSidebarElementGroup
+            v-on:element-clicked="sidebarElementClicked"
+            v-on:dropdown-clicked="openModuleAddElement"
+          />
+        </div>
       </div>
     </div>
+
+    <div class="resizer" @mousedown="startResize"></div>
   </div>
 </template>
 
@@ -56,7 +62,11 @@ export default Vue.extend({
   data() {
     return {
       showCollapseBtn: false,
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      startX: 0,
+      startWidth: 0,
+      width: 200,
+      left: 0,
     };
   },
   computed: {
@@ -98,14 +108,41 @@ export default Vue.extend({
             } else {
                 // event not relevant for this function
             }
-        }
+    },
+    startResize(event: MouseEvent) {
+      event.preventDefault();
+      (this as any).startX = event.pageX;
+      (this as any).startWidth = (this as any).width;
+      document.addEventListener('mousemove', (this as any).resize);
+      document.addEventListener('mouseup', (this as any).stopResize);
+    },
+    resize(event: MouseEvent) {
+      const deltaX = event.pageX - (this as any).startX;
+      (this as any).width = (this as any).startWidth + deltaX;
+      if ((this as any).width > window.innerWidth) {
+        (this as any).width = window.innerWidth;
+      }
+    },
+    stopResize() {
+      document.removeEventListener('mousemove', (this as any).resize);
+      document.removeEventListener('mouseup', (this as any).stopResize);
+    },
   }
 });
 </script>
 
 <style scoped>
 .sidebar {
+  display: flex;
+  justify-content: space-between;
   height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+.sidebar-left {
+  position: relative;
+  width: calc(100% - 10px);
 }
 
 .sidebar-visible {
@@ -113,6 +150,7 @@ export default Vue.extend({
 }
 
 .sidebar-header {
+  align-self: left;
   height: 7%;
   padding: 7px;
   background: #b5dfdd;
@@ -123,6 +161,7 @@ export default Vue.extend({
 }
 
 .sidebar-content {
+  align-self: left;
   height: 93%;
   overflow: scroll;
 }
@@ -156,6 +195,18 @@ export default Vue.extend({
 }
 .shadow {
   box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.19) !important;
+}
+
+.resizer {
+  position: relative;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 100%;
+  float: right;
+  cursor: ew-resize;
+  background-color: #ddd;
 }
 </style>
 
