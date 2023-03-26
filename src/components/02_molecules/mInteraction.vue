@@ -9,23 +9,29 @@
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
+                :btnDisabled="showInteractionError"
                 v-on:select="$emit('select')"
                 v-on:deselect="$emit('deselect')"
             />
 
             <aInteractionInput
                 v-else-if="interactionType === 'property-write' || interactionType === 'action-invoke' || interactionType === 'property-observe-write' && interactionSelectBtn.btnInputType.propType"
+                ref="interactionInput"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
                 :btnInputType="interactionSelectBtn.btnInputType"
+                :btnInputSchema="interactionSelectBtn.btnInputSchema"
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
                 :element="element"
                 v-on:select-with-input="selectWithInput"
                 v-on:deselect="$emit('deselect')"
+                v-on:show-error-message="showErrorMessage"
+                v-on:remove-error-message="removeErrorMessage"
             />
 
         </div>
+        <div v-if="showInteractionError" class="interaction-popover">{{interactionErrorMessage}}</div>
     </div>
 </template>
 
@@ -41,6 +47,12 @@ export default Vue.extend({
         aDropdownButton,
         aInteractionInput,
         aButtonSelect
+    },
+    data() {
+        return {
+            showInteractionError: false,
+            interactionErrorMessage: ''
+        }
     },
     props: {
         interactionType: {
@@ -66,6 +78,14 @@ export default Vue.extend({
     methods: {
         selectWithInput(element: any, inputValue: any, changeInput: boolean) {
             this.$emit('select-with-input', element, inputValue, changeInput);
+        },
+        showErrorMessage(message) {
+            this.interactionErrorMessage = message;
+            this.showInteractionError = true;
+        },
+        removeErrorMessage() {
+            this.interactionErrorMessage = '';
+            this.showInteractionError = false;
         }
     }
 });
@@ -73,6 +93,7 @@ export default Vue.extend({
 
 <style scoped>
 .interaction-container {
+    position: relative;
     display: flex;
     width: 100%;
     height: 35px;
@@ -100,5 +121,23 @@ export default Vue.extend({
 
 .interaction-dropdown-btn {
     height: 100%;
+}
+
+.interaction-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  overflow-y: scroll;
+  z-index: 1;
+  width: 100%;
+  height: 50px;
+  border: 1px solid #393B3A;
+  border-radius: 3px;
+  padding: 10px;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+  color: #393B3A;
+  background-color: #A36A5B;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

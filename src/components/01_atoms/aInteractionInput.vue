@@ -66,7 +66,7 @@
       <img
         class="select-btn"
         @click.prevent="btnSelected ? deselect() : select()"
-        :src="!isInputEmpty ? currentSrc : srcSelectionNotPossibele"
+        :src="!hasError && !isInputEmpty ? currentSrc : srcSelectionNotPossible"
       />
     </div>
   </div>
@@ -74,6 +74,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import Ajv from 'ajv';
+
 export default Vue.extend({
   name: 'aInteractionInput',
   created() {
@@ -93,7 +95,7 @@ export default Vue.extend({
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
       srcSelected: require('@/assets/checked_circle.png'),
-      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
+      srcSelectionNotPossible: require('@/assets/circle_grey.png')
     };
   },
   props: {
@@ -119,6 +121,13 @@ export default Vue.extend({
     btnInputType: {
       type: Object,
       required: true
+    },
+    /**
+     * Input data shema to validate the user input.
+     */
+    btnInputSchema: {
+      type: Object,
+      required: false
     },
     /**
      * Button css style. Can either be 'btn-grey' or 'btn-pos' or any other custom style.
@@ -185,6 +194,27 @@ export default Vue.extend({
       } else {
         return false;
       }
+    },
+    hasError(): boolean {
+      let errorMessage = '\n';
+
+      const validationResult = this.getInputValidationResult();
+
+      if (validationResult) {
+        for (const result of validationResult) {
+          errorMessage += `- ${result}\n`;
+        }
+      }
+
+      errorMessage = errorMessage.trim();
+      
+      if (errorMessage) {
+        this.$emit('show-error-message', errorMessage);
+        return true;
+      } else {
+        this.$emit('remove-error-message', errorMessage);
+        return false;
+      }
     }
   },
   methods: {
@@ -223,6 +253,7 @@ export default Vue.extend({
         this.dropdownVisible = !this.dropdownVisible;
         (this as any).inputValue = input;
       }
+
       // When btn is selected emit selection change
       if (this.btnSelected) {
         this.$emit(
@@ -235,7 +266,7 @@ export default Vue.extend({
     },
     select() {
       // Cannot be selected when there's no input value
-      if (this.isInputEmpty || !this.element) return;
+      if (this.isInputEmpty || !this.element || this.hasError) return;
       // Change UI selection
       this.btnSelected = true;
       this.currentSrc = this.srcSelected;
@@ -256,6 +287,7 @@ export default Vue.extend({
     // Parse string input to correct data type (do not show in UI)
     getParsedInputValue() {
       let parsedInputValue: any = this.inputValue;
+
       if (
         ['integer', 'float', 'double', 'number'].indexOf(
           this.btnInputType.propType
@@ -267,7 +299,6 @@ export default Vue.extend({
         try {
           parsedInputValue = JSON.parse(this.inputValue);
         } catch {
-          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
       }
@@ -276,14 +307,39 @@ export default Vue.extend({
         try {
           parsedInputValue = JSON.parse(jsonArr);
         } catch {
-          // TODO: show error that input is incorrect
           parsedInputValue = null;
         }
         if (!parsedInputValue || typeof parsedInputValue === 'string')
           parsedInputValue = this.inputValue.split(' ');
       }
+
       return parsedInputValue;
-    }
+    },
+    getInputValidationResult(): any {
+      if (this.isInputEmpty) {
+        return; 
+      }
+
+      if (this.btnInputSchema) {
+        const ajv = new Ajv({ allErrors: true });
+        const validate = ajv.compile(this.btnInputSchema);
+
+        const valid = validate(this.getParsedInputValue());
+        
+        if (!valid) {
+          const errorMessages: (string | undefined) [] = [];
+          for (const error of validate.errors!) {
+            if (error.instancePath) {
+              errorMessages.push(`${error.instancePath} ${error.message}`);
+            } else {
+              errorMessages.push(error.message);
+            }
+          }
+
+          return errorMessages;
+        } 
+      }
+    },
   }
 });
 </script>
