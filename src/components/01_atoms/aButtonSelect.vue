@@ -19,7 +19,7 @@
     </button>
 
     <div class="select-btn-container">
-      <img class="select-btn" @click.prevent="changeSelection" :src="!btnDisabled ? currentSrc : srcSelectionNotPossibele"/>
+      <img class="select-btn" @click.prevent="changeSelection" :src="!btnDisabled ? currentSrc : srcSelectionNotPossible"/>
     </div>
 
   </div>
@@ -34,17 +34,26 @@ export default Vue.extend({
       this.btnSelected = false;
       this.currentSrc = this.srcUnselected;
     });
+    this.$eventHub.$on('read-all', () => {
+      if (this.btnKey.endsWith('read')) {
+        this.btnSelected = true;
+        this.currentSrc = this.srcSelected;
+        this.readAllSelected = true;
+      }
+    });
   },
   beforeDestroy() {
     this.$eventHub.$off('selections-reseted');
+    this.$eventHub.$off('read-all');
   },
   data() {
     return {
       btnSelected: false,
+      readAllSelected: false,
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
       srcSelected: require('@/assets/checked_circle.png'),
-      srcSelectionNotPossibele: require('@/assets/circle_grey.png')
+      srcSelectionNotPossible: require('@/assets/circle_grey.png')
     };
   },
   props: {

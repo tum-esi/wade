@@ -6,7 +6,24 @@
         <div class="selection-area" v-if="isValidTd">
             <!-- Properties -->
             <div class="properties border-bottom-bold selection-area-el">
-                <div class="selection-label-container border-bottom"><label>Properties</label></div>
+                <div class="selection-label-container border-bottom"><label>Properties</label>
+                    <aBasicButton 
+                        class="selection-btn-read-all"
+                        :class="{'full-width' : showButtons.indexOf(' ') === -1}"
+                        :btnClass="getReadAllBtn.btnClass"
+                        :btnLabel="getReadAllBtn.btnLabel"
+                        :btnOnClick="getReadAllBtn.btnOnClick"
+                        btnActive=true
+                    />
+                    <aBasicButton 
+                        class="selection-btn-write-all"
+                        :class="{'full-width' : showButtons.indexOf(' ') === -1}"
+                        :btnClass="getWriteAllBtn.btnClass"
+                        :btnLabel="getWriteAllBtn.btnLabel"
+                        :btnOnClick="getWriteAllBtn.btnOnClick"
+                        btnActive=true
+                    />
+                </div>
                 <div class="interaction-container-all">
                     <mInteraction 
                         v-for="(element, index) in 
@@ -114,6 +131,8 @@ export default Vue.extend({
        ...mapGetters('TdStore', [
            'getSelectionBtn',
            'getSelectionResetBtn',
+           'getReadAllBtn',
+           'getWriteAllBtn',
            'getInteractionState',
            'getTdParsed',
            'getTdState',

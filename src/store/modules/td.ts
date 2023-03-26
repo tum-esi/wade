@@ -84,6 +84,16 @@ export default {
             btnLabel: 'Status: No interaction selected.',
             btnOnClick: '-'
         },
+        tdReadAllBtn: {
+            btnClass: 'btn-read-all',
+            btnLabel: 'Read All',
+            btnOnClick: 'read-all'
+        },
+        tdWriteAllBtn: {
+            btnClass: 'btn-write-all',
+            btnLabel: 'Write All',
+            btnOnClick: 'write-all'
+        },
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
@@ -345,6 +355,12 @@ export default {
         },
         getResultsBtn(state: any) {
             return state.tdResultsBtn;
+        },
+        getReadAllBtn(state: any) {
+            return state.tdReadAllBtn;
+        },
+        getWriteAllBtn(state: any) {
+            return state.tdWriteAllBtn;
         },
         getEditorPlaceholder(state: any) {
             return state.tdEditorPlaceholder;
