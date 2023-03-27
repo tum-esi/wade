@@ -75,6 +75,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Ajv from 'ajv';
+import { JSONSchemaFaker  as jsf} from 'json-schema-faker';
 
 export default Vue.extend({
   name: 'aInteractionInput',
@@ -82,13 +83,28 @@ export default Vue.extend({
     this.$eventHub.$on('selections-reseted', () => {
       this.deselect();
     });
+    this.$eventHub.$on('write-all', () => {
+      console.log('Hey!')
+      if (this.btnKey.endsWith('write')) {
+        this.btnSelected = true;
+        this.currentSrc = this.srcSelected;
+        this.writeAllSelected = true;
+        const fakeInputValue = jsf.generate(this.btnInputSchema);
+        if (this.btnInputType.propType === 'boolean' || this.btnInputType.propEnum) {
+            (this as any).inputValue = fakeInputValue;
+        }
+        this.inputValue = JSON.stringify(fakeInputValue);
+      }
+    });
   },
   beforeDestroy() {
     this.$eventHub.$off('selections-reseted');
+    this.$eventHub.$off('write-all');
   },
   data() {
     return {
       btnSelected: false,
+      writeAllSelected: false,
       inputValue: '',
       dropdownVisible: false,
       placeholder: '',
@@ -321,7 +337,7 @@ export default Vue.extend({
       }
 
       if (this.btnInputSchema) {
-        const ajv = new Ajv({ allErrors: true });
+        const ajv = new Ajv({ allErrors: true, strict: false });
         const validate = ajv.compile(this.btnInputSchema);
 
         const valid = validate(this.getParsedInputValue());
@@ -397,7 +413,7 @@ export default Vue.extend({
   left: -100%;
   width: 200%;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  z-index: 2;
   border-radius: 3px;
 }
 

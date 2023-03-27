@@ -39,6 +39,7 @@ export default Vue.extend({
         this.btnSelected = true;
         this.currentSrc = this.srcSelected;
         this.readAllSelected = true;
+        this.$emit('select-read-all');
       }
     });
   },

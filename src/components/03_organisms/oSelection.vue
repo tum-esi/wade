@@ -13,7 +13,7 @@
                         :btnClass="getReadAllBtn.btnClass"
                         :btnLabel="getReadAllBtn.btnLabel"
                         :btnOnClick="getReadAllBtn.btnOnClick"
-                        btnActive=true
+                        :btnActive=true
                     />
                     <aBasicButton 
                         class="selection-btn-write-all"
@@ -21,7 +21,7 @@
                         :btnClass="getWriteAllBtn.btnClass"
                         :btnLabel="getWriteAllBtn.btnLabel"
                         :btnOnClick="getWriteAllBtn.btnOnClick"
-                        btnActive=true
+                        :btnActive=true
                     />
                 </div>
                 <div class="interaction-container-all">
