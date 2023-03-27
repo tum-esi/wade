@@ -7,7 +7,7 @@
       type="text"
       :placeholder="getPlaceholder"
       v-model="inputValue"
-      @change="changeInput(inputValue, false)"
+      @input="changeInput(inputValue, false)"
     />
 
     <input
@@ -18,7 +18,7 @@
       :max="this.btnInputType.propMax"
       placeholder="Number"
       v-model="inputValue"
-      @change="changeInput(inputValue, false)"
+      @input="changeInput(inputValue, false)"
     />
 
     <div v-else-if="btnInputType.propType === 'boolean'" class="input-dropdown">
@@ -247,7 +247,10 @@ export default Vue.extend({
       return false;
     },
     changeInput(input: string | boolean | number | any, isDropdown: boolean) {
-      if (input === undefined) return;
+      if (input === undefined || input === '' || input === null) { 
+        this.deselect();
+        return;
+      }
       // Hide dropdown and change input when enum/boolean
       if (isDropdown) {
         this.dropdownVisible = !this.dropdownVisible;
@@ -321,7 +324,7 @@ export default Vue.extend({
       }
 
       if (this.btnInputSchema) {
-        const ajv = new Ajv({ allErrors: true });
+        const ajv = new Ajv({ allErrors: true, strict: false });
         const validate = ajv.compile(this.btnInputSchema);
 
         const valid = validate(this.getParsedInputValue());
