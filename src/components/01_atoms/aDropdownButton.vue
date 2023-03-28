@@ -17,7 +17,11 @@
 
     <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
 
-    <div class="dropdown-container" v-if="showDropdown" :class="btnStyle">
+    <div class="dropdown-container" 
+      v-if="showDropdown" 
+      @mouseleave="showDropdown = false" 
+      :class="btnStyle"
+    >
       <div
         class="dropdown-element"
         v-for="(dropdownElement, index) in btnDropdownOptions"
@@ -287,4 +291,9 @@ export default Vue.extend({
 .dropdown-custom-editor div:hover {
   background-color: #8aaba9;
 }
+
+.dropdown-element:hover {
+  background-color: #8aaba9;
+}
+
 </style>
