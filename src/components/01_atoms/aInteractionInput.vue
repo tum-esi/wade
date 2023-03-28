@@ -193,7 +193,7 @@ export default Vue.extend({
           );
         } else {
           this.btnSelected = false;
-          this.currentSrc = this.srcSelected;
+          this.currentSrc = this.srcUnselected;
           this.writeAllSelected = false;
           this.inputValue = '';
         }

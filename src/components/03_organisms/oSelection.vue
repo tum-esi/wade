@@ -217,6 +217,9 @@ export default Vue.extend({
     watch: {
         '$route.params.id'(id) {
             (this as any).resetAll();
+        },
+        getTdParsed() {
+            (this as any).resetAll();
         }
     }
 });
@@ -282,7 +285,7 @@ export default Vue.extend({
 }
 
 [class*="interaction-meta-button"] {
-    padding: 2px;
+    padding: 3px;
     font-size: 14px !important;
 }
 
