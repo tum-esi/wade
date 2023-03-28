@@ -20,7 +20,8 @@ export default class TdParser {
       propertyInteractions: [],
       actionInteractions: [],
       eventInteractions: [],
-      metaInteractions: [],
+      readAllElement: null,
+      writeAllElement: null
     };
     this.protocols = protocols;
     this.eventSubscriptions = {};
@@ -330,7 +331,7 @@ export default class TdParser {
       for (const operation of operations) {
         switch (operation) {
           case MetaInteractionTypesEnum.PROP_READ_ALL:
-            this.parsedTd.propertyInteractions.push({
+            this.parsedTd.readAllElement = {
               interactionName: 'Read All',
               interactionTitle: `${operation} (r)`,
               interactionType: PossibleInteractionTypesEnum.PROP_READ_ALL,
@@ -345,72 +346,28 @@ export default class TdParser {
                   );
                 }
               }
-            });
-            break;
-          case MetaInteractionTypesEnum.PROP_READ_MULTIPLE:
-            this.parsedTd.propertyInteractions.push({
-              interactionName: operation,
-              interactionTitle: `${operation} (r)`,
-              interactionType: PossibleInteractionTypesEnum.PROP_READ_MULTIPLE,
-              interactionSelectBtn: {
-                btnKey: operation,
-                btnGeneralStyle: 'btn-event-interaction',
-                btnSelectedStyle: 'btn-event-interaction-selected',
-                interaction: async () => {
-                  // return getReadResponseWithTiming(
-                  //   this.consumedTd,
-                  //   this.SizeCalculator
-                  // );
-                }
-              }
-            });
+            };
             break;
           case MetaInteractionTypesEnum.PROP_WRITE_ALL:
-            this.parsedTd.propertyInteractions.push({
-              interactionName: operation,
+            this.parsedTd.writeAllElement = {
+              interactionName: 'Write All',
               interactionTitle: `${operation} (w)`,
               interactionType: PossibleInteractionTypesEnum.PROP_WRITE_ALL,
               interactionSelectBtn: {
-                btnKey: PossibleInteractionTypesEnum.PROP_WRITE_ALL,
+                btnKey: 'write-all',
                 btnGeneralStyle: 'btn-event-interaction',
                 btnSelectedStyle: 'btn-event-interaction-selected',
-                interaction: async () => {
-                  // return getReadResponseWithTiming(
-                  //   this.consumedTd,
-                  //   this.SizeCalculator
-                  // );
+                interaction: async (val: any, options?: any) => {
+                  return getWriteAllResponseWithTiming(
+                      this.consumedTd,
+                      val,
+                      this.SizeCalculator,
+                      options
+                    );
                 }
               }
-            });
+            }; 
             break;
-          case MetaInteractionTypesEnum.PROP_WRITE_MULTIPLE:
-            this.parsedTd.propertyInteractions.push({
-              interactionName: operation,
-              interactionTitle: `${operation} (w)`,
-              interactionType: PossibleInteractionTypesEnum.PROP_WRITE_MULTIPLE,
-              interactionSelectBtn: {
-                btnKey: PossibleInteractionTypesEnum.PROP_WRITE_MULTIPLE,
-                btnGeneralStyle: 'btn-event-interaction',
-                btnSelectedStyle: 'btn-event-interaction-selected',
-                interaction: async () => {
-                  // return getReadResponseWithTiming(
-                  //   this.consumedTd,
-                  //   this.SizeCalculator
-                  // );
-                }
-              }
-            });
-            break;
-          // case MetaInteractionTypesEnum.PROP_OBSERVE_ALL:
-          //   break;
-          // case MetaInteractionTypesEnum.PROP_UNOBSERVE_ALL:
-          //   break;
-          // case MetaInteractionTypesEnum.ACTION_QUERY_ALL:
-          //   break;
-          // case MetaInteractionTypesEnum.EVENT_SUB_ALL:
-          //   break;
-          // case MetaInteractionTypesEnum.EVENT_UNSUB_ALL:
-          //   break;
           default:
             break;
 
@@ -448,6 +405,45 @@ export default class TdParser {
           });
         if (response.res !== undefined && response.res !== null) {
           response.size = sizeCalculator.getSize(response.res);
+        }
+        return response;
+      }
+
+      async function getWriteAllResponseWithTiming(
+        consumedTd: WoT.ConsumedThing | null,
+        val: any,
+        sizeCalculator: SizeCalculator,
+        options?: any
+      ) {
+        if (!consumedTd) return { error: 'No consumed Thing available.' };
+        const startTime = process.hrtime();
+        const response = await consumedTd
+          .writeMultipleProperties(val, options)
+          .then(async res => {
+            const endTime = process.hrtime(startTime);
+            return {
+              res: 'Success',
+              s: endTime[0],
+              ms: endTime[1] / 1000000,
+              size: 'n.A.'
+            };
+          })
+          .catch(async err => {
+            await err;
+            const endTime = process.hrtime(startTime);
+            return {
+              res: undefined,
+              error: err,
+              s: endTime[0],
+              ms: endTime[1] / 1000000,
+              size: 'n.A.'
+            };
+          });
+        if (response.res) {
+          response.size =
+            options !== undefined
+              ? sizeCalculator.getSize(val) + sizeCalculator.getSize(options)
+              : sizeCalculator.getSize(val);
         }
         return response;
       }

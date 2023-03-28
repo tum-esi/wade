@@ -19,7 +19,9 @@
     </button>
 
     <div class="select-btn-container">
-      <img class="select-btn" @click.prevent="changeSelection" :src="!btnDisabled ? currentSrc : srcSelectionNotPossible"/>
+      <img class="select-btn"
+        @click.prevent="!interactionReadAll ? changeSelection() : null" 
+        :src="!btnDisabled ? currentSrc : srcSelectionNotPossible"/>
     </div>
 
   </div>
@@ -34,23 +36,13 @@ export default Vue.extend({
       this.btnSelected = false;
       this.currentSrc = this.srcUnselected;
     });
-    this.$eventHub.$on('read-all', () => {
-      if (this.btnKey.endsWith('read')) {
-        this.btnSelected = true;
-        this.currentSrc = this.srcSelected;
-        this.readAllSelected = true;
-        this.$emit('select-read-all');
-      }
-    });
   },
   beforeDestroy() {
     this.$eventHub.$off('selections-reseted');
-    this.$eventHub.$off('read-all');
   },
   data() {
     return {
       btnSelected: false,
-      readAllSelected: false,
       currentSrc: require('@/assets/circle.png'),
       srcUnselected: require('@/assets/circle.png'),
       srcSelected: require('@/assets/checked_circle.png'),
@@ -110,6 +102,31 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: false
+    },
+    interactionReadAll: {
+      type: Boolean,
+      required: true
+    }
+  },
+  watch: {
+    interactionReadAll() {
+      if (this.interactionReadAll === undefined || this.interactionReadAll === null) return;
+
+      if (this.btnKey.endsWith('read')) {
+        if (this.interactionReadAll) {
+          if (this.btnSelected) {
+            this.changeSelection();
+          }
+
+          this.btnSelected = true;
+          this.currentSrc = this.srcSelected;
+          this.$emit('select-read-all');
+        } else {
+          this.btnSelected = false;
+          this.currentSrc = this.srcUnselected;
+          this.$emit('deselect-read-all');
+        }
+      }
     }
   },
   computed: {
