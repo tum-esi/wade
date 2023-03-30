@@ -1,8 +1,11 @@
 <template>
   <div
+    ref="dropdownBtnContainer"
     class="dropdown-btn-container"
     v-on:click.prevent="showDropdown = !showDropdown"
     :title="btnTitle"
+    @blur="showDropdown = false"
+    tabindex="0"
   >
     <div v-if="btnLabel" class="button-label-container">
       <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
@@ -17,9 +20,8 @@
 
     <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
 
-    <div class="dropdown-container" 
+    <div ref="dropdownContainer" class="dropdown-container" 
       v-if="showDropdown" 
-      @mouseleave="showDropdown = false" 
       :class="btnStyle"
     >
       <div
