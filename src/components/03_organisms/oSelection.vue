@@ -132,6 +132,9 @@ export default Vue.extend({
             default: 'selection-btn-reset selection-btn-invoke'
         }
     },
+    beforeDestroy() {
+        (this as any).resetInteractions();
+    },
     data() {
         return {
             interactionReadAll: false,

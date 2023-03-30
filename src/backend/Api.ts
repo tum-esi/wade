@@ -315,7 +315,7 @@ export async function invokeInteractions(selectedInteractions) {
   }
   
   return {
-    resultProps: resultProps.values(),
+    resultProps,
     resultActions,
     resultEvents
   };

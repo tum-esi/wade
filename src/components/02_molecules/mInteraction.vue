@@ -3,7 +3,7 @@
         <div class="interaction-name"><label>{{ interactionName }}</label></div>
         <div class="interaction-options">
             <aButtonSelect 
-                v-if="(interactionType === 'select' || interactionType === 'property-read' || interactionType === 'property-read-all' || interactionType === 'property-read-multiple' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType) || interactionType === 'property-observe-read'"
+                v-if="(interactionType === 'select' || interactionType === 'property-read' || interactionType === 'property-read-multiple' || interactionType === 'action-invoke' && !interactionSelectBtn.btnInputType.propType) || interactionType === 'property-observe-read'"
                 class="interaction-select-btn"
                 :btnLabel="interactionSelectBtn.btnLabel"
                 :btnKey="interactionSelectBtn.btnKey"
@@ -27,7 +27,7 @@
                 :element="element"
                 :interactionWriteAll="interactionWriteAll"
                 v-on:select-with-input="selectWithInput"
-                v-on:select-write-all="selectWithInputForWriteAll"
+                v-on:select-write-all="selectWriteAll"
                 v-on:deselect="$emit('deselect')"
                 v-on:show-error-message="showErrorMessage"
                 v-on:remove-error-message="removeErrorMessage"
@@ -90,7 +90,7 @@ export default Vue.extend({
         selectWithInput(element: any, inputValue: any, changeInput: boolean) {
             this.$emit('select-with-input', element, inputValue, changeInput);
         },
-        selectWithInputForWriteAll(element: any, inputValue: any) {
+        selectWriteAll(element: any, inputValue: any) {
             this.$emit('select-write-all', element, inputValue);
         },
         showErrorMessage(message) {
