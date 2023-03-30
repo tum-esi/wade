@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="resizer" @mousedown="startResize"></div>
+    <div :class="getResizeBarStyle" @mousedown="startResize"></div>
   </div>
 </template>
 
@@ -81,6 +81,9 @@ export default Vue.extend({
     },
     getHeaderStyle() {
       return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? '' : (this as any).getSidebarActive ? '' : 'border-right';
+    },
+    getResizeBarStyle() {
+      return (this as any).$route.params.id === undefined && !(this as any).getSidebarActive ? '' : (this as any).getSidebarActive ? "resizebar-full-height" : "resizebar-header-height";
     }
   },
   methods: {
@@ -137,16 +140,13 @@ export default Vue.extend({
   justify-content: space-between;
   height: 100%;
   width: 100%;
+  min-width: 15%;
   overflow: auto;
 }
 
 .sidebar-left {
   position: relative;
-  width: calc(100% - 10px);
-}
-
-.sidebar-visible {
-  border-right: 3px solid #393b3a;
+  width: calc(100% - 3px);
 }
 
 .sidebar-header {
@@ -197,16 +197,22 @@ export default Vue.extend({
   box-shadow: 0 6px 5px 0 rgba(0, 0, 0, 0.19) !important;
 }
 
-.resizer {
+[class^="resizebar"] {
   position: relative;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 10px;
-  height: 100%;
+  width: 3px;
   float: right;
   cursor: ew-resize;
-  background-color: #ddd;
+  background-color: #393b3a;
+}
+
+.resizebar-header-height {
+  height: 7%;
+}
+.resizebar-full-height {
+  height: 100%;
 }
 </style>
 
