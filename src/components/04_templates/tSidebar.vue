@@ -32,6 +32,7 @@
         <div class="sidebar-elements-container">
           <mSidebarElementGroup
             v-on:element-clicked="sidebarElementClicked"
+          v-on:element-renamed="sidebarElementRenamed"
             v-on:dropdown-clicked="openModuleAddElement"
           />
         </div>
@@ -97,6 +98,9 @@ export default Vue.extend({
     },
     sidebarElementClicked(elementId: string, elementType: string) {
       this.$emit('sidebar-element-clicked', elementId, elementType);
+    },
+    sidebarElementRenamed(elementId: string, elementType: string, newElementId: string) {
+      this.$emit('sidebar-element-renamed', elementId, elementType, newElementId);
     },
     openModuleAddElement(element: any) {
       this.$emit('open-module-element', element);
