@@ -315,6 +315,9 @@ export default {
                 }
             }
             commit('deleteElementFromStore', payload);
+        },
+        async renameElement({ commit }, payload: {id: string, type: string, newId: string}) {
+            commit('renameElement', payload);
         }
     },
     mutations: {
@@ -615,6 +618,25 @@ export default {
                     index = state.tds.indexOf(element);
                     state.tds[index] = tdElement;
                     break;
+                }
+            }
+        },
+        renameElement(state: any, payload: {id: string, type: string, newId: string}) {
+            for (const element of state.sidebarElements) {
+                if (element.id === payload.id) {
+                    element.id = payload.newId;
+                    element.title = payload.newId;
+                    break;
+                }
+            }
+
+            console.log(payload.type)
+
+            for (const element of state[`${payload.type}s`]) {
+                if (element.id === payload.id) {
+                    element.id = payload.newId;
+                    element.title = payload.newId;
+                    return;
                 }
             }
         }

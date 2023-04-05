@@ -3,6 +3,7 @@
     <tSidebar id="sidebar" 
       v-on:open-module-element="openModal"
       v-on:sidebar-element-clicked="sidebarElementClicked"
+      v-on:sidebar-element-renamed="sidebarElementRenamed"
       v-on:home-clicked="homeClicked"
     />
     <router-view id="main-content"/>
@@ -51,7 +52,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapActions('SidebarStore', ['addNewElement']),
+    ...mapActions('SidebarStore', ['addNewElement', 'renameElement']),
     ...mapMutations('SidebarStore', ['addSidebarElement']),
     openModal(element: any) {
       switch (element.btnValue) {
@@ -140,6 +141,16 @@ export default Vue.extend({
         name: routeName,
         params: { id: elementId }
       });
+    },
+    sidebarElementRenamed(elementId: string, elementType: string, newElementId: string) {
+      const payload = {
+        id: elementId,
+        type: elementType,
+        newId: newElementId
+      };
+      console.log(payload);
+      (this as any).renameElement(payload);
+      (this as any).sidebarElementClicked(newElementId, elementType);
     }
   }
 });

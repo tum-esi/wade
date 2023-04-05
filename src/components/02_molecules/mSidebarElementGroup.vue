@@ -13,6 +13,7 @@
       :styleCss="element.styleCss"
       :showChildren="element.showChildren"
       v-on:element-clicked="sidebarElementClicked"
+      v-on:element-renamed="sidebarElementRenamed"
       v-on:delete-element="deleteElement"
       v-on:dropdown-clicked="optionDropdownClicked"
     />
@@ -164,7 +165,6 @@ export default Vue.extend({
         }
       }
     },
-
     removeComponent(id) {
       // this.sidebarElements is a one dimensional vs store sidebarElements is nested
       for (const sidebarElement of this.sidebarElements) {
@@ -185,6 +185,16 @@ export default Vue.extend({
     },
     sidebarElementClicked(id: string, type: string) {
       this.$emit('element-clicked', id, type);
+    },
+    sidebarElementRenamed(id: string, type: string, newId: string) {
+      this.$emit('element-renamed', id, type, newId);
+      for (const sidebarElement of this.sidebarElements) {
+        if (sidebarElement.id === id) {
+          sidebarElement.id = newId
+          sidebarElement.title = newId
+          break;
+        }
+      }
     },
     deleteElement(id: string, type: string) {
       this.deleteSidebarElement({ id, type });
