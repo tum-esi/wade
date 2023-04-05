@@ -106,17 +106,15 @@ export default class TdParser {
         const response = await consumedTd
           .readProperty(property)
           .then(async res => {
-            await res;
             const endTime = process.hrtime(startTime);
             return {
-              res,
+              res: await res.value(),
               s: endTime[0],
               ms: endTime[1] / 1000000,
               size: 'n.A.'
             };
           })
-          .catch(async err => {
-            await err;
+          .catch(err => {
             const endTime = process.hrtime(startTime);
             return {
               res: undefined,
@@ -179,8 +177,7 @@ export default class TdParser {
               size: 'n.A.'
             };
           })
-          .catch(async err => {
-            await err;
+          .catch(err => {
             const endTime = process.hrtime(startTime);
             return {
               res: undefined,
@@ -242,17 +239,15 @@ export default class TdParser {
         const response = await consumedTd
           .invokeAction(action, input)
           .then(async res => {
-            await res;
             const endTime = process.hrtime(startTime);
             return {
-              res: res,
+              res: await res?.value(),
               s: endTime[0],
               ms: endTime[1] / 1000000,
               size: 'n.A.'
             };
           })
-          .catch(async err => {
-            await err;
+          .catch(err => {
             const endTime = process.hrtime(startTime);
             return {
               error: err,
