@@ -1,28 +1,30 @@
 <template>
   <div
-    ref="dropdownBtnContainer"
     class="dropdown-btn-container"
-    v-on:click.prevent="showDropdown = !showDropdown"
     :title="btnTitle"
-    @blur="showDropdown = false"
-    tabindex="0"
   >
-    <div v-if="btnLabel" class="button-label-container">
-      <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
+    <div class="dropdown-btn-elements"
+      v-on:click.prevent="showDropdown = !showDropdown, showDropdown ? focusDropdown() : null"
+    >
+      <div v-if="btnLabel" class="button-label-container">
+        <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
+      </div>
+
+      <img
+        class="button-icon"
+        v-if="btnSrc"
+        v-bind:src="iconSrc"
+        :class="btnIconStyle"
+      />
+
+      <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
     </div>
-
-    <img
-      class="button-icon"
-      v-if="btnSrc"
-      v-bind:src="iconSrc"
-      :class="btnIconStyle"
-    />
-
-    <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
 
     <div ref="dropdownContainer" class="dropdown-container" 
       v-if="showDropdown" 
       :class="btnStyle"
+      @blur="showDropdown = false"
+      tabindex="-1"
     >
       <div
         class="dropdown-element"
@@ -49,6 +51,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { focusElement } from '@/util/helpers';
+
 export default Vue.extend({
   name: 'aDropdownButton',
   props: {
@@ -143,6 +147,9 @@ export default Vue.extend({
         btnInput: dropdownElement.inputValue,
         parentId: null
       });
+    },
+    focusDropdown() {
+      focusElement("dropdownContainer", this);
     }
   },
   watch: {
