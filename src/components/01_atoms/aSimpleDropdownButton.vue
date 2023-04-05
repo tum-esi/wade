@@ -22,7 +22,7 @@
             <label 
                 v-for="(el, index) in this.dropdownOptions"
                 :key="index"
-                :class="el.style"
+                :class="el.style + ' dropdown-element'"
                 @click.prevent="changeSelection(el.title)">
                 {{ el.title }}
             </label>
@@ -180,4 +180,9 @@ export default Vue.extend({
     max-width: 100%;
     padding: 5px;
 }
+
+.dropdown-element:hover {
+  background-color: #8aaba9;
+}
+
 </style>
