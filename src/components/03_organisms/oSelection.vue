@@ -196,8 +196,8 @@ export default Vue.extend({
             (this as any).interactionWriteAll = false;
             (this as any).resetSelections();
         },
-        invoke() {
-            (this as any).invokeInteractions();
+        async invoke() {
+            await (this as any).invokeInteractions();
         },
         readAllProperties() {
             (this as any).interactionReadAll = !(this as any).interactionReadAll;

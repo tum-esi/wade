@@ -1136,84 +1136,88 @@
   dependencies:
     easy-stack "1.0.1"
 
-"@node-wot/binding-coap@~0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/binding-coap/-/binding-coap-0.8.1.tgz"
-  integrity sha512-Ic/yEA9hHv3rpbFAjAtoKeP3NHB/Ag435C2VjQp/Z6HxgEUQMk+3t1QtpbHcW5vgIIZuR+iw5d+JnbvRpcDmCQ==
+"@node-wot/binding-coap@~0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/binding-coap/-/binding-coap-0.8.5.tgz#0a543947a9ba31d13d6a6fd769950a50a2c15c90"
+  integrity sha512-a5pVnXoFYRth3JAShy+GeI0DSX3NKYSbapr/441VoRVMGQKySl1kxPoq3/GeL38lEolSWEM/lR2eOk17a6pk6Q==
   dependencies:
-    "@node-wot/core" "0.8.1"
-    "@node-wot/td-tools" "0.8.1"
+    "@node-wot/core" "0.8.5"
+    "@node-wot/td-tools" "0.8.5"
     "@types/node" "16.4.13"
-    coap "^1.0.8"
+    coap "^1.3.0"
     node-coap-client "1.0.8"
     rxjs "5.5.11"
     slugify "^1.4.5"
-    wot-typescript-definitions "0.8.0-SNAPSHOT.22"
+    wot-typescript-definitions "0.8.0-SNAPSHOT.23"
 
-"@node-wot/binding-http@0.8.1", "@node-wot/binding-http@~0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/binding-http/-/binding-http-0.8.1.tgz"
-  integrity sha512-/4uvqZwQN6GMn3o36nDQFG+t3qWYOWWd0ioAFHUSGYhECSjjG2uGIaSImgV/5mPSpoHzQ94jfW0RQo8ynC2m7Q==
+"@node-wot/binding-http@0.8.5", "@node-wot/binding-http@~0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/binding-http/-/binding-http-0.8.5.tgz#d12d4e9338130858aec0ccb9644e866122a41286"
+  integrity sha512-ppPVKO8ucurvxFCv9GjH3ZtzPwtcicONIdSWt+mMPxkseGxma2RrAweC3V8fFL2iozU3dpTo73Drn9rqp2r8pQ==
   dependencies:
-    "@node-wot/core" "0.8.1"
-    "@node-wot/td-tools" "0.8.1"
+    "@node-wot/core" "0.8.5"
+    "@node-wot/td-tools" "0.8.5"
     "@types/eventsource" "^1.1.2"
     accept-language-parser "1.5.0"
     basic-auth "2.0.1"
     client-oauth2 "^4.2.5"
-    eventsource "^1.0.7"
+    eventsource "^2.0.2"
     node-fetch "^2.6.7"
     query-string "^7.1.1"
     rxjs "5.5.11"
     slugify "^1.4.5"
+    wot-thing-description-types "^1.1.0-13-October-2022"
 
-"@node-wot/binding-mqtt@~0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/binding-mqtt/-/binding-mqtt-0.8.1.tgz"
-  integrity sha512-O175SYdnHMn88VKnDjWtWkq8FIbCYtksNJFt/52E3+vuRq1shnnMkWowSaucltLTabmpQ26OkR01ArgMm/uhvA==
+"@node-wot/binding-mqtt@~0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/binding-mqtt/-/binding-mqtt-0.8.5.tgz#3c91129d67121e5b0732fb0e1db570789553cffb"
+  integrity sha512-OiMrMbmjfoam+PYe6CR7peo2xC6O/Gxk02sWWrh3+CceSqWk6lpTqa/5Kw938eoYogMh8IrH/cv37oHTlda61w==
   dependencies:
-    "@node-wot/core" "0.8.1"
-    "@node-wot/td-tools" "0.8.1"
+    "@node-wot/core" "0.8.5"
+    "@node-wot/td-tools" "0.8.5"
     aedes "^0.46.2"
     mqtt "^4.2.8"
     rxjs "5.5.11"
+    wot-thing-description-types "^1.1.0-13-October-2022"
 
-"@node-wot/binding-websockets@~0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/binding-websockets/-/binding-websockets-0.8.1.tgz"
-  integrity sha512-562BDUvvL2nqZupPfaSjD0U2wf+giD6s4YFd+weA78+M2MMR0B7yG5EFx2DGeQEAh533oRh4C9dDpzaMyoRXcA==
+"@node-wot/binding-websockets@~0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/binding-websockets/-/binding-websockets-0.8.5.tgz#6f5362a2cd51fbe65fbc3964f38416a20ebad863"
+  integrity sha512-W6GWyuk4zmp5NjHh/jqE4Ty01uJZieZKWhFnzByALvuwkjjwbBzLD9MX0JioBcPahtUZRb++GfmESZBUH2USpQ==
   dependencies:
-    "@node-wot/binding-http" "0.8.1"
-    "@node-wot/core" "0.8.1"
-    "@node-wot/td-tools" "0.8.1"
+    "@node-wot/binding-http" "0.8.5"
+    "@node-wot/core" "0.8.5"
+    "@node-wot/td-tools" "0.8.5"
     slugify "^1.4.5"
     ws "^7.5.4"
 
-"@node-wot/core@0.8.1", "@node-wot/core@~0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/core/-/core-0.8.1.tgz"
-  integrity sha512-ZUPpjk9F3C+QIjTXMgSM0f1ac0QkmV3dulzHWm16lXCh/G8xXS0xNPFYIoc5UnjSVZL542dvuE8P6FFnZbwrPg==
+"@node-wot/core@0.8.5", "@node-wot/core@~0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/core/-/core-0.8.5.tgz#d307c244508eaf8bd43bf9142ff811dd98e4261d"
+  integrity sha512-CwL3KT8czC7Dmu3UmrbiKakhgSuARoDLpKtTl8saf8momH3YiCqLnw/RVtG7zAwtaMkn8VcxC34gxWRGRPTnKQ==
   dependencies:
-    "@node-wot/td-tools" "0.8.1"
+    "@node-wot/td-tools" "0.8.5"
     "@petamoriken/float16" "^3.1.1"
     ajv "^7.0.4"
+    debug "^4.3.4"
     rxjs "5.5.11"
     uritemplate "0.3.4"
     uuid "^7.0.3"
     web-streams-polyfill "^3.0.1"
 
-"@node-wot/td-tools@0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@node-wot/td-tools/-/td-tools-0.8.1.tgz"
-  integrity sha512-D6xrYeCavozedXA/spj15yj/ytexSfDZxGFr6zllsLXRIjvvUyjLev2uWbaeVszTtnuNnbEeomPzszOLR5j9TQ==
+"@node-wot/td-tools@0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@node-wot/td-tools/-/td-tools-0.8.5.tgz#fa65469815601f78e1d887e4ac935f457fdfbdff"
+  integrity sha512-CFAg0+PlmV8pfPH1nvbM3d2AfR5RSVHEe5CglyuAHyxZgWrbSfDZnofakwy7PQL0gNU2DFbEV9ethC6axpl2QA==
   dependencies:
     ajv "^7.0.4"
+    debug "^4.3.4"
     is-absolute-url "3.0.3"
     json-placeholder-replacer "^1.0.35"
     url-toolkit "2.1.6"
-    wot-thing-description-types "^1.1.0-09-February-2022"
-    wot-thing-model-types "^1.1.0-3-February-2022"
-    wot-typescript-definitions "0.8.0-SNAPSHOT.22"
+    wot-thing-description-types "^1.1.0-13-October-2022"
+    wot-thing-model-types "^1.1.0-13-October-2022"
+    wot-typescript-definitions "0.8.0-SNAPSHOT.23"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1327,14 +1331,6 @@
   version "0.2.0"
   resolved "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
-
-"@types/bl@^5.0.2":
-  version "5.0.2"
-  resolved "https://registry.npmjs.org/@types/bl/-/bl-5.0.2.tgz"
-  integrity sha512-V4g3uJIfBHeDd/35QTPOujJ4+viJJVtNwC2LmBUZeXGSGL60R5iTsBEZ9Nh+wP3asMOA/LEFHxmKT6JzK+Vd0A==
-  dependencies:
-    "@types/node" "*"
-    "@types/readable-stream" "*"
 
 "@types/body-parser@*":
   version "1.19.2"
@@ -1580,13 +1576,13 @@
   dependencies:
     rdf-js "*"
 
-"@types/readable-stream@*":
-  version "2.3.13"
-  resolved "https://registry.npmjs.org/@types/readable-stream/-/readable-stream-2.3.13.tgz"
-  integrity sha512-4JSCx8EUzaW9Idevt+9lsRAt1lcSccoQfE+AouM1gk8sFxnnytKNIO3wTl9Dy+4m6jRJ1yXhboLHHT/LXBQiEw==
+"@types/readable-stream@^2.3.15":
+  version "2.3.15"
+  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-2.3.15.tgz#3d79c9ceb1b6a57d5f6e6976f489b9b5384321ae"
+  integrity sha512-oM5JSKQCcICF1wvGgmecmHldZ48OZamtMxcGGVICOJA8o8cahXC1zEVAif8iwoc5j8etxFaRFnf095+CDsuoFQ==
   dependencies:
     "@types/node" "*"
-    safe-buffer "*"
+    safe-buffer "~5.1.1"
 
 "@types/request@^2.48.8":
   version "2.48.8"
@@ -2240,6 +2236,13 @@ abbrev@1:
   resolved "https://registry.npmjs.org/abbrev/-/abbrev-1.1.1.tgz"
   integrity sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==
 
+abort-controller@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/abort-controller/-/abort-controller-3.0.0.tgz#eaf54d53b62bae4138e809ca225c8439a6efb392"
+  integrity sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==
+  dependencies:
+    event-target-shim "^5.0.0"
+
 accept-language-parser@1.5.0:
   version "1.5.0"
   resolved "https://registry.npmjs.org/accept-language-parser/-/accept-language-parser-1.5.0.tgz"
@@ -2827,14 +2830,14 @@ bl@^4.0.2, bl@^4.0.3, bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
-bl@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/bl/-/bl-5.0.0.tgz"
-  integrity sha512-8vxFNZ0pflFfi0WXA3WQXlj6CaMEwsmh63I1CNp0q+wWv8sD0ARx1KovSQd0l2GkwrMIOyedq0EF1FxI+RCZLQ==
+bl@^6.0.0:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-6.0.1.tgz#f35547d073b5f920512943a3fe0ec9ad5854fcb7"
+  integrity sha512-zk1P1eAEBHhhB+4NfGxqmuV6NgwECnIoRgsOq2ObdEsmoFVIYzJ/Jjcgaj7JOY/8ekH27bIHSV4Si2T+evqu+Q==
   dependencies:
     buffer "^6.0.3"
     inherits "^2.0.4"
-    readable-stream "^3.4.0"
+    readable-stream "^4.2.0"
 
 bluebird-lst@^1.0.9:
   version "1.0.9"
@@ -3556,25 +3559,25 @@ clone@^1.0.2:
   resolved "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-coap-packet@^1.1.0:
+coap-packet@^1.1.1:
   version "1.1.1"
   resolved "https://registry.npmjs.org/coap-packet/-/coap-packet-1.1.1.tgz"
   integrity sha512-Bkz2ZKI/7hU2gm6nUuo5l+MBSkdFJx7My1ZgNEhKUC7K2yYfQYVbBPRa64BBYLcEcYgaSlau4A1Uw5xfM2I0zw==
 
-coap@^1.0.8:
-  version "1.0.11"
-  resolved "https://registry.npmjs.org/coap/-/coap-1.0.11.tgz"
-  integrity sha512-38BP98kiOzpv45aX1YmjR1OskPnHRQ3V/w43Ogp05sUGShhxVPBwmfjDRPHrpP8WnJbhwAdrj9WghaQ4ZxpHOQ==
+coap@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/coap/-/coap-1.3.0.tgz#181c79a6151f452b83d1ac137c39f6fcb2426667"
+  integrity sha512-vRi1x4z0iCfez3fy9JCiH3Kwkt0wPmRZxeRfr9lQeWTrBSevkKZ458N3ZrwieD9vulcVODJr4SQP4cigIO150A==
   dependencies:
-    "@types/bl" "^5.0.2"
     "@types/lru-cache" "^5.1.1"
-    bl "^5.0.0"
+    "@types/readable-stream" "^2.3.15"
+    bl "^6.0.0"
     capitalize "^2.0.4"
-    coap-packet "^1.1.0"
-    debug "^4.3.3"
+    coap-packet "^1.1.1"
+    debug "^4.3.4"
     fastseries "^2.0.0"
     lru-cache "^6.0.0"
-    readable-stream "^3.6.0"
+    readable-stream "^4.2.0"
 
 code-point-at@^1.0.0:
   version "1.1.0"
@@ -4655,7 +4658,7 @@ debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9:
   dependencies:
     ms "2.0.0"
 
-debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.3:
+debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
   integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
@@ -5363,6 +5366,11 @@ event-pubsub@4.3.0:
   resolved "https://registry.npmjs.org/event-pubsub/-/event-pubsub-4.3.0.tgz"
   integrity sha512-z7IyloorXvKbFx9Bpie2+vMJKKx1fH1EN5yiTfp8CiLOTptSYy1g8H4yDpGlEdshL1PBiFtBHepF2cNsqeEeFQ==
 
+event-target-shim@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
+  integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
+
 eventemitter3@1.x.x:
   version "1.2.0"
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-1.2.0.tgz"
@@ -5373,15 +5381,15 @@ eventemitter3@^4.0.0:
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
-events@^3.0.0, events@^3.2.0:
+events@^3.0.0, events@^3.2.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
-eventsource@^1.0.7:
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/eventsource/-/eventsource-1.1.2.tgz"
-  integrity sha512-xAH3zWhgO2/3KIniEKYPr8plNSzlGINOUqYj0m0u7AB81iRw8b/3E73W6AuU+6klLbaSFmZnaETQ2lXPfAydrA==
+eventsource@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/eventsource/-/eventsource-2.0.2.tgz#76dfcc02930fb2ff339520b6d290da573a9e8508"
+  integrity sha512-IzUmBGPR3+oUG9dUeXynyNmf91/3zUSJg1lCktzKw47OXuhco54U3r9B7O4XX+Rb1Itm9OZ2b0RkTs10bICOxA==
 
 evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
   version "1.0.3"
@@ -9126,6 +9134,16 @@ readable-stream@^3.0.0, readable-stream@^3.0.2, readable-stream@^3.0.6, readable
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
+readable-stream@^4.2.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.3.0.tgz#0914d0c72db03b316c9733bb3461d64a3cc50cba"
+  integrity sha512-MuEnA0lbSi7JS8XM+WNJlWZkHAAdm7gETHdFK//Q/mChGyj2akEFtdLZh32jSdkWGbRwCW9pn6g3LWDdDeZnBQ==
+  dependencies:
+    abort-controller "^3.0.0"
+    buffer "^6.0.3"
+    events "^3.3.0"
+    process "^0.11.10"
+
 readdirp@^2.2.1:
   version "2.2.1"
   resolved "https://registry.npmjs.org/readdirp/-/readdirp-2.2.1.tgz"
@@ -9436,15 +9454,15 @@ rxjs@5.5.11:
   dependencies:
     symbol-observable "1.0.1"
 
-safe-buffer@*, safe-buffer@5.2.1, safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz"
-  integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
-
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
+
+safe-buffer@5.2.1, safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
+  integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
 
 safe-regex@^1.1.0:
   version "1.1.0"
@@ -11250,20 +11268,20 @@ worker-farm@^1.7.0:
   dependencies:
     errno "~0.1.7"
 
-wot-thing-description-types@^1.1.0-09-February-2022:
-  version "1.1.0-18-May-2022"
-  resolved "https://registry.npmjs.org/wot-thing-description-types/-/wot-thing-description-types-1.1.0-18-May-2022.tgz"
-  integrity sha512-ESD2ZaxcDd93lUQofHrJ/Ze6CTQB/NuQWfxsR52eQmW+aQbjBypN+2u9bptodTbew2GHukAU0ZVZ6mdDkt2bFg==
+wot-thing-description-types@^1.1.0-13-October-2022:
+  version "1.1.0-13-October-2022"
+  resolved "https://registry.yarnpkg.com/wot-thing-description-types/-/wot-thing-description-types-1.1.0-13-October-2022.tgz#172717f28f58d4ad2e19fc1b87ef30dd2268d0e7"
+  integrity sha512-16LVRNat1cSTiGHZBGKomIwISboAtS3LoZPtYF14uOTvW8wBu/QtJYcZi6MPEXCut7/WNw68EmtYMLfhU5UQbA==
 
-wot-thing-model-types@^1.1.0-3-February-2022:
-  version "1.1.0-3-February-2022"
-  resolved "https://registry.npmjs.org/wot-thing-model-types/-/wot-thing-model-types-1.1.0-3-February-2022.tgz"
-  integrity sha512-IYetSr4Z7DmXESMg2OKDyIPTRwGSciIMuJBPyABNptNHodbwcMHx/48GO0kx6TpsDy9gBYkGO1SFXvt1/NZoMw==
+wot-thing-model-types@^1.1.0-13-October-2022:
+  version "1.1.0-13-October-2022"
+  resolved "https://registry.yarnpkg.com/wot-thing-model-types/-/wot-thing-model-types-1.1.0-13-October-2022.tgz#195fbb79fcf52a66a794cf33a9f277f7c9a32d5a"
+  integrity sha512-gN6Eky3AcrZAFqIUQlyEHhkM+UpkEjFXjUul13mX2FOuKI3uY8Gc6/391RDN0NU93odIq+B7+57CGwQTWKAF1Q==
 
-wot-typescript-definitions@0.8.0-SNAPSHOT.22:
-  version "0.8.0-SNAPSHOT.22"
-  resolved "https://registry.npmjs.org/wot-typescript-definitions/-/wot-typescript-definitions-0.8.0-SNAPSHOT.22.tgz"
-  integrity sha512-1K57EfbZkLderX5/hTVGkBjmTAwm/bZNdp1aywgKK1Tov5Ml2oAJRyhr4i3q5+75gZfSjU30Sxu0/WyOirAFRw==
+wot-typescript-definitions@0.8.0-SNAPSHOT.23:
+  version "0.8.0-SNAPSHOT.23"
+  resolved "https://registry.yarnpkg.com/wot-typescript-definitions/-/wot-typescript-definitions-0.8.0-SNAPSHOT.23.tgz#ab5afcbd464557c81b6c43d3792b3cad2afab69c"
+  integrity sha512-xVp0RmiMWfGgW9im/b21Xi6CRn27U99Y3Al2/RpMQB08KGzedmTZlBWL8cex7uKe9Dg/NiD32fUJPZB9GLKAqw==
 
 wrap-ansi@^3.0.1:
   version "3.0.1"

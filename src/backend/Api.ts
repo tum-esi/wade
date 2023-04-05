@@ -170,17 +170,12 @@ export async function invokeInteractions(selectedInteractions) {
   const resultActions: any[] = [];
   const resultEvents: any[] = [];
 
-  for (const interaction in selectedInteractions) {
-    if (!selectedInteractions.hasOwnProperty(interaction)) {
-      continue;
-    }
-
+  for (const interaction of selectedInteractions) {
     const {
-      interactionName,
       interactionSelectBtn,
       interactionTitle,
       interactionType
-    } = selectedInteractions[interaction];
+    } = interaction;
 
     switch (interactionType) {
       case PossibleInteractionTypesEnum.PROP_READ:
@@ -191,7 +186,7 @@ export async function invokeInteractions(selectedInteractions) {
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp.error ? resultProp.error : (await resultProp.res.value()),
+            resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
             resultError: resultProp.error ? true : false,
             resultSize: resultProp.size
@@ -301,7 +296,7 @@ export async function invokeInteractions(selectedInteractions) {
             resultTitle: interactionTitle,
             resultValue: resultAction.error
               ? resultAction.error
-              : (await resultAction.res.value() || 'Success'),
+              : (resultAction.res || 'Success'),
             resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
             resultError: resultAction.error ? true : false,
             resultSize: resultAction.size
