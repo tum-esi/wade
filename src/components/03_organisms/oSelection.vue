@@ -220,9 +220,6 @@ export default Vue.extend({
     watch: {
         '$route.params.id'(id) {
             (this as any).resetAll();
-        },
-        getTdParsed() {
-            (this as any).resetAll();
         }
     }
 });
