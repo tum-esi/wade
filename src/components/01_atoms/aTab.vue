@@ -195,7 +195,7 @@ export default Vue.extend({
 
 /* Will only be applied for tabbar-tabs */
 .tab-container-in-tabbar {
-  width: 15%;
+  width: 100%;
   justify-content: center;
   padding: 10px 20px 10px 20px;
   border-right: 1px solid #393B3A;
@@ -212,6 +212,8 @@ export default Vue.extend({
 .tab-button-container {
   height: 100%;
   width: 40%;
+  min-width: 25px;
+  max-width: 50px;
   display: flex;
   margin-left: 10px;
 }

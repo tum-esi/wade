@@ -173,6 +173,7 @@ export default Vue.extend({
 <style scoped>
 .editor-container {
   height: 100%;
+  overflow-x: scroll;
 }
 .editor-title {
   position: relative;
