@@ -154,8 +154,8 @@ export default Vue.extend({
             // Resets all selections in store
             (this as any).resetSelections();
         },
-        invoke() {
-            (this as any).invokeInteractions();
+        async invoke() {
+            await (this as any).invokeInteractions();
         }
     },
     watch: {

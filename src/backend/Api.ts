@@ -170,30 +170,23 @@ export async function invokeInteractions(selectedInteractions) {
   const resultActions: any[] = [];
   const resultEvents: any[] = [];
 
-  for (const interaction in selectedInteractions) {
-    if (!selectedInteractions.hasOwnProperty(interaction)) {
-      continue;
-    }
-
+  for (const interaction of selectedInteractions) {
     const {
-      interactionName,
       interactionSelectBtn,
       interactionTitle,
       interactionType
-    } = selectedInteractions[interaction];
+    } = interaction;
 
     switch (interactionType) {
       case PossibleInteractionTypesEnum.PROP_READ:
         if (interactionSelectBtn.interaction) {
           // Invoke property read (no input)
-          const resultProp = await selectedInteractions[
-            interaction
-          ].interactionSelectBtn.interaction();
+          const resultProp = await interactionSelectBtn.interaction();
 
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
             resultTitle: interactionTitle,
-            resultValue: resultProp.error ? resultProp.error : (await resultProp.res.value()),
+            resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
             resultError: resultProp.error ? true : false,
             resultSize: resultProp.size
@@ -204,9 +197,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.PROP_WRITE:
         if (interactionSelectBtn.interaction) {
           // Invoke property write (with input)
-          const resultProp = await selectedInteractions[
-            interaction
-          ].interactionSelectBtn.interaction(interactionSelectBtn.input);
+          const resultProp = await interactionSelectBtn.interaction(interactionSelectBtn.input);
 
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_READ,
@@ -225,9 +216,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.PROP_OBSERVE_READ:
       case PossibleInteractionTypesEnum.PROP_OBSERVE_WRITE:
         if (interactionSelectBtn.interaction) {
-          const resultProp = await selectedInteractions[
-            interaction
-          ].interactionSelectBtn.interaction();
+          const resultProp = await interactionSelectBtn.interaction();
 
           resultProps.push({
             resultType: PossibleInteractionTypesEnum.PROP_OBSERVE_READ,
@@ -241,9 +230,7 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.EVENT_SUB:
         // Subscribe to event
         if (interactionSelectBtn.interaction) {
-          let resultEvent = await selectedInteractions[
-            interaction
-          ].interactionSelectBtn.interaction();
+          let resultEvent = await interactionSelectBtn.interaction();
 
           resultEvents.push({
             resultType: PossibleInteractionTypesEnum.EVENT_SUB,
@@ -263,16 +250,14 @@ export async function invokeInteractions(selectedInteractions) {
       case PossibleInteractionTypesEnum.ACTION:
         if (interactionSelectBtn.interaction) {
           // Invoke action (possibly with input)
-          const resultAction = await selectedInteractions[
-            interaction
-          ].interactionSelectBtn.interaction(interactionSelectBtn.input);
+          const resultAction = await interactionSelectBtn.interaction(interactionSelectBtn.input);
 
           resultActions.push({
             resultType: PossibleInteractionTypesEnum.ACTION,
             resultTitle: interactionTitle,
             resultValue: resultAction.error
               ? resultAction.error
-              : (await resultAction.res.value() || 'Success'),
+              : (resultAction.res || 'Success'),
             resultTime: `${resultAction.s} sec ${resultAction.ms} ms`,
             resultError: resultAction.error ? true : false,
             resultSize: resultAction.size
