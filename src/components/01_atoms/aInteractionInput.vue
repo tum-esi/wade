@@ -24,13 +24,16 @@
     <div v-else-if="btnInputType.propType === 'boolean'" class="input-dropdown">
       <button
         class="input-dropdown-btn"
-        @click.prevent="dropdownVisible = !dropdownVisible"
+        @click.prevent="dropdownVisible = !dropdownVisible, dropdownVisible ? focusDropdown('booleanDropdown') : null"
       >
         {{ getSelectedOption }}
       </button>
       <div
+        ref="booleanDropdown"
         class="input-dropdown-content"
         :class="{ 'input-dropdown-content-visible': dropdownVisible }"
+        @blur="dropdownVisible = false"
+        tabindex="-1"
       >
         <label @click.prevent="changeInput(true, true)">
           True
@@ -44,13 +47,16 @@
     <div v-else-if="btnInputType.propEnum" class="input-dropdown">
       <button
         class="input-dropdown-btn"
-        @click.prevent="dropdownVisible = !dropdownVisible"
+        @click.prevent="dropdownVisible = !dropdownVisible, dropdownVisible ? focusDropdown('enumDropdown') : null"
       >
         {{ getSelectedOption }}
       </button>
       <div
+        ref="enumDropdown"
         class="input-dropdown-content"
         :class="{ 'input-dropdown-content-visible': dropdownVisible }"
+        @blur="dropdownVisible = false"
+        tabindex="-1"
       >
         <label
           v-for="(el, index) in this.btnInputType.propEnum"
@@ -75,6 +81,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Ajv from 'ajv';
+import { focusElement } from '@/util/helpers';
 
 export default Vue.extend({
   name: 'aInteractionInput',
@@ -343,6 +350,9 @@ export default Vue.extend({
         } 
       }
     },
+    focusDropdown(refName: string) {
+      focusElement(refName, this);
+    }
   }
 });
 </script>

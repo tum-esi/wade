@@ -1,7 +1,6 @@
 <template>
     <div 
         class="dropdown-simple-container"
-        @click.prevent="dropdownVisible = !dropdownVisible"
     >
         <!-- Dropdown button -->
         <button 
@@ -9,17 +8,22 @@
                 ? `${optionalStyle} width-80` 
                 : `${optionalStyle} full-width`"
             class="input-dropdown-btn" 
+            @click.prevent="dropdownVisible = !dropdownVisible, dropdownVisible ? focusDropdown() : null"
         >
             {{ getSelectedOption }}
         </button>
         <!-- Dropdown elements -->
-        <div class="input-dropdown-content" 
-            :class="{'input-dropdown-content-visible' : dropdownVisible}">
+        <div ref="dropdownContent" 
+            class="input-dropdown-content" 
+            :class="{'input-dropdown-content-visible' : dropdownVisible}"
+            @blur="dropdownVisible = false"
+            tabindex="-1"
+        >
             <label 
                 v-for="(el, index) in this.dropdownOptions"
                 :key="index"
-                :class="el.style"
-                @click.prevent="changeSelection(el.title), dropdownVisible = !dropdownVisible">
+                :class="el.style + ' dropdown-element'"
+                @click.prevent="changeSelection(el.title)">
                 {{ el.title }}
             </label>
         </div>
@@ -36,6 +40,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { focusElement } from '@/util/helpers';
+
 export default Vue.extend({
     name: 'aSimpleDropdownButton',
     props: {
@@ -115,6 +121,9 @@ export default Vue.extend({
          */
         getIcon(path: string) {
            return require(`@/assets/${path}.png`);
+        },
+        focusDropdown() {
+            focusElement("dropdownContent", this);
         }
     }
 });
@@ -171,4 +180,9 @@ export default Vue.extend({
     max-width: 100%;
     padding: 5px;
 }
+
+.dropdown-element:hover {
+  background-color: #8aaba9;
+}
+
 </style>
