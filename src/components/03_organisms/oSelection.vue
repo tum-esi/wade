@@ -6,8 +6,30 @@
         <div class="selection-area" v-if="isValidTd">
             <!-- Properties -->
             <div class="properties border-bottom-bold selection-area-el">
-                <div class="selection-label-container border-bottom"><label>Properties</label></div>
-                <div class="interaction-container-all">
+                <div class="selection-label-container border-bottom">
+                    <label>Properties</label>
+                    <div class="interaction-meta-button-container">
+                        <aBasicButton 
+                            v-if="getTdParsed.readAllElement"
+                            :class="interactionReadAll ? 'interaction-meta-button-selected' : 'interaction-meta-button'"
+                            :btnClass="getReadAllBtn.btnClass"
+                            :btnLabel="getReadAllBtn.btnLabel"
+                            :btnOnClick="getReadAllBtn.btnOnClick"
+                            :btnActive=true
+                            v-on:read-all="readAllProperties"
+                        />
+                        <aBasicButton 
+                            v-if="getTdParsed.writeAllElement"
+                            :class="interactionWriteAll ? 'interaction-meta-button-selected' : 'interaction-meta-button'"
+                            :btnClass="getWriteAllBtn.btnClass"
+                            :btnLabel="getWriteAllBtn.btnLabel"
+                            :btnOnClick="getWriteAllBtn.btnOnClick"
+                            :btnActive=true
+                            v-on:write-all="writeAllProperties"
+                        />
+                    </div>
+                </div>
+                <div ref="properties" class="interaction-container-all">
                     <mInteraction 
                         v-for="(element, index) in 
                         getTdParsed.propertyInteractions"
@@ -16,7 +38,10 @@
                         :element="element"
                         :interactionName="element.interactionName"
                         :interactionSelectBtn="element.interactionSelectBtn"
+                        :interactionReadAll="interactionReadAll"
+                        :interactionWriteAll="interactionWriteAll"
                         v-on:select-with-input="select"
+                        v-on:select-write-all="selectWithInputForWriteAll"
                         v-on:select="select(element)"
                         v-on:deselect="reset(element)"
                     />
@@ -110,10 +135,20 @@ export default Vue.extend({
     beforeDestroy() {
         (this as any).resetInteractions();
     },
+    data() {
+        return {
+            interactionReadAll: false,
+            interactionWriteAll: false,
+            writeAllElement: {},
+            writeAllInput: new Map<string, WoT.InteractionInput>()
+        }
+    },
     computed: {
        ...mapGetters('TdStore', [
            'getSelectionBtn',
            'getSelectionResetBtn',
+           'getReadAllBtn',
+           'getWriteAllBtn',
            'getInteractionState',
            'getTdParsed',
            'getTdState',
@@ -133,13 +168,18 @@ export default Vue.extend({
         // Add clicked interaction to selected interactions.
         // element: { interactionName, interactionSelectBtn, interactionType }
         async select(element, input?, changeInput?: boolean) {
-            if (input !== null || input !== undefined)element.interactionSelectBtn.input = input;
-
+            if (input !== null || input !== undefined) element.interactionSelectBtn.input = input;
             // Either just change input or add new interaction
             await (this as any).addToSelectedInteractions(
                 changeInput
                 ? { changeInteraction: element}
                 : { newInteraction: element});
+        },
+        async selectWithInputForWriteAll(element, input?) {
+            (this as any).writeAllInput.set(element.interactionName, input);
+            (this as any).writeAllElement = (this as any).getTdParsed.writeAllElement;
+            (this as any).writeAllElement.interactionSelectBtn.input = (this as any).writeAllInput;
+            (this as any).addToSelectedInteractions({ newInteraction: (this as any).writeAllElement });
         },
         // Remove clicked interaction of selected interactions.
         // element: { interactionName, interactionSelectBtn, interactionType }
@@ -152,10 +192,29 @@ export default Vue.extend({
             this.$emit('selections-reseted');
             this.$eventHub.$emit('unsubscribe');
             // Resets all selections in store
+            (this as any).interactionReadAll = false;
+            (this as any).interactionWriteAll = false;
             (this as any).resetSelections();
         },
         async invoke() {
             await (this as any).invokeInteractions();
+        },
+        readAllProperties() {
+            (this as any).interactionReadAll = !(this as any).interactionReadAll;
+            if ((this as any).interactionReadAll) {
+                (this as any).addToSelectedInteractions({ newInteraction: (this as any).getTdParsed.readAllElement });
+            } else {
+                (this as any).removeFromSelectedInteractions({ interactionToRemove: (this as any).getTdParsed.readAllElement });
+            }
+        },
+        writeAllProperties() {
+            (this as any).interactionWriteAll = !(this as any).interactionWriteAll;
+            (this as any).writeAllElement = (this as any).getTdParsed.writeAllElement;
+            if ((this as any).interactionWriteAll) {
+                (this as any).addToSelectedInteractions({ newInteraction: (this as any).writeAllElement });
+            } else {
+                (this as any).removeFromSelectedInteractions({ interactionToRemove: (this as any).writeAllElement });
+            }
         }
     },
     watch: {
@@ -220,4 +279,18 @@ export default Vue.extend({
     overflow: auto;
     height: 80%;
 }
+
+.interaction-meta-button-container {
+    margin: 5px;
+}
+
+[class*="interaction-meta-button"] {
+    padding: 3px;
+    font-size: 14px !important;
+}
+
+.interaction-meta-button-selected {
+    background: #305E5C !important;
+}
+
 </style>

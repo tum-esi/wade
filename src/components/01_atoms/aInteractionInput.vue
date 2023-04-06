@@ -71,7 +71,7 @@
     <div class="select-btn-container">
       <img
         class="select-btn"
-        @click.prevent="btnSelected ? deselect() : select()"
+        @click.prevent="!interactionWriteAll ? (btnSelected ? deselect() : select()) : null"
         :src="!hasError && !isInputEmpty ? currentSrc : srcSelectionNotPossible"
       />
     </div>
@@ -81,6 +81,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Ajv from 'ajv';
+import { JSONSchemaFaker  as jsf } from 'json-schema-faker';
 import { focusElement } from '@/util/helpers';
 
 export default Vue.extend({
@@ -96,6 +97,7 @@ export default Vue.extend({
   data() {
     return {
       btnSelected: false,
+      writeAllSelected: false,
       inputValue: '',
       dropdownVisible: false,
       placeholder: '',
@@ -170,6 +172,39 @@ export default Vue.extend({
      */
     element: {
       required: false
+    },
+    interactionWriteAll: {
+      type: Boolean,
+      required: false
+    }
+  },
+  watch: {
+    interactionWriteAll() {
+      if (this.interactionWriteAll === undefined || this.interactionWriteAll === null) return;
+
+      if (this.btnKey.endsWith('write')) {
+        if (this.interactionWriteAll) {
+          if (this.btnSelected) {
+            this.deselect();
+          }
+
+          this.btnSelected = true;
+          this.currentSrc = this.srcSelected;
+          this.writeAllSelected = true;
+          this.inputValue = this.generateInputValue();
+
+          this.$emit(
+            'select-write-all',
+            this.element,
+            this.getParsedInputValue()
+          );
+        } else {
+          this.btnSelected = false;
+          this.currentSrc = this.srcUnselected;
+          this.writeAllSelected = false;
+          this.inputValue = '';
+        }
+      }
     }
   },
   computed: {
@@ -258,6 +293,7 @@ export default Vue.extend({
         this.deselect();
         return;
       }
+
       // Hide dropdown and change input when enum/boolean
       if (isDropdown) {
         this.dropdownVisible = !this.dropdownVisible;
@@ -266,12 +302,20 @@ export default Vue.extend({
 
       // When btn is selected emit selection change
       if (this.btnSelected) {
-        this.$emit(
-          'select-with-input',
-          this.element,
-          isDropdown ? this.inputValue : this.getParsedInputValue(),
-          true
-        );
+        if (this.writeAllSelected) {
+          this.$emit(
+            'select-write-all',
+            this.element,
+            this.getParsedInputValue()
+          );
+        } else {
+          this.$emit(
+            'select-with-input',
+            this.element,
+            isDropdown ? this.inputValue : this.getParsedInputValue(),
+            true
+          );
+        }
       }
     },
     select() {
@@ -333,7 +377,6 @@ export default Vue.extend({
       if (this.btnInputSchema) {
         const ajv = new Ajv({ allErrors: true, strict: false });
         const validate = ajv.compile(this.btnInputSchema);
-
         const valid = validate(this.getParsedInputValue());
         
         if (!valid) {
@@ -350,10 +393,21 @@ export default Vue.extend({
         } 
       }
     },
+
+    generateInputValue(): any {
+      const fakeInputValue = jsf.generate(this.btnInputSchema);
+      if (this.btnInputType.propType === 'boolean') {
+        return fakeInputValue as boolean;
+      } else {
+        return JSON.stringify(fakeInputValue);
+      }
+    },
     focusDropdown(refName: string) {
       focusElement(refName, this);
+
     }
   }
+
 });
 </script>
 
@@ -410,7 +464,7 @@ export default Vue.extend({
   left: -100%;
   width: 200%;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  z-index: 2;
   border-radius: 3px;
 }
 

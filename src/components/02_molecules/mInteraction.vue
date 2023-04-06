@@ -10,6 +10,7 @@
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
                 :btnDisabled="showInteractionError"
+                :interactionReadAll="interactionReadAll"
                 v-on:select="$emit('select')"
                 v-on:deselect="$emit('deselect')"
             />
@@ -24,7 +25,9 @@
                 :btnGeneralStyle="interactionSelectBtn.btnGeneralStyle"
                 :btnSelectedStyle="interactionSelectBtn.btnSelectedStyle"
                 :element="element"
+                :interactionWriteAll="interactionWriteAll"
                 v-on:select-with-input="selectWithInput"
+                v-on:select-write-all="selectWriteAll"
                 v-on:deselect="$emit('deselect')"
                 v-on:show-error-message="showErrorMessage"
                 v-on:remove-error-message="removeErrorMessage"
@@ -73,11 +76,22 @@ export default Vue.extend({
         },
         element: {
             required: false
+        },
+        interactionReadAll: {
+            type: Boolean,
+            required: false
+        },
+        interactionWriteAll: {
+            type: Boolean,
+            required: false
         }
     },
     methods: {
         selectWithInput(element: any, inputValue: any, changeInput: boolean) {
             this.$emit('select-with-input', element, inputValue, changeInput);
+        },
+        selectWriteAll(element: any, inputValue: any) {
+            this.$emit('select-write-all', element, inputValue);
         },
         showErrorMessage(message) {
             this.interactionErrorMessage = message;

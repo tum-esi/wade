@@ -194,13 +194,33 @@ export async function invokeInteractions(selectedInteractions) {
         }
         break;
 
+      case PossibleInteractionTypesEnum.PROP_READ_ALL:
+        if (interactionSelectBtn.interaction) {
+          // Invoke property read (no input)
+          const resultProp = await interactionSelectBtn.interaction();
+
+          for(const [key, value] of resultProp.res.entries()) {
+            const title = `${key} (r)`;
+
+            resultProps.push({
+              resultType: PossibleInteractionTypesEnum.PROP_READ_ALL,
+              resultTitle: title,
+              resultValue: resultProp.error ? resultProp.error : (await value.value()),
+              resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
+              resultError: resultProp.error ? true : false,
+              resultSize: resultProp.size
+            });
+          }
+        }
+        break;
+
       case PossibleInteractionTypesEnum.PROP_WRITE:
         if (interactionSelectBtn.interaction) {
           // Invoke property write (with input)
           const resultProp = await interactionSelectBtn.interaction(interactionSelectBtn.input);
 
           resultProps.push({
-            resultType: PossibleInteractionTypesEnum.PROP_READ,
+            resultType: PossibleInteractionTypesEnum.PROP_WRITE,
             resultTitle: interactionTitle,
             resultValue: resultProp.error ? resultProp.error : resultProp.res,
             resultTime: `${resultProp.s}sec ${resultProp.ms}ms`,
@@ -210,6 +230,25 @@ export async function invokeInteractions(selectedInteractions) {
                 ? 'n.a.'
                 : `Input ${resultProp.size}`
           });
+        }
+        break;
+      case PossibleInteractionTypesEnum.PROP_WRITE_ALL:
+        if (interactionSelectBtn.interaction) {
+          // Invoke property write (with input)
+          const resultProp = await interactionSelectBtn.interaction(interactionSelectBtn.input);
+
+          for(const [key, value] of interactionSelectBtn.input.entries()) {
+            const title = `${key} (w)`;
+
+            resultProps.push({
+              resultType: PossibleInteractionTypesEnum.PROP_WRITE_ALL,
+              resultTitle: title,
+              resultValue: resultProp.error ? resultProp.error : resultProp.res,
+              resultTime: `${resultProp.s} sec ${resultProp.ms} ms`,
+              resultError: resultProp.error ? true : false,
+              resultSize: resultProp.size
+            });
+          }
         }
         break;
 
@@ -269,7 +308,7 @@ export async function invokeInteractions(selectedInteractions) {
         break;
     }
   }
-
+  
   return {
     resultProps,
     resultActions,

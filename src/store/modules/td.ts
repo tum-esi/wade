@@ -84,6 +84,16 @@ export default {
             btnLabel: 'Status: No interaction selected.',
             btnOnClick: '-'
         },
+        tdReadAllBtn: {
+            btnClass: 'btn-read-all',
+            btnLabel: 'Read All',
+            btnOnClick: 'read-all'
+        },
+        tdWriteAllBtn: {
+            btnClass: 'btn-write-all',
+            btnLabel: 'Write All',
+            btnOnClick: 'write-all'
+        },
         tdEditorPlaceholder: 'Paste your Thing Description here or press the upload button.'
     },
     actions: {
@@ -105,7 +115,6 @@ export default {
                   tdState,
                   errorMsg
                 }; 
-                console.log(fetchedTd);
                 commit('setTdState', tdState);
                 commit('setErrorMsg', null);
                 commit('setInteractionState', null);
@@ -182,25 +191,25 @@ export default {
         },
 
         // Add new interaction or change interaction input (without changing the order of selected interactions).
-        async addToSelectedInteractions({ commit, state }, payload) {
+        addToSelectedInteractions({ commit, state }, payload) {
             if (!payload.changeInteraction && !payload.newInteraction) return;
 
-            const selectedInteractions = await state.selections;
+            const selectedInteractions = state.selections;
 
-            const interaction = await payload.changeInteraction
+            const interaction = payload.changeInteraction
                 ? payload.changeInteraction
                 : payload.newInteraction ? payload.newInteraction : null;
-            const index = await selectedInteractions.indexOf(interaction);
-            const isNew = await payload.newInteraction ? true : false;
+            const index = selectedInteractions.indexOf(interaction);
+            const isNew = payload.newInteraction ? true : false;
 
             if (isNew) {
                 // Remove interaction if it already exists
-                if (index !== -1) await selectedInteractions.splice(index, 1);
+                if (index !== -1) selectedInteractions.splice(index, 1);
                 // Add to selected interactions
                 selectedInteractions.push(interaction);
             } else {
                 // Replace selected interaction when input changed
-                selectedInteractions[index] = await interaction;
+                selectedInteractions[index] = interaction;
             }
             commit('setSelections', selectedInteractions);
             commit('setStatusMessage');
@@ -345,6 +354,12 @@ export default {
         },
         getResultsBtn(state: any) {
             return state.tdResultsBtn;
+        },
+        getReadAllBtn(state: any) {
+            return state.tdReadAllBtn;
+        },
+        getWriteAllBtn(state: any) {
+            return state.tdWriteAllBtn;
         },
         getEditorPlaceholder(state: any) {
             return state.tdEditorPlaceholder;
