@@ -1,23 +1,31 @@
 <template>
   <div
     class="dropdown-btn-container"
-    v-on:click.prevent="showDropdown = !showDropdown"
     :title="btnTitle"
   >
-    <div v-if="btnLabel" class="button-label-container">
-      <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
+    <div class="dropdown-btn-elements"
+      v-on:click.prevent="showDropdown = !showDropdown, showDropdown ? focusDropdown() : null"
+    >
+      <div v-if="btnLabel" class="button-label-container">
+        <label v-if="btnLabel" class="button-label">{{ btnLabel }}</label>
+      </div>
+
+      <img
+        class="button-icon"
+        v-if="btnSrc"
+        v-bind:src="iconSrc"
+        :class="btnIconStyle"
+      />
+
+      <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
     </div>
 
-    <img
-      class="button-icon"
-      v-if="btnSrc"
-      v-bind:src="iconSrc"
-      :class="btnIconStyle"
-    />
-
-    <i v-else-if="btnFaIcon" class="fa button-icon" :class="btnFaIcon"></i>
-
-    <div class="dropdown-container" v-if="showDropdown" :class="btnStyle">
+    <div ref="dropdownContainer" class="dropdown-container" 
+      v-if="showDropdown" 
+      :class="btnStyle"
+      @blur="showDropdown = false"
+      tabindex="-1"
+    >
       <div
         class="dropdown-element"
         v-for="(dropdownElement, index) in btnDropdownOptions"
@@ -43,6 +51,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { focusElement } from '@/util/helpers';
+
 export default Vue.extend({
   name: 'aDropdownButton',
   props: {
@@ -137,6 +147,9 @@ export default Vue.extend({
         btnInput: dropdownElement.inputValue,
         parentId: null
       });
+    },
+    focusDropdown() {
+      focusElement("dropdownContainer", this);
     }
   },
   watch: {
@@ -288,4 +301,9 @@ export default Vue.extend({
 .dropdown-custom-editor div:hover {
   background-color: #8aaba9;
 }
+
+.dropdown-element:hover {
+  background-color: #8aaba9;
+}
+
 </style>

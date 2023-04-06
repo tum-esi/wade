@@ -1,3 +1,4 @@
+import ComponentPublicInstance from 'vue';
 
 export function getFormattedJsonString(value: string): string {
     return JSON.stringify(JSON.parse(value), null, 2);
@@ -42,4 +43,11 @@ export const confidenceLevel = {
 export function getCurrentDate() {
     const date = new Date();
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}-${date.getHours()}h${date.getMinutes()}min${date.getSeconds()}sec`;
+}
+
+export function focusElement(refName: string, component: ComponentPublicInstance) {
+    component.$nextTick(() => {
+        const element = component.$refs[refName] as HTMLElement;
+        element.focus();    
+    })
 }
