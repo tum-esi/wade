@@ -406,6 +406,7 @@ export default Vue.extend({
       focusElement(refName, this);
 
     }
+  }
 
 });
 </script>
