@@ -25,7 +25,7 @@
         :btnActive="td.length > 0"
       />
       <aButtonBasic
-        v-on:save-td="$store.commit('SidebarStore/saveTd', { content: td, id })"
+        v-on:save-td="onSaveTd"
         :btnClass="saveTdBtn.btnClass"
         :btnLabel="saveTdBtn.btnLabel"
         :btnOnClick="saveTdBtn.btnOnClick"
@@ -89,13 +89,13 @@ export default Vue.extend({
       get(): string {
         return this.td;
       },
-      async set(value: string) {
-        this.tdChanged({ td: value });
+      set(value: string) {
+        this.td = getFormattedJsonString(value);
       }
     }
   },
   methods: {
-    ...mapMutations('SidebarStore', ['saveTdProtocols']),
+    ...mapMutations('SidebarStore', ['saveTdProtocols', 'saveTd']),
     ...mapActions('TdStore', [
       'resetInteractions',
       'resetSelections',
@@ -126,10 +126,6 @@ export default Vue.extend({
       });
       // Hide url bar if td changed
       this.$emit('hide-url-bar');
-      // Reset result fields and interaction fields
-      (this as any).resetInteractions();
-      (this as any).resetSelections();
-      (this as any).resetResults();
       // Update possible protocol list
       this.$eventHub.$emit('selections-reseted');
     },
@@ -160,6 +156,10 @@ export default Vue.extend({
       } else {
         // event not relevant for this function
       }
+    },
+    onSaveTd() {
+      (this as any).saveTd({ content: this.td, id: this.id });
+      this.tdChanged({ td: this.td });
     }
   },
   watch: {
