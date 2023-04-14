@@ -67,6 +67,13 @@ export default {
                 tabStyle: 'tab-container-in-tabbar',
                 tabLink: '/virtual',
                 tabIsActive: false
+            },
+            {
+                tabId: 'testbench',
+                tabTitle: 'Testbench',
+                tabStyle: 'tab-container-in-tabbar',
+                tabLink: '/testbench',
+                tabIsActive: false
             }
         ],
         tdSelectionBtn: {

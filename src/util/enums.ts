@@ -10,7 +10,8 @@ export enum ElementTypeEnum {
 export enum TDTabsEnum {
   EDITOR = 'editor',
   CONFIG = 'config',
-  PERFORMANCE = 'performance'
+  PERFORMANCE = 'performance',
+  TESTBENCH = 'testbench'
 }
 
 export enum ElementTitleEnum {
