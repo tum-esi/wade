@@ -54,6 +54,7 @@
         </div>
       </div>
     </div>
+    <!-- Tab Testbench -->
     <div
       v-if="currentTabId === 'testbench'"
       :class="getSidebarActive ? 'td-testbench border-top' : 'td-testbench border-top full-screen'"
@@ -202,6 +203,12 @@ export default Vue.extend({
 
 .td-performance {
   height: 93%;
+  width: 100%;
+  display: flex;
+}
+
+.td-testbench {
+  height: 100%;
   width: 100%;
   display: flex;
 }

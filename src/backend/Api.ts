@@ -14,6 +14,8 @@ import VtCall from './VtCall';
 import * as stream from 'stream';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Testbench } from 'wot-testbench';
+import Servient from '@node-wot/core';
 
 let tdConsumer: null | TdConsumer  = null;
 
@@ -452,4 +454,12 @@ export function loadExampleTd(exampleTdPath: string) {
       }
     });
   });
+}
+
+export async function fastTest() {
+    if (tdConsumer) {
+      const tb = new Testbench(new Servient());
+      const consumedTd = await tdConsumer.getConsumedTd();
+      return await tb.fastTest(false, true, consumedTd.tdConsumed!)
+    }
 }
