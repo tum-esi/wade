@@ -76,7 +76,7 @@ export default Vue.extend({
 }
 
 .test-scenario-failed:hover {
-    background-color: rgba(255, 0, 0, 0.8);
+    background-color: rgba(255, 0, 0, 0.7);
 }
 
 </style>
