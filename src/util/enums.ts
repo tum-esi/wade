@@ -136,3 +136,11 @@ export enum TypeOfMeasurementContext {
   DYNAMIC_ACTION = 'dynamicTimingContext_action',
   NULL = 'null'
 }
+
+export enum TestbenchConfigEnum {
+  INFO = 'This config will be used to test your TD',
+  UNSAVED = 'Please save your changes to apply them',
+  SAVE_SUCCESS = 'Testbench config was saved successfully.',
+  RESET = 'Testbench config was reset to default config. Save to apply!',
+  ERROR = 'Error: Wrong data format. Change Testbench config to make it saveable.'
+}
