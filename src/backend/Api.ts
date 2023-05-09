@@ -18,6 +18,8 @@ import { Testbench } from 'wot-testbench';
 import Servient from '@node-wot/core';
 
 let tdConsumer: null | TdConsumer  = null;
+const testbenchServient = new Servient();
+let testbench: Testbench = new Testbench(testbenchServient);
 
 export function retrieveProtocols(td: string): ProtocolEnum[] | null {
   const protocols = [] as ProtocolEnum[];
@@ -456,10 +458,39 @@ export function loadExampleTd(exampleTdPath: string) {
   });
 }
 
-export async function fastTest() {
-    if (tdConsumer) {
-      const tb = new Testbench(new Servient());
-      const consumedTd = await tdConsumer.getConsumedTd();
-      return await tb.fastTest(false, true, consumedTd.tdConsumed!)
-    }
+export async function testConformance(testConfig) {
+  if (tdConsumer) {
+    const consumedTd = await tdConsumer.getConsumedTd();
+    testbench.setTestConfig(testConfig);
+    await testbench.testThing(true, consumedTd.tdConsumed!);
+    return testbench.getTestReport();
+  }
+}
+
+export async function testVulnerability(testConfig) {
+  if (tdConsumer) {
+    const consumedTd = await tdConsumer.getConsumedTd();
+    testbench.setTestConfig(testConfig);
+    await testbench.testVulnerabilities(true, consumedTd.tdConsumed!);
+    return testbench.getTestReport();
+  }
+}
+
+export async function fastTest(): Promise<any> {
+  if (tdConsumer) { 
+    const consumedTd = await tdConsumer.getConsumedTd();
+    return await testbench.fastTest(true, true, consumedTd.tdConsumed!);
+  }
+
+  Promise.reject("No consumed TD is available!");
+}
+
+export async function testAllLevels(testConfig) {
+  if (tdConsumer) {
+    const consumedTd = await tdConsumer.getConsumedTd();
+    testbench.setTestConfig(testConfig);
+    return await testbench.testAllLevels(true, consumedTd.tdConsumed!);
+  }
+
+  Promise.reject("No consumed TD is available!");
 }

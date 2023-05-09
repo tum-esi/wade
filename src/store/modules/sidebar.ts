@@ -349,6 +349,21 @@ export default {
 
             commit('setVulnerabilityResults', { index, results: payload.results })
         },
+        setCoverageResults({ commit, state }, payload: { id: string, results: any }) {
+            let index = -1
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    index = state.tds.indexOf(td);
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            commit('setCoverageResults', { index, results: payload.results })
+        },
         setTestbenchConfig({ commit, state }, payload: { id: string, config: object }) {
             let index = -1
             for (const td of state.tds) {
@@ -689,6 +704,9 @@ export default {
         setVulnerabilityResults(state: any, payload: {index: number, results: any}) {
             state.tds[payload.index].vulnerabilityResults = payload.results;
         },
+        setCoverageResults(state: any, payload: {index: number, results: any}) {
+            state.tds[payload.index].coverageResults = payload.results;
+        },
         setTestbenchConfig(state: any, payload: {index: number, config: object}) {
             state.tds[payload.index].testbenchConfig = payload.config;
         }
@@ -942,6 +960,15 @@ export default {
                 for (const td of state.tds) {
                     if (td.id === id) {
                         return td.vulnerabilityResults;
+                    }
+                }
+            }
+        },
+        getCoverageResults(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.coverageResults;
                     }
                 }
             }

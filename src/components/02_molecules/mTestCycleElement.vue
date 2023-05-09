@@ -27,6 +27,7 @@ import mTestScenarioElement from '@/components/02_molecules/mTestScenarioElement
 
 export default Vue.extend({
     name: "mTestCycleElement",
+    components: { aConformanceTestElement, mTestScenarioElement },
     props: {
         scenarios: {
             type: Array,
@@ -39,10 +40,6 @@ export default Vue.extend({
             testCycleFailed: false
         }
     },
-    created() {
-        console.log(this.scenarios);
-    },
-    components: { aConformanceTestElement, mTestScenarioElement },
     methods: {
         toggleCycle() {
             this.showCycle = !this.showCycle;
