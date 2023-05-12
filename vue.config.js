@@ -8,7 +8,7 @@ module.exports = defineConfig({
       nodeIntegration: true,
       builderOptions: {
         // options placed here will be merged with default configuration and passed to electron-builder
-        extraResources: ["example-tds", "./node_modules/virtual-thing"],
+        extraResources: ["node_modules/core-js", "example-tds", "./node_modules/virtual-thing"],
       },
     },
   },
