@@ -1,12 +1,13 @@
 <template>
-    <div>
-        <label class="coverage-test-result-label"
+    <div class="coverage-test-element-container">
+        <label
+            :class="passed ? 'passed-test' : 'failed-test'"
             v-on:click="toggleResultDetail"
-        >{{ coverageName }}</label>
-        <div class="coverage-test-result-detail"
+        >{{ interactionName }}</label>
+        <div class="test-result-detail"
             v-show="showResultDetail"
         >
-            <textarea class="coverage-result-detail" disabled>
+            <textarea class="result-detail" disabled>
                 {{ resultDetail }}
             </textarea>
         </div>
@@ -17,20 +18,29 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-    name: 'aCoverageTestElement',
+    name: "aCoverageTestElement",
+    created() {
+        if (!this.passed) {
+            this.$emit('test-failed');
+        }
+    }, 
     data() {
         return {
-            showResultDetail: false
+            showResultDetail: false,
         }
     },
     props: {
-        coverageName: {
+        interactionName: {
             type: String,
             required: true
         },
         resultDetail: {
-            type: [Object, Array],
+            type: Object,
             required: true
+        },
+        passed: {
+            type: Boolean,
+            required: false
         }
     },
     methods: {
@@ -38,29 +48,37 @@ export default Vue.extend({
             this.showResultDetail = !this.showResultDetail;
         }
     }
-})
+});
+
 </script>
 
 <style scoped>
-
-
-.coverage-test-result-label {
+.passed-test {
     padding-left: 5px;
     color: white;
-    background-color: gray;
+    background-color: green;
     display: block;
-    border: 1px solid black;
-    border-radius: 2px;
 }
 
-.coverage-test-result-label:hover { 
-    background-color: rgba(128, 128, 128, 0.5);
+.passed-test:hover {
+    background-color: rgba(0, 128, 0, 0.6);
 }
 
-.coverage-result-detail {
+.failed-test {
+    padding-left: 5px;
+    color: white;
+    background-color: red;
+    display: block;
+
+}
+
+.failed-test:hover {
+    background-color: rgba(255, 0, 0, 0.7);
+}
+
+.result-detail {
     display: block;
     width: 100%;
-    height: 100px;
+    height: 150px;
 }
-
 </style>

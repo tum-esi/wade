@@ -109,12 +109,13 @@
                     />
                     <p> Coverage Results </p>
                     <hr/>
-
-                    <aCoverageTestElement
+                </div>
+                <div class="coverage-results-body">
+                    <mCoverageTestGroup
                         v-for="(element, index) in coverageResults"
                         :key="index"
                         :coverageName="index"
-                        :resultDetail="element"
+                        :interactions="element"
                     />
                 </div>
                 
@@ -131,7 +132,7 @@ import mVulnerabilityTestContainer from '@/components/02_molecules/mVulnerabilit
 import aEditorMonaco from '@/components/01_atoms/aEditorMonaco.vue';
 import aConfigStatusBar from '@/components/01_atoms/aConfigStatusBar.vue';
 import aButtonBasic from '@/components/01_atoms/aButtonBasic.vue';
-import aCoverageTestElement from '@/components/01_atoms/aCoverageTestElement.vue';
+import mCoverageTestGroup from '@/components/02_molecules/mCoverageTestGroup.vue';
 import { mapActions, mapGetters } from 'vuex';
 import * as Api from '@/backend/Api';
 import { TestbenchConfigEnum } from '@/util/enums';
@@ -145,7 +146,7 @@ export default Vue.extend({
         aEditorMonaco,
         aConfigStatusBar,
         mVulnerabilityTestContainer,
-        aCoverageTestElement, 
+        mCoverageTestGroup, 
     },
     props: {},
     created() {
@@ -366,7 +367,8 @@ export default Vue.extend({
 }
 
 .results-container {
-    padding: 5px 5px 5px 5px;
+    margin-top: 5px;
+    padding: 0px 5px 5px 5px;
     height: 30%;
     overflow-y: scroll;
 }
