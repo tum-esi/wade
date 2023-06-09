@@ -7,7 +7,7 @@
     }
   ],
   "@type": "Thing",
-  "description": "Test Thing copied from plugfest.thingweb.io without HTTP forms",
+  "description":"Test Thing copied from plugfest.thingweb.io without HTTP forms",
   "title": "TestThing",
   "securityDefinitions": {
     "nosec_sc": {
@@ -22,22 +22,6 @@
       "title": "true/false",
       "type": "boolean",
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/bool",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/bool",
-          "contentType": "application/cbor",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/properties/bool",
           "contentType": "application/json",
@@ -64,22 +48,6 @@
       "type": "integer",
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/int",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/int",
-          "contentType": "application/cbor",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/properties/int",
           "contentType": "application/json",
           "op": [
@@ -104,22 +72,6 @@
       "title": "Floating point",
       "type": "number",
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/num",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/num",
-          "contentType": "application/cbor",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/properties/num",
           "contentType": "application/json",
@@ -159,22 +111,6 @@
             "readproperty",
             "writeproperty"
           ]
-        },
-        {
-          "href": "coap://plugfest.thingweb.io:5683/testthing/properties/string",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "coap://plugfest.thingweb.io:5683/testthing/properties/string",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
         }
       ],
       "readOnly": false,
@@ -186,22 +122,6 @@
       "type": "array",
       "items": {},
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/array",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/array",
-          "contentType": "application/cbor",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/properties/array",
           "contentType": "application/json",
@@ -241,22 +161,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/object",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/properties/object",
-          "contentType": "application/cbor",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/properties/object",
           "contentType": "application/json",
           "op": [
@@ -284,22 +188,6 @@
       "description": "Action without input nor output",
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-void",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-void",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/void-void",
           "contentType": "application/json",
           "op": "invokeaction"
@@ -317,22 +205,6 @@
       "title": "void-int Action",
       "description": "Action without input, but with integer output",
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-int",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-int",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/void-int",
           "contentType": "application/json",
@@ -354,22 +226,6 @@
         "type": "integer"
       },
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-void",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-void",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/int-void",
           "contentType": "application/json",
@@ -395,22 +251,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-int",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-int",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/int-int",
           "contentType": "application/json",
           "op": "invokeaction"
@@ -434,22 +274,6 @@
         "type": "string"
       },
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-string",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/int-string",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/int-string",
           "contentType": "application/json",
@@ -484,22 +308,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-obj",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/void-obj",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/void-obj",
           "contentType": "application/json",
           "op": "invokeaction"
@@ -533,22 +341,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/obj-void",
-          "contentType": "application/json",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/actions/obj-void",
-          "contentType": "application/cbor",
-          "op": [
-            "invokeaction"
-          ],
-          "htv:methodName": "POST"
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/actions/obj-void",
           "contentType": "application/json",
           "op": "invokeaction"
@@ -571,24 +363,6 @@
         "type": "boolean"
       },
       "forms": [
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-bool",
-          "contentType": "application/json",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-bool",
-          "contentType": "application/cbor",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
         {
           "href": "coap://plugfest.thingweb.io:5683/testthing/events/on-bool",
           "contentType": "application/json",
@@ -615,24 +389,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-int",
-          "contentType": "application/json",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-int",
-          "contentType": "application/cbor",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/events/on-int",
           "contentType": "application/json",
           "op": [
@@ -658,24 +414,6 @@
       },
       "forms": [
         {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-num",
-          "contentType": "application/json",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
-        {
-          "href": "http://plugfest.thingweb.io:8083/testthing/events/on-num",
-          "contentType": "application/cbor",
-          "subprotocol": "longpoll",
-          "op": [
-            "subscribeevent",
-            "unsubscribeevent"
-          ]
-        },
-        {
           "href": "coap://plugfest.thingweb.io:5683/testthing/events/on-num",
           "contentType": "application/json",
           "op": [
@@ -694,27 +432,5 @@
       ]
     }
   },
-  "id": "urn:uuid:0f7fcd76-66ad-43c1-a9a6-6d351351dcf2",
-  "forms": [
-    {
-      "href": "http://plugfest.thingweb.io:8083/testthing/properties",
-      "contentType": "application/json",
-      "op": [
-        "readallproperties",
-        "readmultipleproperties",
-        "writeallproperties",
-        "writemultipleproperties"
-      ]
-    },
-    {
-      "href": "http://plugfest.thingweb.io:8083/testthing/properties",
-      "contentType": "application/cbor",
-      "op": [
-        "readallproperties",
-        "readmultipleproperties",
-        "writeallproperties",
-        "writemultipleproperties"
-      ]
-    }
-  ]
+  "id": "urn:uuid:0f7fcd76-66ad-43c1-a9a6-6d351351dcf2"
 }

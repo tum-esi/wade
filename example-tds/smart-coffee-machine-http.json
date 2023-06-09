@@ -1,0 +1,462 @@
+{
+  "@context": [
+    "https://www.w3.org/2019/wot/td/v1",
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "@language": "en"
+    }
+  ],
+  "@type": "Thing",
+  "title": "Smart-Coffee-Machine",
+  "description": "A smart coffee machine with a range of capabilities, copied from plugfest.thingweb.io without CoAP forms",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": [
+    "nosec_sc"
+  ],
+  "properties": {
+    "allAvailableResources": {
+      "type": "object",
+      "description": "Current level of all available resources given as an integer percentage for each particular resource.\nThe data is obtained from the machine's sensors but can be set manually via the availableResourceLevel property in case the sensors are broken.",
+      "readOnly": true,
+      "properties": {
+        "water": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "milk": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "chocolate": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "coffeeBeans": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/allAvailableResources",
+          "contentType": "application/json",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/allAvailableResources",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        }
+      ],
+      "writeOnly": false,
+      "observable": false
+    },
+    "availableResourceLevel": {
+      "type": "number",
+      "description": "Current level of a particular resource. Requires resource id variable as uriVariables.\nThe property can also be overridden, which also requires resource id as uriVariables.",
+      "uriVariables": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "water",
+            "milk",
+            "chocolate",
+            "coffeeBeans"
+          ]
+        }
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/availableResourceLevel{?id}",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/availableResourceLevel{?id}",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "readOnly": false,
+      "writeOnly": false,
+      "observable": false
+    },
+    "possibleDrinks": {
+      "type": "array",
+      "description": "The list of possible drinks in general. Doesn't depend on the available resources.",
+      "readOnly": true,
+      "items": {
+        "type": "string"
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/possibleDrinks",
+          "contentType": "application/json",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/possibleDrinks",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        }
+      ],
+      "writeOnly": false,
+      "observable": false
+    },
+    "servedCounter": {
+      "type": "integer",
+      "description": "The total number of served beverages.",
+      "minimum": 0,
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/servedCounter",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/servedCounter",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        }
+      ],
+      "readOnly": false,
+      "writeOnly": false,
+      "observable": false
+    },
+    "maintenanceNeeded": {
+      "type": "boolean",
+      "description": "Shows whether a maintenance is needed. The property is observable. Automatically set to true when the servedCounter property exceeds 1000.",
+      "observable": true,
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/maintenanceNeeded",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/maintenanceNeeded/observable",
+          "contentType": "application/json",
+          "op": [
+            "observeproperty",
+            "unobserveproperty"
+          ],
+          "subprotocol": "longpoll"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/maintenanceNeeded",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty",
+            "writeproperty"
+          ]
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/maintenanceNeeded/observable",
+          "contentType": "application/cbor",
+          "op": [
+            "observeproperty",
+            "unobserveproperty"
+          ],
+          "subprotocol": "longpoll"
+        }
+      ],
+      "readOnly": false,
+      "writeOnly": false
+    },
+    "schedules": {
+      "type": "array",
+      "description": "The list of scheduled tasks.",
+      "readOnly": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "drinkId": {
+            "type": "string",
+            "description": "Defines what drink to make, drinkId is one of possibleDrinks property values, e.g. latte."
+          },
+          "size": {
+            "type": "string",
+            "description": "Defines the size of a drink, s = small, m = medium, l = large.",
+            "enum": [
+              "s",
+              "m",
+              "l"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Defines how many drinks to make, ranging from 1 to 5.",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "time": {
+            "type": "string",
+            "description": "Defines the time of the scheduled task in 24h format, e.g. 10:00 or 21:00."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Defines the mode of the scheduled task, e.g. once or everyday. All the possible values are given in the enum field of this Thing Description.",
+            "enum": [
+              "once",
+              "everyday",
+              "everyMo",
+              "everyTu",
+              "everyWe",
+              "everyTh",
+              "everyFr",
+              "everySat",
+              "everySun"
+            ]
+          }
+        }
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/schedules",
+          "contentType": "application/json",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties/schedules",
+          "contentType": "application/cbor",
+          "op": [
+            "readproperty"
+          ],
+          "htv:methodName": "GET"
+        }
+      ],
+      "writeOnly": false,
+      "observable": false
+    }
+  },
+  "actions": {
+    "makeDrink": {
+      "description": "Make a drink from available list of beverages. Accepts drink id, size and quantity as uriVariables.\nBrews one medium americano if no uriVariables are specified.",
+      "uriVariables": {
+        "drinkId": {
+          "type": "string",
+          "description": "Defines what drink to make, drinkId is one of possibleDrinks property values, e.g. latte."
+        },
+        "size": {
+          "type": "string",
+          "description": "Defines the size of a drink, s = small, m = medium, l = large.",
+          "enum": [
+            "s",
+            "m",
+            "l"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Defines how many drinks to make, ranging from 1 to 5.",
+          "minimum": 1,
+          "maximum": 5
+        }
+      },
+      "output": {
+        "type": "object",
+        "description": "Returns true/false and a message when all invoked promises are resolved (asynchronous).",
+        "properties": {
+          "result": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/actions/makeDrink{?drinkId,size,quantity}",
+          "contentType": "application/json",
+          "op": [
+            "invokeaction"
+          ],
+          "htv:methodName": "POST"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/actions/makeDrink{?drinkId,size,quantity}",
+          "contentType": "application/cbor",
+          "op": [
+            "invokeaction"
+          ],
+          "htv:methodName": "POST"
+        }
+      ],
+      "idempotent": false,
+      "safe": false
+    },
+    "setSchedule": {
+      "description": "Add a scheduled task to the schedules property. Accepts drink id, size, quantity, time and mode as body of a request.\nAssumes one medium americano if not specified, but time and mode are mandatory fields.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "drinkId": {
+            "type": "string",
+            "description": "Defines what drink to make, drinkId is one of possibleDrinks property values, e.g. latte."
+          },
+          "size": {
+            "type": "string",
+            "description": "Defines the size of a drink, s = small, m = medium, l = large.",
+            "enum": [
+              "s",
+              "m",
+              "l"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Defines how many drinks to make, ranging from 1 to 5.",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "time": {
+            "type": "string",
+            "description": "Defines the time of the scheduled task in 24h format, e.g. 10:00 or 21:00."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Defines the mode of the scheduled task, e.g. once or everyday. All the possible values are given in the enum field of this Thing Description.",
+            "enum": [
+              "once",
+              "everyday",
+              "everyMo",
+              "everyTu",
+              "everyWe",
+              "everyTh",
+              "everyFr",
+              "everySat",
+              "everySun"
+            ]
+          }
+        },
+        "required": [
+          "time",
+          "mode"
+        ]
+      },
+      "output": {
+        "type": "object",
+        "description": "Returns true/false and a message when all invoked promises are resolved (asynchronous).",
+        "properties": {
+          "result": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/actions/setSchedule",
+          "contentType": "application/json",
+          "op": [
+            "invokeaction"
+          ],
+          "htv:methodName": "POST"
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/actions/setSchedule",
+          "contentType": "application/cbor",
+          "op": [
+            "invokeaction"
+          ],
+          "htv:methodName": "POST"
+        }
+      ],
+      "idempotent": false,
+      "safe": false
+    }
+  },
+  "events": {
+    "outOfResource": {
+      "description": "Out of resource event. Emitted when the available resource level is not sufficient for a desired drink.",
+      "data": {
+        "type": "string"
+      },
+      "forms": [
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/events/outOfResource",
+          "contentType": "application/json",
+          "subprotocol": "longpoll",
+          "op": [
+            "subscribeevent",
+            "unsubscribeevent"
+          ]
+        },
+        {
+          "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/events/outOfResource",
+          "contentType": "application/cbor",
+          "subprotocol": "longpoll",
+          "op": [
+            "subscribeevent",
+            "unsubscribeevent"
+          ]
+        }
+      ]
+    }
+  },
+  "id": "urn:uuid:23337b5a-48d2-4c09-8698-9c196f08398e",
+  "support": "https://github.com/eclipse-thingweb/node-wot/",
+  "forms": [
+    {
+      "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties",
+      "contentType": "application/json",
+      "op": [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties"
+      ]
+    },
+    {
+      "href": "http://plugfest.thingweb.io:8083/smart-coffee-machine/properties",
+      "contentType": "application/cbor",
+      "op": [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties"
+      ]
+    }
+  ]
+}

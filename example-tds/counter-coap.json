@@ -1,0 +1,307 @@
+{
+  "@context": [
+    "https://www.w3.org/2019/wot/td/v1",
+    "https://www.w3.org/2022/wot/td/v1.1",
+    {
+      "iot": "http://example.org/iot"
+    },
+    {
+      "@language": "en"
+    }
+  ],
+  "@type": "Thing",
+  "title": "Counter",
+  "description": "Counter example Thing copied directly from plugfest.thingweb.io without the HTTP forms",
+  "descriptions": {
+    "en": "Counter example Thing",
+    "de": "Zähler Beispiel Ding",
+    "it": "Contatore di esempio"
+  },
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": [
+    "nosec_sc"
+  ],
+  "properties": {
+    "count": {
+      "title": "Count",
+      "titles": {
+        "en": "Count",
+        "de": "Zähler",
+        "it": "Valore"
+      },
+      "type": "integer",
+      "description": "Current counter value",
+      "descriptions": {
+        "en": "Current counter value",
+        "de": "Derzeitiger Zählerwert",
+        "it": "Valore attuale del contatore"
+      },
+      "iot:Custom": "example annotation",
+      "observable": true,
+      "readOnly": true,
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/count",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "observeproperty",
+            "unobserveproperty"
+          ]
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/count",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "observeproperty",
+            "unobserveproperty"
+          ]
+        }
+      ],
+      "writeOnly": false
+    },
+    "countAsImage": {
+      "description": "Current counter value as SVG image",
+      "descriptions": {
+        "en": "Current counter value as SVG image",
+        "de": "Aktueller Zählerwert als SVG-Bild",
+        "it": "Valore attuale del contatore come immagine SVG"
+      },
+      "observable": false,
+      "readOnly": true,
+      "uriVariables": {
+        "fill": {
+          "type": "string"
+        }
+      },
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/countAsImage",
+          "contentType": "image/svg+xml",
+          "op": [
+            "readproperty"
+          ]
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/countAsImage",
+          "contentType": "image/svg+xml",
+          "op": [
+            "readproperty"
+          ]
+        }
+      ],
+      "writeOnly": false
+    },
+    "redDotImage": {
+      "description": "Red dot image as PNG",
+      "descriptions": {
+        "en": "Red dot image as PNG",
+        "de": "Rotes Punktbild als PNG",
+        "it": "Immagine punto rosso come PNG"
+      },
+      "observable": false,
+      "readOnly": true,
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/redDotImage",
+          "contentType": "image/png;base64",
+          "op": [
+            "readproperty"
+          ]
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/redDotImage",
+          "contentType": "image/png;base64",
+          "op": [
+            "readproperty"
+          ]
+        }
+      ],
+      "writeOnly": false
+    },
+    "lastChange": {
+      "title": "Last change",
+      "titles": {
+        "en": "Last change",
+        "de": "Letzte Zählerwertänderung",
+        "it": "Ultima modifica"
+      },
+      "type": "string",
+      "description": "Last change of counter value",
+      "descriptions": {
+        "en": "Last change of counter value",
+        "de": "Letzte Änderung",
+        "it": "Ultima modifica del valore"
+      },
+      "observable": true,
+      "readOnly": true,
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/lastChange",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "observeproperty",
+            "unobserveproperty"
+          ]
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/properties/lastChange",
+          "contentType": "application/json",
+          "op": [
+            "readproperty",
+            "observeproperty",
+            "unobserveproperty"
+          ]
+        }
+      ],
+      "writeOnly": false
+    }
+  },
+  "actions": {
+    "increment": {
+      "title": "Increment",
+      "titles": {
+        "en": "Increment",
+        "de": "Erhöhen",
+        "it": "Incrementa"
+      },
+      "description": "Increment counter value",
+      "descriptions": {
+        "en": "Increment counter value",
+        "de": "Zählerwert erhöhen",
+        "it": "Incrementa il valore del contatore"
+      },
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/increment",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/increment",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ],
+      "idempotent": false,
+      "safe": false
+    },
+    "decrement": {
+      "title": "Decrement",
+      "titles": {
+        "en": "Decrement",
+        "de": "Verringern",
+        "it": "Decrementa"
+      },
+      "description": "Decrementing counter value",
+      "descriptions": {
+        "en": "Decrementing counter value",
+        "de": "Zählerwert verringern",
+        "it": "Decrementare il valore del contatore"
+      },
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/decrement",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/decrement",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ],
+      "idempotent": false,
+      "safe": false
+    },
+    "reset": {
+      "title": "Reset",
+      "titles": {
+        "en": "Reset",
+        "de": "Zurücksetzen",
+        "it": "Reset"
+      },
+      "description": "Resetting counter value",
+      "descriptions": {
+        "en": "Resetting counter value",
+        "de": "Zählerwert zurücksetzen",
+        "it": "Resettare il valore del contatore"
+      },
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/reset",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/actions/reset",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ],
+      "idempotent": false,
+      "safe": false
+    }
+  },
+  "events": {
+    "change": {
+      "title": "Changed",
+      "titles": {
+        "en": "Changed",
+        "de": "Geändert",
+        "it": "Valore modificato"
+      },
+      "description": "Change event",
+      "descriptions": {
+        "en": "Change event",
+        "de": "Änderungsereignis",
+        "it": "Valore modificato"
+      },
+      "forms": [
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/events/change",
+          "contentType": "application/json",
+          "op": [
+            "subscribeevent",
+            "unsubscribeevent"
+          ]
+        },
+        {
+          "href": "coap://plugfest.thingweb.io:5683/counter/events/change",
+          "contentType": "application/json",
+          "op": [
+            "subscribeevent",
+            "unsubscribeevent"
+          ]
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "href": "https://www.thingweb.io/img/favicon/favicon.png",
+      "sizes": "16x14",
+      "rel": "icon"
+    }
+  ],
+  "id": "urn:uuid:69f10c94-189f-4d4b-9960-85b89d9f18cb",
+  "titles": {
+    "en": "Counter",
+    "de": "Zähler",
+    "it": "Contatore"
+  },
+  "support": "https://github.com/eclipse-thingweb/node-wot/",
+  "uriVariables": {
+    "step": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 250
+    }
+  }
+}
