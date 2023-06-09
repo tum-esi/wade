@@ -37,22 +37,6 @@
             "readproperty",
             "writeproperty"
           ]
-        },
-        {
-          "href": "coap://plugfest.thingweb.io:5683/testthing/properties/bool",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
-        },
-        {
-          "href": "coap://plugfest.thingweb.io:5683/testthing/properties/bool",
-          "contentType": "application/json",
-          "op": [
-            "readproperty",
-            "writeproperty"
-          ]
         }
       ],
       "readOnly": false,
