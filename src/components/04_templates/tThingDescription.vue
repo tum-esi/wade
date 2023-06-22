@@ -79,8 +79,7 @@ import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
 import oTestbench from '@/components/03_organisms/oTestbench.vue';
 import tPerformance from '@/components/04_templates/tPerformance.vue';
-import { TdStateEnum, TDTabsEnum } from '../../util/enums';
-import * as Api from '@/backend/Api';
+import { TDTabsEnum } from '../../util/enums';
 
 export default Vue.extend({
   name: 'tThingDescription',
