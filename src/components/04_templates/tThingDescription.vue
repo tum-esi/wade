@@ -54,6 +54,13 @@
         </div>
       </div>
     </div>
+    <!-- Tab Testbench -->
+    <div
+      v-if="currentTabId === 'testbench'"
+      :class="getSidebarActive ? 'td-testbench border-top' : 'td-testbench border-top full-screen'"
+      >
+      <oTestbench />
+    </div>
   </div>
 </template>
 
@@ -70,9 +77,9 @@ import oVirtualThing from '@/components/03_organisms/oVirtualThing.vue';
 import oSelection from '@/components/03_organisms/oSelection.vue';
 import oResults from '@/components/03_organisms/oResults.vue';
 import oProtocolSelection from '@/components/03_organisms/oProtocolSelection.vue';
+import oTestbench from '@/components/03_organisms/oTestbench.vue';
 import tPerformance from '@/components/04_templates/tPerformance.vue';
-import { TdStateEnum, TDTabsEnum } from '../../util/enums';
-import * as Api from '@/backend/Api';
+import { TDTabsEnum } from '../../util/enums';
 
 export default Vue.extend({
   name: 'tThingDescription',
@@ -87,7 +94,8 @@ export default Vue.extend({
     oResults,
     mTabbar,
     mUrlBar,
-    tPerformance
+    tPerformance,
+    oTestbench
   },
   created() {
     (this as any).changeActiveTab();
@@ -194,6 +202,12 @@ export default Vue.extend({
 
 .td-performance {
   height: 93%;
+  width: 100%;
+  display: flex;
+}
+
+.td-testbench {
+  height: 100%;
   width: 100%;
   display: flex;
 }

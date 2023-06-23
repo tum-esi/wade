@@ -50,7 +50,7 @@
     "electron-json-storage": "^4.5.0",
     "js-beautify": "^1.14.4",
     "js-combinatorics": "^0.6.1",
-    "json-schema-faker": "^0.5.0-rcv.46",
+    "json-schema-faker": "0.5.0-rcv.46",
     "jsonld-streaming-parser": "^2.4.3",
     "mermaid": "9.1.2",
     "monaco-editor": "^0.33.0",
@@ -61,7 +61,8 @@
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2",
-    "vuex-electron-store": "^1.4.26"
+    "vuex-electron-store": "^1.4.26",
+    "wot-testbench": "^1.1.2"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",

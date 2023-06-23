@@ -2,7 +2,7 @@ import { ElementTypeEnum, ElementTitleEnum, ProtocolEnum, VtStatus, TdStateEnum,
 import * as Api from '@/backend/Api';
 import * as stream from 'stream';
 import { loggingError } from '@/util/helpers';
-import { virtualConfigDefault } from '@/util/defaults';
+import { virtualConfigDefault, testbenchConfigDefault } from '@/util/defaults';
 import { TD, Folder, Mashup } from '@/backend/Td';
 
 
@@ -318,7 +318,67 @@ export default {
         },
         async renameElement({ commit }, payload: {id: string, type: string, newId: string}) {
             commit('renameElement', payload);
-        }
+        },
+        setConformanceResults({ commit, state }, payload: { id: string, results: any }) {
+            let index = -1
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    index = state.tds.indexOf(td);
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            commit('setConformanceResults', { index, results: payload.results })
+        },
+        setVulnerabilityResults({ commit, state }, payload: { id: string, results: any }) {
+            let index = -1
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    index = state.tds.indexOf(td);
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            commit('setVulnerabilityResults', { index, results: payload.results })
+        },
+        setCoverageResults({ commit, state }, payload: { id: string, results: any }) {
+            let index = -1
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    index = state.tds.indexOf(td);
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            commit('setCoverageResults', { index, results: payload.results })
+        },
+        setTestbenchConfig({ commit, state }, payload: { id: string, config: object }) {
+            let index = -1
+            for (const td of state.tds) {
+                if (td.id === payload.id) {
+                    index = state.tds.indexOf(td);
+                    break;
+                }
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            commit('setTestbenchConfig', { index, config: payload.config });
+        }   
     },
     mutations: {
         saveTdConfig(state: any, payload: { config: any, id: string }) {
@@ -630,8 +690,6 @@ export default {
                 }
             }
 
-            console.log(payload.type)
-
             for (const element of state[`${payload.type}s`]) {
                 if (element.id === payload.id) {
                     element.id = payload.newId;
@@ -639,6 +697,18 @@ export default {
                     return;
                 }
             }
+        },
+        setConformanceResults(state: any, payload: {index: number, results: any}) {
+            state.tds[payload.index].conformanceResults = payload.results;
+        },
+        setVulnerabilityResults(state: any, payload: {index: number, results: any}) {
+            state.tds[payload.index].vulnerabilityResults = payload.results;
+        },
+        setCoverageResults(state: any, payload: {index: number, results: any}) {
+            state.tds[payload.index].coverageResults = payload.results;
+        },
+        setTestbenchConfig(state: any, payload: {index: number, config: object}) {
+            state.tds[payload.index].testbenchConfig = payload.config;
         }
     },
     getters: {
@@ -650,6 +720,9 @@ export default {
         },
         getDefaultVirtualConfig(state: any) {
             return JSON.stringify(virtualConfigDefault);
+        },
+        getTestbenchDefaultConfig() {
+            return JSON.stringify(testbenchConfigDefault);
         },
         getConfig(state: any) {
             return (id: string) => {
@@ -690,6 +763,27 @@ export default {
                 }
                 return '';
             };
+        },
+        getTestbenchConfig(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        if (td.testbenchConfig) {
+                            let testbenchConfig = '';
+
+                            try {
+                                testbenchConfig = JSON.stringify(td.testbenchConfig);
+                            } catch (error) {
+                                testbenchConfig = td.testbenchConfig.toString();
+                            }
+
+                            return testbenchConfig;
+                        } else {
+                            return JSON.stringify(testbenchConfigDefault);
+                        }
+                    }
+                }
+            }
         },
         getProtocols(state: any) {
             return (id: string) => {
@@ -851,6 +945,33 @@ export default {
                 }
                 return '';
             };
+        },
+        getConformanceResults(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.conformanceResults;
+                    }
+                }
+            }
+        },
+        getVulnerabilityResults(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.vulnerabilityResults;
+                    }
+                }
+            }
+        },
+        getCoverageResults(state: any) {
+            return (id: string) => {
+                for (const td of state.tds) {
+                    if (td.id === id) {
+                        return td.coverageResults;
+                    }
+                }
+            }
         }
     }
 };
